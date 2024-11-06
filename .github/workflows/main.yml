@@ -21,7 +21,7 @@ jobs:
       uses: SamKirkland/FTP-Deploy-Action@4.3.0
       with:
         server: ftp.nibiz.online
-        username: znz@nibiz.online
+        username: zandz@znz.nibiz.online
         password: bn+2IF01:lxE4I
         local-dir: ./
         server-dir: /
