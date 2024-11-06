@@ -1,0 +1,21 @@
+<?php
+return array(
+	'dashboard',
+	'employee',
+	'supervisor',
+	'appraisal',
+	'appraisal_rating',
+	'appraisal_review',
+	'attendance',
+	'holiday',
+	'leave',
+	'payroll',
+	'announcement',
+	'award',
+	'expense',
+	'task',
+	'ticket',
+	'message',
+	'job',
+	'job_application'
+	);
