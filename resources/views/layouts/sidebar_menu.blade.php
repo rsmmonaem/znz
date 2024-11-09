@@ -1,7 +1,7 @@
 
 							<li {!! (in_array('dashboard',$menu)) ? 'class="active"' : '' !!} {!! menuAttr($menus,'dashboard') !!}><a href="{!! URL::to('/') !!}"><i class="fa fa-home icon"></i> {!! trans('messages.dashboard') !!}</a></li>
 							@if(Entrust::can('list_employee'))
-							<li {!! (in_array('employee',$menu)) ? 'class="active"' : '' !!} {!! menuAttr($menus,'employee') !!}><a href="{!! URL::to('/employee') !!}"><i class="fa fa-users icon"></i> {!! trans('messages.employee') !!}</a></li>
+							<li {!! (in_array('employee',$menu)) ? 'class="active"' : '' !!} {!! menuAttr($menus,'employee') !!}><a href="{!! URL::to('/employee') !!}"><i class="fa fa-users icon"></i> {!! trans('messages.employee') !!}</a></li> 
 							@endif
 							
 							<li {!! (in_array('supervisor_list',$menu)) ? 'class="active"' : '' !!} {!! menuAttr($menus,'supervisor_list') !!}><a href="#"><i class="fa fa-user-secret icon"></i><i class="fa fa-angle-double-down i-right"></i> {!! trans('messages.supervisor_list_menu') !!}</a>
