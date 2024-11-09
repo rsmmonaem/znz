@@ -38,15 +38,18 @@ class EmployeeController extends Controller{
         $roles = \App\Role::whereIsHidden(0)->get()->pluck('name','id')->all();
 
         $col_heads = array(
-                trans('messages.option'),
-                trans('messages.employee_code'),
-                trans('messages.first_name'),
-                trans('messages.last_name'),
-                trans('messages.username'),
-                trans('messages.email'),
-                trans('messages.role'),
-                trans('messages.designation'),
-                trans('messages.status'));
+            'Option',
+            'ID',
+            'Name',
+            'Designation',
+            'Department',
+            'Category',
+            'Date of Birth',
+            'Blood Group',
+            'Job Nature',
+            'Phone Number',
+            'Gender',
+        );
         $table_info = array(
             'source' => 'employee',
             'title' => 'Employee List',
@@ -86,43 +89,143 @@ class EmployeeController extends Controller{
         $employee_graph_data = array('designation_wise_user_graph' => $designation_user_stat,'status_wise_user_graph' => $status_user_stat,'department_wise_user_graph' => $department_user_stat, 'role_wise_user_graph' => $role_user_stat);
 
         $assets = ['graph'];
+       
         return view('employee.index',compact('col_heads','table_info','designations','roles','assets','employee_graph_data'));
     }
 
     public function lists(Request $request){
 
-        if(Entrust::can('manage_all_employee'))
-          $employees = User::all();
-        elseif(Entrust::can('manage_subordinate_employee')){
-          $childs = Helper::childDesignation(Auth::user()->designation_id,1);
-          $employees = User::with('roles')->whereIn('designation_id',$childs)->get();
+        //     if (Entrust::can('manage_all_employee')){
+        //     $employees = DB::select(DB::raw('
+        //     SELECT
+        //         u.id AS user_id,
+        //         u.id AS user_id,
+        //         u.first_name AS user_name,
+        //         u.last_name as last_name,
+        //         u.email as email,
+        //         COALESCE(MAX(CASE WHEN cf.name = "bangla-name" THEN cfv.value END), "N/A") AS bangla_name,
+        //         COALESCE(MAX(CASE WHEN cf.name = "category" THEN cfv.value END), "N/A") AS category,
+        //         COALESCE(MAX(CASE WHEN cf.name = "job-nature" THEN cfv.value END), "N/A") AS job_nature,
+        //         COALESCE(MAX(CASE WHEN cf.name = "father-name" THEN cfv.value END), "N/A") AS father_name,
+        //         COALESCE(MAX(CASE WHEN cf.name = "mother-name" THEN cfv.value END), "N/A") AS mother_name,
+        //         COALESCE(MAX(CASE WHEN cf.name = "confirm-date" THEN cfv.value END), "N/A") AS confirm_date,
+        //         COALESCE(MAX(CASE WHEN cf.name = "religion-" THEN cfv.value END), "N/A") AS religion,
+        //         COALESCE(MAX(CASE WHEN cf.name = "height" THEN cfv.value END), "N/A") AS height,
+        //         COALESCE(MAX(CASE WHEN cf.name = "weight" THEN cfv.value END), "N/A") AS weight,
+        //         COALESCE(MAX(CASE WHEN cf.name = "employ-phone-" THEN cfv.value END), "N/A") AS employ_phone,
+        //         COALESCE(MAX(CASE WHEN cf.name = "nationality-" THEN cfv.value END), "N/A") AS nationality,
+        //         COALESCE(MAX(CASE WHEN cf.name = "blood-group" THEN cfv.value END), "N/A") AS blood_group,
+        //         COALESCE(MAX(CASE WHEN cf.name = "birth-" THEN cfv.value END), "N/A") AS birth,
+        //         COALESCE(MAX(CASE WHEN cf.name = "passport-" THEN cfv.value END), "N/A") AS passport,
+        //         COALESCE(MAX(CASE WHEN cf.name = "tin" THEN cfv.value END), "N/A") AS tin,
+        //         COALESCE(d.name, "N/A") AS designation_name,
+        //         COALESCE(dp.name, "N/A") AS department_name
+        //     FROM
+        //         users u
+        //     LEFT JOIN
+        //         custom_field_values cfv ON cfv.unique_id = u.id
+        //     LEFT JOIN
+        //         custom_fields cf ON cfv.field_id = cf.id
+        //     LEFT JOIN 
+        //         designations d ON u.designation_id = d.id
+        //     LEFT JOIN
+        //         departments dp ON d.department_id = dp.id
+        //     GROUP BY
+        //         u.id, u.first_name, d.name
+        //     ORDER BY
+        //         u.id desc
+        // '));
+        //     } else {
+        //         $employees =[];
+        //     }
+        //     // Prepare rows to match column headers
+        //     $rows = [];
+        //     foreach ($employees as $employee) {
+        //         $rows[] = [
+        //             '<div class="btn-group btn-group-xs">' .
+        //             '<a href="/employee/' . $employee->user_id . '" class="btn btn-default btn-xs" data-toggle="tooltip" title="' . trans('messages.view') . '"> <i class="fa fa-arrow-circle-right"></i></a> ' .
+        //             (Entrust::can('delete_employee') ? delete_form(['employee.destroy', $employee->user_id], 'employee', 1) : '') .
+        //             '</div>',
+        //             $employee->user_id,
+        //             $employee->user_name,
+        //             $employee->last_name,
+        //             // $employee->email,
+        //             $employee->bangla_name,
+        //             $employee->designation_name,
+        //             $employee->department_name,
+        //             $employee->category,
+        //             $employee->job_nature,
+        //             $employee->father_name,
+        //             $employee->mother_name,
+        //             $employee->confirm_date,
+        //             $employee->religion,
+        //             $employee->height,
+        //             $employee->weight,
+        //             $employee->employ_phone,
+        //             $employee->nationality,
+        //             $employee->blood_group,
+        //             $employee->birth,
+        //             $employee->passport,
+        //             $employee->tin,
+        //         ];
+        //     }
+        if (Entrust::can('manage_all_employee'))
+            // $employees = User::with('profile', 'designation', 'designation.department')->get();
+         $employees = DB::table('users')
+            ->leftJoin('profile', 'users.id', '=', 'profile.user_id')
+            ->leftJoin('designations', 'users.designation_id', '=',
+                'designations.id'
+            )
+            ->leftJoin('departments', 'designations.department_id', '=', 'departments.id')
+            ->select(
+                'users.id',
+                'profile.employee_code',
+                'users.first_name',
+                'designations.name as designation_name',
+                'departments.name as department_name',
+                'profile.category',
+                'profile.date_of_birth',
+                'profile.blood_group',
+                'profile.job_nature',
+                'profile.contact_number',
+                'profile.gender'
+            )
+            ->get();
+        elseif (Entrust::can('manage_subordinate_employee')) {
+            $childs = Helper::childDesignation(Auth::user()->designation_id, 1);
+            $employees = User::with('roles')->whereIn('designation_id', $childs)->get();
         } else
-          $employees = [];
+            $employees = [];
 
-        $rows=array();
+        $data = json_encode($employees);
+        // return $data;
+        // die;
+        $rows = array();
 
-        foreach ($employees as $employee){
-
-            foreach($employee->roles as $role)
-              $role_name = Helper::toWord($role->name);
+        foreach ($employees as $employee) {
+            // foreach ($employee->roles as $role)
+            //     $role_name = Helper::toWord($role->name);
 
             $rows[] = array(
-                    '<div class="btn-group btn-group-xs">'.
-                    '<a href="/employee/'.$employee->id.'" class="btn btn-default btn-xs" data-toggle="tooltip" title="'.trans('messages.view').'"> <i class="fa fa-arrow-circle-right"></i></a> '.
-                    (Entrust::can('delete_employee') ? delete_form(['employee.destroy',$employee->id],'employee',1) : '').
+                '<div class="btn-group btn-group-xs">' .
+                    '<a href="/employee/' . $employee->id . '" class="btn btn-default btn-xs" data-toggle="tooltip" title="' . trans('messages.view') . '"> <i class="fa fa-arrow-circle-right"></i></a> ' .
+                    (Entrust::can('delete_employee') ? delete_form(['employee.destroy', $employee->id], 'employee', 1) : '') .
                     '</div>',
-                    ($employee->Profile->employee_code != '') ? $employee->Profile->employee_code : trans('messages.na') ,
-                    $employee->first_name,
-                    $employee->last_name,
-                    $employee->username.' '.(($employee->is_hidden) ? '<span class="label label-danger">'.trans('messages.default').'</span>' : ''),
-                    $employee->email,
-                    $role_name,
-                    $employee->Designation->full_designation,
-                    ($employee->status == 'active') ? '<span class="label label-success">'.trans('messages.active').'</span>' : '<span class="label label-danger">'.trans('messages.in_active').'</span>'
-                    );  
-            }
+                ($employee->employee_code != '') ? $employee->employee_code : trans('messages.na'),
+                $employee->first_name,
+                $employee->designation_name,
+                $employee->designation_name,
+                $employee->category,
+                $employee->date_of_birth,
+                $employee->blood_group,
+                $employee->job_nature,
+                $employee->contact_number,
+                $employee->gender
+            );
+        }
         $list['aaData'] = $rows;
-        return json_encode($list);
+        // Return the result as JSON for DataTable
+        return response()->json($list);
     }
 
     public function profile($id = null){
@@ -181,8 +284,10 @@ class EmployeeController extends Controller{
 
         $assets = ['rte'];
         $menu = ['employee'];
+        $type = ['Owner' => 'Owner', 'Staff' => 'Staff'];
+        $riligion = ['Islam' => 'Islam', 'Hinduism' => 'Hinduism', 'Christianity' => 'Christianity', 'Buddhism' => 'Buddhism', 'Judaism' => 'Judaism', 'Sikhism' => 'Sikhism', 'Jainism' => 'Jainism'];
 
-        return view('employee.show',compact('employee','designations','assets','menu','role','roles','gender','marital_status','custom_field_values','employee_relation','social_custom_field_values','contract_types','earning_salary_types','deduction_salary_types','leave_types','contract_lists','office_shifts','document_types','templates'));
+        return view('employee.show',compact('type', 'riligion','employee','designations','assets','menu','role','roles','gender','marital_status','custom_field_values','employee_relation','social_custom_field_values','contract_types','earning_salary_types','deduction_salary_types','leave_types','contract_lists','office_shifts','document_types','templates'));
     }
 
     public function edit(User $employee){
@@ -282,7 +387,7 @@ class EmployeeController extends Controller{
     }
 
     public function update(EmployeeRequest $request, User $employee){
-       
+        // return $request->all();
         $validation = Helper::validateCustomField($this->form,$request);
         
         if($validation->fails()){
@@ -320,6 +425,55 @@ class EmployeeController extends Controller{
         $profile->date_of_birth = ($request->input('date_of_birth')) ? : null;
         $profile->date_of_joining = ($request->input('date_of_joining')) ? : null;
         $profile->date_of_leaving = ($request->input('date_of_leaving')) ? : null;
+        // Extra Added Code
+        $profile->category = $request->input('category');
+        $profile->job_nature = $request->input('job_nature');
+        $profile->fathers_name = $request->input('fathers_name');
+        $profile->mothers_name = $request->input('mothers_name');
+        $profile->gender = $request->input('gender');
+        $profile->marital_status = $request->input('marital_status');
+        $profile->confirm_date = $request->input('empoloyee_confirm') ?: null;
+        $profile->religion = $request->input('reliagion');
+        $profile->height = $request->input('height') ?: null;
+        $profile->weight = $request->input('weight') ?: null;
+        $profile->contact_number = $request->input('contact_number');
+        $profile->nationality = $request->input('nationality');
+        $profile->blood_group = $request->input('blood_group') ?: null;
+        $profile->nid = $request->input('nid');
+        $profile->birth = $request->input('brith');
+        $profile->passport = $request->input('passport');
+        $profile->tin = $request->input('tin');
+        // Present address fields
+        $profile->pres_house = $request->input('pres_house');
+        $profile->pres_road = $request->input('pres_road');
+        $profile->pres_division = $request->input('pres_division');
+        $profile->pres_post = $request->input('pres_post');
+        $profile->pres_district = $request->input('pres_district');
+        $profile->pres_thana = $request->input('pres_thana');
+        $profile->pres_upazila = $request->input('pres_upazila');
+        $profile->pres_post_code = $request->input('pres_post_code');
+        // Permanet Address
+        $profile->perm_house = $request->input('house');
+        $profile->perm_road = $request->input('road');
+        $profile->perm_division = $request->input('division');
+        $profile->perm_post = $request->input('post');
+        $profile->perm_district = $request->input('district');
+        $profile->perm_thana = $request->input('thana');
+        $profile->perm_upazila = $request->input('upazila');
+        $profile->perm_post_code = $request->input('post_code');
+        // Upload Image
+        if ($request->hasFile('photo') && $request->input('remove_photo') != 1) {
+            $extension = $request->file('photo')->getClientOriginalExtension();
+            $filename = uniqid();
+            $file = $request->file('photo')->move(config('constants.upload_path.profile_image'), $filename.".".$extension);
+            $img = Image::make(config('constants.upload_path.profile_image').$filename.".".$extension);
+            $img->resize(200, null, function ($constraint) {
+                $constraint->aspectRatio();
+            });
+            $img->save(config('constants.upload_path.profile_image').$filename.".".$extension);
+            $profile->photo = $filename.".".$extension;
+            // return $profile->photo;
+        } 
         $employee->profile()->save($profile);
 
         if(isset($profile->date_of_leaving) && $profile->date_of_leaving < date('Y-m-d'))
