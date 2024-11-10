@@ -31,7 +31,7 @@
 </div>
 	
 @include('layouts.foot')	
-
+@yield('javascript')
 		
 	
 	

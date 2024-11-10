@@ -144,6 +144,9 @@ Route::group(['middleware' => ['auth','license','account_valid']], function () {
 	Route::post('/auth/register',array('as' => 'auth.register','uses' => 'Auth\AuthController@postRegister'));
 	Route::model('employee','\App\User');
 	Route::post('/employee/lists','EmployeeController@lists');
+	Route::get('/employee/report', 'EmployeeController@EmployeeReport');
+	Route::post('/employee/report', 'EmployeeController@EmployeeReportPOST');
+
 	Route::post('/employee/email/{id}',array('as' => 'employee.email', 'uses' => 'EmployeeController@email'));
 	Route::resource('/employee', 'EmployeeController',['except' => ['create', 'store']]);
 	Route::patch('/users/profile/{id}',['as' => 'employee.profile-update', 'uses' => 'EmployeeController@profileUpdate']);

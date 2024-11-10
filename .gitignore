@@ -63,3 +63,10 @@ storage/framework/views/b9e5d27d51bac7aee5f0a8f73a73500d36f1dbb6.php
 storage/framework/views/ebb46c60b89714a1aab71b69801487b3a0409a33.php
 storage/framework/views/07a9e17de1421502de58668c457e3623dbdd3bff.php
 storage/framework/views/bb1efbc8153e4b1f32a3674259d660fe8f70bd37.php
+/storage/*.key
+/storage/app/public
+/storage/framework/cache/data
+/storage/framework/sessions
+/storage/framework/testing
+/storage/framework/views
+/storage/logs/*

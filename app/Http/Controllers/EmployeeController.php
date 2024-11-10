@@ -1,9 +1,13 @@
 <?php
 namespace App\Http\Controllers;
+
+use App\Branch;
 use Illuminate\Http\Request;
 use App\Http\Requests\EmployeeRequest;
 use App\Http\Requests\EmployeeProfileRequest;
 use App\Classes\Helper;
+use App\Department;
+use App\Designation;
 use App\User;
 use App\Template;
 use Entrust;
@@ -12,6 +16,10 @@ use App\LeaveType;
 use App\SalaryType;
 use App\Salary;
 use App\DocumentType;
+use App\Grade;
+use App\Profile;
+use App\ReportType;
+use App\Section;
 use Image;
 use File;
 use Mail;
@@ -44,11 +52,13 @@ class EmployeeController extends Controller{
             'Designation',
             'Department',
             'Category',
-            'Date of Birth',
+            'DOJ',
+            'DOB',
             'Blood Group',
             'Job Nature',
             'Phone Number',
             'Gender',
+            'Branch',
         );
         $table_info = array(
             'source' => 'employee',
@@ -173,9 +183,8 @@ class EmployeeController extends Controller{
             // $employees = User::with('profile', 'designation', 'designation.department')->get();
          $employees = DB::table('users')
             ->leftJoin('profile', 'users.id', '=', 'profile.user_id')
-            ->leftJoin('designations', 'users.designation_id', '=',
-                'designations.id'
-            )
+            ->leftjoin('branchs', 'profile.branch_id', '=', 'branchs.id')
+            ->leftJoin('designations', 'users.designation_id', '=','designations.id')
             ->leftJoin('departments', 'designations.department_id', '=', 'departments.id')
             ->select(
                 'users.id',
@@ -184,11 +193,13 @@ class EmployeeController extends Controller{
                 'designations.name as designation_name',
                 'departments.name as department_name',
                 'profile.category',
+                'profile.date_of_joining',
                 'profile.date_of_birth',
                 'profile.blood_group',
                 'profile.job_nature',
                 'profile.contact_number',
-                'profile.gender'
+                'profile.gender',
+                'branchs.name as branch_name'
             )
             ->get();
         elseif (Entrust::can('manage_subordinate_employee')) {
@@ -216,11 +227,13 @@ class EmployeeController extends Controller{
                 $employee->designation_name,
                 $employee->designation_name,
                 $employee->category,
+                $employee->date_of_joining,
                 $employee->date_of_birth,
                 $employee->blood_group,
                 $employee->job_nature,
                 $employee->contact_number,
-                $employee->gender
+                $employee->gender,
+                $employee->branch_name
             );
         }
         $list['aaData'] = $rows;
@@ -286,8 +299,11 @@ class EmployeeController extends Controller{
         $menu = ['employee'];
         $type = ['Owner' => 'Owner', 'Staff' => 'Staff'];
         $riligion = ['Islam' => 'Islam', 'Hinduism' => 'Hinduism', 'Christianity' => 'Christianity', 'Buddhism' => 'Buddhism', 'Judaism' => 'Judaism', 'Sikhism' => 'Sikhism', 'Jainism' => 'Jainism'];
-
-        return view('employee.show',compact('type', 'riligion','employee','designations','assets','menu','role','roles','gender','marital_status','custom_field_values','employee_relation','social_custom_field_values','contract_types','earning_salary_types','deduction_salary_types','leave_types','contract_lists','office_shifts','document_types','templates'));
+        $brach = Branch::all()->pluck('name','id')->all();
+        $section = Section::all()->pluck('name','id')->all();
+        $grade = Grade::all()->pluck('name','id')->all();
+        // return $brach;
+        return view('employee.show',compact('section','grade','brach','type', 'riligion','employee','designations','assets','menu','role','roles','gender','marital_status','custom_field_values','employee_relation','social_custom_field_values','contract_types','earning_salary_types','deduction_salary_types','leave_types','contract_lists','office_shifts','document_types','templates'));
     }
 
     public function edit(User $employee){
@@ -461,6 +477,11 @@ class EmployeeController extends Controller{
         $profile->perm_thana = $request->input('thana');
         $profile->perm_upazila = $request->input('upazila');
         $profile->perm_post_code = $request->input('post_code');
+        // Added Branch
+        $profile->branch_id = $request->input('branch_id');
+        $profile->section_id = $request->input('section_id');
+        $profile->grade_id = $request->input('grade_id');
+        // return $profile->branch_id;
         // Upload Image
         if ($request->hasFile('photo') && $request->input('remove_photo') != 1) {
             $extension = $request->file('photo')->getClientOriginalExtension();
@@ -644,5 +665,82 @@ class EmployeeController extends Controller{
             return response()->json($response, 200, array('Access-Controll-Allow-Origin' => '*'));
         }
         return redirect('/employee')->withSuccess(trans('messages.employee').' '.trans('messages.deleted'));
+    }
+
+    public function EmployeeReport(Request $request){
+        $brach = Branch::select('name','id')->get();
+        $departments = Department::select('name','id')->get();
+        $designation = Designation::select('name','id')->get();
+        $section = Section::select('name','id')->get();
+        $grade = Grade::select('name','id')->get();
+        $report_type = ReportType::select('name','id')->get();
+
+        
+        return view('employee.employee_report',compact('brach','departments','designation','section','grade','report_type'));
+    }
+
+    public function EmployeeReportPOST(Request $request){
+        if ($request->ajax()) {
+            $query = Profile::leftJoin('users', 'profile.user_id', '=', 'users.id')
+            ->leftJoin('designations', 'users.designation_id','=', 'designations.id')
+            ->leftJoin('departments', 'designations.department_id', '=', 'departments.id')
+            ->leftJoin('branchs', 'profile.branch_id', '=', 'branchs.id')
+            ->leftJoin('sections', 'profile.section_id', '=', 'sections.id')
+            ->leftJoin('grades', 'profile.grade_id', '=', 'grades.id')
+            ->select(
+                'users.id',
+                'profile.employee_code',
+                'users.first_name',
+                'designations.name as designation_name',
+                'departments.name as department_name',
+                'profile.category',
+                'profile.date_of_joining',
+                'profile.date_of_birth',
+                'profile.blood_group',
+                'profile.job_nature',
+                'profile.contact_number',
+                'profile.gender',
+                'branchs.name as branch_name',
+                'sections.name as section_name',
+                'grades.name as grade_name'
+            ); 
+            if($request->multiple_id != '') {
+                // return $request->multiple_id;
+                $query->whereIn('profile.employee_code', $request->multiple_id);
+            }
+            if ($request->branch != '') {
+                $query->where('profile.branch_id', $request->branch);
+            }
+            if ($request->section != '') {
+                $query->where('profile.section_id', $request->section);
+            }
+            if ($request->grade != '') {
+                $query->where('profile.grade_id', $request->grade);
+            }
+            if ($request->gender != '') {
+                $query->where('profile.gender', $request->gender);
+            }
+
+            if ($request->category != '') {
+                $query->where('profile.category', $request->category);
+            }
+
+            if ($request->employee_id != '') {
+                $query->where('profile.employee_code', '=', $request->employee_id);
+            }
+
+            if ($request->designation != ''
+            ) {
+                $query->where('users.designation_id', $request->designation);
+            }
+
+            if ($request->department != '') {
+                $query->where('designations.department_id', $request->department);
+            }
+
+            $profile = $query->get();
+
+            return response()->json($profile);
+        }
     }
 }

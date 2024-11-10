@@ -765,4 +765,9 @@
   'menu' => 'Menu',
   'branch' => 'Branch',
   'description' => 'Description',
+  'branch_name' => 'Branch Name',
+  'employee_list' => 'Employee List',
+  'employee_report' => 'Employee Report',
+  'section' => 'Section',
+  'grade' => 'Grade',
 );
