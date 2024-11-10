@@ -131,6 +131,28 @@
 										{!! Form::input('text','email',isset($employee->email) ? $employee->email : '',['class'=>'form-control','placeholder'=>trans('messages.email')])!!}
 									  </div>
 								  	</div>
+									{{-- Branch --}}
+									<div class="col-sm-6">
+									  <div class="form-group flex-form-group">
+									    {!! Form::label('branch_id',trans('messages.branch'),['class' => 'control-label'])!!}
+										{!! Form::select('branch_id', [null=>trans('messages.select_one')] + $brach ,($employee->Profile->branch_id) ? $employee->Profile->branch_id : '',['class'=>'form-control input-xlarge select2me','placeholder'=>trans('messages.select_one')])!!}
+									  </div>
+								  	</div>
+									{{-- Section --}}
+									<div class="col-sm-6">
+									  <div class="form-group flex-form-group">
+									    {!! Form::label('section_id',trans('messages.section'),['class' => 'control-label'])!!}
+										{!! Form::select('section_id', [null=>trans('messages.select_one')] + $section ,($employee->Profile->section_id) ? $employee->Profile->section_id : '',['class'=>'form-control input-xlarge select2me','placeholder'=>trans('messages.select_one')])!!}
+									  </div>
+								  	</div>
+									{{-- Section --}}
+									<div class="col-sm-6">
+									  <div class="form-group flex-form-group">
+									    {!! Form::label('grade_id',trans('messages.grade'),['class' => 'control-label'])!!}
+										{!! Form::select('grade_id', [null=>trans('messages.select_one')] + $grade ,($employee->Profile->grade_id) ? $employee->Profile->grade_id : '',['class'=>'form-control input-xlarge select2me','placeholder'=>trans('messages.select_one')])!!}
+									  </div>
+								  	</div>
+									{{-- Grade --}}
 								  </div>	
 								  <div class="row">
 								  	@if(!$employee->Designation->is_hidden)
