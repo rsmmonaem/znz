@@ -113,8 +113,9 @@ Route::group(['middleware' => ['auth','license','account_valid']], function () {
 	
 	Route::model('designation','\App\Designation');
 	Route::post('/designation/lists','DesignationController@lists');
-	Route::resource('/designation', 'DesignationController'); 
-	
+	Route::resource('/designation', 'DesignationController');
+	Route::resource('/branch', 'BranchController');
+
 	Route::group(['middleware' => ['permission:manage_custom_field']], function () {
 		Route::model('custom_field','\App\CustomField');
 		Route::post('/custom-field/lists','CustomFieldController@lists');

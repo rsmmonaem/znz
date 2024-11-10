@@ -48,6 +48,9 @@
 									@if(Entrust::can('list_department'))
 										<li><a href="/department">{!! trans('messages.department') !!}</a></li>
 									@endif
+									@if(Entrust::can('list_department'))
+										<li><a href="/branch">{!! trans('messages.branch') !!}</a></li>
+									@endif
 									@if(Entrust::can('list_designation'))
 										<li><a href="/designation">{!! trans('messages.designation') !!}</a></li>
 									@endif

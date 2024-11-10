@@ -763,4 +763,6 @@
   'hour' => 'Hour',
   'activity_backup_generated' => 'Backup generated.',
   'menu' => 'Menu',
+  'branch' => 'Branch',
+  'description' => 'Description',
 );
