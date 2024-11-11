@@ -44,20 +44,33 @@
 						  <li class="active"><a href="#basic" data-toggle="tab"><i class="fa fa-user"></i> {!! trans('messages.basic') !!}</a></li>
 						  <li><a href="#profile-picture" data-toggle="tab"><i class="fa fa-camera"></i> {!! trans('messages.profile_picture') !!}</a></li>
 						  <li><a href="#contact" data-toggle="tab"><i class="fa fa-phone"></i> {!! trans('messages.contact') !!}</a></li>
-						  <li><a href="#social-networking" data-toggle="tab"><i class="fa fa-users"></i> {!! trans('messages.social_networking') !!}</a></li>
+						 
+						  <li><a href="#eduex" data-toggle="tab"><i class="fa fa-graduation-cap"></i> {!! trans('messages.education') !!}</a></li>
+						  
 						  <li><a href="#document" data-toggle="tab"><i class="fa fa-file"></i> {!! trans('messages.document') !!}</a></li>
 						  <li><a href="#bank-account" data-toggle="tab"><i class="fa fa-laptop"></i> {!! trans('messages.account') !!}</a></li>
 						  <li><a href="#contract" data-toggle="tab"><i class="fa fa-pencil"></i> {!! trans('messages.contract') !!}</a></li>
-						  @if(count($employee->Contract))
+						  {{-- @if(count($employee->Contract)) --}}
 						  <li><a href="#salary" data-toggle="tab"><i class="fa fa-money"></i> {!! trans('messages.salary') !!}</a></li>
 						  <li><a href="#leave" data-toggle="tab"><i class="fa fa-coffee"></i> {!! trans('messages.leave') !!}</a></li>
-						  @endif
+						  {{-- @endif --}}
 						  <li><a href="#office_shift" data-toggle="tab"><i class="fa fa-clock-o"></i> {!! trans('messages.shift') !!}</a></li>
 						  <li><a href="#template" data-toggle="tab"><i class="fa fa-envelope"></i> {!! trans('messages.email').' '.trans('messages.template') !!}</a></li>
 						  @if(Entrust::can('reset_employee_password') && $employee->id != Auth::user()->id)
 						  <li><a href="#change_password" data-toggle="tab"><i class="fa fa-key"></i> {!! trans('messages.change_password') !!}</a></li>
 						  @endif
 						</ul>
+						<script>
+							document.querySelectorAll('a[data-toggle="tab"]').forEach(function(tab) {
+								tab.addEventListener('click', function(event) {
+									var newHash = this.getAttribute('href'); 
+									var currentUrl = window.location.href.split('#')[0]; 
+									var newUrl = currentUrl + newHash;
+									window.history.pushState({}, '', newUrl);
+									console.log('Updated URL: ' + newUrl);
+								});
+							});
+						</script>
 				        <div id="myTabContent" class="tab-content col-md-10"  style="padding:5px;">
 						  <div class="tab-pane animated active fadeInRight" id="basic">
 						    <div class="user-profile-content-wm">
@@ -445,34 +458,11 @@
 								</div>
 							</div>
 						  </div>
-						  <div class="tab-pane animated fadeInRight" id="social-networking">
+						  <div class="tab-pane animated fadeInRight" id="eduex">
 						    <div class="user-profile-content-wm">
-							<h2>{!! trans('messages.social_networking') !!}</h2>
-								{!! Form::model($employee,['method' => 'PATCH','action' => ['EmployeeController@profileUpdate',$employee->id] ,'class' => 'employee-social-form', 'role' => 'form','id' => 'employee-social-form','data-no-form-clear' => 1]) !!}
-									<div class="form-group flex-form-group">
-									    {!! Form::label('facebook_link',trans('messages.facebook_profile'))!!}
-										{!! Form::input('text','facebook_link',isset($employee->Profile->facebook_link) ? $employee->Profile->facebook_link : '',['class'=>'form-control','placeholder'=>trans('messages.facebook_profile')])!!}
-									</div>
-			    				  	<div class="form-group flex-form-group">
-									    {!! Form::label('twitter_link',trans('messages.twitter_profile'))!!}
-										{!! Form::input('text','twitter_link',isset($employee->Profile->twitter_link) ? $employee->Profile->twitter_link : '',['class'=>'form-control','placeholder'=>trans('messages.twitter_profile')])!!}
-									</div>
-			    				  	<div class="form-group flex-form-group">
-									    {!! Form::label('blogger_link',trans('messages.blogger_profile'))!!}
-										{!! Form::input('text','blogger_link',isset($employee->Profile->blogger_link) ? $employee->Profile->blogger_link : '',['class'=>'form-control','placeholder'=>trans('messages.blogger_profile')])!!}
-									</div>
-			    				  	<div class="form-group flex-form-group">
-									    {!! Form::label('linkedin_link',trans('messages.linkedin_profile'))!!}
-										{!! Form::input('text','linkedin_link',isset($employee->Profile->linkedin_link) ? $employee->Profile->linkedin_link : '',['class'=>'form-control','placeholder'=>trans('messages.linkedin_profile')])!!}
-									</div>
-			    				  	<div class="form-group flex-form-group">
-									    {!! Form::label('googleplus_link',trans('messages.google_plus_profile'))!!}
-										{!! Form::input('text','googleplus_link',isset($employee->Profile->googleplus_link) ? $employee->Profile->googleplus_link : '',['class'=>'form-control','placeholder'=>trans('messages.google_plus_profile')])!!}
-									</div>
-			  						{{ App\Classes\Helper::getCustomFields('employee-social-form',$social_custom_field_values) }}
-								{!! Form::hidden('type','social_networking') !!}
-								{!! Form::submit(isset($buttonText) ? $buttonText : trans('messages.save'),['class' => 'btn btn-primary pull-right']) !!}
-								{!! Form::close() !!}
+							<h2>{!! trans('messages.education') !!}</h2>
+							   @include('employee.tab-contant.education')
+							   @include('employee.tab-contant.experience')
 							</div>
 						  </div>
 						  <div class="tab-pane animated fadeInRight" id="bank-account">

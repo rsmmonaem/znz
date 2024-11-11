@@ -771,4 +771,5 @@
   'section' => 'Section',
   'grade' => 'Grade',
   'employee_transfer' => 'Employee Transfer',
+  'education' => 'Education'
 );
