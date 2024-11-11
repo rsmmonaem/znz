@@ -16,6 +16,7 @@ use App\LeaveType;
 use App\SalaryType;
 use App\Salary;
 use App\DocumentType;
+use App\EmployeeTransfer;
 use App\Grade;
 use App\Profile;
 use App\ReportType;
@@ -24,6 +25,7 @@ use Image;
 use File;
 use Mail;
 use DB;
+use Exception;
 use Validator;
 
 class EmployeeController extends Controller{
@@ -741,6 +743,130 @@ class EmployeeController extends Controller{
             $profile = $query->get();
 
             return response()->json($profile);
+        }
+    }
+
+    /**
+     * This function is used to generate view for transfer of employee
+     * 
+     * @param Request $request 
+     * 
+     * @return view
+     */
+    public function transferview(Request $request){
+        $branch = Branch::select('name','id')->get();
+        $department = Department::select('name','id')->get();
+        $designation = Designation::select('name','id')->get();
+        $section = Section::select('name','id')->get();
+        $employee = User::leftJoin('profile', 'users.id', '=', 'profile.user_id')
+        ->select('users.first_name', 'users.id', 'profile.employee_code')
+        ->get();
+        return view('employee_transfer.transfer',compact('branch','department','designation','section','employee'));
+    }
+    /**
+     * Handles the transfer of an employee.
+     *
+     * @param Request $request The HTTP request object containing transfer data.
+     * 
+     * @return \Illuminate\Http\JsonResponse A JSON response indicating the status of the transfer.
+     */
+    public function transfer(Request $request){
+      DB::beginTransaction();
+      try{
+            EmployeeTransfer::create($request->all());
+            Profile::where('user_id', $request->femployee)->update(['branch_id' => $request->tbranch, 'section_id' => $request->tsection]);
+            Designation::where('id', $request->fdesignation)->update(['department_id' => $request->tdepartment]);
+            User::where('id', $request->femployee)->update(['designation_id' => $request->tdesignation]);
+            DB::commit();
+            return response()->json(['status' => 'success', 'message' => trans('Employee Transfered Successfully')]);
+      }catch(Exception $e){
+        DB::rollback();
+        return response()->json(['status' => 'success', 'message' => $e->getMessage()]);
+      }
+    }
+
+    /**
+     * This function is used to generate the view for list of transferred employees
+     * 
+     * @return view
+     */
+    public function transferList(){
+        $transferlist = EmployeeTransfer::select(
+            'employeetransfer.id',
+            'profile.employee_code',
+            'users.first_name',
+            'designations.name as designation_name',  // Alias for designation name
+            'ftransfer_date',
+            'tjoin_date',
+            'remarks',
+            'users.status'
+        )
+            ->leftJoin('users', 'employeetransfer.femployee', '=', 'users.id')
+            ->leftJoin('designations', 'employeetransfer.fdesignation', '=', 'designations.id')
+            ->leftJoin('profile', 'users.id', '=', 'profile.user_id')  // Assuming 'profiles' is the table and relationship for employee_code
+            ->orderBy('employeetransfer.id', 'desc')
+            ->get();
+        return $transferlist;
+    }
+    
+    /**
+     * This function is used to generate the view for edit of transferred employees
+     * @param int $id The ID of the employee transfer record to edit
+     * @return view
+     */
+    public function transferEdit($id){
+        $transfer = EmployeeTransfer::find($id);
+        $branch = Branch::select('name', 'id')->get();
+        $department = Department::select('name', 'id')->get();
+        $designation = Designation::select('name', 'id')->get();
+        $section = Section::select('name', 'id')->get();
+        $employee = User::leftJoin('profile', 'users.id', '=', 'profile.user_id')
+        ->select('users.first_name', 'users.id', 'profile.employee_code')
+        ->get();
+        return view('employee_transfer.transfer-edit',compact('branch','department','designation','section','employee','transfer'));
+        // return $transfer;
+    }
+
+
+    /**
+     * This function is used to update the employee transfer record
+     * @param Request $request The request sent from the form
+     * @param int $id The ID of the employee transfer record to update
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function transferUpdate(Request $request, $id){
+        DB::beginTransaction();
+        try{
+            EmployeeTransfer::where('id', $id)->update($request->all());
+            Profile::where('user_id', $request->femployee)->update(['branch_id' => $request->tbranch, 'section_id' => $request->tsection]);
+            Designation::where('id', $request->fdesignation)->update(['department_id' => $request->tdepartment]);
+            User::where('id', $request->femployee)->update(['designation_id' => $request->tdesignation]);
+            DB::commit();
+            return response()->json(['status' => 'success', 'message' => trans('Employee Transfered Successfully')]);
+        }catch(Exception $e){
+            DB::rollback();
+            return response()->json(['status' => 'success', 'message' => $e->getMessage()]);
+        }
+    }
+
+    /**
+     * This function is used to delete the employee transfer record
+     * @param int $id The ID of the employee transfer record to delete
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function transferCancel($id){
+        DB::beginTransaction();
+        try{
+            $olddata = EmployeeTransfer::where('id', $id)->first();
+            Profile::where('user_id', $olddata->femployee)->update(['branch_id' => $olddata->fbranch, 'section_id' => $olddata->fsection]);
+            Designation::where('id', $olddata->fdesignation)->update(['department_id' => $olddata->fdepartment]);
+            User::where('id', $olddata->femployee)->update(['designation_id' => $olddata->fdesignation]);
+            EmployeeTransfer::where('id', $id)->delete();
+            DB::commit();
+            return response()->json(['status' => 'success', 'message' => trans('Employee Transfer Deleted Successfully')]);
+         }catch(Exception $e){
+            DB::rollback();
+            return response()->json(['status' => 'success', 'message' => $e->getMessage()]);
         }
     }
 }

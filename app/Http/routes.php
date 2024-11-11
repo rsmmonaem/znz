@@ -1,4 +1,5 @@
 <?php
+
 Route::get('/', 'Auth\AuthController@getLogin');
 Route::get('/whats-new',function(){
 	return view('whats_new');
@@ -115,6 +116,8 @@ Route::group(['middleware' => ['auth','license','account_valid']], function () {
 	Route::post('/designation/lists','DesignationController@lists');
 	Route::resource('/designation', 'DesignationController');
 	Route::resource('/branch', 'BranchController');
+	// Section for Employee
+	Route::resource('/sections', 'SectionController');
 
 	Route::group(['middleware' => ['permission:manage_custom_field']], function () {
 		Route::model('custom_field','\App\CustomField');
@@ -146,6 +149,13 @@ Route::group(['middleware' => ['auth','license','account_valid']], function () {
 	Route::post('/employee/lists','EmployeeController@lists');
 	Route::get('/employee/report', 'EmployeeController@EmployeeReport');
 	Route::post('/employee/report', 'EmployeeController@EmployeeReportPOST');
+	Route::get('/employee/transfer', 'EmployeeController@transferview');
+	Route::post('/employee/transfer', 'EmployeeController@transfer');
+	Route::get('/employee/transfer-list', 'EmployeeController@transferList');
+	Route::get('employee/transfer-edit/{id}', 'EmployeeController@transferEdit');
+	Route::post('employee/transfer-edit/{id}', 'EmployeeController@transferUpdate');
+	Route::post('employee/transfer-cancel/{id}', 'EmployeeController@transferCancel');
+
 
 	Route::post('/employee/email/{id}',array('as' => 'employee.email', 'uses' => 'EmployeeController@email'));
 	Route::resource('/employee', 'EmployeeController',['except' => ['create', 'store']]);

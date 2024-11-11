@@ -10,6 +10,8 @@
 								     ) ? 'class="visible"' : '' !!}>
 									<li {!! (in_array('employee_list',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/employee') !!}"><i class="fa fa-angle-right"></i> {!! trans('messages.employee_list') !!} </a></li>
 									<li {!! (in_array('employee_report',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/employee/report') !!}"><i class="fa fa-angle-right"></i> {!! trans('messages.employee_report') !!} </a></li>
+									<li {!! (in_array('employee_transfer',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/employee/transfer') !!}"><i class="fa fa-angle-right"></i> {!! trans('messages.employee_transfer') !!} </a></li>
+
 									</ul>
 							</li> 
 							@endif

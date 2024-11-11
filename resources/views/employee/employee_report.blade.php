@@ -305,7 +305,7 @@
                             <td>${item.category || ''}</td>
                             <td>${item.contact_number || ''}</td>
                             <td>${item.gender || ''}</td>
-                            <td>${item.branch_name || ''}</td>
+                            <td>${item.grade_name || ''}</td>
                             <td>${item.job_nature || ''}</td>
                         `;
                             tbody.appendChild(tr);
