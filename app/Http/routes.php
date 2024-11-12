@@ -155,7 +155,11 @@ Route::group(['middleware' => ['auth','license','account_valid']], function () {
 	Route::get('employee/transfer-edit/{id}', 'EmployeeController@transferEdit');
 	Route::post('employee/transfer-edit/{id}', 'EmployeeController@transferUpdate');
 	Route::post('employee/transfer-cancel/{id}', 'EmployeeController@transferCancel');
-
+    
+	// Emplyee Education Added
+	Route::post('/education/lists','EducationController@lists');
+	Route::resource('/education', 'EducationController');
+	Route::post('/work_experience', 'EducationController@work_experience');
 
 	Route::post('/employee/email/{id}',array('as' => 'employee.email', 'uses' => 'EmployeeController@email'));
 	Route::resource('/employee', 'EmployeeController',['except' => ['create', 'store']]);
@@ -201,6 +205,11 @@ Route::group(['middleware' => ['auth','license','account_valid']], function () {
 	Route::resource('/contract', 'ContractController'); 
 	Route::post('/contract/{id}',array('uses' => 'ContractController@store','as' => 'contract.store'));
 	Route::post('/get-user-leave','ProfileController@getLeave');
+	Route::post('leave/check', 'LeaveController@Leavecheckvalue');
+	Route::post('getuserData', 'LeaveController@getuserData');
+	Route::post('getLeave', 'LeaveController@LeaveRemaining');
+
+	Route::post('leave-apply-save', 'LeaveController@leaveStore');
 	
 	Route::patch('/change-employee-password/{id}',array('as'=>'change-employee-password','uses' =>'EmployeeController@doChangeEmployeePassword'));
 	
@@ -259,6 +268,8 @@ Route::group(['middleware' => ['auth','license','account_valid']], function () {
 	Route::post('/leave/lists','LeaveController@lists');
 	Route::resource('/leave', 'LeaveController'); 
 	Route::post('/update-leave-status/{id}', ['as' => 'leave.update-status', 'uses' => 'LeaveController@updateStatus']);
+    Route::get('leave-check', 'LeaveController@Leavecheck');
+	Route::get('leave-apply', 'LeaveController@Leaveapply');
 
 	Route::model('clock','\App\Clock');
 	Route::post('/my-clock/lists','ClockController@lists');

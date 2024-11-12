@@ -313,7 +313,7 @@
   'last_login' => 'Last Login',
   'last_name' => 'Bangla Name',
   'late' => 'Late',
-  'leave' => 'Leave',
+  'leave' => 'Leave Management',
   'leave_already_approved_for_contract' => 'Employee has already leave approved for this contract period.',
   'leave_already_assigned_for_contract' => 'Leave already assigned for this contract.',
   'leave_blank_for_all_designation' => 'Leave it blank for all designation',
@@ -771,4 +771,8 @@
   'section' => 'Section',
   'grade' => 'Grade',
   'employee_transfer' => 'Employee Transfer',
+  'education' => 'Education',
+  'leave_request' => 'All Leave Requests',
+  'leave_blance_check' => 'Leave Balance Check',
+  'leave_apply' => 'Apply Leave',
 );

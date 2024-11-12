@@ -1,5 +1,7 @@
 <?php
 namespace App\Http\Controllers;
+
+use App\Branch;
 use Illuminate\Http\Request;
 use App\Http\Requests\LeaveRequest;
 use App\Http\Requests\LeaveStatusRequest;
@@ -53,6 +55,8 @@ Class LeaveController extends Controller{
 			}
 		}
 
+		// return $leave_graph;
+
         $col_heads = Helper::putCustomHeads($this->form, $col_heads);
         $leave_types = LeaveType::pluck('name','id')->all();
         $menu = ['leave'];
@@ -62,14 +66,14 @@ Class LeaveController extends Controller{
 			'title' => 'Leave List',
 			'id' => 'leave_table'
 		);
-
+ 
 		return view('leave.index',compact('col_heads','menu','leave_types','table_info','leave_graph','assets'));
 	}
 
 	public function lists(Request $request){
 
 		if(Entrust::can('manage_all_leave'))
-        	$leaves = Leave::all();
+        	$leaves = Leave::orderBy('status','desc')->get();
         elseif(Entrust::can('manage_subordinate_leave')){
 			$child_designations = Helper::childDesignation(Auth::user()->designation_id,1);
 			$child_users = User::whereIn('designation_id',$child_designations)->pluck('id')->all();
@@ -142,6 +146,7 @@ Class LeaveController extends Controller{
         }
 
         $menu = ['leave'];
+
 
 		return view('leave.show',compact('leave','other_leaves','status','menu','available_date'));
 	}
@@ -462,5 +467,236 @@ Class LeaveController extends Controller{
         }
         return redirect('/leave')->withSuccess(trans('messages.leave').' '.trans('messages.request').' '.trans('messages.deleted'));
 	}
+
+/**
+ * Shows a form to select an employee and branch to check the leave balance of the employee.
+ * 
+ * @param  Request $request 
+ * @return string        HTML form with a select box for employee and branch
+ */
+	public function Leavecheck(Request $request){
+		$branch = Branch::all();
+        $employee = User::select('users.id','users.first_name as name','profile.employee_code as employee_id','designations.name as designation')
+		->LeftJoin('profile', 'users.id', '=', 'profile.user_id')
+		->LeftJoin('designations', 'users.designation_id', '=', 'designations.id')
+		->get();
+		// return $employee;
+		return view('leave.check', compact('branch', 'employee'));
+	}
+
+	/**
+	 * Shows the leave balance for a given employee.
+	 * 
+	 * @param  Request $request 
+	 * @return string        HTML table with leave balance
+	 */
+	public function Leavecheckvalue(Request $request){
+		// $contract = Helper::getContract(2);
+		$branch = $request->branch;
+		$financialYear = $request->financialYear;
+		$date = date('Y-m-d');
+		// return $request->employee_id;
+		$user = \App\User::leftJoin('profile', 'users.id', '=', 'profile.user_id')
+		->where('users.id', $request->employee_id) 
+		->where('profile.branch_id', $branch)
+		->first();
+        // return $user;
+		$contract = \App\Contract::whereUserId($user->id)
+			->where('from_date', '<=', $date)
+			->where('to_date', '>=', $date)
+			->first();
+		$leave_types = \App\LeaveType::all();
+		$raw_data = array();
+		$data = '';
+
+		if (!$contract)
+		return '<div class="alert alert-danger"><i class="fa fa-times icon"></i> ' . trans('messages.no_data_found') . '</div>';
+
+		$data .= '<p style="margin-left:20px">' . trans('messages.contract_period') . ': <strong>' . showDate($contract->from_date) . ' ' . trans('messages.to') . ' ' . showDate($contract->to_date) . '</strong></p>';
+		foreach ($leave_types as $leave_type) {
+			$name = $leave_type->name;
+			$used = ($contract->UserLeave->whereLoose('leave_type_id', $leave_type->id)->count()) ? $contract->UserLeave->whereLoose('leave_type_id', $leave_type->id)->first()->leave_used : 0;
+			$allotted = ($contract->UserLeave->whereLoose('leave_type_id', $leave_type->id)->count()) ? $contract->UserLeave->whereLoose('leave_type_id', $leave_type->id)->first()->leave_count : 0;
+
+			if ($allotted) {
+				$used_percentage = ($allotted) ? ($used / $allotted) * 100 : 0;
+				$data .= '<tr>
+                <td>' . $name . '</td>
+                <td>' . $allotted . '</td>
+                <td>
+                    ' . $used . '
+                </td>
+                <td>' . ($allotted - $used) . '</td>
+              </tr>';
+			}
+		}
+		return $data;
+	}
+ 
+/**
+ * Returns the employee name and designation for a given employee code.
+ *
+ * @param  Request $request
+ * @return \Illuminate\Http\JsonResponse The employee name and designation in JSON format.
+ */
+	public function getuserData(Request $request){
+		$id = $request->id;
+		$employee = User::select('users.id', 'users.first_name as name', 'profile.employee_code as employee_id', 'designations.name as designation')
+		->LeftJoin('profile', 'users.id', '=', 'profile.user_id')
+		->LeftJoin('designations', 'users.designation_id', '=', 'designations.id')
+		->where('users.id','=',$id)
+		->first();
+		// return $employee->name;
+		if ($employee) {
+			return response()->json([
+				'name' => $employee->name,
+				'designation' => $employee->designation,
+			]);
+		} else {
+			return response()->json(['error' => 'Employee not found'], 404);
+		}
+	}
+
+/**
+ * Displays the leave application form view.
+ *
+ * @param  Request $request
+ * @return \Illuminate\View\View The view for applying leave
+ */
+	public function Leaveapply(Request $request){
+		$branch = Branch::all();
+		$employee = User::select('users.id', 'users.first_name as name', 'profile.employee_code as employee_id', 'designations.name as designation')
+		->LeftJoin('profile', 'users.id', '=', 'profile.user_id')
+		->LeftJoin('designations', 'users.designation_id', '=', 'designations.id')
+		->get();
+		$leaveType = LeaveType::all();
+		return view('leave.apply',compact('branch','employee', 'leaveType'));
+	}
+
+	public function LeaveRemaining(Request $request){
+		// return $request->leaveType;
+		$user = \App\User::leftJoin('profile', 'users.id', '=', 'profile.user_id')
+		->where('users.id', $request->user_id)
+		// ->where('profile.branch_id', $branch)
+		->first();
+
+		$date = date('Y-m-d'); 
+		$contract = \App\Contract::whereUserId($user->id)
+			->where('from_date', '<=', $date)
+			->where('to_date', '>=', $date)
+			->first();
+        // return $contract;
+		if (!$contract) {
+			return response()->json(['error' => 'Contract not found Selected Employee, Please Change Employee'], 404);
+		}
+		$leave_types = \App\LeaveType::where('id', '=', $request->leaveType) 
+		->get();
+		$leave_data = [];
+		foreach ($leave_types as $leave_type) {
+			$userLeave = $contract->UserLeave->where('leave_type_id', $leave_type->id)->first();
+			$used = $userLeave ? $userLeave->leave_used : 0;
+			$allotted = $userLeave ? $userLeave->leave_count : 0;
+			$remaining = $allotted - $used;
+
+			if ($allotted > 0) {
+				$leave_data[] = [
+					// 'leave_type' => $leave_type->name, // Optional: You can include leave type name if needed
+					// 'allotted' => $allotted,
+					// 'used' => $used,
+					'remaining' => $remaining,
+				];
+			}
+		}
+		return response()->json($leave_data);
+	}
+
+	public function leaveStore(Request $request, Leave $leave){
+		// return $request->all();
+		$user_id = $request->input('user_id');
+		$from_date = $request->input('from_date');
+		$to_date = $request->input('to_date');
+        $user = \App\User::find($user_id);
+		// return $user;
+		$contract = \App\Contract::whereUserId($user->id)
+		->where('from_date', '<=', $from_date)
+		->where('to_date', '>=', $to_date)
+		->first();
+    //    return $contract;
+	// 	if (!$contract) {
+	// 		if ($request->has('ajax_submit')) {
+	// 			$response = ['message' => trans('messages.contract_period_not_found'), 'status' => 'error'];
+	// 			return response()->json($response, 200, array('Access-Controll-Allow-Origin' => '*'));
+	// 		}
+	// 		return redirect()->back()->withErrors(trans('messages.contract_period_not_found'));
+	// 	}
+
+		$user_leave = \App\UserLeave::whereContractId($contract->id)
+		->whereLeaveTypeId($request->input('leave_type_id'))
+		->first();
+
+		// return $user_leave;
+		// if (!$user_leave) {
+		// 	if ($request->has('ajax_submit')) {
+		// 		$response = ['message' => trans('messages.leave_not_defined'), 'status' => 'error'];
+		// 		return response()->json($response, 200, array('Access-Controll-Allow-Origin' => '*'));
+		// 	}
+		// 	return redirect()->back()->withErrors(trans('messages.leave_not_defined'));
+		// }
+
+		$leave_request_count = (strtotime($to_date) - strtotime($from_date)) / (60 * 60 * 24) + 1;
+		$leave_type = LeaveType::find($request->input('leave_type_id'));
+		$leave_balance = $user_leave->leave_count - $user_leave->leave_used;
+		// return $leave_balance;
+		if ($leave_balance <  $leave_request_count) {
+			if ($request->has('ajax_submit')) {
+				$response = ['message' => trans('messages.only') . ' ' . $leave_balance . ' ' . $leave_type->name . ' ' . trans('messages.remaining'), 'status' => 'error'];
+				return response()->json($response, 200, array('Access-Controll-Allow-Origin' => '*'));
+			}
+			return redirect()->back()->withErrors(trans('messages.only') . ' ' . $leave_balance . ' ' . $leave_type->name . ' ' . trans('messages.remaining'));
+		}
+
+		$leaves = Leave::where('user_id', '=', $user_id)
+		->where(function ($query) use ($from_date, $to_date) {
+			$query->where(function ($query) use ($from_date, $to_date) {
+				$query->where('from_date', '>=', $from_date)
+				->where('from_date', '<=', $to_date);
+			})->orWhere(function ($query)  use ($from_date, $to_date) {
+				$query->where('to_date', '>=', $from_date)
+				->where('to_date', '<=', $to_date);
+			});
+		})->count();
+
+		// return $leaves;
+
+		if ($leaves) {
+			if ($request->has('ajax_submit')) {
+				$response = ['message' => trans('messages.leave_requested_for_this_period'), 'status' => 'error'];
+				return response()->json($response, 200, array('Access-Controll-Allow-Origin' => '*'));
+			}
+			// return redirect()->back()->withInput()->withErrors(trans('messages.leave_requested_for_this_period'));
+			return $response = ['message' => 'Already' . ' ' . trans('messages.requested'), 'status' => 'error'];
+		}
+
+		$data = $request->all();
+		// return $data;
+		$data['user_id'] = $user_id;
+		$leave->fill($data);
+		$leave->status = 'pending';
+		$leave->balance = $request->input('balance');
+		$leave->appliedDays = $request->input('appliedDays');
+		$leave->branch = $request->input('branch');
+		$leave->recommendID = $request->input('recommendID');
+		$leave->remarks = $request->input('reason');
+		$leave->save();
+		$this->logActivity(['module' => 'leave', 'unique_id' => $leave->id, 'activity' => 'activity_added']);
+		 return $response = ['message' => trans('messages.leave') . ' ' . trans('messages.requested'), 'status' => 'success'];
+		// Helper::storeCustomField($this->form, $leave->id, $data);
+
+		if ($request->has('ajax_submit')) {
+			$response = ['message' => trans('messages.leave') . ' ' . trans('messages.requested'), 'status' => 'success'];
+			return response()->json($response, 200, array('Access-Controll-Allow-Origin' => '*'));
+		}
+	}
+
 }
 ?>
