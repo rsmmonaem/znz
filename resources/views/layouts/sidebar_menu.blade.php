@@ -80,7 +80,28 @@
 							@if(Entrust::can('list_holiday'))
 							<li {!! (in_array('holiday',$menu)) ? 'class="active"' : '' !!} {!! menuAttr($menus,'holiday') !!}><a href="{!! URL::to('/holiday') !!}"><i class="fa fa-fighter-jet icon"></i> {!! trans('messages.holiday') !!}</a></li>
 							@endif
-							<li {!! (in_array('leave',$menu)) ? 'class="active"' : '' !!} {!! menuAttr($menus,'leave') !!}><a href="{!! URL::to('/leave') !!}"><i class="fa fa-coffee icon"></i> {!! trans('messages.leave') !!}</a></li>
+                          
+							
+							
+							<li {!! (in_array('leave',$menu)) ? 'class="active"' : '' !!} {!! menuAttr($menus,'leave') !!}><a href="#"><i class="fa fa-coffee icon"></i> <i class="fa fa-angle-double-down i-right"></i> {!! trans('messages.leave') !!}</a>
+							    <ul {!! (in_array('leave',$menu) ||
+											in_array('leave',$menu) ||
+											in_array('leave',$menu)
+								     ) ? 'class="visible"' : '' !!}>
+									<li {!! (in_array('/leave',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/leave') !!}"><i class="fa fa-angle-right"></i> {!! trans('messages.leave_request') !!} </a>
+									</li>
+									<li {!! (in_array('/leave-check',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/leave-check') !!}"><i class="fa fa-angle-right"></i> {!! trans('messages.leave_blance_check') !!} </a>
+									</li>
+									<li {!! (in_array('/leave-apply',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/leave-apply') !!}"><i class="fa fa-angle-right"></i> {!! trans('messages.leave_apply') !!} </a>
+									</li>
+									
+								</ul>
+							</li> 
+
+
+							{{-- <li {!! (in_array('leave',$menu)) ? 'class="active"' : '' !!} {!! menuAttr($menus,'leave') !!}><a href="{!! URL::to('/leave') !!}"><i class="fa fa-coffee icon"></i> {!! trans('messages.leave') !!}</a></li> --}}
+
+
 							<li {!! (in_array('payroll',$menu)) ? 'class="active"' : '' !!} {!! menuAttr($menus,'payroll') !!}><a href="{!! URL::to('/payroll') !!}"><i class="fa fa-money icon"></i> {!! trans('messages.payroll') !!}</a></li>
 							@if(Entrust::can('list_announcement'))
 							<li {!! (in_array('announcement',$menu)) ? 'class="active"' : '' !!} {!! menuAttr($menus,'announcement') !!}><a href="{!! URL::to('/announcement') !!}"><i class="fa fa-list-alt icon"></i> {!! trans('messages.announcement') !!}</a></li>

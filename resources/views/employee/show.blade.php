@@ -50,10 +50,10 @@
 						  <li><a href="#document" data-toggle="tab"><i class="fa fa-file"></i> {!! trans('messages.document') !!}</a></li>
 						  <li><a href="#bank-account" data-toggle="tab"><i class="fa fa-laptop"></i> {!! trans('messages.account') !!}</a></li>
 						  <li><a href="#contract" data-toggle="tab"><i class="fa fa-pencil"></i> {!! trans('messages.contract') !!}</a></li>
-						  {{-- @if(count($employee->Contract)) --}}
+						  @if(count($employee->Contract))
 						  <li><a href="#salary" data-toggle="tab"><i class="fa fa-money"></i> {!! trans('messages.salary') !!}</a></li>
 						  <li><a href="#leave" data-toggle="tab"><i class="fa fa-coffee"></i> {!! trans('messages.leave') !!}</a></li>
-						  {{-- @endif --}}
+						  @endif
 						  <li><a href="#office_shift" data-toggle="tab"><i class="fa fa-clock-o"></i> {!! trans('messages.shift') !!}</a></li>
 						  <li><a href="#template" data-toggle="tab"><i class="fa fa-envelope"></i> {!! trans('messages.email').' '.trans('messages.template') !!}</a></li>
 						  @if(Entrust::can('reset_employee_password') && $employee->id != Auth::user()->id)
