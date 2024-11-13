@@ -94,6 +94,8 @@
 									</li>
 									<li {!! (in_array('/leave-apply',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/leave-apply') !!}"><i class="fa fa-angle-right"></i> {!! trans('messages.leave_apply') !!} </a>
 									</li>
+									<li {!! (in_array('/leave-report',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/leave-report') !!}"><i class="fa fa-angle-right"></i> Leave Report </a>
+									</li>
 									
 								</ul>
 							</li> 

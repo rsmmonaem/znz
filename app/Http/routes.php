@@ -208,6 +208,9 @@ Route::group(['middleware' => ['auth','license','account_valid']], function () {
 	Route::post('leave/check', 'LeaveController@Leavecheckvalue');
 	Route::post('getuserData', 'LeaveController@getuserData');
 	Route::post('getLeave', 'LeaveController@LeaveRemaining');
+	
+	Route::get('/leave-report', 'LeaveController@LeaveReport');
+	Route::post('/leave-report', 'LeaveController@LeaveReportPOST');
 
 	Route::post('leave-apply-save', 'LeaveController@leaveStore');
 	

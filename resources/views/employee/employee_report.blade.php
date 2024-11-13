@@ -161,12 +161,12 @@
                                 }
                             </style>
                             <div class="display-flex">
-                                <div class="left-item"><img
-                                        src="https://scontent.fdac5-2.fna.fbcdn.net/v/t39.30808-6/393121278_798706948724860_2546228729910779588_n.jpg?_nc_cat=103&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=vQcQLo3QVUYQ7kNvgFtKCh7&_nc_zt=23&_nc_ht=scontent.fdac5-2.fna&_nc_gid=AX8Fbrg3qFhZVC5RKqHZovl&oh=00_AYAArKIIbszCKaXu-u_jLPX6ByaExdfXcDQihV2sLvTLqQ&oe=673643D4"
-                                        height="100" /> </div>
+                                <div class="left-item">
+                                    <img src="{{ URL::to(config('constants.upload_path.logo').config('config.logo')) }}" width="150px" style="margin-left:20px;">
+                                </div>
                                 <div class="center-item">
                                     <h4>Head Office</h4>
-                                    <p>Address</p>
+                                    <p>Address : {{ config('config.address_1') }}</p>
                                     <p>Name of the Report</p>
                                 </div>
                             </div>
