@@ -26,6 +26,10 @@ class Profile extends Eloquent {
 	public function user() {
     	return $this->belongsTo('App\User');
 	}
+
+	public function branch() {
+		return $this->belongsTo('App\Branch');
+	}
 	public function designation()
 	{
 		return $this->belongsTo(Designation::class);

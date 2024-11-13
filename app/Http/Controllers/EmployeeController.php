@@ -874,4 +874,61 @@ class EmployeeController extends Controller{
             return response()->json(['status' => 'success', 'message' => $e->getMessage()]);
         }
     }
+
+    public function report(Request $request){   
+        $branch = Branch::select('name', 'id')->get();
+        $department = Department::select('name', 'id')->get();
+        $section = Section::select('name', 'id')->get();
+        $designation = Designation::select('name', 'id')->get();
+        $employee = User::leftJoin('profile', 'users.id', '=', 'profile.user_id')
+        ->select('users.first_name', 'users.id', 'profile.employee_code')
+        ->get();
+        return view('employee_transfer.report',compact('branch','department','section','designation','employee'));
+    }
+
+    public function reportData(Request $request){
+        $user_id = Profile::where('employee_code', $request->employeeID)
+            ->select('user_id')
+            ->first();
+        // return $request->all();
+        $user_id = $user_id ? $user_id->user_id : null;
+        $data = EmployeeTransfer::when($user_id, function ($query) use ($user_id) {
+            return $query->where('femployee','=' , $user_id); 
+        })
+        ->when($request->branch, function ($query) use ($request) {
+           return $query->where('tbranch','=', $request->branch); 
+        })
+        ->when($request->department, function ($query) use ($request) {
+            return $query->where('tdepartment','=', $request->department); 
+        })
+        ->when($request->section, function ($query) use ($request) {
+            return $query->where('tsection','=', $request->section); 
+         })
+        ->when($request->designation, function ($query) use ($request) {
+            return $query->where('tdesignation', '=', $request->designation); 
+        })
+        ->leftJoin('users', 'employeetransfer.femployee', '=', 'users.id')
+        ->leftJoin('profile', 'users.id', '=', 'profile.user_id')
+        ->leftJoin('branchs as from_branch', 'employeetransfer.fbranch', '=', 'from_branch.id')
+        ->leftJoin('branchs as to_branch', 'employeetransfer.tbranch', '=', 'to_branch.id')
+        ->leftJoin('sections', 'employeetransfer.fsection', '=', 'sections.id')
+        ->leftJoin('departments', 'employeetransfer.fdepartment', '=', 'departments.id')
+        ->leftJoin('designations', 'employeetransfer.fdesignation', '=', 'designations.id')
+        ->select(
+            'employeetransfer.id',
+            'profile.employee_code',
+            'users.first_name as name',
+            'profile.date_of_joining',
+            'designations.name as designation',
+            'departments.name as department',
+            'sections.name as section',
+            'from_branch.name as from_branch',
+            'to_branch.name as to_branch',
+            'employeetransfer.ftransfer_date',
+            'to_branch.name as to_branch'
+        )
+        ->get();
+
+       return $data;
+    }
 }

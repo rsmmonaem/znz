@@ -771,8 +771,10 @@
   'section' => 'Section',
   'grade' => 'Grade',
   'employee_transfer' => 'Employee Transfer',
+  'employee_transfer_report' => 'Employee Transfer Report',
   'education' => 'Education',
   'leave_request' => 'All Leave Requests',
   'leave_blance_check' => 'Leave Balance Check',
   'leave_apply' => 'Apply Leave',
+  'leave_repot' => 'Leave Report',
 );

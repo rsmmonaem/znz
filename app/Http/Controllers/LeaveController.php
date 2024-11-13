@@ -12,6 +12,9 @@ use App\LeaveType;
 use App\User;
 use Auth;
 use App\Classes\Helper;
+use App\Department;
+use App\Designation;
+use App\Section;
 
 Class LeaveController extends Controller{
     use BasicController;
@@ -697,6 +700,72 @@ Class LeaveController extends Controller{
 			return response()->json($response, 200, array('Access-Controll-Allow-Origin' => '*'));
 		}
 	}
+
+
+	/**
+	 * Display a listing of the resource.
+	 *
+	 * @return \Illuminate\Http\Response
+	 */
+	public function LeaveReport(Request $request){
+		$branch = Branch::all();
+		$leaveType = LeaveType::all();
+		$department = Department::all();
+        $designation = Designation::all();
+		$section = Section::all();
+		$status = ['pending','approved','rejectd'];
+		return view('leave.report', compact('branch','leaveType','department','designation','section','status'));
+	}
+
+	public function LeaveReportPOST(Request $request){
+		$user = User::leftJoin('profile', 'users.id', '=', 'profile.user_id')
+		->leftJoin('designations', 'users.designation_id', '=', 'designations.id')
+		->leftJoin('departments', 'designations.department_id', '=', 'departments.id')
+		->leftJoin('sections', 'profile.section_id', '=', 'sections.id')
+		->where('profile.employee_code', '=', $request->employeeID)
+		->when($request->branch, function ($query) use ($request) {
+			return $query->where('profile.branch_id', '=', $request->branch);
+		})
+		->when($request->section, function ($query) use ($request) {
+			return $query->where('profile.section_id', '=', $request->section);
+		})
+		->when($request->department, function ($query) use ($request) {
+			return $query->where('departments.id', '=', $request->department);
+		})
+		->select('users.id', 'profile.employee_code as employee_id' ,'designations.name as designation_name', 'departments.name as department_name', 'users.first_name', 'sections.name as section_name')
+		->first();
+
+		if (!$user) {
+			return response()->json(['error' => 'User not found'], 404);
+		}
+
+		$data = Leave::where('user_id', '=', $user->id)
+			->leftJoin('leave_types', 'leaves.leave_type_id', '=', 'leave_types.id')
+			->when($request->status, function ($query) use ($request) {
+				return $query->where('leaves.status', '=', $request->status);
+			})
+			->where('from_date', '>=', $request->fromDate)
+			->where('to_date', '<=', $request->toDate)
+			->select('leaves.*', 'leave_types.name as leave_type_name')
+			->get();
+
+		$mergedLeaveRecords = $data->map(function ($data) use ($user) {
+			return array_merge($user->toArray(), $data->toArray());
+		});
+
+		// return $mergedLeaveRecords;
+
+		$finalData = [
+			'data' => $mergedLeaveRecords,
+			'fromDate' => $request->fromDate,
+			'toDate' => $request->toDate,
+			'reportType' => $request->reportType,
+		];
+
+		return response()->json($finalData);
+
+	}
+
 
 }
 ?>

@@ -11,7 +11,7 @@
 									<li {!! (in_array('employee_list',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/employee') !!}"><i class="fa fa-angle-right"></i> {!! trans('messages.employee_list') !!} </a></li>
 									<li {!! (in_array('employee_report',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/employee/report') !!}"><i class="fa fa-angle-right"></i> {!! trans('messages.employee_report') !!} </a></li>
 									<li {!! (in_array('employee_transfer',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/employee/transfer') !!}"><i class="fa fa-angle-right"></i> {!! trans('messages.employee_transfer') !!} </a></li>
-
+									<li {!! (in_array('employee_report',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('employee-transfer/report') !!}"><i class="fa fa-angle-right"></i> {!! trans('messages.employee_report') !!} </a></li>
 									</ul>
 							</li> 
 							@endif
@@ -93,6 +93,8 @@
 									<li {!! (in_array('/leave-check',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/leave-check') !!}"><i class="fa fa-angle-right"></i> {!! trans('messages.leave_blance_check') !!} </a>
 									</li>
 									<li {!! (in_array('/leave-apply',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/leave-apply') !!}"><i class="fa fa-angle-right"></i> {!! trans('messages.leave_apply') !!} </a>
+									</li>
+									<li {!! (in_array('/leave-report',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/leave-report') !!}"><i class="fa fa-angle-right"></i> Leave Report </a>
 									</li>
 									
 								</ul>
