@@ -118,6 +118,7 @@ Route::group(['middleware' => ['auth','license','account_valid']], function () {
 	Route::resource('/branch', 'BranchController');
 	// Section for Employee
 	Route::resource('/sections', 'SectionController');
+	Route::resource('/grades','GradeController');
 
 	Route::group(['middleware' => ['permission:manage_custom_field']], function () {
 		Route::model('custom_field','\App\CustomField');

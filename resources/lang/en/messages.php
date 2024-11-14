@@ -777,4 +777,5 @@
   'leave_blance_check' => 'Leave Balance Check',
   'leave_apply' => 'Apply Leave',
   'leave_repot' => 'Leave Report',
+  'grade' => 'Grade',
 );
