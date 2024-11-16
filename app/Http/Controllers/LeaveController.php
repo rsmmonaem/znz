@@ -544,16 +544,17 @@ Class LeaveController extends Controller{
  */
 	public function getuserData(Request $request){
 		$id = $request->id;
-		$employee = User::select('users.id', 'users.first_name as name', 'profile.employee_code as employee_id', 'designations.name as designation')
+		$employee = User::select('users.id', 'users.first_name as name', 'profile.employee_code as employee_id', 'designations.name as designation', 'designations.id as designation_id')
 		->LeftJoin('profile', 'users.id', '=', 'profile.user_id')
 		->LeftJoin('designations', 'users.designation_id', '=', 'designations.id')
 		->where('users.id','=',$id)
 		->first();
-		// return $employee->name;
+		// return $employee;
 		if ($employee) {
 			return response()->json([
 				'name' => $employee->name,
 				'designation' => $employee->designation,
+				'designation_id' => $employee->designation_id
 			]);
 		} else {
 			return response()->json(['error' => 'Employee not found'], 404);
