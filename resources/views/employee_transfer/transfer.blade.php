@@ -90,7 +90,7 @@
                                         @endforeach
                                     </select>
                                 </div>
-                                <div class="form-group">
+                                {{-- <div class="form-group">
                                     <label>Designation</label>
                                     <select class="form-control select2me select2-offscreen" name="fdesignation">
                                         <option value="">Select Designation</option>
@@ -98,14 +98,10 @@
                                             <option value="{{ $d->id }}">{{ $d->name }}</option>
                                         @endforeach
                                     </select>
-                                </div>
-                                <div class="form-group">
-                                    <label>Transfer Date</label>
-                                    <input type="date" class="form-control" name="ftransfer_date">
-                                </div>
+                                </div> --}}
                                 <div class="form-group">
                                     <label>Employee ID</label>
-                                    <select class="form-control select2me select2-offscreen" name="femployee">
+                                    <select id="employeeId" class="form-control select2me select2-offscreen" name="femployee">
                                         <option value="">Select Employee ID</option>
                                         @foreach ($employee as $e)
                                             <option value="{{ $e->id }}">{{ $e->first_name }} -
@@ -113,10 +109,19 @@
                                         @endforeach
                                     </select>
                                 </div>
-                                {{-- <div class="form-group">
+                                <div class="form-group">
                                         <label>Employee Name</label>
-                                        <input type="text" class="form-control" placeholder="Enter Employee Name">
-                                    </div> --}}
+                                        <input type="text" class="form-control" placeholder="Enter Employee Name" id="employeeName" readonly>
+                                </div>
+                                 <div class="form-group">
+                                        <label>Degisnation</label>
+                                        <input type="text" class="form-control" name="fdesignation" id="employeeDesignation" placeholder="Enter Employee Designation" readonly>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Transfer Date</label>
+                                    <input type="date" class="form-control" name="ftransfer_date">
+                                </div> 
                             </div>
 
                             <div class="col-md-6">
@@ -327,5 +332,25 @@
                 toastr.info('Action cancelled.'); // Info toast for cancelled action
             }
         });
+
+        $('#employeeId').on('change', function() {
+            var employeeId = $(this).val();
+            $.ajax({
+                url: '/getuserData',
+                type: 'POST',
+                data: {
+                    "_token": "{{ csrf_token() }}",
+                    "id": employeeId
+                },
+                success: function(response) {
+                    $('#employeeName').val(response.name);
+                    $('#employeeDesignation').val(response.designation);
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error fetching employee data:", error);
+                    toastr.error("Failed to retrieve employee data. Please try again.");
+                }
+            });
+        })
     </script>
 @stop
