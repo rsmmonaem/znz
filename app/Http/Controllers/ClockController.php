@@ -1,5 +1,7 @@
 <?php
 namespace App\Http\Controllers;
+
+use App\Branch;
 use DB;
 use App\Clock;
 use Auth;
@@ -11,12 +13,16 @@ use File;
 use App\Holiday;
 use App\User;
 use App\Classes\Helper;
+use App\Department;
+use App\Designation;
 use Illuminate\Http\Request;
 use App\Http\Requests\ClockRequest;
 use App\Http\Requests\AttendanceRequest;
 use App\Http\Requests\DateWiseAttendanceRequest;
 use App\Http\Requests\DateWiseSummaryAttendanceRequest;
 use App\Http\Requests\AttendanceUploadRequest;
+use App\Profile;
+use App\Section;
 use Validator;
 
 Class ClockController extends Controller{
@@ -601,6 +607,7 @@ Class ClockController extends Controller{
 			$users = User::whereId(Auth::user()->id)->get()->pluck('full_name_with_designation','id')->all();
 
         $col_heads = array(
+				trans('messages.name'),
         		trans('messages.status'),
         		trans('messages.date'),
         		trans('messages.clock_in'),
@@ -641,20 +648,32 @@ Class ClockController extends Controller{
         $raw_data = array();
 
 		$leave_approved = array();
+		$leave_pending = array();
 
-        $leaves = \App\Leave::whereUserId($user_id)->whereStatus('approved')->where(function($query) use($from_date,$to_date) {
-            $query->whereBetween('from_date',array($from_date,$to_date))
-            ->orWhereBetween('to_date',array($from_date,$to_date))
-            ->orWhere(function($query1) use($from_date,$to_date) {
-                $query1->where('from_date','<',$from_date)
-                ->where('to_date','>',$to_date);
-            });
-        })->get();
+		function getLeaveCount($user_id,$from_date,$to_date,$type){
+			return \App\Leave::whereUserId($user_id)->whereStatus($type)->where(function ($query) use ($from_date, $to_date) {
+				$query->whereBetween('from_date', array($from_date, $to_date))
+					->orWhereBetween('to_date', array($from_date, $to_date))
+					->orWhere(function ($query1) use ($from_date, $to_date) {
+						$query1->where('from_date', '<', $from_date)
+							->where('to_date', '>', $to_date);
+					});
+			})->get();
+		}
+
+		$leaves = getLeaveCount($user_id,$from_date,$to_date,'approved');
+		$leavesWP = getLeaveCount($user_id, $from_date, $to_date, 'lwp');
         foreach($leaves as $leave){
             $leave_approved_dates = ($leave->approved_date) ? explode(',',$leave->approved_date) : [];
             foreach($leave_approved_dates as $leave_approved_date)
                 $leave_approved[] = $leave_approved_date;
         }
+
+		foreach ($leavesWP as $leave) {
+			$leave_approved_dates = ($leave->approved_date) ? explode(',', $leave->approved_date) : [];
+			foreach ($leave_approved_dates as $leave_approved_date)
+			   $leave_pending[] = $leave_approved_date;
+		}
 
         $user = User::find($user_id);
         $clocked_user = array();
@@ -668,6 +687,7 @@ Class ClockController extends Controller{
         $total_overtime = 0;
         $total_working = 0;
         $total_rest = 0;
+
 
         $date = $from_date;
         $tag_count = array();
@@ -736,8 +756,11 @@ Class ClockController extends Controller{
 				$attendance_label = '<span class="badge badge-success">'.trans('messages.present').'</span>';
 			} elseif(count($leave_approved) && in_array($date,$leave_approved)){
 				$attendance = 'L';
-				$attendance_label = '<span class="badge badge-warning">'.trans('messages.leave').'</span>';
-			} elseif($holiday){
+				$attendance_label = '<span class="badge badge-warning">'.trans('messages.leave_title').'</span>';
+			} elseif(count($leave_pending) && in_array($date,$leave_pending)){
+				$attendance = 'LWP';
+				$attendance_label = '<span class="badge badge-warning">' . 'LWP' . '</span>';
+			}elseif($holiday){
 				$attendance = 'H';
 				$attendance_label = '<span class="badge badge-info">'.trans('messages.holiday').'</span>';
 			} elseif(!$holiday && $date < date('Y-m-d')){
@@ -763,6 +786,8 @@ Class ClockController extends Controller{
 				);
 
 			$rows[] = array(
+				    
+					$user->full_name_with_designation,
 					$attendance_label,
 					showDate($date),
 					(isset($in)) ? showTime($in->clock_in) : '-',
@@ -820,38 +845,50 @@ Class ClockController extends Controller{
         $cols_summary = array_count_values($cols_summary);
         $tag_summary = array_count_values($tag_count);
         $list['aaData'] = $rows;
-        $list['foot'] = '<tr>
-        				<th colspan="4"></th>
-        				<th>'.Helper::showDuration($total_late).'</th>
-        				<th>'.Helper::showDuration($total_early).'</th>
-        				<th>'.Helper::showDuration($total_overtime).'</th>
-        				<th>'.Helper::showDuration($total_working).'</th>
-        				<th>'.Helper::showDuration($total_rest).'</th>
-        				<th></th>
-        				</tr>';
-       	$list['summary'] = '<ul class="list-group">
-				  <li class="list-group-item">
-					<span class="badge badge-danger">'.(array_key_exists('A',$cols_summary) ? $cols_summary['A'] : '-').'</span>'.trans('messages.absent').
-				  '</li>
-				  <li class="list-group-item">
-					<span class="badge badge-info">'.(array_key_exists('H',$cols_summary) ? $cols_summary['H'] : '-').'</span>'.trans('messages.holiday').
-				  '</li>
-				  <li class="list-group-item">
-					<span class="badge badge-success">'.(array_key_exists('P',$cols_summary) ? $cols_summary['P'] : '-').'</span>'.trans('messages.present').
-				  '</li>
-				  <li class="list-group-item">
-					<span class="badge badge-warning">'.(array_key_exists('L',$cols_summary) ? $cols_summary['L'] : '-').'</span>'.trans('messages.leave').
-				  '</li>
-				  <li class="list-group-item">
-					<span class="badge badge-danger">'.(array_key_exists('L',$tag_summary) ? $tag_summary['L'] : '-').'</span>'.trans('messages.late').
-				  '</li>
-				  <li class="list-group-item">
-					<span class="badge badge-success">'.(array_key_exists('O',$tag_summary) ? $tag_summary['O'] : '-').'</span>'.trans('messages.overtime').
-				  '</li>
-				  <li class="list-group-item">
-					<span class="badge badge-warning">'.(array_key_exists('E',$tag_summary) ? $tag_summary['E'] : '-').'</span>'.trans('messages.early').
-				  '</li>
-				</ul>';
+        // $list['foot'] = '<tr>
+        // 				<th colspan="5"></th>
+        // 				<th>'.Helper::showDuration($total_late).'</th>
+        // 				<th>'.Helper::showDuration($total_early).'</th>
+        // 				<th>'.Helper::showDuration($total_overtime).'</th>
+        // 				<th>'.Helper::showDuration($total_working).'</th>
+        // 				<th>'.Helper::showDuration($total_rest).'</th>
+        // 				<th></th>
+        // 				</tr>';
+       	$list['foot'] =
+		'
+<table class="table table-bordered" style="width:100%">
+    <thead>
+        <tr style="background-color: #f5f5f5">
+            <th class="text-center">' . trans('messages.absent') . '</th>
+            <th class="text-center">' . trans('messages.holiday') . '</th>
+            <th class="text-center">' . trans('messages.present') . '</th>
+            <th class="text-center">' . trans('messages.leave_title') . '</th>
+            <th class="text-center">LWP</th>
+            <th class="text-center">' . trans('messages.late') . '</th>
+            <th class="text-center">' . trans('messages.overtime') . '</th>
+            <th class="text-center">' . trans('messages.early') . '</th>
+			<th class="text-center">' .'Late' . '</th>
+			<th class="text-center">' .'Working' . '</th>
+			<th class="text-center">' .'Early' . '</th>
+        </tr>
+    </thead>
+    <tbody style="text-center">
+        <tr>
+            <th class="text-danger text-center">' . (array_key_exists("A", $cols_summary) ? $cols_summary["A"] : "-") . '</th>
+            <th class="text-info text-center">' . (array_key_exists("H", $cols_summary) ? $cols_summary["H"] : "-") . '</th>
+            <th class="text-success text-center">' . (array_key_exists("P", $cols_summary) ? $cols_summary["P"] : "-") . '</th>
+            <th class="text-warning text-center">' . (array_key_exists("L", $cols_summary) ? $cols_summary["L"] : "-") . '</th>
+            <th class="text-warning text-center">' . (array_key_exists("LWP", $cols_summary) ? $cols_summary["LWP"] : "-") . '</th>
+            <th class="text-danger text-center">' . (array_key_exists("L", $tag_summary) ? $tag_summary["L"] : "-") . '</th>
+            <th class="text-success text-center">' . (array_key_exists("O", $tag_summary) ? $tag_summary["O"] : "-") . '</th>
+            <th class="text-warning text-center">' . (array_key_exists("E", $tag_summary) ? $tag_summary["E"] : "-") . '</th>
+			<th>' . Helper::showDuration($total_overtime) . '</th>
+			<th>' . Helper::showDuration($total_working) . '</th>
+        	<th>' . Helper::showDuration($total_rest) . '</th>
+        </tr>
+    </tbody>
+</table>
+';
 
         return json_encode($list);
 	}
@@ -1272,6 +1309,37 @@ Class ClockController extends Controller{
             return response()->json($response, 200, array('Access-Controll-Allow-Origin' => '*'));
         }
         return redirect()->back()->withSuccess(trans('messages.deleted'));
+	}
+
+	public function attendanceReprt(Request $request){
+	   $branch = Branch::all();
+	   $section = Section::all();
+	   $department = Department::all();
+       $category = ['staff', 'owner'];
+	   $designation = Designation::all();
+	   return view('attendance.report',compact('branch','section','department','category','designation'));
+	} 
+
+	public function attendanceReprtPOST(Request $request){
+		$user = User::leftJoin('profile', 'users.id', '=', 'profile.user_id')
+		->leftJoin('designations', 'users.designation_id', '=', 'designations.id')
+		->leftJoin('departments', 'designations.department_id', '=', 'departments.id')
+		->leftJoin('sections', 'profile.section_id', '=', 'sections.id')
+		->where('profile.employee_code', '=', $request->employee_id)
+		->when($request->branch, function ($query) use ($request) {
+			return $query->where('profile.branch_id', '=', $request->branch);
+		})
+		->when($request->section, function ($query) use ($request) {
+			return $query->where('profile.section_id', '=', $request->section);
+		})
+		->when($request->department, function ($query) use ($request) {
+			return $query->where('departments.id', '=', $request->department);
+		})
+		->select('users.id', 'profile.employee_code as employee_id', 'designations.name as designation_name', 'departments.name as department_name', 'users.first_name', 'sections.name as section_name')
+		->first();
+
+		return $user;
+		// return $request->all();
 	}
 }
 ?>

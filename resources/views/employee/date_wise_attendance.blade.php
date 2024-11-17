@@ -38,11 +38,15 @@
 					{!! Form::close() !!}
 				</div>
 			</div>
-			<div class="col-sm-4 pull-right" id="attendance_summary"></div>
+			
 			<div class="col-sm-12">
 				<div class="box-info full">
 					<h2><strong>{!! trans('messages.attendance') !!}</strong> @if(isset($user)) {!! trans('messages.of') !!} {!! $user->full_name_with_designation.' '.trans('messages.'.$month).' '.$year !!} @endif</h2>
+					@php
+						$total = '<div class="col-sm-12" id="attendance_summary"></div>';
+					@endphp
 					@include('common.datatable',['col_heads' => $col_heads])
+					
 				</div>
 			</div>
 		</div>

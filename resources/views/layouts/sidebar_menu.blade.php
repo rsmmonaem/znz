@@ -75,6 +75,7 @@
 									@if(Entrust::can('update_attendance'))
 									<li {!! (in_array('update_attendance',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/update-attendance') !!}"><i class="fa fa-angle-right"></i> {!! trans('messages.update_attendance') !!} </a></li>
 									@endif
+									<li {!! (in_array('attandance_report',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/attendance-report') !!}"><i class="fa fa-angle-right"></i> {!! trans('messages.attandance_report') !!} </a></li>
 								</ul>
 							</li>
 							@if(Entrust::can('list_holiday'))
