@@ -116,6 +116,7 @@
                                  <div class="form-group">
                                         <label>Degisnation</label>
                                         <input type="text" class="form-control" name="fdesignation" id="employeeDesignation" placeholder="Enter Employee Designation" readonly>
+                                        <input type="hidden" name= "fdesignation_id" id="employeeDesignationID" >
                                 </div>
 
                                 <div class="form-group">
@@ -220,7 +221,7 @@
             const fbranch = document.querySelector('select[name="fbranch"]').value;
             const fdepartment = document.querySelector('select[name="fdepartment"]').value;
             const fsection = document.querySelector('select[name="fsection"]').value;
-            const fdesignation = document.querySelector('select[name="fdesignation"]').value;
+            const fdesignation = document.getElementById('employeeDesignationID').value;
             const ftransfer_date = document.querySelector('input[name="ftransfer_date"]').value;
             const femployee = document.querySelector('select[name="femployee"]').value;
             const tbranch = document.querySelector('select[name="tbranch"]').value;
@@ -229,7 +230,8 @@
             const tdesignation = document.querySelector('select[name="tdesignation"]').value;
             const tjoin_date = document.querySelector('input[name="tjoin_date"]').value;
             const remarks = document.querySelector('.remarks-box').value;
-
+            // alert(fdesignation);
+            // return;
             const formData = {
                 fbranch: fbranch,
                 fdepartment: fdepartment,
@@ -343,8 +345,10 @@
                     "id": employeeId
                 },
                 success: function(response) {
+                    console.log(response);
                     $('#employeeName').val(response.name);
                     $('#employeeDesignation').val(response.designation);
+                    $('#employeeDesignationID').val(response.designation_id);
                 },
                 error: function(xhr, status, error) {
                     console.error("Error fetching employee data:", error);

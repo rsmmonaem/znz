@@ -314,6 +314,7 @@
   'last_name' => 'Bangla Name',
   'late' => 'Late',
   'leave' => 'Leave Management',
+  'leave_title' => 'Leave',
   'leave_already_approved_for_contract' => 'Employee has already leave approved for this contract period.',
   'leave_already_assigned_for_contract' => 'Leave already assigned for this contract.',
   'leave_blank_for_all_designation' => 'Leave it blank for all designation',
@@ -778,4 +779,6 @@
   'leave_apply' => 'Apply Leave',
   'leave_repot' => 'Leave Report',
   'grade' => 'Grade',
+  'attandance_report' => 'Attendance Report',
+  'reports' => 'Reports',
 );

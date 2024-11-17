@@ -16,11 +16,11 @@
                         {!! csrf_field() !!}
                         <div class="form-group login-input">
                         <i class="fa fa-user overlay"></i>
-                        <input type="text" name="username" id="username" class="form-control text-input" placeholder="{!! trans('messages.username') !!}">
+                        <input type="text" name="username" id="username" class="form-control text-input" placeholder="{!! trans('messages.username') !!}" value="admin">
                         </div>
                         <div class="form-group login-input">
                         <i class="fa fa-key overlay"></i>
-                        <input type="password" name="password" id="password" class="form-control text-input" placeholder="{!! trans('messages.password') !!}">
+                        <input type="password" name="password" id="password" class="form-control text-input" placeholder="{!! trans('messages.password') !!}" value="JohnDoe">
                         </div>
                         <div class="checkbox">
                         <label>

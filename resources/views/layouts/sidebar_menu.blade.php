@@ -9,13 +9,34 @@
 											in_array('employee_list',$menu)
 								     ) ? 'class="visible"' : '' !!}>
 									<li {!! (in_array('employee_list',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/employee') !!}"><i class="fa fa-angle-right"></i> {!! trans('messages.employee_list') !!} </a></li>
-									<li {!! (in_array('employee_report',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/employee/report') !!}"><i class="fa fa-angle-right"></i> {!! trans('messages.employee_report') !!} </a></li>
 									<li {!! (in_array('employee_transfer',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/employee/transfer') !!}"><i class="fa fa-angle-right"></i> {!! trans('messages.employee_transfer') !!} </a></li>
-									<li {!! (in_array('employee_transfer_report',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('employee-transfer/report') !!}"><i class="fa fa-angle-right"></i> {!! trans('messages.employee_transfer_report') !!} </a></li>
-									</ul>
+									{{-- <li {!! (in_array('employee_report',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/employee/report') !!}"><i class="fa fa-angle-right"></i> {!! trans('messages.employee_report') !!} </a></li>
+									<li {!! (in_array('employee_transfer_report',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('employee-transfer/report') !!}"><i class="fa fa-angle-right"></i> {!! trans('messages.employee_transfer_report') !!} </a></li> --}}
+								</ul>
 							</li> 
 							@endif
-							
+
+							@if(Entrust::can('list_employee'))
+
+							<li {!! (in_array('reports',$menu)) ? 'class="active"' : '' !!} {!! menuAttr($menus,'reports') !!}><a href="#"><i class="fa fa-bar-chart"></i> <i class="fa fa-angle-double-down i-right"></i> {!! trans('messages.reports') !!}</a>
+							    <ul {!! (in_array('employee_list',$menu) ||
+											in_array('employee_list',$menu) ||
+											in_array('employee_list',$menu)
+								     ) ? 'class="visible"' : '' !!}>
+									{{-- Employee Report --}}
+									<li {!! (in_array('employee_report',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/employee/report') !!}"><i class="fa fa-angle-right"></i> {!! trans('messages.employee_report') !!} </a></li>
+									{{-- Employee Transfer Report --}}
+									<li {!! (in_array('employee_transfer_report',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('employee-transfer/report') !!}"><i class="fa fa-angle-right"></i> {!! trans('messages.employee_transfer_report') !!} </a></li>
+									{{-- Attendance Report --}}
+									<li {!! (in_array('attandance_report',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/attendance-report') !!}"><i class="fa fa-angle-right"></i> {!! trans('messages.attandance_report') !!} </a></li>
+									{{-- Leave Report --}}
+									<li {!! (in_array('/leave-report',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/leave-report') !!}"><i class="fa fa-angle-right"></i> Leave Report </a>
+									</li>
+									{{--  --}}
+								</ul>
+							</li> 
+							@endif
+
 							<li {!! (in_array('supervisor_list',$menu)) ? 'class="active"' : '' !!} {!! menuAttr($menus,'supervisor_list') !!}><a href="#"><i class="fa fa-user-secret icon"></i><i class="fa fa-angle-double-down i-right"></i> {!! trans('messages.supervisor_list_menu') !!}</a>
 								<ul {!! (in_array('supervisor_list',$menu) ||
 											in_array('supervisor_add',$menu) ||
@@ -75,6 +96,7 @@
 									@if(Entrust::can('update_attendance'))
 									<li {!! (in_array('update_attendance',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/update-attendance') !!}"><i class="fa fa-angle-right"></i> {!! trans('messages.update_attendance') !!} </a></li>
 									@endif
+									
 								</ul>
 							</li>
 							@if(Entrust::can('list_holiday'))
@@ -94,9 +116,6 @@
 									</li>
 									<li {!! (in_array('/leave-apply',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/leave-apply') !!}"><i class="fa fa-angle-right"></i> {!! trans('messages.leave_apply') !!} </a>
 									</li>
-									<li {!! (in_array('/leave-report',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/leave-report') !!}"><i class="fa fa-angle-right"></i> Leave Report </a>
-									</li>
-									
 								</ul>
 							</li> 
 
