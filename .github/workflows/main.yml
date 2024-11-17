@@ -20,9 +20,9 @@ jobs:
     - name: Setup FTP deployment
       uses: SamKirkland/FTP-Deploy-Action@4.3.0
       with:
-        server: ftp.nibiz.online
-        username: zandz@znz.nibiz.online
-        password: bn+2IF01:lxE4I
+        server: ftp.betikromfashion.com
+        username: znz@zandz.betikromfashion.com
+        password: L7Uk.71s#HiNt1
         local-dir: ./
         server-dir: /
         exclude: .gitignore
