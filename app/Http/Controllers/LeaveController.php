@@ -723,7 +723,9 @@ Class LeaveController extends Controller{
 		->leftJoin('designations', 'users.designation_id', '=', 'designations.id')
 		->leftJoin('departments', 'designations.department_id', '=', 'departments.id')
 		->leftJoin('sections', 'profile.section_id', '=', 'sections.id')
-		->where('profile.employee_code', '=', $request->employeeID)
+		->when($request->employeeID, function ($query) use ($request) {
+			return $query->where('profile.employee_code', '=', $request->employeeID);
+		})
 		->when($request->branch, function ($query) use ($request) {
 			return $query->where('profile.branch_id', '=', $request->branch);
 		})
@@ -733,14 +735,16 @@ Class LeaveController extends Controller{
 		->when($request->department, function ($query) use ($request) {
 			return $query->where('departments.id', '=', $request->department);
 		})
+		->when($request->designation, function ($query) use ($request) {
+			return $query->where('designations.id', '=', $request->designation);
+		})
 		->select('users.id', 'profile.employee_code as employee_id' ,'designations.name as designation_name', 'departments.name as department_name', 'users.first_name', 'sections.name as section_name')
-		->first();
-
+		->get();
+       
 		if (!$user) {
-			return response()->json(['error' => 'User not found'], 404);
+			return response()->json(['error' => 'User not found'], 500);
 		}
-
-		$data = Leave::where('user_id', '=', $user->id)
+		$data = Leave::whereIn('user_id', $user->pluck('id'))
 			->leftJoin('leave_types', 'leaves.leave_type_id', '=', 'leave_types.id')
 			->when($request->status, function ($query) use ($request) {
 				return $query->where('leaves.status', '=', $request->status);
@@ -750,11 +754,10 @@ Class LeaveController extends Controller{
 			->select('leaves.*', 'leave_types.name as leave_type_name')
 			->get();
 
-		$mergedLeaveRecords = $data->map(function ($data) use ($user) {
-			return array_merge($user->toArray(), $data->toArray());
+		$mergedLeaveRecords = $data->map(function ($leave) use ($user) {
+			$user = $user->where('id', $leave->user_id)->first(); 
+			return array_merge($user->toArray(), $leave->toArray());
 		});
-
-		// return $mergedLeaveRecords;
 
 		$finalData = [
 			'data' => $mergedLeaveRecords,

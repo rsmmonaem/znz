@@ -780,4 +780,5 @@
   'leave_repot' => 'Leave Report',
   'grade' => 'Grade',
   'attandance_report' => 'Attendance Report',
+  'reports' => 'Reports',
 );

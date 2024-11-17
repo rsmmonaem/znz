@@ -142,66 +142,7 @@
                             </form>
                         </div>
 
-                        <div class="table-container" style="display: none">
-                            <h3>Report View</h3>
-                            <style>
-                                .center-item {
-                                    margin-left: auto;
-                                    margin-right: auto;
-                                    /* Centers the second item */
-                                }
-
-                                .display-flex {
-                                    display: flex;
-                                    justify-content: space-between;
-                                    align-items: center;
-                                    border: 1px solid #ccc;
-                                    padding: 10px;
-                                    margin: 0 0 20px 0;
-                                }
-                            </style>
-                            <div class="display-flex">
-                                <div class="left-item">
-                                    <img src="{{ URL::to(config('constants.upload_path.logo').config('config.logo')) }}" width="150px" style="margin-left:20px;">
-                                </div>
-                                <div class="center-item">
-                                    <h4>Head Office</h4>
-                                    <p>Address : {{ config('config.address_1') }}</p>
-                                    <p>Name of the Report</p>
-                                </div>
-                            </div>
-
-                            <table class="table table-bordered table-striped">
-                                <thead>
-                                    <tr>
-                                        <th>SL</th>
-                                        <th>ID</th>
-                                        <th>Name</th>
-                                        <th>Designation</th>
-                                        <th>Department</th>
-                                        <th>Section</th>
-                                        <th>DOJ</th>
-                                        <th>DOB</th>
-                                        <th>Blood</th>
-                                        <th>Category</th>
-                                        <th>Mobile</th>
-                                        <th>Gender</th>
-                                        <th>Grade</th>
-                                        <th>Job Nature</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="report-tbody">
-
-                                </tbody>
-                            </table>
-
-                            <div class="display-flex">
-                                <div class="left-item"></div>
-                                <div class="center-item">
-                                    <button class="btn btn-primary" id="print">Print</button>
-                                </div>
-                            </div>
-                        </div>
+                   
                     </div>
                 </div>
             </div>
@@ -250,73 +191,168 @@
                 document.querySelector('.table-container').style.display = 'none';
             })
             // Generate Report
-            document.getElementById('report').addEventListener('click', function() {
-                const btn = document.getElementById('report');
-                btn.disabled = true;
-                // Get values of all form fields
-                const group = document.querySelector('select[name="group"]').value;
-                const report_type = document.querySelector('select[name="report_type"]').value;
-                const branch = document.querySelector('select[name="branch"]').value;
-                const category = document.querySelector('select[name="category"]').value;
-                const department = document.querySelector('select[name="department"]').value;
-                const gender = document.querySelector('select[name="gender"]').value;
-                const section = document.querySelector('select[name="section"]').value;
-                const grade = document.querySelector('select[name="grade"]').value;
-                const designation = document.querySelector('select[name="designation"]').value;
-                const employee_id = document.querySelector('input[name="employee_id"]').value;
-                const multiple_id = document.querySelector('input[name="multiple_id"]').value;
-                const multiple_id_array = multiple_id.split(',').map(id => id.trim()).filter(id => id !== "");
-                const formData = {
-                    group: group,
-                    report_type: report_type,
-                    branch: branch,
-                    category: category,
-                    department: department,
-                    gender: gender,
-                    section: section,
-                    grade: grade,
-                    designation: designation,
-                    employee_id: employee_id,
-                    multiple_id: multiple_id_array
-                };
-                console.log(formData);
-                $.ajax({
-                    url: "{{ url('employee/report') }}",
-                    method: 'POST',
-                    data: formData,
-                    success: function(response) {
-                        btn.disabled = false;
-                        // console.log(response);
-                        document.querySelector('.table-container').style.display = 'block';
-                        const tbody = document.getElementById('report-tbody');
-                        tbody.innerHTML = '';
-                        response.forEach((item, index) => {
-                            const tr = document.createElement('tr');
-                            tr.innerHTML = `
-                            <td>${index + 1}</td>
-                            <td>${item.employee_code}</td>
-                            <td>${item.first_name || ''}</td>
-                            <td>${item.designation_name || ''}</td>
-                            <td>${item.department_name || ''}</td>
-                            <td>${item.section_name || ''}</td>
-                            <td>${item.date_of_joining || ''}</td>
-                            <td>${item.date_of_birth || ''}</td>
-                            <td>${item.blood_group || ''}</td>
-                            <td>${item.category || ''}</td>
-                            <td>${item.contact_number || ''}</td>
-                            <td>${item.gender || ''}</td>
-                            <td>${item.grade_name || ''}</td>
-                            <td>${item.job_nature || ''}</td>
-                        `;
-                            tbody.appendChild(tr);
-                        });
-                    },
-                    error: function(xhr, status, error) {
-                        console.error(error);
-                        btn.disabled = false;
-                    }
-                })
-            });
         });
+        document.getElementById('report').addEventListener('click', function () {
+    const btn = document.getElementById('report');
+    btn.disabled = true;
+
+    // Collect form values
+    const group = document.querySelector('select[name="group"]').value;
+    const report_type = document.querySelector('select[name="report_type"]').value;
+    const branch = document.querySelector('select[name="branch"]').value;
+    const category = document.querySelector('select[name="category"]').value;
+    const department = document.querySelector('select[name="department"]').value;
+    const gender = document.querySelector('select[name="gender"]').value;
+    const section = document.querySelector('select[name="section"]').value;
+    const grade = document.querySelector('select[name="grade"]').value;
+    const designation = document.querySelector('select[name="designation"]').value;
+    const employee_id = document.querySelector('input[name="employee_id"]').value;
+    const multiple_id = document.querySelector('input[name="multiple_id"]').value;
+    const multiple_id_array = multiple_id.split(',').map(id => id.trim()).filter(id => id !== "");
+
+    const formData = {
+        group: group,
+        report_type: report_type,
+        branch: branch,
+        category: category,
+        department: department,
+        gender: gender,
+        section: section,
+        grade: grade,
+        designation: designation,
+        employee_id: employee_id,
+        multiple_id: multiple_id_array
+    };
+
+    console.log(formData);
+
+    $.ajax({
+        url: "{{ url('employee/report') }}",
+        method: 'POST',
+        data: formData,
+        success: function (response) {
+            btn.disabled = false;
+
+            // Generate report table rows dynamically
+            let tableRows = '';
+            response.forEach((item, index) => {
+                tableRows += `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${item.employee_code}</td>
+                        <td>${item.first_name || ''}</td>
+                        <td>${item.designation_name || ''}</td>
+                        <td>${item.department_name || ''}</td>
+                        <td>${item.section_name || ''}</td>
+                        <td>${item.date_of_joining || ''}</td>
+                        <td>${item.date_of_birth || ''}</td>
+                        <td>${item.blood_group || ''}</td>
+                        <td>${item.category || ''}</td>
+                        <td>${item.contact_number || ''}</td>
+                        <td>${item.gender || ''}</td>
+                        <td>${item.grade_name || ''}</td>
+                        <td>${item.job_nature || ''}</td>
+                    </tr>
+                `;
+            });
+
+            // Open a new window and inject HTML content
+            const newWindow = window.open('', '_blank', 'width=1000,height=800');
+            newWindow.document.open();
+
+            // Build the report layout in the new window
+            const reportHTML = `
+                <html>
+                <head>
+                    <title>Employee Report</title>
+                    <style>
+                        body {
+                            font-family: Arial, sans-serif;
+                            margin: 20px;
+                        }
+                        .display-flex {
+                            display: flex;
+                            justify-content: space-between;
+                            align-items: center;
+                            border: 1px solid #ccc;
+                            padding: 10px;
+                            margin-bottom: 20px;
+                        }
+                        .center-item {
+                            text-align: center;
+                            margin: auto;
+                        }
+                        table {
+                            width: 100%;
+                            border-collapse: collapse;
+                            margin-bottom: 20px;
+                        }
+                        th, td {
+                            border: 1px solid #ccc;
+                            padding: 8px;
+                            text-align: left;
+                        }
+                        th {
+                            background-color: #f4f4f4;
+                        }
+                        h3 {
+                            text-align: center;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="table-container">
+                        <div class="display-flex">
+                            <div class="left-item">
+                                <img src="{{ URL::to(config('constants.upload_path.logo').config('config.logo')) }}" width="150px" style="margin-left:20px;">
+                            </div>
+                            <div class="center-item">
+                                <h4>Head Office</h4>
+                                <p>Address : {{ config('config.address_1') }}</p>
+                                <p>Name of the Report</p>
+                            </div>
+                        </div>
+                        <table class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th>SL</th>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Designation</th>
+                                    <th>Department</th>
+                                    <th>Section</th>
+                                    <th>DOJ</th>
+                                    <th>DOB</th>
+                                    <th>Blood</th>
+                                    <th>Category</th>
+                                    <th>Mobile</th>
+                                    <th>Gender</th>
+                                    <th>Grade</th>
+                                    <th>Job Nature</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${tableRows}
+                            </tbody>
+                        </table>
+                        <div class="display-flex">
+                            <div class="center-item">
+                                <button onclick="window.print()" class="btn btn-primary">Print</button>
+                            </div>
+                        </div>
+                    </div>
+                </body>
+                </html>
+            `;
+
+            newWindow.document.write(reportHTML);
+            newWindow.document.close();
+        },
+        error: function (xhr, status, error) {
+            console.error(error);
+            btn.disabled = false;
+        }
+    });
+});
     </script>
 @stop
