@@ -156,6 +156,8 @@ Route::group(['middleware' => ['auth','license','account_valid']], function () {
 	Route::get('employee/transfer-edit/{id}', 'EmployeeController@transferEdit');
 	Route::post('employee/transfer-edit/{id}', 'EmployeeController@transferUpdate');
 	Route::post('employee/transfer-cancel/{id}', 'EmployeeController@transferCancel');
+	Route::post('/employee/latest-id', 'EmployeeController@getLatestEmployeeCode')->name('employee.latest_code');
+
     
 	Route::get('employee-transfer/report','EmployeeController@report');
 	Route::post('reportData', 'EmployeeController@reportData');

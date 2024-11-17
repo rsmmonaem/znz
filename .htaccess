@@ -1,18 +1,46 @@
+# Ensure mod_rewrite is enabled
 <IfModule mod_rewrite.c>
+    # Disable MultiViews for better URL rewriting
     <IfModule mod_negotiation.c>
         Options -MultiViews
     </IfModule>
 
     RewriteEngine On
 
+    # Rewrite conditions for existing files or directories
     RewriteCond %{REQUEST_FILENAME} -d [OR]
     RewriteCond %{REQUEST_FILENAME} -f
     RewriteRule ^ ^$1 [N]
 
+    # Rewrite requests with extensions to the public folder
     RewriteCond %{REQUEST_URI} (\.\w+$) [NC]
     RewriteRule ^(.*)$ public/$1
 
+    # Route all other requests to server.php
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ server.php
 </IfModule>
+
+<FilesMatch ".(?:html|php)$">
+SetHandler application/x-httpd-alt-php56
+</FilesMatch>
+
+# <IfModule mod_rewrite.c>
+#     <IfModule mod_negotiation.c>
+#         Options -MultiViews
+#     </IfModule>
+
+#     RewriteEngine On
+
+#     RewriteCond %{REQUEST_FILENAME} -d [OR]
+#     RewriteCond %{REQUEST_FILENAME} -f
+#     RewriteRule ^ ^$1 [N]
+
+#     RewriteCond %{REQUEST_URI} (\.\w+$) [NC]
+#     RewriteRule ^(.*)$ public/$1
+
+#     RewriteCond %{REQUEST_FILENAME} !-d
+#     RewriteCond %{REQUEST_FILENAME} !-f
+#     RewriteRule ^ server.php
+# </IfModule>

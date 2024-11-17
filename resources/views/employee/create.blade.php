@@ -9,7 +9,7 @@
 		<div class="col-md-6">
 			<div class="form-group">
 			    {!! Form::label('first_name',trans('messages.first_name'),['class' => 'control-label'])!!}
-				{!! Form::input('text','first_name','',['class'=>'form-control','placeholder'=>trans('messages.first_name')])!!}
+				{!! Form::input('text','first_name','',['id' => 'username','class'=>'form-control','placeholder'=>trans('messages.first_name')])!!}
 			</div>
 			<div class="form-group">
 			    {!! Form::label('last_name',trans('messages.last_name'),['class' => 'control-label'])!!}
@@ -17,7 +17,7 @@
 			</div>
 			<div class="form-group">
 			    {!! Form::label('employee_code',trans('messages.employee_code'),['class' => 'control-label'])!!}
-				{!! Form::input('text','employee_code','',['class'=>'form-control','placeholder'=>trans('messages.employee_code')])!!}
+				{!! Form::input('text','employee_code','',['id' => 'employee_code', 'class'=>'form-control','placeholder'=>trans('messages.employee_code'),'readonly' => 'readonly'])!!}
 			</div>	
 			<div class="form-group">
 			    {!! Form::label('designation_id',trans('messages.designation'),['class' => 'control-label'])!!}

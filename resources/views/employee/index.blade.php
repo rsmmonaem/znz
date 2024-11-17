@@ -140,3 +140,29 @@
 		</div>
 
 	@stop
+
+	@section('javascript')
+	<script type="text/javascript">
+		$(document).ready(function() {
+			$('#employee_code').attr("disabled", true) 
+
+			$('#first_name').on('change', function () {
+				$.ajax({
+					url: '/employee/latest-id',
+					method: 'post',
+					headers: {
+						'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') // Include CSRF token
+					},
+					success: function (data) {
+						if (data.employee_code) {
+							$('#employee_code').val(data.employee_code);
+						}
+					},
+					error: function (xhr, status, error) {
+						console.error('Error fetching employee code:', error);
+					}
+				});
+			});
+		});
+	</script>
+	@stop
