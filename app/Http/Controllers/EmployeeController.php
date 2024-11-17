@@ -931,4 +931,11 @@ class EmployeeController extends Controller{
 
        return $data;
     }
+
+    public function getLatestEmployeeCode(Request $request)
+    {
+        $maxCode = Profile::max('employee_code');
+        $newCode = $maxCode ? intval($maxCode) + 1 : 1;
+        return response()->json(['employee_code' => $newCode]);
+    }
 }
