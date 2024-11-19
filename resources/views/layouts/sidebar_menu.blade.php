@@ -16,9 +16,8 @@
 							</li> 
 							@endif
 
-							@if(Entrust::can('list_employee'))
-
-							<li {!! (in_array('reports',$menu)) ? 'class="active"' : '' !!} {!! menuAttr($menus,'reports') !!}><a href="#"><i class="fa fa-bar-chart"></i> <i class="fa fa-angle-double-down i-right"></i> {!! trans('messages.reports') !!}</a>
+							@if(Entrust::can('all_report'))
+							<li data-position="21" {!! (in_array('reports',$menu)) ? 'class="active"' : '' !!} {!! menuAttr($menus,'reports') !!}><a href="#"><i class="fa fa-bar-chart"></i> <i class="fa fa-angle-double-down i-right"></i> {!! trans('messages.reports') !!}</a>
 							    <ul {!! (in_array('employee_list',$menu) ||
 											in_array('employee_list',$menu) ||
 											in_array('employee_list',$menu)
@@ -39,7 +38,8 @@
 							</li> 
 							@endif
 
-							<li {!! (in_array('supervisor_list',$menu)) ? 'class="active"' : '' !!} {!! menuAttr($menus,'supervisor_list') !!}><a href="#"><i class="fa fa-user-secret icon"></i><i class="fa fa-angle-double-down i-right"></i> {!! trans('messages.supervisor_list_menu') !!}</a>
+
+							<li data-position="35" {!! (in_array('supervisor_list',$menu)) ? 'class="active"' : '' !!} {!! menuAttr($menus,'supervisor_list') !!}><a href="#"><i class="fa fa-user-secret icon"></i><i class="fa fa-angle-double-down i-right"></i> {!! trans('messages.supervisor_list_menu') !!}</a>
 								<ul {!! (in_array('supervisor_list',$menu) ||
 											in_array('supervisor_add',$menu) ||
 											in_array('supervisor_employee',$menu)

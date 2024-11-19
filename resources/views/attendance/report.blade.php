@@ -295,8 +295,8 @@
                                 <td>${attendance.shift_name || 'N/A'}</td>
                                 <td>${attendance.in_time || 'N/A'}</td>
                                 <td>${attendance.out_time || 'N/A'}</td>
-                                <td>${attendance.status || 'N/A'} <br> ${attendance.overTime || ''} </br> ${attendance.lateTime || ''}</td>
-                                <td>${attendance.remarks || 'N/A'}</td>
+                                <td>${attendance.status || 'N/A'} </td>
+                                <td>${attendance.overTime || ''}</br> ${attendance.lateTime || ''}</td>
                             </tr>
                             `;
                         });
