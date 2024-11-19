@@ -47,7 +47,7 @@
         <div class="row">
             <div class="container attendance-report">
                 <h2 class="text-center">Attendance Report</h2>
-                <h4 class="text-center">Monthly Attendance Report</h4>
+                <h4 class="text-center">Daily Attendance Report</h4>
                 <form>
                     <div class="row">
                         <div class="col-md-6 form-section">
@@ -94,8 +94,8 @@
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label for="employeeId">Employee ID(Single & Multiple)</label>
-                                <input type="text" class="form-control" name="employeeId" id="employeeId" placeholder="ID1,ID2,ID3">
+                                <label for="employeeId">Employee ID</label>
+                                <input type="text" class="form-control" name="employeeId" id="employeeId">
                             </div>
                         </div>
                         <div class="col-md-6 form-section">
@@ -123,13 +123,13 @@
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label for="date">StartDate</label>
-                                <input type="date" name="date" class="form-control" id="startDate" format>
+                                <label for="date">Date</label>
+                                <input type="date" name="date" class="form-control" id="startDate">
                             </div>
-                            <div class="form-group">
+                            {{-- <div class="form-group">
                                 <label for="date">End Date</label>
                                 <input type="date" name="date" class="form-control" id="endDate">
-                            </div>
+                            </div> --}}
                             <div class="form-group">
                                 <label>Status</label>
                                 <div>
@@ -199,7 +199,7 @@
                     shift_id: shift_id
                 }
                 $.ajax({
-                    url: "{{ url('attendance-report') }}",
+                    url: "{{ url('daily-attendance-report') }}",
                     method: 'POST',
                     data: formData,
                     headers: {
@@ -254,7 +254,7 @@
                                         <h4>{{ config('config.company_name') }}</h4>
                                         <p>Daily Attendance Report (Date)</p>
                                         <p>Branch: {{ Auth::user()->profile->branch->name }}</p>
-                                        <p>Date: <strong id="date">${response.startDate} to ${response.toDate}</strong></p>
+                                        <p>Date: <strong id="date">${response.startDate} </strong></p>
                                     </div>
                                 </div>
                                 <table class="table table-bordered report-table">

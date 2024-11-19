@@ -21,8 +21,12 @@ use App\Http\Requests\AttendanceRequest;
 use App\Http\Requests\DateWiseAttendanceRequest;
 use App\Http\Requests\DateWiseSummaryAttendanceRequest;
 use App\Http\Requests\AttendanceUploadRequest;
+use App\Leave;
+use App\OfficeShift;
 use App\Profile;
 use App\Section;
+use App\UserShift;
+use Carbon\Carbon;
 use Validator;
 
 Class ClockController extends Controller{
@@ -1311,35 +1315,524 @@ Class ClockController extends Controller{
         return redirect()->back()->withSuccess(trans('messages.deleted'));
 	}
 
+	// Helper function to get the dates between two dates
+	
 	public function attendanceReprt(Request $request){
+
+		// $userId = 2;
+		// $startDate = Carbon::parse('2024-11-01');
+		// $endDate = Carbon::parse('2024-11-30');
+		// $weeklyHolidays = [Carbon::FRIDAY];
+
+		// function getDatesBetween($startDate, $endDate)
+		// {
+		// 	// Create Carbon instances for start and end dates
+		// 	$start = Carbon::parse($startDate)->addDay(); // Add 1 day to start date
+		// 	$end = Carbon::parse($endDate);
+		// 	// Generate an array of dates between the start and end dates
+		// 	$dates = [];
+		// 	while ($start->lt($end)) {
+		// 		$dates[] = $start->format('Y-m-d');
+		// 		$start->addDay(); 
+		// 	}
+		// 	return $dates;
+		// }
+		// // Profile Details
+		// $Profiles = Profile::where('user_id', '=', $userId)
+		// 	->LeftJoin('users', 'profile.user_id', '=', 'users.id')
+		// 	->LeftJoin('designations', 'users.designation_id', '=', 'designations.id')
+		// 	->LeftJoin('departments', 'designations.department_id', '=', 'departments.id')
+		// 	->LeftJoin('sections', 'profile.section_id', '=', 'sections.id')
+		// 	->LeftJoin('branchs', 'profile.branch_id', '=', 'branchs.id')
+		// 	->select('profile.employee_code', 'users.first_name','designations.name as designation_name', 'departments.name as department_name', 'sections.name as section_name', 'branchs.name as branch_name')
+		// 	->first();
+
+		// // Generate calendar range
+		// $dateRange = collect();
+		// for ($date = Carbon::parse($startDate); $date->lte(Carbon::parse($endDate)); $date->addDay()) {
+		// 	$dateRange->push($date->format('Y-m-d'));
+		// }
+
+		// // Fetch shift data
+        // $shiftTime = UserShift::where('user_id', '=', $userId)
+		// ->LeftJoin('office_shifts', 'user_shifts.office_shift_id', '=', 'office_shifts.id')
+		// ->LeftJoin('office_shift_details', 'user_shifts.office_shift_id', '=', 'office_shift_details.office_shift_id')
+		// ->select('user_shifts.user_id', 'office_shift_details.in_time', 'office_shift_details.out_time')
+		// ->first();
+
+		// // Fetch in-out data
+		// $attendances = Clock::leftJoin('users', 'clocks.user_id', '=', 'users.id')
+		//     ->whereBetween('date', [$startDate, $endDate])
+		// 	->where('clocks.user_id', '=', $userId)
+		// 	->select('clocks.date', 'clocks.clock_in', 'clocks.clock_out','users.id as user_id','users.first_name')
+		// 	->get()
+		// 	->groupBy('date');
+
+
+		// // Fetch leave data
+		// $leaves = Leave::leftJoin('users', 'leaves.user_id', '=', 'users.id')
+		// // ->where('leaves.status', '=', 'approved')
+		// ->where('leaves.user_id', '=', $userId)
+		// 	->where(function ($query) use ($startDate, $endDate) {
+		// 		$query->whereBetween('from_date', [$startDate, $endDate])
+		// 			->orWhere(function ($subQuery) use ($startDate, $endDate) {
+		// 				$subQuery->where('from_date', '<=', $startDate)
+		// 					->where('to_date', '>=', $endDate);
+		// 			});
+		// 	})
+		// 	->select('leaves.from_date', 'leaves.to_date','leaves.status')
+		// 	->get();
+		// // Initialize a collection to store leave days
+		// $leaveDays = collect();
+
+		// // Iterate through each leave record and get the leave days
+		// foreach ($leaves as $leave) {
+		// 	$fromDate = Carbon::parse($leave->from_date);
+		// 	$toDate = Carbon::parse($leave->to_date);
+		// 	$datesBetween = getDatesBetween($fromDate, $toDate);
+		// 	$leaveDays = $leaveDays->merge($datesBetween);
+		// 	foreach ($datesBetween as $date) {
+		// 		$leaveDays->put($date, $leave->status); 
+		// 	}
+		// }
+		// // Map the data to the calendar range
+		// $result = $dateRange->map(function ($date) use ($attendances, $leaveDays, $weeklyHolidays, $shiftTime, $Profiles) {
+		// 	$attendance = $attendances->get($date);
+		// 	$dayOfWeek = Carbon::parse($date)->dayOfWeek;
+		// 	$status = 'Absent'; // Default status
+
+		// 	$earliestClockIn = 'N/A';
+		// 	$latestClockOut = 'N/A';
+
+		// 	if ($leaveDays->has($date)) {
+		// 		$status = $leaveDays->get($date); 
+		// 	} elseif (in_array($dayOfWeek, $weeklyHolidays)) {
+		// 		$status = $attendance ? 'OT' : 'WHD';
+		// 	} elseif ($attendance && $attendance->count() > 0) {
+		// 		// Get earliest clock-in and latest clock-out
+		// 		$earliestClockIn = $attendance->min('clock_in'); // Earliest clock-in
+		// 		$latestClockOut = $attendance->max('clock_out'); // Latest clock-out
+		// 		if ($shiftTime) {
+		// 			$inTime = Carbon::parse($shiftTime->in_time);
+		// 			$outTime = Carbon::parse($shiftTime->out_time);
+		// 			$clockIn = Carbon::parse($earliestClockIn);
+		// 			$clockOut = Carbon::parse($latestClockOut);
+
+		// 			if ($clockIn->eq($inTime) && $clockOut->eq($outTime)) {
+		// 				$status = 'P'; // Present
+		// 			} elseif ($clockOut->gt($outTime)) { // Overtime check
+		// 				$overtimeHours = $clockOut->diffInHours($outTime);
+		// 				$status = "P (OT: {$overtimeHours} hrs)";
+		// 			} else {
+		// 				$status = 'OT'; // Regular overtime
+		// 			}
+		// 		} else {
+		// 			$status = 'P'; // Mark present if no shift defined
+		// 		}
+		// 	} else {
+		// 		$status = 'A'; // Absent
+		// 	}
+
+		// 	return [
+		// 		'date' => $date,
+		// 		'name' => $Profiles ? $Profiles->first_name : 'N/A',
+		// 		'designation' => $Profiles ? $Profiles->designation_name : 'N/A',
+		// 		'department' => $Profiles ? $Profiles->department_name : 'N/A',
+		// 		'section' => $Profiles ? $Profiles->section_name : 'N/A',
+		// 		'branch' => $Profiles ? $Profiles->branch_name : 'N/A',
+		// 		'day' => Carbon::parse($date)->format('D'),
+		// 		'in_time' => $earliestClockIn,
+		// 		'out_time' => $latestClockOut,
+		// 		'shift_time' => $shiftTime ? $shiftTime->in_time . ' - ' . $shiftTime->out_time : 'N/A',
+		// 		'status' => $status == 'P' ? 'Present' : 
+		// 		($status == 'OT' ? 'Overtime' : 
+		// 		($status == 'WHD' ? 'WHD' : 
+		// 		($status == 'A' ? 'Absent' : ($status == 'approved' ? 'Leave' : ($status == 'lwp' ? 'LWP' : 'N/A')) ))),
+		// 	];
+		// });
+		// Return the result
+		// return response()->json($result);
+		// foreach ($userIds as $userId) {}
 	   $branch = Branch::all();
 	   $section = Section::all();
 	   $department = Department::all();
        $category = ['staff', 'owner'];
 	   $designation = Designation::all();
-	   return view('attendance.report',compact('branch','section','department','category','designation'));
-	} 
+	   $shift = OfficeShift::all();
+	   return view('attendance.report',compact('branch','section','department','category','designation','shift'));
+	}
 
-	public function attendanceReprtPOST(Request $request){
-		$user = User::leftJoin('profile', 'users.id', '=', 'profile.user_id')
+	// Attendance Report POST method
+	public function attendanceReprtPOST(Request $request)
+	{
+		$employeeIds = $request->employee_id
+			? (is_array($request->employee_id) ? $request->employee_id : explode(',', $request->employee_id))
+			: null;
+		// Fetch user IDs based on the provided filters
+		$userIds = User::leftJoin('profile', 'users.id',
+			'=',
+			'profile.user_id'
+		)
 		->leftJoin('designations', 'users.designation_id', '=', 'designations.id')
 		->leftJoin('departments', 'designations.department_id', '=', 'departments.id')
 		->leftJoin('sections', 'profile.section_id', '=', 'sections.id')
-		->where('profile.employee_code', '=', $request->employee_id)
-		->when($request->branch, function ($query) use ($request) {
-			return $query->where('profile.branch_id', '=', $request->branch);
+		->LeftJoin('user_shifts', 'users.id', '=', 'user_shifts.id')
+		->when(!empty($employeeIds), function ($query) use ($employeeIds) {
+			return $query->whereIn('profile.employee_code', $employeeIds);
 		})
-		->when($request->section, function ($query) use ($request) {
-			return $query->where('profile.section_id', '=', $request->section);
+		->when(isset($request->branch_id) && !empty($request->branch_id), function ($query) use ($request) {
+			return $query->where('profile.branch_id', $request->branch_id);
 		})
-		->when($request->department, function ($query) use ($request) {
-			return $query->where('departments.id', '=', $request->department);
+		->when(isset($request->section_id) && !empty($request->section_id), function ($query) use ($request) {
+			return $query->where('profile.section_id', $request->section_id);
 		})
-		->select('users.id', 'profile.employee_code as employee_id', 'designations.name as designation_name', 'departments.name as department_name', 'users.first_name', 'sections.name as section_name')
-		->first();
+		->when(isset($request->department_id) && !empty($request->department_id), function ($query) use ($request) {
+			return $query->where('departments.id', $request->department_id);
+		})
+		->when(isset($request->designation_id) && !empty($request->designation_id), function ($query) use ($request) {
+			return $query->where('designations.id', $request->designation_id);
+		})
+		->when(isset($request->category_id) && !empty($request->category_id), function ($query) use ($request) {
+			return $query->where('profile.category', $request->category_id);
+		})
+		->when(isset($request->shift_id) && !empty($request->shift_id), function ($query) use ($request) {
+			return $query->where('user_shifts.office_shift_id', $request->shift_id);
+		})
+		->pluck('users.id');
+			
+		$results = collect();
+		foreach ($userIds as $userId) {
+			$userReport = $this->getAttendanceReport1($userId, $request->startDate, $request->endDate);
+			$results = $results->merge($userReport);
+		}
 
-		return $user;
-		// return $request->all();
+		$status_filter = $request->input('status');
+		switch ($status_filter) {
+			case '1': // Present
+				$status_to_filter = 'P';
+				break;
+			case '2': // Overtime
+				$status_to_filter = 'L';
+				break;
+			case '3': // Absent
+				$status_to_filter = 'Absent';
+				break;
+			case '4': // WHD
+				$status_to_filter = 'WHD';
+				break;
+			case '5': // LWP
+				$status_to_filter = 'LWP';
+				break;
+			case '6': // Leave
+				$status_to_filter = 'Leave';
+				break;
+			case '7': 
+				$status_to_filter = 'HLD';
+				break;
+			default: // All statuses
+				$status_to_filter = null;
+				break;
+		}
+		$filtered_data = $results->filter(function ($item) use ($status_to_filter) {
+			// If no filter is applied, show all statuses
+			if ($status_to_filter === null) {
+				return true;
+			}
+
+			return $item['status'] === $status_to_filter;
+		});
+
+		$filtered_data = $filtered_data->values();
+
+		// Calculate totals for all data
+		$totals = $filtered_data->groupBy('status')->map(function ($items, $status) {
+			return [
+				'status' => $status,
+				'count' => $items->count(),
+			];
+		})->values();
+
+		$response = [
+			'filtered_data' => $filtered_data,  
+			'filtered_totals' => $totals,
+			'startDate' => $request->startDate,
+			'toDate' => $request->endDate
+		];
+		return $response;
+
+	}
+
+	function getDatesBetweentwo($startDate, $endDate)
+	{
+		$start = Carbon::parse($startDate)->addDay(); // Add 1 day to start date
+		$end = Carbon::parse($endDate);
+		$dates = [];
+		while ($start->lt($end)) {
+			$dates[] = $start->format('Y-m-d');
+			$start->addDay();
+		}
+		return $dates;
+	}
+
+
+	// Attendance report generation for a single user
+	public function getAttendanceReport1($userId, $startDat, $endDat)
+	{
+	    $startDate = Carbon::parse($startDat);
+		$endDate = Carbon::parse($endDat);
+		$weeklyHolidays = [Carbon::FRIDAY];
+		// Fetch user profile details
+		$Profiles = Profile::where('user_id', '=', $userId)
+			->LeftJoin('users', 'profile.user_id', '=', 'users.id')
+			->LeftJoin('designations', 'users.designation_id', '=', 'designations.id')
+			->LeftJoin('departments', 'designations.department_id', '=', 'departments.id')
+			->LeftJoin('sections', 'profile.section_id', '=', 'sections.id')
+			->LeftJoin('branchs', 'profile.branch_id', '=', 'branchs.id')
+			->select(
+				'profile.employee_code',
+				'users.first_name',
+				'designations.name as designation_name',
+				'departments.name as department_name',
+				'sections.name as section_name',
+				'branchs.name as branch_name'
+			)
+			->first();
+
+		// Generate calendar range
+		$dateRange = collect();
+		for ($date = Carbon::parse($startDate); $date->lte(Carbon::parse($endDate)); $date->addDay()) {
+			$dateRange->push($date->format('Y-m-d'));
+		}
+
+		// Fetch shift data
+		$shiftTime = UserShift::where('user_id', '=', $userId)
+			->LeftJoin('office_shifts', 'user_shifts.office_shift_id', '=', 'office_shifts.id')
+			->LeftJoin('office_shift_details', 'user_shifts.office_shift_id', '=', 'office_shift_details.office_shift_id')
+			->select('user_shifts.user_id', 'office_shifts.name','office_shift_details.in_time', 'office_shift_details.out_time','office_shifts.id as shift_id')
+			->first();
+
+		// Fetch attendance data (clock-in, clock-out)
+		$attendances = Clock::leftJoin('users', 'clocks.user_id', '=', 'users.id')
+		->whereBetween('date', [$startDate, $endDate])
+			->where('clocks.user_id', '=', $userId)
+			->select('clocks.date', 'clocks.clock_in', 'clocks.clock_out', 'users.id as user_id', 'users.first_name')
+			->get()
+			->groupBy('date');
+
+		// Fetch leave data
+		$leaves = Leave::leftJoin('users', 'leaves.user_id', '=', 'users.id')
+		->where('leaves.user_id', '=', $userId)
+			->where(function ($query) use ($startDate, $endDate) {
+				$query->whereBetween('from_date', [$startDate, $endDate])
+					->orWhere(function ($subQuery) use ($startDate, $endDate) {
+						$subQuery->where('from_date', '<=', $startDate)
+							->where('to_date', '>=', $endDate);
+					});
+			})
+			->select('leaves.from_date', 'leaves.to_date', 'leaves.status')
+			->get();
+        // Holydays
+		 $holidays = Holiday::whereBetween('date', [$startDate, $endDate])
+			->pluck('date') // Extract only the date column
+			->toArray();
+		//  return $holidays;
+		// Initialize leave days collection
+		$leaveDays = collect();
+		foreach ($leaves as $leave) {
+			$fromDate = Carbon::parse($leave->from_date);
+			$toDate = Carbon::parse($leave->to_date);
+			$datesBetween = $this->getDatesBetweentwo($fromDate, $toDate);
+			$leaveDays = $leaveDays->merge($datesBetween);
+			foreach ($datesBetween as $date) {
+				$leaveDays->put($date, $leave->status);
+			}
+		}
+
+		// Map the data to the calendar range
+		$result = $dateRange->map(function ($date) use ($attendances, $leaveDays, $holidays, $weeklyHolidays, $shiftTime, $Profiles) {
+			$attendance = $attendances->get($date);
+			$dayOfWeek = Carbon::parse($date)->dayOfWeek;
+			$status = 'Absent'; // Default status
+
+			$earliestClockIn = 'N/A';
+			$latestClockOut = 'N/A';
+			$overtimeHours = '';
+			$lateMinutes = '';
+
+			if ($leaveDays->has($date)) {
+				$status = $leaveDays->get($date);
+			}elseif (in_array($date, $holidays)) {
+				$status = 'HLD';
+			} 
+			elseif (in_array($dayOfWeek, $weeklyHolidays)) {
+				$status = $attendance ? 'OT' : 'WHD';
+			} elseif ($attendance && $attendance->count() > 0) {
+				// Get earliest clock-in and latest clock-out
+				$earliestClockIn = Carbon::parse($attendance->min('clock_in'))->format('H:i:s');
+				$latestClockOut = Carbon::parse($attendance->max('clock_out'))->format('H:i:s');
+				
+				// return $earliestClockIn;
+				if ($shiftTime) {
+					$inTime = Carbon::parse($shiftTime->in_time);
+					$outTime = Carbon::parse($shiftTime->out_time);
+					$clockIn = Carbon::parse($earliestClockIn);
+					$clockOut = Carbon::parse($latestClockOut);
+
+					if ($clockIn->eq($inTime) && $clockOut->eq($outTime)) {
+						$status = 'P'; // Present
+					} elseif ($clockIn->gt($inTime)) { // Late entry
+						$lateMinutes = $inTime->diffInMinutes($clockIn);
+					    // $lateTime = "(Late: {$lateMinutes} mins)";
+						$status = "L"; // Late
+					} 
+					elseif ($clockOut->gt($outTime)) {
+						$overtimeHours = $clockOut->diffInHours($outTime);
+						// return $overtimeHours;
+						$status = "P";
+						// $overTime = '(OT: {$overtimeHours} hrs)';
+					} else {
+						$overtimeHours = $clockOut->diffInHours($outTime);
+						$status = "P"; // Regular overtime
+					}
+				} else {
+					$status = 'P'; // Mark present if no shift defined
+				}
+			} else {
+				$status = 'A'; // Absent
+			}
+
+			return [
+				'date' => $date,
+				'employee_code' => $Profiles ? $Profiles->employee_code : 'N/A',
+				'name' => $Profiles ? $Profiles->first_name : 'N/A',
+				'designation' => $Profiles ? $Profiles->designation_name : 'N/A',
+				'department' => $Profiles ? $Profiles->department_name : 'N/A',
+				'section' => $Profiles ? $Profiles->section_name : 'N/A',
+				'branch' => $Profiles ? $Profiles->branch_name : 'N/A',
+				'day' => Carbon::parse($date)->format('D'),
+				'in_time' => $earliestClockIn,
+				'out_time' => $latestClockOut,
+				'shift_time' => $shiftTime ? $shiftTime->in_time . ' - ' . $shiftTime->out_time : 'N/A',
+				'shift_in' => $shiftTime ? $shiftTime->in_time : 'N/A',
+				'shift_out' => $shiftTime ? $shiftTime->out_time : 'N/A',
+				'shift_name' => $shiftTime ? $shiftTime->name : 'N/A',
+				// 'shift_id' => $shiftTime ? $shiftTime->id : 'N/A',
+				'overTime' => $overtimeHours ?  'OT: '. $overtimeHours . ' hrs' : '',
+				'lateTime' => $lateMinutes ? 'Late: ' . $lateMinutes . ' mins' : '',
+				'status' => $status == 'P' ? 'P' : ($status == 'OT' ? 'Overtime' : ($status == 'WHD' ? 'WHD' : ($status == 'A' ? 'Absent' : ($status == 'approved' ? 'Leave' : ($status == 'lwp' ? 'LWP' : $status))))),
+			];
+		});
+		
+		// Return the result as a JSON response
+		return $result;
+	}
+    // End Function
+
+	public function dailyattendanceReprt(Request $request) {
+		$branch = Branch::all();
+		$section = Section::all();
+		$department = Department::all();
+		$category = ['staff', 'owner'];
+		$designation = Designation::all();
+		$shift = OfficeShift::all();
+		return view('attendance.daily-report', compact('branch', 'section', 'department', 'category', 'designation', 'shift'));
+
+	}
+
+	public function dailyattendanceReprtPOST(Request $request) {
+		// Fetch user IDs based on the provided filters
+		$userIds = User::leftJoin(
+			'profile',
+			'users.id',
+			'=',
+			'profile.user_id'
+		)
+			->leftJoin('designations', 'users.designation_id', '=', 'designations.id')
+			->leftJoin('departments', 'designations.department_id', '=', 'departments.id')
+			->leftJoin('sections', 'profile.section_id', '=', 'sections.id')
+			->LeftJoin('user_shifts', 'users.id', '=', 'user_shifts.id')
+			->when(!empty($request->employee_id), function ($query) use ($request) {
+				return $query->where('profile.employee_code', $request->employee_id);
+			})
+			->when(isset($request->branch_id) && !empty($request->branch_id), function ($query) use ($request) {
+				return $query->where('profile.branch_id', $request->branch_id);
+			})
+			->when(isset($request->section_id) && !empty($request->section_id), function ($query) use ($request) {
+				return $query->where('profile.section_id', $request->section_id);
+			})
+			->when(isset($request->department_id) && !empty($request->department_id), function ($query) use ($request) {
+				return $query->where('departments.id', $request->department_id);
+			})
+			->when(isset($request->designation_id) && !empty($request->designation_id), function ($query) use ($request) {
+				return $query->where('designations.id', $request->designation_id);
+			})
+			->when(isset($request->category_id) && !empty($request->category_id), function ($query) use ($request) {
+				return $query->where('profile.category', $request->category_id);
+			})
+			->when(isset($request->shift_id) && !empty($request->shift_id), function ($query) use ($request) {
+				return $query->where('user_shifts.office_shift_id', $request->shift_id);
+			})
+			->pluck('users.id');
+
+		$results = collect();
+		 $endDtate = $request->startDate;
+		foreach ($userIds as $userId) {
+			$userReport = $this->getAttendanceReport1($userId, $request->startDate, $endDtate);
+			$results = $results->merge($userReport);
+		}
+
+		$status_filter = $request->input('status');
+		switch ($status_filter) {
+			case '1': // Present
+				$status_to_filter = 'P';
+				break;
+			case '2': // Overtime
+				$status_to_filter = 'L';
+				break;
+			case '3': // Absent
+				$status_to_filter = 'Absent';
+				break;
+			case '4': // WHD
+				$status_to_filter = 'WHD';
+				break;
+			case '5': // LWP
+				$status_to_filter = 'LWP';
+				break;
+			case '6': // Leave
+				$status_to_filter = 'Leave';
+				break;
+			case '7':
+				$status_to_filter = 'HLD';
+				break;
+			default: // All statuses
+				$status_to_filter = null;
+				break;
+		}
+		$filtered_data = $results->filter(function ($item) use ($status_to_filter) {
+			// If no filter is applied, show all statuses
+			if ($status_to_filter === null) {
+				return true;
+			}
+			return $item['status'] === $status_to_filter;
+		});
+
+		$filtered_data = $filtered_data->values();
+
+		// Calculate totals for all data
+		$totals = $filtered_data->groupBy('status')->map(function ($items, $status) {
+			return [
+				'status' => $status,
+				'count' => $items->count(),
+			];
+		})->values();
+
+		$response = [
+			'filtered_data' => $filtered_data,
+			'filtered_totals' => $totals,
+			'startDate' => $request->startDate,
+			'toDate' => $request->endDate
+		];
+		return $response;
 	}
 }
 ?>

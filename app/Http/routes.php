@@ -289,7 +289,10 @@ Route::group(['middleware' => ['auth','license','account_valid']], function () {
 
 	Route::get('/attendance-report', 'ClockController@attendanceReprt');
 	Route::post('/attendance-report', 'ClockController@attendanceReprtPOST');
-	
+	// Daily Attendance
+	Route::get('/daily-attendance-report', 'ClockController@dailyattendanceReprt');
+	Route::post('/daily-attendance-report', 'ClockController@dailyattendanceReprtPOST');
+	// Daily Attendance
 	Route::get('/date-wise-attendance', 'ClockController@dateWiseAttendance');
 	Route::post('/date-wise-attendance', array('as'=>'clock.date-wise-attendance','uses'=>'ClockController@postDateWiseAttendance'));
 	Route::post('/date-wise-attendance/lists',array('uses' => 'ClockController@listDateWiseAttendance','as' => 'clock.list-date-wise-attendance'));

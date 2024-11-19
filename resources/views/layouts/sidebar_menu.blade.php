@@ -29,6 +29,8 @@
 									<li {!! (in_array('employee_transfer_report',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('employee-transfer/report') !!}"><i class="fa fa-angle-right"></i> {!! trans('messages.employee_transfer_report') !!} </a></li>
 									{{-- Attendance Report --}}
 									<li {!! (in_array('attandance_report',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/attendance-report') !!}"><i class="fa fa-angle-right"></i> {!! trans('messages.attandance_report') !!} </a></li>
+									{{-- Daily Attendence Report --}}
+									<li {!! (in_array('daily-attendance-report',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/daily-attendance-report') !!}"><i class="fa fa-angle-right"></i> {!! trans('messages.daily-attendance-report') !!} </a></li>
 									{{-- Leave Report --}}
 									<li {!! (in_array('/leave-report',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/leave-report') !!}"><i class="fa fa-angle-right"></i> Leave Report </a>
 									</li>

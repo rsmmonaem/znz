@@ -44,6 +44,7 @@ return array(
 			],
 	'leave_status' => ['pending' => 'Pending',
 			'approved' => 'Approved',
+			'lwp' => 'LWP',
 			'rejected' => 'Rejected'
 			],
 	'job_type' => ['full_time' => 'Full Time',

@@ -408,7 +408,7 @@ Class LeaveController extends Controller{
 
 		$approved_date = $request->has('approved_date') ? explode(',',$request->input('approved_date')) : $request_date;
 
-		if($request->input('status') == 'pending' || $request->input('status') == 'rejected')
+		if($request->input('status') == 'pending' || $request->input('status') == 'rejected' || $request->input('status') == 'lwp')
 			$approved_date = [];
 
 		$leave_type = LeaveType::find($leave->leave_type_id);
