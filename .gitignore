@@ -72,3 +72,7 @@ storage/framework/views/bb1efbc8153e4b1f32a3674259d660fe8f70bd37.php
 /storage/logs/*
 storage/framework/cache/95/1d/951db68fd8d64a412f1c4c0344df057986df8830
 /.env
+storage/logs/laravel.log
+public/uploads/backup/backup_2024_11_20_16_38_28.sql.gz
+public/uploads/backup/backup_2020_01_04_02_26_09.sql.gz
+public/uploads/backup/backup_2019_09_19_13_25_34.sql.gz

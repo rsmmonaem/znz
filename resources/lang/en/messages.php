@@ -782,5 +782,7 @@
   'attandance_report' => 'Attendance Report',
   'reports' => 'Reports',
   'daily-attendance-report' => 'Daily Attendance Report',
-  'lwp' => 'LWP'
+  'lwp' => 'LWP',
+  'employee_separetion' => 'Employee Separation', 
+  'employee_separetion_report' => 'Employee Separation Report',
 );

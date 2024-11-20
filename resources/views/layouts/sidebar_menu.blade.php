@@ -3,7 +3,7 @@
 							
 							@if(Entrust::can('list_employee'))
 
-							<li {!! (in_array('employee',$menu)) ? 'class="active"' : '' !!} {!! menuAttr($menus,'employee') !!}><a href="#"><i class="fa fa-users icon"></i> <i class="fa fa-angle-double-down i-right"></i> {!! trans('messages.employee') !!}</a>
+							<li  {!! (in_array('employee',$menu)) ? 'class="active"' : '' !!} {!! menuAttr($menus,'employee') !!}><a href="#"><i class="fa fa-users icon"></i> <i class="fa fa-angle-double-down i-right"></i> {!! trans('messages.employee') !!}</a>
 							    <ul {!! (in_array('employee_list',$menu) ||
 											in_array('employee_list',$menu) ||
 											in_array('employee_list',$menu)
@@ -12,6 +12,18 @@
 									<li {!! (in_array('employee_transfer',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/employee/transfer') !!}"><i class="fa fa-angle-right"></i> {!! trans('messages.employee_transfer') !!} </a></li>
 									{{-- <li {!! (in_array('employee_report',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/employee/report') !!}"><i class="fa fa-angle-right"></i> {!! trans('messages.employee_report') !!} </a></li>
 									<li {!! (in_array('employee_transfer_report',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('employee-transfer/report') !!}"><i class="fa fa-angle-right"></i> {!! trans('messages.employee_transfer_report') !!} </a></li> --}}
+								</ul>
+							</li> 
+							@endif
+
+							@if(Entrust::can('employee_separetion'))
+							<li data-position="22" {!! (in_array('employee_separetion',$menu)) ? 'class="active"' : '' !!} {!! menuAttr($menus,'employee_separetion') !!}><a href="#"><i class="fa fa-users icon"></i> <i class="fa fa-angle-double-down i-right"></i> {!! trans('messages.employee_separetion') !!}</a>
+							    <ul {!! (in_array('employee_list',$menu) ||
+											in_array('employee_list',$menu) ||
+											in_array('employee_list',$menu)
+								     ) ? 'class="visible"' : '' !!}>
+									<li {!! (in_array('employee-separation',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/employee-separation') !!}"><i class="fa fa-angle-right"></i> {!! trans('messages.employee_separetion') !!} </a></li>
+									<li {!! (in_array('employee_separetion_report',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/employee-separation-report') !!}"><i class="fa fa-angle-right"></i> {!! trans('messages.employee_separetion_report') !!} </a></li>
 								</ul>
 							</li> 
 							@endif
@@ -33,7 +45,8 @@
 									{{-- Leave Report --}}
 									<li {!! (in_array('/leave-report',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/leave-report') !!}"><i class="fa fa-angle-right"></i> Leave Report </a>
 									</li>
-									{{--  --}}
+									{{-- Employee Separetion Report --}}
+									<li {!! (in_array('employee_separetion_report',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/employee-separation-report') !!}"><i class="fa fa-angle-right"></i> {!! trans('messages.employee_separetion_report') !!} </a></li>
 								</ul>
 							</li> 
 							@endif
@@ -48,7 +61,7 @@
 									</ul>
 							</li>
 							
-							<li {!! (in_array('appraisal',$menu)) ? 'class="active"' : '' !!} {!! menuAttr($menus,'appraisal') !!}><a href="#"><i class="fa fa-graduation-cap icon"></i><i class="fa fa-angle-double-down i-right"></i> {!! trans('messages.appraisal') !!}</a>
+							{{-- <li {!! (in_array('appraisal',$menu)) ? 'class="active"' : '' !!} {!! menuAttr($menus,'appraisal') !!}><a href="#"><i class="fa fa-graduation-cap icon"></i><i class="fa fa-angle-double-down i-right"></i> {!! trans('messages.appraisal') !!}</a>
 								<ul {!! (in_array('appraisal_user',$menu) ||
 											in_array('appraisal_user_edit',$menu) ||
 											in_array('appraisal_user_view',$menu) ||
@@ -100,7 +113,7 @@
 									@endif
 									
 								</ul>
-							</li>
+							</li> --}}
 							@if(Entrust::can('list_holiday'))
 							<li {!! (in_array('holiday',$menu)) ? 'class="active"' : '' !!} {!! menuAttr($menus,'holiday') !!}><a href="{!! URL::to('/holiday') !!}"><i class="fa fa-fighter-jet icon"></i> {!! trans('messages.holiday') !!}</a></li>
 							@endif
