@@ -123,8 +123,8 @@
                                             <option value="">All</option>
                                             <option value="pending">Pending</option>
                                             <option value="approved">Approved</option>
+                                            <option value="lwp">LWP</option>
                                             <option value="rejected">Rejected</option>
-                                            <option value="pending">Pending</option>
                                         </select>
                                     </div>
                                 </div>

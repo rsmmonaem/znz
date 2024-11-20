@@ -3,7 +3,7 @@
 @section('breadcrumb')
     <ul class="breadcrumb">
         <li><a href="/dashboard">{!! trans('messages.dashboard') !!}</a></li>
-        <li class="active">{!! trans('messages.employee') !!}</li>
+        <li class="active">{!! trans('messages.attendance') !!}</li>
     </ul>
 @stop
 
@@ -47,14 +47,14 @@
         <div class="row">
             <div class="container attendance-report">
                 <h2 class="text-center">Attendance Report</h2>
-                <h4 class="text-center">Daily Attendance Report</h4>
+                <h4 class="text-center">Monthly Attendance Report</h4>
                 <form>
                     <div class="row">
                         <div class="col-md-6 form-section">
                             <div class="form-group">
                                 <label for="group">Group</label>
                                 <select class="form-control" id="group">
-                                    <option>J & J Group</option>
+                                    <option>J & Z Group</option>
                                 </select>
                             </div>
                             <div class="form-group">
@@ -94,15 +94,15 @@
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label for="employeeId">Employee ID</label>
-                                <input type="text" class="form-control" name="employeeId" id="employeeId">
+                                <label for="employeeId">Employee ID(Single & Multiple)</label>
+                                <input type="text" class="form-control" name="employeeId" id="employeeId" placeholder="ID1,ID2,ID3">
                             </div>
                         </div>
                         <div class="col-md-6 form-section">
                             <div class="form-group">
                                 <label for="reportType">Report Type</label>
                                 <select class="form-control" id="reportType">
-                                    <option value="Daily Attendance">Daily Attendance</option>
+                                    <option value="Daily Attendance">Monthly Attendance</option>
                                 </select>
                             </div>
                             <div class="form-group">
@@ -114,8 +114,21 @@
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label for="date">Date</label>
-                                <input type="date" name="date" class="form-control" id="date">
+                                <label for="category">Shift</label>
+                                <select class="form-control" id="shift_id" name="shift_id">
+                                    <option value="">Select shift</option>
+                                    @foreach ($shift as $s)
+                                        <option value="{{ $s->id }}">{{ $s->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="date">StartDate</label>
+                                <input type="date" name="date" class="form-control" id="startDate" format>
+                            </div>
+                            <div class="form-group">
+                                <label for="date">End Date</label>
+                                <input type="date" name="date" class="form-control" id="endDate">
                             </div>
                             <div class="form-group">
                                 <label>Status</label>
@@ -129,11 +142,15 @@
                                         Absent</label>
                                     </br>
                                     <label class="radio-inline"><input type="radio" name="status" value="4">
-                                        HL</label>
+                                        WHD</label>
                                     <label class="radio-inline"><input type="radio" name="status" value="5">
                                         LWP</label>
                                     <label class="radio-inline"><input type="radio" name="status" value="6">
                                         Leave</label>
+                                    <label class="radio-inline"><input type="radio" name="status" value="7">
+                                        Holiday</label>
+                                   {{-- <label class="radio-inline"><input type="radio" name="status" value="8">
+                                        Overtime</label> --}}
                                 </div>
                             </div>
                         </div>
@@ -143,98 +160,7 @@
                         </div>
                     </div>
                 </form>
-                <div class="table-container">
-                    <style>
-                        .center-item {
-                            margin-left: auto;
-                            margin-right: auto;
-                            /* Centers the second item */
-                        }
-
-                        .display-flex {
-                            display: flex;
-                            justify-content: space-between;
-                            align-items: center;
-                            border: 1px solid #ccc;
-                            padding: 10px;
-                            margin: 0 0 20px 0;
-                        }
-                    </style>
-                    <div class="display-flex" id="header-for">
-                        <div class="left-item">
-                            <img src="{{ URL::to(config('constants.upload_path.logo') . config('config.logo')) }}"
-                                width="150px" style="margin-left:20px;">
-                        </div>
-                        <div class="center-item">
-                            <h4>{{ config('config.company_name') }}</h4>
-                            <p>Daily Attendance Report (Date)</p>
-                            <p>Branch: {{ Auth::user()->profile->branch->name }}</p>
-                            <p>Date: <strong id="date"></strong></p>
-                        </div>
-                    </div>
-                    <table class="table table-bordered report-table">
-                        <thead>
-                            <tr>
-                                <th>SL</th>
-                                <th>ID</th>
-                                <th>Name</th>
-                                <th>Department</th>
-                                <th>Section</th>
-                                <th>Category</th>
-                                <th>Designation</th>
-                                <th>Shift In</th>
-                                <th>Shift Out</th>
-                                <th>Shift Name</th>
-                                <th>Punch In</th>
-                                <th>Punch Out</th>
-                                <th>Status</th>
-                                <th>OT</th>
-                                <th>Extra Time</th>
-                                <th>Remarks</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <!-- Sample Row -->
-                            <tr>
-                                <td>1</td>
-                                <td>101</td>
-                                <td>John Doe</td>
-                                <td>HR</td>
-                                <td>Section A</td>
-                                <td>Staff</td>
-                                <td>Manager</td>
-                                <td>09:00 AM</td>
-                                <td>05:00 PM</td>
-                                <td>Morning</td>
-                                <td>09:01 AM</td>
-                                <td>05:10 PM</td>
-                                <td>Present</td>
-                                <td>1</td>
-                                <td>10 mins</td>
-                                <td>-</td>
-                            </tr>
-                            <!-- More rows can be added as needed -->
-                        </tbody>
-                        <tfoot>
-                            <tr class="totals-row">
-                                <td colspan="2">Total Present</td>
-                                <td colspan="2">Total Absent</td>
-                                <td colspan="2">Total OL</td>
-                                <td colspan="2">Total ML</td>
-                                <td colspan="2">Total LWP</td>
-                                <td colspan="2">Total SL</td>
-                                <td colspan="2">Total OT</td>
-                                <td colspan="2">Total WHD</td>
-                            </tr>
-                        </tfoot>
-                    </table>
-                    <div class="display-flex">
-                        <div class="left-item"></div>
-                        <div class="center-item">
-                            <button class="btn btn-primary" id="print">Print</button>
-                        </div>
-                    </div>
-                </div>
+              
             </div>
         </div>
     </div>
@@ -244,6 +170,8 @@
     <script>
         $(document).ready(function() {
             $('#getData').on('click', function() {
+                $('#getData').prop('disabled', true);
+                $('#getData').text('Please Wait...');
                 const date = $('#date').val();
                 const status = $('input[name="status"]:checked').val();
                 const branch_id = $('#branch').val();
@@ -252,6 +180,11 @@
                 const category_id = $('#category').val();
                 const designation_id = $('#designation').val();
                 const employee_id = $('input[name="employeeId"]').val();
+                const startDate = $('#startDate').val();
+                const $endDate = $('#endDate').val();
+                const shift_id = $('#shift_id').val();
+                // console.log(shift_id);
+
                 const formData = {
                     date: date,
                     status: status,
@@ -261,6 +194,9 @@
                     category_id: category_id,
                     designation_id: designation_id,
                     employee_id: employee_id,
+                    startDate: startDate,
+                    endDate: $endDate,
+                    shift_id: shift_id
                 }
                 $.ajax({
                     url: "{{ url('attendance-report') }}",
@@ -270,8 +206,153 @@
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },
                     success: function(response) {
+                         $('#getData').prop('disabled', false);
+                         $('#getData').text('Report');
+                         toastr.success('Report Generated Successfully');
+                         var newWindow = window.open('', '_blank', 'width=1200,height=800');
 
+                        // Build the content for the new window
+                        var content = `
+                        <html>
+                            <head>
+                                <title>Monthly Attendance Report</title>
+                                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.5.2/css/bootstrap.min.css">
+                                <style>
+                                    .center-item {
+                                        margin-left: auto;
+                                        margin-right: auto;
+                                        text-align: center;
+                                    }
+                                    .display-flex {
+                                        display: flex;
+                                        justify-content: space-between;
+                                        align-items: center;
+                                        border: 1px solid #ccc;
+                                        padding: 10px;
+                                        margin: 0 0 20px 0;
+                                    }
+                                    table {
+                                        width: 100%;
+                                        border-collapse: collapse;
+                                    }
+                                    th, td {
+                                        border: 1px solid #ccc;
+                                        padding: 8px;
+                                        text-align: left;
+                                    }
+                                    .totals-row td {
+                                        font-weight: bold;
+                                    }
+                                </style>
+                            </head>
+                            <body>
+                                <div class="display-flex" id="header-for">
+                                    <div class="left-item">
+                                        <img src="{{ URL::to(config('constants.upload_path.logo') . config('config.logo')) }}" width="150px" style="margin-left:20px;">
+                                    </div>
+                                    <div class="center-item">
+                                        <h4>{{ config('config.company_name') }}</h4>
+                                        <p>Daily Attendance Report (Date)</p>
+                                        <p>Branch: {{ Auth::user()->profile->branch->name }}</p>
+                                        <p>Date: <strong id="date">${response.startDate} to ${response.toDate}</strong></p>
+                                    </div>
+                                </div>
+                                <table class="table table-bordered report-table">
+                                    <thead>
+                                        <tr>
+                                            <th>SL</th>
+                                            <th>Date</th>
+                                            <th>ID</th>
+                                            <th>Name</th>
+                                            <th>Department</th>
+                                            <th>Section</th>
+                                            <th>Category</th>
+                                            <th>Designation</th>
+                                            <th>Shift In</th>
+                                            <th>Shift Out</th>
+                                            <th>Shift Name</th>
+                                            <th>Punch In</th>
+                                            <th>Punch Out</th>
+                                            <th>Status</th>
+                                            <th>Remarks</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                        `;
+                        response.filtered_data.forEach((attendance, index) => {
+                            content += `
+                            <tr>
+                                <td>${index + 1}</td>
+                                <td>${attendance.date || 'N/A'}</td>
+                                <td>${attendance.employee_code || 'N/A'}</td>
+                                <td>${attendance.name || 'N/A'}</td>
+                                <td>${attendance.department || 'N/A'}</td>
+                                <td>${attendance.section || 'N/A'}</td>
+                                <td>${attendance.branch || 'N/A'}</td>
+                                <td>${attendance.designation || 'N/A'}</td>
+                                <td>${attendance.shift_in || 'N/A'}</td>
+                                <td>${attendance.shift_out || 'N/A'}</td>
+                                <td>${attendance.shift_name || 'N/A'}</td>
+                                <td>${attendance.in_time || 'N/A'}</td>
+                                <td>${attendance.out_time || 'N/A'}</td>
+                                <td>${attendance.status || 'N/A'} </td>
+                                <td>${attendance.overTime || ''}</br> ${attendance.lateTime || ''}</td>
+                            </tr>
+                            `;
+                        });
+
+                        // Close the table and add the print button
+                        content += `
+                                    </tbody>
+                                    <tfoot>`;
+                                        content += `
+                                        
+                                       <tr class="totals-row">
+    <td colspan="3" style="text-align:center;">
+        Total Present = ${response.filtered_totals.find(status => status.status === "P")?.count || 0}
+    </td>
+    <td colspan="3" style="text-align:center;">
+        Total Absent = ${response.filtered_totals.find(status => status.status === "Absent")?.count || 0}
+    </td>
+    <td colspan="2" style="text-align:center;">
+        Total WHD = ${response.filtered_totals.find(status => status.status === "WHD")?.count || 0}
+    </td>
+    <td colspan="2" style="text-align:center;">
+        Total Late = ${response.filtered_totals.find(status => status.status === "L")?.count || 0}
+    </td>
+    <td colspan="2" style="text-align:center;">
+        Total LWP = ${response.filtered_totals.find(status => status.status === "LWP")?.count || 0}
+    </td>
+    <td colspan="2" style="text-align:center;">
+        Total HLD = ${response.filtered_totals.find(status => status.status === "HLD")?.count || 0}
+    </td>
+    <td colspan="2" style="text-align:center;">
+        Total Leave = ${response.filtered_totals.find(status => status.status === "Leave")?.count || 0}
+    </td>
+</tr>
+                                    </tfoot>
+                                </table>
+                                <div class="display-flex">
+                                    <div class="left-item"></div>
+                                    <div class="center-item">
+                                        <button onclick="window.print()" class="btn btn-primary">Print</button>
+                                    </div>
+                                </div>
+                            </body>
+                        </html>
+                        `;
+
+                        // Write the content to the new window
+                        newWindow.document.write(content);
+                        newWindow.document.close();  // Close the document to apply the styles
+
+
+                    }, error: function(xhr, status, error) {
+                         $('#getData').prop('disabled', false);
+                         $('#getData').text('Report');
+                         toastr.error('Something went wrong. Please try again.');
                     }
+                    
                 })
             });
         });
