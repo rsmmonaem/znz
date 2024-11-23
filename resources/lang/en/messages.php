@@ -785,4 +785,8 @@
   'lwp' => 'LWP',
   'employee_separetion' => 'Employee Separation', 
   'employee_separetion_report' => 'Employee Separation Report',
+  'promotion_increment'=>'Promotion/Increment',
+  'promotion_increment_approval'=> 'Approval Panel',
+  'promotion_increment_report'=>'Promotion/Increment Report',
+
 );

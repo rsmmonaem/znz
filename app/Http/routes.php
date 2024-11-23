@@ -334,6 +334,21 @@ Route::group(['middleware' => ['auth','license','account_valid']], function () {
 	Route::get('/payroll/{id}/edit','PayrollController@edit');
 	Route::patch('/payroll/{id}/update',array('as' => 'payroll.update','uses' => 'PayrollController@update'));
 	
+	// Increment And Promotion
+	Route::get('/increment-and-promotion', 'IncrementAndPromotion@index');
+	Route::get('/increment-and-promotion-approval', 'IncrementAndPromotion@ApprovalPanel');
+	Route::post('/get-employee-details/{id}', 'IncrementAndPromotion@getUserData');
+	Route::post('/increment-and-promotion','IncrementAndPromotion@store');
+	Route::get('/increment-and-promotion-data', 'IncrementAndPromotion@getIncrementAndPromotionData');
+	Route::delete('/increment-and-promotion/{id}', 'IncrementAndPromotion@destroy');
+	Route::get('/increment-and-promotion/{id}/edit', 'IncrementAndPromotion@edit');
+	Route::post('/increment-and-promotion/{id}', 'IncrementAndPromotion@update')->name('increment-and-promotion.update');
+	Route::post('/increment-and-promotion-approval', 'IncrementAndPromotion@ApprovalPanelPost');
+	Route::post('/increment-and-promotion-approve', 'IncrementAndPromotion@approve');
+	Route::get('/increment-and-promotion-report', 'IncrementAndPromotion@reportView');
+	Route::post('/increment-and-promotion-report', 'IncrementAndPromotion@reportPost');
+	// Increment And Promotion
+
 	Route::post('/copy-template',array('as' => 'copy-template','uses' => 'MailController@copyTemplate'));
 	Route::post('/mail',array('as' => 'mail.index','uses' => 'MailController@index'));
 

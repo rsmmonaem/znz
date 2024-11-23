@@ -28,6 +28,20 @@
 							</li> 
 							@endif
 
+							@if(Entrust::can('promotion_increment'))
+							<li data-position="23" {!! (in_array('promotion_increment',$menu)) ? 'class="active"' : '' !!} {!! menuAttr($menus,'promotion_increment') !!}><a href="#"><i class="fa fa-trophy"></i> <i class="fa fa-angle-double-down i-right"></i> {!! trans('messages.promotion_increment') !!}</a>
+							    <ul {!! (in_array('employee_list',$menu) ||
+											in_array('employee_list',$menu) ||
+											in_array('employee_list',$menu)
+								     ) ? 'class="visible"' : '' !!}>
+									<li {!! (in_array('promotion_increment',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/increment-and-promotion') !!}"><i class="fa fa-angle-right"></i> {!! trans('messages.promotion_increment') !!} </a></li>
+									@if(Entrust::can('promotion_increment_aprrove'))
+									<li {!! (in_array('promotion_increment_approval',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/increment-and-promotion-approval') !!}"><i class="fa fa-angle-right"></i> {!! trans('messages.promotion_increment_approval') !!} </a></li>
+									@endif
+								</ul>
+							</li> 
+							@endif
+
 							@if(Entrust::can('all_report'))
 							<li data-position="21" {!! (in_array('reports',$menu)) ? 'class="active"' : '' !!} {!! menuAttr($menus,'reports') !!}><a href="#"><i class="fa fa-bar-chart"></i> <i class="fa fa-angle-double-down i-right"></i> {!! trans('messages.reports') !!}</a>
 							    <ul {!! (in_array('employee_list',$menu) ||
@@ -47,6 +61,8 @@
 									</li>
 									{{-- Employee Separetion Report --}}
 									<li {!! (in_array('employee_separetion_report',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/employee-separation-report') !!}"><i class="fa fa-angle-right"></i> {!! trans('messages.employee_separetion_report') !!} </a></li>
+									{{-- Promotion Increment Report --}}
+									<li {!! (in_array('increment-and-promotion-report',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/increment-and-promotion-report') !!}"><i class="fa fa-angle-right"></i> {!! trans('messages.promotion_increment_report') !!} </a></li>
 								</ul>
 							</li> 
 							@endif
