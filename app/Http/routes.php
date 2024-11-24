@@ -334,6 +334,17 @@ Route::group(['middleware' => ['auth','license','account_valid']], function () {
 	Route::get('/payroll/{id}/edit','PayrollController@edit');
 	Route::patch('/payroll/{id}/update',array('as' => 'payroll.update','uses' => 'PayrollController@update'));
 	
+	// Salary
+	Route::get('/salary-slab', 'SalaryController@salary');
+	Route::post('/salary-slab-create', 'SalaryController@CreateSlab');
+	Route::get('/slary-slab-list', 'SalaryController@SalarySlabList');
+	
+	// Salary Bank Part
+	Route::get('/salary-bank-part', 'SalaryController@Salary_BankPart');
+
+	Route::get('salary-report', 'SalaryController@salaryReport');
+	// Salary
+
 	// Increment And Promotion
 	Route::get('/increment-and-promotion', 'IncrementAndPromotion@index');
 	Route::get('/increment-and-promotion-approval', 'IncrementAndPromotion@ApprovalPanel');
