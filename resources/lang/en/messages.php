@@ -789,4 +789,8 @@
   'promotion_increment_approval'=> 'Approval Panel',
   'promotion_increment_report'=>'Promotion/Increment Report',
 
+  'Salary' => 'Salary',
+  'salary_slab' => 'Salary Slab',
+  'Salary_BankPart' => 'Salary Bank Part',
+  'salary_report' => 'Salary Report',
 );

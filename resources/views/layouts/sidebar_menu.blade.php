@@ -63,11 +63,30 @@
 									<li {!! (in_array('employee_separetion_report',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/employee-separation-report') !!}"><i class="fa fa-angle-right"></i> {!! trans('messages.employee_separetion_report') !!} </a></li>
 									{{-- Promotion Increment Report --}}
 									<li {!! (in_array('increment-and-promotion-report',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/increment-and-promotion-report') !!}"><i class="fa fa-angle-right"></i> {!! trans('messages.promotion_increment_report') !!} </a></li>
+									{{-- Salary Report --}}
+									<li {!! (in_array('salary_report',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/salary-report') !!}"><i class="fa fa-angle-right"></i> {!! trans('messages.salary_report') !!} </a></li>
 								</ul>
 							</li> 
 							@endif
 
-
+							@if(Entrust::can('Salary'))
+								<li data-position="24" {!! (in_array('Salary',$menu)) ? 'class="active"' : '' !!} {!! menuAttr($menus,'Salary') !!}><a href="#"><i class="fa fa-money icon"></i> <i class="fa fa-angle-double-down i-right"></i> {!! trans('messages.Salary') !!}</a>
+									<ul {!! (in_array('Salary',$menu) ||
+												in_array('Salary',$menu) ||
+												in_array('Salary',$menu)
+										) ? 'class="visible"' : '' !!}>
+										@if (Entrust::can('Salary_slab'))
+											<li {!! (in_array('salary_slab',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/salary-slab') !!}"><i class="fa fa-angle-right"></i> {!! trans('messages.salary_slab') !!} </a></li>
+										@endif
+										@if (Entrust::can('Salary_BankPart'))
+											<li {!! (in_array('Salary_BankPart',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/salary-bank-part') !!}"><i class="fa fa-angle-right"></i> {!! trans('messages.Salary_BankPart') !!} </a></li>
+										@endif
+										@if (Entrust::can('payroll'))
+											
+										@endif
+									</ul>
+								</li> 
+							@endif
 							<li data-position="35" {!! (in_array('supervisor_list',$menu)) ? 'class="active"' : '' !!} {!! menuAttr($menus,'supervisor_list') !!}><a href="#"><i class="fa fa-user-secret icon"></i><i class="fa fa-angle-double-down i-right"></i> {!! trans('messages.supervisor_list_menu') !!}</a>
 								<ul {!! (in_array('supervisor_list',$menu) ||
 											in_array('supervisor_add',$menu) ||
