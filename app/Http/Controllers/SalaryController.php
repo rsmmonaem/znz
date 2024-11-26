@@ -1,10 +1,12 @@
 <?php
 namespace App\Http\Controllers;
 
+use App\BankAccount;
 use App\Branch;
 use App\Contact;
 use App\Contract;
 use App\Department;
+use App\Designation;
 use Illuminate\Http\Request;
 use App\Http\Requests\SalaryRequest;
 use App\SalaryType;
@@ -346,13 +348,228 @@ Class SalaryController extends Controller{
         $branch = Branch::all();
         $department = Department::all();
         $section = Section::all();
-        $employee = User::LeftJoin('profile', 'users.id', '=', 'profile.user_id')->select('users.id', 'profile.employee_code', 'users.first_name')->get();
+        $employee = User::LeftJoin('profile', 'users.id', '=', 'profile.user_id')
+        ->select(
+            'users.id', 
+            'profile.employee_code', 
+            'users.first_name'
+        )
+        ->get();
         return view('salary.salary', compact('group', 'branch', 'department', 'section', 'employee'));
     }
 
-    public function  salaryReport() {
-        return view('salary.salaryReport');
+    public function  Salary_BankPartPost(Request $request) {
+        $gross = $request->gross;
+        $bankAmount = $request->bankAmount;
+        $effectiveDate = $request->effectiveDate;
+        $employeeId = $request->employeeId;
+        $entryDate = $request->entryDate;
+        $remarks = $request->remarks;
+        $cashAmout = $gross - $bankAmount;
+
+        $data = [
+            'user_id' => $employeeId,
+            'effective_date' => $effectiveDate,
+            'bank_amount' => $bankAmount,
+            'cash_amount' => $cashAmout,
+            'status' => false,
+            'remarks' => $remarks,
+            'entry_date' => $entryDate,
+            'gross' => $gross
+        ];
+        $bankAmount = BankAccount::where('user_id', $employeeId)->first();
+        // return $bankAmount;
+        if(!$bankAmount) {
+            return response()->json(['message' => 'Bank account does not exists for this employee.', 'status' => 'error'], 200, array('Access-Controll-Allow-Origin' => '*'));
+        }
+        DB::table('salary_bank')->insert($data);
+        // return $request->all();
+        $this->logActivity(['module' => 'salary', 'activity' => 'activity_added', 'secondary_id' => $employeeId]);
+        return response()->json(['success']);
     }
 
+    public function GetBankPart() {   
+        $data = DB::table('salary_bank')
+        ->leftjoin('users', 'salary_bank.user_id', '=', 'users.id')
+        ->leftjoin('profile', 'users.id', '=', 'profile.user_id')
+        ->select('users.id', 'profile.employee_code', 'users.first_name', 'salary_bank.*')
+        ->orderby('salary_bank.id','desc')
+        ->get();
+        return $data;
+     }
+
+    public function updateStatus(Request $request) {
+        $oldData = DB::table('salary_bank')->where('id', $request->id)->first();
+        $data = [
+            'status' => $request->status,
+        ];
+        // Check the condition for status 0
+        if ($request->status == 0) {
+            $data['cash_amount'] = $oldData->cash_amount - $oldData->old_bank;
+            $data['bank_amount'] = $oldData->old_bank;
+        }else if($request->status == 1){
+            $data['cash_amount'] = $oldData->cash_amount + $oldData->old_bank;
+            $data['old_bank'] = $oldData->bank_amount;
+            $data['bank_amount'] = 0;
+        }
+        // Update the salary_bank table with the prepared data array
+        DB::table('salary_bank')->where('id', $request->id)->update($data);
+
+        return response()->json(['message' => 'Status Update Successfully']);
+    }
+     public function  salaryReport() {
+        $group = DB::table('com_group')->get();
+        $branch = Branch::all();
+        $department = Department::all();
+        $designation = Designation::all();
+        $section = Section::all();
+        $employee = User::LeftJoin('profile', 'users.id', '=', 'profile.user_id')
+        ->select(
+            'users.id', 
+            'profile.employee_code', 
+            'users.first_name'
+        )
+        ->get();
+        $category = DB::table('category')->get();
+        return view('salary.salaryReport',compact('group','branch','department','section','employee','designation', 'category'));
+    }
+
+    // Get User Infor with Gross Salary
+    public function getGrossSalary(Request $request) {
+        $employee = User::leftjoin('profile', 'users.id', '=', 'profile.user_id')
+        ->leftjoin('salary_slab', 'users.id', '=', 'salary_slab.user_id')
+        ->leftjoin('designations', 'users.designation_id', '=', 'designations.id')
+        ->select(
+            'users.id',
+            'profile.employee_code',
+            'users.first_name',
+            'salary_slab.gross',
+            'salary_slab.entrydate',
+            'salary_slab.effactive_date',
+            'profile.category',
+            'designations.name as designation'
+        )
+        ->where('users.id', $request->employeeId)
+        ->orderby('salary_slab.id','desc')
+        ->first();
+        // return $employee;
+        return response()->json($employee);
+    }
+
+    // Get Salary Report 
+    public function SalaryReportPOST(Request $request) {
+        // Step 1: Get filtered user IDs
+        $userIds = User::leftJoin('profile', 'users.id', '=', 'profile.user_id')
+            ->leftJoin('designations', 'users.designation_id', '=', 'designations.id')
+            ->leftJoin('departments', 'designations.department_id', '=', 'departments.id')
+            ->leftJoin('sections', 'profile.section_id', '=', 'sections.id')
+            ->leftJoin('grades', 'profile.grade_id', '=', 'grades.id')
+            ->when(!empty($request->employeeId), function ($query) use ($request) {
+                return $query->where('profile.employee_code', $request->employeeId);
+            })
+            ->when(!empty($request->branch), function ($query) use ($request) {
+                return $query->where('profile.branch_id', $request->branch);
+            })
+            ->when(!empty($request->section), function ($query) use ($request) {
+                return $query->where('profile.section_id', $request->section);
+            })
+            ->when(!empty($request->department), function ($query) use ($request) {
+                return $query->where('departments.id', $request->department);
+            })
+            ->when(!empty($request->designation), function ($query) use ($request) {
+                return $query->where('designations.id', $request->designation);
+            })
+            ->when(!empty($request->category), function ($query) use ($request) {
+                return $query->where('profile.category', $request->category);
+            })
+            ->select(
+                'users.id',
+                'profile.employee_code',
+                'users.first_name',
+                'profile.category',
+                'sections.name as section',
+                'profile.date_of_joining',
+                'grades.name as grade',
+                'departments.name as departments',
+                'designations.name as designation'
+            )
+            ->get('users.id');
+
+        // Fetch earning salary types only once
+        $earning_salary_types = \App\SalaryType::where('salary_type', '=', 'earning')->get();
+
+        $data = []; // Initialize an array for storing all users' data
+
+        foreach ($userIds as $user) {
+            // Get the latest contract for the current user
+            $latest_contract = \App\Contract::whereUserId($user->id)
+            ->latest('id') // Ensure it fetches the latest contract by ID
+                ->first();
+
+            // Check if a contract exists before proceeding
+            if ($latest_contract) {
+                // Fetch the salaries associated with the latest contract
+                $contract_salaries = \App\Salary::where('contract_id', $latest_contract->id)
+                ->latest('id')
+                ->get();
+
+                // Get the latest salary slab
+                $slab_data = DB::table('salary_slab')
+                    ->where('user_id', $user->id)
+                    ->latest('id')
+                    ->first();
+
+                // Get the latest salary bank data
+                $salary_bank = DB::table('salary_bank')
+                    ->where('user_id', $user->id)
+                    ->latest('id')
+                    ->first();
+
+                // Get the latest bank account details
+                $bank_accounts = DB::table('bank_accounts')
+                ->where('user_id', $user->id)
+                ->latest('id')
+                ->first();
+                
+                $contractData = [
+                    'user_info' => [
+                        'first_name' => $user->first_name,
+                        'departments' => $user->departments,
+                        'designation' => $user->designation,
+                        'section' => $user->section,
+                        'date_of_joining'=> $user->date_of_joining,
+                        'grades'=> $user->grade,
+                        'account_number' => $bank_accounts ? $bank_accounts->account_number : null,
+                        'employee_code' => $user->profile->employee_code,
+                        'entry_date' => isset($slab_data->entrydate) ? date('Y-m-d', strtotime($slab_data->entrydate)) : null,
+                        'effective_date' => isset($slab_data->effactive_date) ? date('Y-m-d', strtotime($slab_data->effactive_date)) : null,
+                        'gross' => isset($salary_bank->gross) ? $salary_bank->gross : null,
+                        'bank_amount' => $salary_bank ? $salary_bank->bank_amount : null,
+                        'cash_amount' => $salary_bank ? $salary_bank->cash_amount : null,
+                        'remarks' => $salary_bank ? $salary_bank->remarks : null,
+                    ],
+                    'salaries' => [],
+                ];
+                // Assuming $earning_salary_types is already defined elsewhere in your code
+                foreach ($earning_salary_types as $earning_salary_type) {
+                    // Filter the salary group to get the correct salary type
+                    $salary = $contract_salaries->filter(function ($salary) use ($earning_salary_type) {
+                        return $salary->salary_type_id == $earning_salary_type->id;
+                    })->first();
+
+                    // Default amount to 0 if no matching salary is found
+                    $amount = $salary ? floor($salary->amount) : 0;
+
+                    $contractData['salaries'][] = [
+                            'salary_type' => $earning_salary_type->head,
+                            'amount' => $amount,
+                        ];
+                }
+                $data[] = $contractData; // Add contract data to the main data array
+            }
+        }
+        return response()->json($data);
+    }
+    
 }
 ?>

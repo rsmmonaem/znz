@@ -130,9 +130,9 @@
 									
 								</ul>
 							</li>
+							 --}}
 							
-							
-							<li {!! (in_array('attendance',$menu)) ? 'class="active"' : '' !!} {!! menuAttr($menus,'attendance') !!}><a href="#"><i class="fa fa-book icon"></i><i class="fa fa-angle-double-down i-right"></i> {!! trans('messages.attendance') !!}</a>
+							<li data-position="23" {!! (in_array('attendance',$menu)) ? 'class="active"' : '' !!} {!! menuAttr($menus,'attendance') !!}><a href="#"><i class="fa fa-book icon"></i><i class="fa fa-angle-double-down i-right"></i> {!! trans('messages.attendance') !!}</a>
 								<ul {!! (in_array('daily_attendance',$menu) ||
 											in_array('date_wise_attendance',$menu) ||
 											in_array('date_wise_summary_attendance',$menu) ||
@@ -148,7 +148,7 @@
 									@endif
 									
 								</ul>
-							</li> --}}
+							</li>
 							@if(Entrust::can('list_holiday'))
 							<li {!! (in_array('holiday',$menu)) ? 'class="active"' : '' !!} {!! menuAttr($menus,'holiday') !!}><a href="{!! URL::to('/holiday') !!}"><i class="fa fa-fighter-jet icon"></i> {!! trans('messages.holiday') !!}</a></li>
 							@endif

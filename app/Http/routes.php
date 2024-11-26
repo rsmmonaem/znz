@@ -341,8 +341,14 @@ Route::group(['middleware' => ['auth','license','account_valid']], function () {
 	
 	// Salary Bank Part
 	Route::get('/salary-bank-part', 'SalaryController@Salary_BankPart');
-
+	Route::post('/salary-bank-part-create', 'SalaryController@Salary_BankPartPost');
+	Route::get('GetBankPart', 'SalaryController@GetBankPart'); 
+	Route::post('updatebank-status', 'SalaryController@updateStatus');
+	// Salary
 	Route::get('salary-report', 'SalaryController@salaryReport');
+	Route::post('get-user-data-salary', 'SalaryController@getGrossSalary');
+
+	Route::post('SalaryReportPOST', 'SalaryController@SalaryReportPOST');
 	// Salary
 
 	// Increment And Promotion

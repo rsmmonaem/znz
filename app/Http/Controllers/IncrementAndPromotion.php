@@ -190,11 +190,11 @@ class IncrementAndPromotion extends Controller{
           }
           // return $contract->id;
           // Prepare salary data
-          $contract->salary()->create([
-            'user_id' => $value->employee_id,
-            'salary_type_id' => 1,
-            'amount' => $value->amount + $value->old_amount,
-          ]);
+          // $contract->salary()->create([
+          //   'user_id' => $value->employee_id,
+          //   'salary_type_id' => 1,
+          //   'amount' => $value->amount + $value->old_amount,
+          // ]);
         }
 
         // Return a success response

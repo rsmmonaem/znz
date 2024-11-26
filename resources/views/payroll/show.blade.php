@@ -18,31 +18,39 @@
 							<tbody>
 								<tr>
 									<th>{!! trans('messages.absent') !!}</th>
-									<td>{!! $att_summary['A'] !!}</td>
+									<td>{!! $att_summary['A'] !!} Days</td>
 								</tr>
 								<tr>
 									<th>{!! trans('messages.holiday') !!}</th>
-									<td>{!! $att_summary['H'] !!}</td>
+									<td>{!! $att_summary['H'] !!} Days</td>
 								</tr>
 								<tr>
 									<th>{!! trans('messages.present') !!}</th>
-									<td>{!! $att_summary['P'] !!}</td>
+									<td>{!! $att_summary['P'] !!} Days</td>
 								</tr>
 								<tr>
-									<th>{!! trans('messages.leave') !!}</th>
-									<td>{!! $att_summary['L'] !!}</td>
+									<th>{!! trans('messages.leave_title') !!}</th>
+									<td>{!! $att_summary['L'] !!} Days</td>
+								</tr>
+								<tr>
+									<th>{!! trans('messages.lwp') !!}</th>
+									<td>{!! $att_summary['LWP'] !!} Days</td>
+								</tr>
+								<tr>
+									<th>WHD</th>
+									<td>{!! $weekenday !!} Days</td>
 								</tr>
 								<tr>
 									<th>{!! trans('messages.late') !!}</th>
-									<td>{!! $att_summary['Late'] !!}</td>
+									<td>{!! $att_summary['Late'] !!} Days</td>
 								</tr>
 								<tr>
 									<th>{!! trans('messages.overtime') !!}</th>
-									<td>{!! $att_summary['Overtime'] !!}</td>
+									<td>{!! $att_summary['Overtime'] !!} Days</td>
 								</tr>
 								<tr>
 									<th>{!! trans('messages.early').' '.trans('messages.leaving') !!}</th>
-									<td>{!! $att_summary['Early'] !!}</td>
+									<td>{!! $att_summary['Early'] !!} Days</td>
 								</tr>
 							</tbody>
 						</table>
@@ -52,26 +60,26 @@
 					<h2><strong>{!! trans('messages.hour').' </strong>'.trans('messages.summary') !!}</h2>
 					<div class="table-responsive">
 						<table class="table table-hover table-striped show-table">
-							<tbody>
-								<tr>
+						    <tbody>
+						 		<tr>
 									<th>{!! trans('messages.total_late') !!}</th>
-									<td>{!! array_key_exists('total_late',$summary) ? $summary['total_late'] : '-' !!}</td>
+									<td>{!! array_key_exists('total_late',$summary) ? $summary['total_late'] : '-' !!} hrs</td>
 								</tr>
 								<tr>
 									<th>{!! trans('messages.total_early') !!}</th>
-									<td>{!! array_key_exists('total_early',$summary) ? $summary['total_early'] : '-' !!}</td>
+									<td>{!! array_key_exists('total_early',$summary) ? $summary['total_early'] : '-' !!} hrs</td>
 								</tr>
 								<tr>
 									<th>{!! trans('messages.total_rest') !!}</th>
-									<td>{!! array_key_exists('total_rest',$summary) ? $summary['total_rest'] : '-' !!}</td>
+									<td>{!! array_key_exists('total_rest',$summary) ? $summary['total_rest'] : '-' !!} hrs</td>
 								</tr>
 								<tr>
 									<th>{!! trans('messages.total_overtime') !!}</th>
-									<td>{!! array_key_exists('total_overtime',$summary) ? $summary['total_overtime'] : '-' !!}</td>
+									<td>{!! array_key_exists('total_overtime',$summary) ? $summary['total_overtime'] : '-' !!} hrs</td>
 								</tr>
 								<tr>
 									<th>{!! trans('messages.total_work') !!}</th>
-									<td>{!! array_key_exists('total_working',$summary) ? $summary['total_working'] : '-' !!}</td>
+									<td>{!! array_key_exists('total_working',$summary) ? $summary['total_working'] : '-' !!} hrs</td>
 								</tr>
 							</tbody>
 						</table>
