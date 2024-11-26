@@ -132,23 +132,23 @@
                                 </div>
                                 <div class="form-group">
                                     <label>Basic %</label>
-                                    <input type="text" class="form-control" id="basic" value="50">
+                                    <input type="text" class="form-control" id="basic" disabled value="50">
                                 </div>
                                 <div class="form-group">
                                     <label>House Rent %</label>
-                                    <input type="text" class="form-control" id="houseRent" value="25">
+                                    <input type="text" class="form-control" id="houseRent" disabled value="28">
                                 </div>
                                 <div class="form-group">
                                     <label>Medical %</label>
-                                    <input type="text" class="form-control" id="medical" value="12">
+                                    <input type="text" class="form-control" id="medical" disabled value="9">
                                 </div>
                                 <div class="form-group">
                                     <label>Conveyance %</label>
-                                    <input type="text" class="form-control" id="conveyance" value="8">
+                                    <input type="text" class="form-control" id="conveyance" disabled value="8">
                                 </div>
                                 <div class="form-group">
                                     <label>Others %</label>
-                                    <input type="text" class="form-control" id="others" value="5">
+                                    <input type="text" class="form-control" id="others" disabled value="5">
                                 </div>
                                 <div class="radio-group">
                                     <label><input type="radio" name="management" value="management"> Management</label>
@@ -208,7 +208,7 @@
                         $('#designation').val(data.designation);
                         $('#date_of_joining').val(data.date_of_joining);
                         $('#category').val(data.category);
-                        $('#gross').val(Math.round(data.amount));
+                        //$('#gross').val(Math.round(data.amount));
                     },
                     error: function() {
                         console.log('error');
@@ -263,7 +263,7 @@
                     const datatable = $('#salaryTable');
                     // Destroy the existing DataTable to reinitialize with new data
                     datatable.DataTable().destroy();
-                    
+                     
                     var tableBody = $('#tableData');
                     tableBody.empty(); // Clear the existing table body
                     

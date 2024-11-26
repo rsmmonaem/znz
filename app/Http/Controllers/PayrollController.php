@@ -14,6 +14,7 @@ use App\Clock;
 use App\Holiday;
 use App\Payroll;
 use App\Classes\Helper;
+use DateTime;
 use Validator;
 
 Class PayrollController extends Controller{
@@ -156,7 +157,8 @@ Class PayrollController extends Controller{
 		$summary = $data['summary'];
 		$att_summary = $data['att_summary'];
 
-		return view('payroll.show',compact('payroll_slip','payroll','user','earning_salary_types','deduction_salary_types','summary','att_summary','salaries'));
+		$weekenday = $this->countFridays($payroll_slip->from_date, $payroll_slip->to_date);
+		return view('payroll.show',compact('weekenday','payroll_slip','payroll','user','earning_salary_types','deduction_salary_types','summary','att_summary','salaries'));
 
 	}
 
@@ -213,6 +215,9 @@ Class PayrollController extends Controller{
 			return redirect()->back()->withInput()->withErrors(trans('messages.change_in_contract_period'));
 
 		$data = $this->getAttendanceSummary($user,$from_date,$to_date);
+		// Get Total Wekenday
+		$weekenday = $this->countFridays($from_date, $to_date);
+
 		$summary = $data['summary'];
 		$att_summary = $data['att_summary'];
 
@@ -223,7 +228,27 @@ Class PayrollController extends Controller{
 	    $deduction_salary_types = SalaryType::where('salary_type','=','deduction')->get();
 	    $salaries = Helper::getContract($user->id,$from_date)->Salary;
 
-		return view('payroll.create',compact('users','user','user_id','earning_salary_types','deduction_salary_types','salaries','summary','att_summary','salary_fraction','menu','from_date','to_date'));
+		return view('payroll.create',compact('weekenday','users','user','user_id','earning_salary_types','deduction_salary_types','salaries','summary','att_summary','salary_fraction','menu','from_date','to_date'));
+	}
+	// Get Friday
+	function countFridays($from_date, $to_date)
+	{
+		$start_date = new DateTime($from_date);
+		$end_date = new DateTime($to_date);
+		$end_date->modify('+1 day'); // Include the end date in the range
+
+		$fridays = 0;
+
+		// Iterate through each day
+		while ($start_date < $end_date) {
+			// Check if the day is Friday (5)
+			if ($start_date->format('w') == 5) {
+				$fridays++;
+			}
+			$start_date->modify('+1 day');
+		}
+
+		return $fridays;
 	}
 
 	public function getAttendanceSummary($user,$from_date,$to_date){
@@ -232,20 +257,33 @@ Class PayrollController extends Controller{
         $holidays = Holiday::where('date','>=',$from_date)->where('date','<=',$to_date)->get();
 
 		$leave_approved = array();
+		$leave_pending = array();
 
-        $leaves = \App\Leave::whereUserId($user->id)->whereStatus('approved')->where(function($query) use($from_date,$to_date) {
-            $query->whereBetween('from_date',array($from_date,$to_date))
-            ->orWhereBetween('to_date',array($from_date,$to_date))
-            ->orWhere(function($query1) use($from_date,$to_date) {
-                $query1->where('from_date','<',$from_date)
-                ->where('to_date','>',$to_date);
-            });
-        })->get();
-        foreach($leaves as $leave){
-            $leave_approved_dates = ($leave->approved_date) ? explode(',',$leave->approved_date) : [];
-            foreach($leave_approved_dates as $leave_approved_date)
-                $leave_approved[] = $leave_approved_date;
-        }
+		function getLeaveCount($user_id, $from_date, $to_date, $type)
+		{
+			return \App\Leave::whereUserId($user_id)->whereStatus($type)->where(function ($query) use ($from_date, $to_date) {
+				$query->whereBetween('from_date', array($from_date, $to_date))
+				->orWhereBetween('to_date', array($from_date, $to_date))
+				->orWhere(function ($query1) use ($from_date, $to_date) {
+					$query1->where('from_date', '<', $from_date)
+					->where('to_date', '>', $to_date);
+				});
+			})->get();
+		}
+
+		$leaves = getLeaveCount($user->id, $from_date, $to_date, 'approved');
+		$leavesWP = getLeaveCount($user->id, $from_date, $to_date, 'lwp');
+		foreach ($leaves as $leave) {
+			$leave_approved_dates = ($leave->approved_date) ? explode(',', $leave->approved_date) : [];
+			foreach ($leave_approved_dates as $leave_approved_date)
+				$leave_approved[] = $leave_approved_date;
+		}
+
+		foreach ($leavesWP as $leave) {
+			$leave_approved_dates = ($leave->approved_date) ? explode(',', $leave->approved_date) : [];
+			foreach ($leave_approved_dates as $leave_approved_date)
+			$leave_pending[] = $leave_approved_date;
+		}
 
         $total_late = 0;
         $total_early = 0;
@@ -321,7 +359,11 @@ Class PayrollController extends Controller{
 			} elseif(count($leave_approved) && in_array($date,$leave_approved)){
 				$attendance = 'L';
 				$attendance_label = '<span class="badge badge-warning">'.trans('messages.leave').'</span>';
-			} elseif($holiday){
+			} elseif (count($leave_pending) && in_array($date, $leave_pending)) {
+				$attendance = 'LWP';
+				$attendance_label = '<span class="badge badge-warning">' . trans('messages.lwp') . '</span>';
+			}
+			 elseif($holiday){
 				$attendance = 'H';
 				$attendance_label = '<span class="badge badge-info">'.trans('messages.holiday').'</span>';
 			} elseif(!$holiday && $date < date('Y-m-d')){
@@ -349,6 +391,7 @@ Class PayrollController extends Controller{
 	  	$att_summary['H'] = array_key_exists('H', $cols_summary) ? $cols_summary['H'] : 0;
 	  	$att_summary['P'] = array_key_exists('P', $cols_summary) ? $cols_summary['P'] : 0;
 	    $att_summary['L'] = array_key_exists('L', $cols_summary) ? $cols_summary['L'] : 0;
+		$att_summary['LWP'] = array_key_exists('LWP', $cols_summary) ? $cols_summary['LWP'] : 0;
 	    $att_summary['Late'] = array_key_exists('L', $tag_summary) ? $tag_summary['L'] : 0;
 	    $att_summary['Early'] = array_key_exists('E', $tag_summary) ? $tag_summary['E'] : 0;
 	    $att_summary['Overtime'] = array_key_exists('O', $tag_summary) ? $tag_summary['O'] : 0;
