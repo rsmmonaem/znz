@@ -180,6 +180,20 @@ Class LeaveController extends Controller{
 		return view('leave.edit',compact('leave','leave_types','custom_field_values','menu'));
 	}
 
+
+/**
+ * Store a newly created leave request in storage.
+ *
+ * This method validates the custom fields, checks for user permissions, 
+ * and verifies the contract period for the leave request. It ensures that 
+ * the requested leave days do not exceed the user's available leave balance 
+ * and that there are no overlapping leave requests for the same period. 
+ * Upon successful validation, the leave request is saved with a 'pending' status.
+ *
+ * @param \App\Http\Requests\LeaveRequest $request
+ * @param \App\Models\Leave $leave
+ * @return \Illuminate\Http\Response
+ */
 	public function store(LeaveRequest $request, Leave $leave){	
 
         $validation = Helper::validateCustomField($this->form,$request);
@@ -274,6 +288,12 @@ Class LeaveController extends Controller{
 		return redirect()->back()->withSuccess(trans('messages.leave').' '.trans('messages.requested'));		
 	}
 
+    /**
+     * Update the specified resource in storage.
+     * @param  \App\Http\Requests\LeaveRequest  $request
+     * @param  \App\Models\Leave  $leave
+     * @return \Illuminate\Http\Response
+     */
 	public function update(LeaveRequest $request, Leave $leave){
 
         $validation = Helper::validateCustomField($this->form,$request);
@@ -368,6 +388,14 @@ Class LeaveController extends Controller{
 		return redirect('/leave')->withSuccess(trans('messages.leave').' '.trans('messages.request').' '.trans('messages.updated'));
 	}
 
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request $request
+     * @param  int $id
+     * @return \Illuminate\Http\Response
+     */
 	public function updateStatus(LeaveStatusRequest $request,$id){
 
 		$leave = Leave::find($id);
@@ -442,6 +470,21 @@ Class LeaveController extends Controller{
         }
 		return redirect()->back()->withSuccess(trans('messages.leave').' '.trans('messages.request').' '.trans('messages.updated'));
 	}
+    /**
+     * Delete the specified leave request if permissions and conditions are met.
+     *
+     * This function checks if the user has the necessary permissions to delete a
+     * leave request and whether the leave request is accessible and in a 'pending'
+     * status. If conditions are fulfilled, it deletes the leave request, logs the
+     * activity, and returns an appropriate response.
+     *
+     * @param  Leave   $leave   The leave request to be deleted.
+     * @param  Request $request The HTTP request instance.
+     * @return \Illuminate\Http\Response|\Illuminate\Http\JsonResponse
+     *         Redirects back with a success message if the leave request is deleted,
+     *         or an error message if the conditions are not met. Returns a JSON response
+     *         if the request is submitted via AJAX.
+     */
 
 	public function destroy(Leave $leave,Request $request){
 		if(!Entrust::can('delete_leave') || !$this->leaveAccessible($leave)){
@@ -501,19 +544,23 @@ Class LeaveController extends Controller{
 		// return $request->employee_id;
 		$user = \App\User::leftJoin('profile', 'users.id', '=', 'profile.user_id')
 		->where('users.id', $request->employee_id) 
-		->where('profile.branch_id', $branch)
+		->when($request->branch, function ($query) use ($request) {
+			return $query->where('profile.branch_id', '=', $request->branch);
+		})
+		// ->where('profile.branch_id', $branch)
 		->first();
         // return $user;
 		$contract = \App\Contract::whereUserId($user->id)
 			->where('from_date', '<=', $date)
 			->where('to_date', '>=', $date)
 			->first();
+		// return $contract;
 		$leave_types = \App\LeaveType::all();
 		$raw_data = array();
 		$data = '';
 
 		if (!$contract)
-		return '<div class="alert alert-danger"><i class="fa fa-times icon"></i> ' . trans('messages.no_data_found') . '</div>';
+		return '<div class="alert alert-danger"><i class="fa fa-times icon"></i> ' . 'No Contract Found' . '</div>';
 
 		$data .= '<p style="margin-left:20px">' . trans('messages.contract_period') . ': <strong>' . showDate($contract->from_date) . ' ' . trans('messages.to') . ' ' . showDate($contract->to_date) . '</strong></p>';
 		foreach ($leave_types as $leave_type) {
