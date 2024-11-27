@@ -81,6 +81,9 @@
 										@if (Entrust::can('Salary_BankPart'))
 											<li {!! (in_array('Salary_BankPart',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/salary-bank-part') !!}"><i class="fa fa-angle-right"></i> {!! trans('messages.Salary_BankPart') !!} </a></li>
 										@endif
+										@if (Entrust::can('salary_advance'))
+											<li {!! (in_array('salary_advance',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/salary-advance') !!}"><i class="fa fa-angle-right"></i> {!! trans('messages.salary_advance') !!} </a></li>
+										@endif
 										@if (Entrust::can('payroll'))
 											
 										@endif

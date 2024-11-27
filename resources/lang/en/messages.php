@@ -793,4 +793,5 @@
   'salary_slab' => 'Salary Slab',
   'Salary_BankPart' => 'Salary Bank Part',
   'salary_report' => 'Salary Report',
+  'salary_advance' => 'Salary Advance',
 );
