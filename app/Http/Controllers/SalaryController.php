@@ -316,6 +316,7 @@ Class SalaryController extends Controller{
                 $salary->contract_id = $contact->id;
                 $salary->salary_type_id = $type_id;
                 $salary->amount = $amount ?: 0;
+                $salary->user_id = $employee_id;
                 $salary->save();
             }
             DB::table('salary_slab')->insert([

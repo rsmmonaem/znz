@@ -85,7 +85,7 @@
 											<li {!! (in_array('salary_advance',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/salary-advance') !!}"><i class="fa fa-angle-right"></i> {!! trans('messages.salary_advance') !!} </a></li>
 										@endif
 										@if (Entrust::can('payroll'))
-											
+											<li {!! (in_array('/slary-process',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/slary-process') !!}"><i class="fa fa-angle-right"></i> Salary Process </a></li>
 										@endif
 									</ul>
 								</li> 

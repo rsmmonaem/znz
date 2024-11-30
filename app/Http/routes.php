@@ -345,7 +345,15 @@ Route::group(['middleware' => ['auth','license','account_valid']], function () {
 	Route::get('salary-advance-edit/{id}', 'SalaryAdvanceController@EditSalaryAdvance');
 	Route::post('salary-advance-edit/{id}', 'SalaryAdvanceController@UpdateSalaryAdvance');
 	Route::post('UserData', 'SalaryAdvanceController@UserData');
-
+	// Salary Process
+	Route::get('/slary-process', 'SalaryProcessController@index');
+	Route::get('/slary-shit', 'SalaryProcessController@SalaryShit');
+	Route::post('/salary-process-post', 'SalaryProcessController@SalaryProcess');
+	Route::post('/slary-shit-post', 'SalaryProcessController@SalaryShitPost');
+	Route::post('/update-arrear-amount', 'SalaryProcessController@UpdateArrearAmount');
+	// Salary Slip
+	Route::get('/salary-slip', 'SalaryProcessController@SalarySlip');
+	Route::post('/salary-slip-post', 'SalaryProcessController@salarySlipPost');
 	// Salary Bank Part
 	Route::get('/salary-bank-part', 'SalaryController@Salary_BankPart');
 	Route::post('/salary-bank-part-create', 'SalaryController@Salary_BankPartPost');
