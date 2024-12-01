@@ -100,9 +100,10 @@
                                 <div class="form-group row">
                                     <label class="col-sm-4 control-label">Report Type</label>
                                     <div class="col-sm-8">
-                                        <select class="form-control" id="reportType">
+                                        {{-- <select class="form-control" id="reportType">
                                             <option>Leave Details (By staff)</option>
-                                        </select>
+                                        </select> --}}
+                                        @include('common.reportSelect')
                                     </div>
                                 </div>
 

@@ -34,12 +34,7 @@
 
                                     <label class="col-sm-2 control-label">Report Type</label>
                                     <div class="col-sm-4">
-                                        <select class="form-control" name="report_type" id="report_type">
-                                            <option value="">Select</option>
-                                            @foreach ($report_type as $rt)
-                                                <option value="{{ $rt->id }}">{{ $rt->name }}</option>
-                                            @endforeach
-                                        </select>
+                                       @include('common.reportSelect')
                                     </div>
                                 </div>
 

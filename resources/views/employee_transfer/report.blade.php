@@ -99,8 +99,9 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="col-sm-4 control-label" for="reportType">Report Type</label>
-                                    <input type="text" class="form-control" id="reportType" value="Transfer History"
-                                        readonly>
+                                    {{-- <input type="text" class="form-control" id="reportType" value="Transfer History"
+                                        readonly> --}}
+                                   @include('common.reportSelect')
                                 </div>
                             </div>
                     </div>

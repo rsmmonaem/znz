@@ -72,10 +72,11 @@
                             <div class="col-sm-6">
                                 <div class="form-group">
                                     <label for="reportType">Report Type</label>
-                                    <select class="form-control" id="reportType">
+                                    {{-- <select class="form-control" id="reportType">
                                         <option>Employee List</option>
                                         <!-- Add more options as necessary -->
-                                    </select>
+                                    </select> --}}
+                                    @include('common.reportSelect')
                                 </div>
                                 <div class="form-group">
                                     <label for="category">Category</label>
