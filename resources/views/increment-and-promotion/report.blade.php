@@ -122,9 +122,10 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="reportType">Report Type</label>
-                                    <select id="reportType" class="form-control">
+                                    {{-- <select id="reportType" class="form-control">
                                         <option value="history">Emp Promotion & Increment History</option>
-                                    </select>
+                                    </select> --}}
+                                    @include('common.reportSelect')
                                 </div>
                                 <div class="form-group">
                                     <label for="financialYear">Financial Year</label>

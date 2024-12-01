@@ -154,6 +154,13 @@
                                 </div>
                                 <div class="col-sm-6">
                                     <div class="form-group">
+                                        <label for="report-type">Report Type</label>
+                                        {{-- <select class="form-control" id="report-type">
+                                            <option value="salary-slab">Salary Slab</option>
+                                        </select> --}}
+                                       @include('common.reportSelect')
+                                    </div>
+                                    <div class="form-group">
                                         <label for="entryDate">Form Date</label>
                                         <input type="date" class="form-control" id="formDate">
                                     </div>

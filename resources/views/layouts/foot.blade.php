@@ -133,6 +133,15 @@
 	$(document).ready(function() {
 		$('select').select2();
 	});
+	function handleSelectChange() {
+			const selectBox = document.getElementById('report-select');
+			const selectedValue = selectBox.value;
+
+			// Check if the selected value is not empty
+			if (selectedValue) {
+				window.location.href = selectedValue; // Redirect to the selected URL
+			}
+		}
 	</script>
 	</body>
 </html>

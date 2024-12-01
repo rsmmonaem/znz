@@ -3,7 +3,7 @@
 @section('breadcrumb')
     <ul class="breadcrumb">
         <li><a href="/dashboard">{!! trans('messages.dashboard') !!}</a></li>
-        <li class="active">{!! trans('messages.Salary_BankPart') !!}</li>
+        <li class="active">Salary Slab Report</li>
     </ul>
 @stop
 
@@ -59,7 +59,7 @@
                 <div class="container" style="margin-bottom: 30px">
                     <!-- Report Header -->
                     <div class="report-header">
-                        <h3>Salary Report</h3>
+                        <h3>Salary Slab Report</h3>
                     </div>
 
                     <!-- Form Section -->
@@ -127,9 +127,10 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="report-type">Report Type</label>
-                                <select class="form-control" id="report-type">
+                                {{-- <select class="form-control" id="report-type">
                                     <option value="salary-slab">Salary Slab</option>
-                                </select>
+                                </select> --}}
+                               @include('common.reportSelect')
                             </div>
                             <div class="form-group">
                                 <label for="category">Category</label>
@@ -208,7 +209,7 @@
     var content = `
     <html>
         <head>
-            <title>Employee Separation Report</title>
+            <title>Salary Slab Report</title>
             <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.5.2/css/bootstrap.min.css">
             <style>
                 .center-item {
@@ -246,7 +247,7 @@
                 </div>
                 <div class="center-item">
                     <h4>{{ config('config.company_name') }}</h4>
-                    <h3>Promotion & Increment Report</h3>
+                    <h3>Salary Slab Report</h3>
                     <p>Branch: {{ Auth::user()->profile->branch->name }}</p>
                     <p>Date: <strong id="date"></strong></p>
                 </div>

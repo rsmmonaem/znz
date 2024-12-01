@@ -101,9 +101,10 @@
                         <div class="col-md-6 form-section">
                             <div class="form-group">
                                 <label for="reportType">Report Type</label>
-                                <select class="form-control" id="reportType">
+                                {{-- <select class="form-control" id="reportType">
                                     <option value="Daily Attendance">Monthly Attendance</option>
-                                </select>
+                                </select> --}}
+                                  @include('common.reportSelect')
                             </div>
                             <div class="form-group">
                                 <label for="category">Category</label>
