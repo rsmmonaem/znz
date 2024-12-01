@@ -25,15 +25,69 @@ class SalaryProcessController extends Controller
         return view('salary-process.index', compact('group', 'branch', 'department', 'section', 'employee', 'designation'));
     }
 
-    public function SalaryProcess(Request $request)
+    public function SalaryProcessView(Request $request)
     {
-        $formDate = $request->formDate;
-        $toDate = $request->toDate;
-        $branch = $request->branch;
-        $department = $request->department;
-        $section = $request->section;
-        $employeeId = $request->employeeId;
-        $remarks = $request->remarks;  
+        $data = User::
+        leftJoin('profile', 'users.id', '=', 'profile.user_id')
+        ->LeftJoin('designations', 'users.designation_id', '=', 'designations.id')
+        ->LeftJoin('sections', 'profile.section_id', '=', 'sections.id')
+        ->LeftJoin('branchs', 'profile.branch_id', '=', 'branchs.id')
+        ->LeftJoin('departments', 'designations.department_id', '=', 'departments.id');
+        if ($request->branch || $request->department || $request->section) {
+            $data->whereNotIn('users.id', function ($query) {
+                $query->select('employee_id')
+                ->from('employee_separations');
+            });
+        }
+        if ($request->branch) {
+            $data->where('profile.branch_id', '=', $request->branch);
+        }
+        if ($request->department) {
+            $data->where('designations.department_id', '=', $request->department);
+        }
+        if ($request->employeeId) {
+            $data->where('users.id', '=', $request->employeeId);
+        }
+        if ($request->section) {
+            $data->where('profile.section_id', '=', $request->section);
+        }
+        $user_ids = $data->pluck('users.id');        
+        $processedEmployeeIds = [];
+
+        foreach ($user_ids as $user_id) {
+            $exists = DB::table('employee_salary_details')
+            ->where('employee_id', $user_id)
+                ->where('form_date', $request->formDate)
+                ->where('to_date', $request->toDate)
+                ->exists();
+
+            if ($exists) {
+                continue;  // Skip if record already exists
+            }
+            // Call the SalaryProcess method to process salary for each user
+            $processedId = $this->SalaryProcess($user_id, $request->formDate, $request->toDate, $request->remarks);
+
+            if ($processedId !== null) {
+                $processedEmployeeIds[] = $processedId;  // Collect the successfully processed employee IDs
+            }
+        }
+
+        // Return the response with the list of processed employee IDs
+        return response()->json([
+            'status' => 'success',
+            'processed_employee_ids' => $processedEmployeeIds,  // Return the list of processed employee IDs
+            'message' => 'Salary processed successfully.',
+        ]);
+    }
+
+
+    public function SalaryProcess($employeeId, $formDate, $toDate, $remarks)
+    {
+        // $formDate = $request->formDate;
+        // $toDate = $request->toDate;
+        // $employeeId = $request->employeeId;
+        // $remarks = $request->remarks;  
+
         // Get Employee
         $User = User::LeftJoin('profile', 'users.id', '=', 'profile.user_id')
         ->LeftJoin('designations', 'users.designation_id', '=', 'designations.id')
@@ -43,7 +97,6 @@ class SalaryProcessController extends Controller
         ->where('users.id', '=', $employeeId)
         ->select('users.id', 'profile.employee_code', 'users.first_name', 'designations.name as designation', 'departments.name as department', 'sections.name as section', 'branchs.name as branch')
         ->get();
-
         // Total Present
         $getTotalPresent = DB::table('clocks')
         ->whereBetween('date', [$formDate, $toDate])
@@ -74,8 +127,8 @@ class SalaryProcessController extends Controller
         ->distinct('from_date') 
         ->count('from_date');
         // Total Days Of Month
-        $startDate = Carbon::parse($request->formDate); 
-        $endDate = Carbon::parse($request->toDate);    
+        $startDate = Carbon::parse($formDate);
+        $endDate = Carbon::parse($toDate); 
         $TotalDays = $startDate->diffInDays($endDate);
 
         // Define an array of weekly holidays
@@ -139,7 +192,7 @@ class SalaryProcessController extends Controller
 
         $totalWorkedDays = $getTotalPresent + $holidays + $leave + $totalFridays;
         $totalAbsents = $TotalDays - $totalWorkedDays;
-
+        
         $perdaysAmount =  $salaryslab->gross / $TotalDays;
         $GrossAmountSalaryPerDays = $perdaysAmount * $totalWorkedDays;
         $TotalDiductionAmount = $perdaysAmount * $totalAbsents;
@@ -188,12 +241,19 @@ class SalaryProcessController extends Controller
             ->exists();
 
         if (!$exists) {
-            // Insert new record if not exists
+            // Insert the new record into the database
             DB::table('employee_salary_details')->insert($TableData);
-            return response()->json(['message' => 'Record inserted successfully.']);
+            return $employeeId;  // Return the processed employee ID for successful insertion
         } else {
-            return response()->json(['message' => 'Record already exists for the same employee and date range.']);
+            return null;  // Return null if the record already exists
         }
+        // if (!$exists) {
+        //     // Insert new record if not exists
+        //     DB::table('employee_salary_details')->insert($TableData);
+        //     return response()->json(['message' => 'Record inserted successfully.']);
+        // } else {
+        //     return response()->json(['message' => 'Record already exists for the same employee and date range.']);
+        // }
     }
 
     public function indexSalaryShit(){
@@ -473,17 +533,62 @@ class SalaryProcessController extends Controller
         }
         $user_ids = $data->pluck('users.id')->unique()->toArray();
 
-        return $this->SalaryData($user_ids, $request->branch);
+        return $this->SalaryData($user_ids, $request->branch, $request->formDate, $request->toDate);
     }
 
+    public function SalarySheetReport(Request $request) {
+        $data = User::leftjoin('employee_salary_details', 'users.id', '=', 'employee_salary_details.employee_id')
+        ->leftJoin('profile', 'users.id', '=', 'profile.user_id')
+        ->LeftJoin('designations', 'users.designation_id', '=', 'designations.id')
+        ->LeftJoin('sections', 'profile.section_id', '=', 'sections.id')
+        ->LeftJoin('branchs', 'profile.branch_id', '=', 'branchs.id')
+        ->LeftJoin('departments', 'designations.department_id', '=', 'departments.id');
+        if ($request->branch) {
+            $data->where('profile.branch_id', '=', $request->branch);
+        }
+        // if ($request->category) {
+        //     $data->where('profile.category', '=', $request->category);
+        // }
+        if ($request->department) {
+            $data->where('designations.department_id', '=', $request->department);
+        }
+        // if ($request->designation) {
+        //     $data->where('users.designation_id', '=', $request->designation);
+        // }
+        if ($request->employeeId) {
+            $data->where('employee_salary_details.employee_id', '=', $request->employeeId);
+        }
+        if ($request->formDate) {
+            $data->where('employee_salary_details.form_date', '>=', $request->formDate);
+        }
+        if ($request->toDate) {
+            $data->where('employee_salary_details.to_date', '<=', $request->toDate);
+        }
+        if ($request->section) {
+            $data->where('profile.section_id', '=', $request->section);
+        }
+        $user_ids = $data->pluck('users.id')->unique()->toArray();
 
+        return $this->SalaryData($user_ids, $request->branch, $request->formDate, $request->toDate);
+    }
 
-    public function SalaryData($user_ids, $branch = null)
+    public function SalaryShitReport() {
+        $group = DB::table('com_group')->get();
+        $branch = Branch::all();
+        $department = Department::all();
+        $section = Section::all();
+        $employee = User::LeftJoin('profile', 'users.id', '=', 'profile.user_id')
+        ->select('users.first_name', 'users.id', 'profile.employee_code')
+        ->get();
+        $designation = Designation::all();
+        return view('salary-process.salary-shit-report', compact('group','branch','department','section','employee','designation'));
+    }
+
+    public function SalaryData($user_ids, $branch = null, $formDate = null, $toDate = null)
     {
         if ($branch) {
             $branch = Branch::where('id', $branch)->first();
         }
-
         // Get the latest bank account for each user using a subquery
         $latestBankAccounts = DB::table('bank_accounts')
         ->select('user_id', DB::raw('MAX(id) as latest_id'))
@@ -524,7 +629,8 @@ class SalaryProcessController extends Controller
                 'bank_accounts.account_number', // Only the latest bank account
                 'employee_salary_details.remarks',
                  DB::raw('DATEDIFF(employee_salary_details.to_date, employee_salary_details.form_date) as date_difference'), // Calculate date difference
-                'employee_salary_details.total_absents_fee'
+                'employee_salary_details.total_absents_fee',
+                'employee_salary_details.created_at'
             )
             ->get();
 
@@ -566,7 +672,10 @@ class SalaryProcessController extends Controller
 
         return response()->json([
             'branch' => $branch, // Include the branch data
-            'employee_salary_data' => $data // Include the employee salary data
+            'employee_salary_data' => $data, // Include the employee salary data
+            'month' => Carbon::parse($toDate)->format('F Y'), // Include the month
+            'to_date' => Carbon::parse($toDate)->format('d F Y'),
+            'form_date' => Carbon::parse($formDate)->format('d F Y'),
         ]);
         return $data;
     }

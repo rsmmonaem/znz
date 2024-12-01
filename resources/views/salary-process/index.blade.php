@@ -169,24 +169,33 @@
                     branch: $('#branch').val(),
                     remarks: $('#remarks').val(),
                 }
-                $.ajax({
-                    url: '/salary-process-post', 
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-                    data: FormData,
-                    success: function(response) {
-                        $icon.removeClass('rotate');
-                        console.log(response);
-                        toastr.success(response.message);
-                    },
-                    error: function() {
-                        $icon.removeClass('rotate');
-                        console.log('error');
-                        toastr.error('Something went wrong');
-                    },
-                });
+               // Check if any required field is empty
+                if (FormData.employeeId === '' && FormData.formDate === '' && FormData.toDate === '' && FormData.section === '' && FormData.department === '' && FormData.branch === '') {
+                    toastr.error('Please select fields');
+                    $icon.removeClass('rotate');
+                } else {
+                    // If all required fields are filled, proceed with the AJAX request
+                    $.ajax({
+                        url: '/salary-process-post',
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') // Include CSRF token for security
+                        },
+                        data: FormData, // Send the data
+                        success: function(response) {
+                            // Handle success
+                            $icon.removeClass('rotate');
+                            console.log(response);
+                            toastr.success(response.message);
+                        },
+                        error: function() {
+                            // Handle error
+                            $icon.removeClass('rotate');
+                            console.log('error');
+                            toastr.error('Something went wrong');
+                        },
+                    });
+                }
             });
         })
     </script>

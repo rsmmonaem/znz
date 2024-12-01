@@ -485,7 +485,7 @@
                         <table>
                             <tr>
                                 <td>Month:</td>
-                                <td>${formatDate(employee.date_of_joining)}</td>
+                                <td>${formatDate(employee.created_at)}</td>
                                 <td>Employee ID:</td>
                                 <td>${employee.employee_code}</td>
                             </tr>
@@ -805,7 +805,7 @@
 
             // Helper function to format date
             function formatDate(date) {
-                const options = { year: 'numeric', month: 'long', day: 'numeric' };
+                const options = { month: 'long' };
                 return new Date(date).toLocaleDateString('en-US', options);
             }
 
@@ -845,7 +845,7 @@
                 }
 
                 const words = convertToWords(amount);
-                return words.trim();
+                return words;
             }
 
         });

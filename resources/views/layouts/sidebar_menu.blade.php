@@ -63,8 +63,12 @@
 									<li {!! (in_array('employee_separetion_report',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/employee-separation-report') !!}"><i class="fa fa-angle-right"></i> {!! trans('messages.employee_separetion_report') !!} </a></li>
 									{{-- Promotion Increment Report --}}
 									<li {!! (in_array('increment-and-promotion-report',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/increment-and-promotion-report') !!}"><i class="fa fa-angle-right"></i> {!! trans('messages.promotion_increment_report') !!} </a></li>
+									{{-- Salary Slab Report --}}
+									<li {!! (in_array('salary_report',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/salary-report') !!}"><i class="fa fa-angle-right"></i> {!! trans('messages.salary_slab_report') !!} </a></li>
+									{{-- Salary Slip Report --}}
+									<li {!! (in_array('salary-slip',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/salary-slip') !!}"><i class="fa fa-angle-right"></i> Salary Slip Panel </a></li>
 									{{-- Salary Report --}}
-									<li {!! (in_array('salary_report',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/salary-report') !!}"><i class="fa fa-angle-right"></i> {!! trans('messages.salary_report') !!} </a></li>
+									<li {!! (in_array('slary-shit-report',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/slary-shit-report') !!}"><i class="fa fa-angle-right"></i> Salary Report</a></li>
 								</ul>
 							</li> 
 							@endif
@@ -86,6 +90,9 @@
 										@endif
 										@if (Entrust::can('payroll'))
 											<li {!! (in_array('/slary-process',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/slary-process') !!}"><i class="fa fa-angle-right"></i> Salary Process </a></li>
+										@endif
+										@if (Entrust::can('payroll'))
+											<li {!! (in_array('/slary-shit',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/slary-shit') !!}"><i class="fa fa-angle-right"></i> Salary Sheet </a></li>
 										@endif
 									</ul>
 								</li> 
@@ -176,7 +183,7 @@
 							{{-- <li {!! (in_array('leave',$menu)) ? 'class="active"' : '' !!} {!! menuAttr($menus,'leave') !!}><a href="{!! URL::to('/leave') !!}"><i class="fa fa-coffee icon"></i> {!! trans('messages.leave') !!}</a></li> --}}
 
 
-							<li {!! (in_array('payroll',$menu)) ? 'class="active"' : '' !!} {!! menuAttr($menus,'payroll') !!}><a href="{!! URL::to('/payroll') !!}"><i class="fa fa-money icon"></i> {!! trans('messages.payroll') !!}</a></li>
+							{{-- <li {!! (in_array('payroll',$menu)) ? 'class="active"' : '' !!} {!! menuAttr($menus,'payroll') !!}><a href="{!! URL::to('/payroll') !!}"><i class="fa fa-money icon"></i> {!! trans('messages.payroll') !!}</a></li> --}}
 							@if(Entrust::can('list_announcement'))
 							<li {!! (in_array('announcement',$menu)) ? 'class="active"' : '' !!} {!! menuAttr($menus,'announcement') !!}><a href="{!! URL::to('/announcement') !!}"><i class="fa fa-list-alt icon"></i> {!! trans('messages.announcement') !!}</a></li>
 							@endif
