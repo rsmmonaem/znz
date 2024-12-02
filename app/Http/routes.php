@@ -384,6 +384,15 @@ Route::group(['middleware' => ['auth','license','account_valid']], function () {
 	Route::post('/increment-and-promotion-report', 'IncrementAndPromotion@reportPost');
 	// Increment And Promotion
 
+	// All Letter NOC Increment and Promotion, Job Expreince
+	Route::get('/letter-noc', 'LetterController@NOC');
+	Route::get('/letter-jec', 'LetterController@JEC');
+	Route::post('/letter-noc', 'LetterController@NOCPOST');
+	Route::post('/letter-jec', 'LetterController@JECPOST');
+	// Letter Increment and Promotion
+	Route::get('/letter-increment', 'LetterController@Increment');
+	Route::post('/letter-increment', 'LetterController@IncrementPOST');
+
 	Route::post('/copy-template',array('as' => 'copy-template','uses' => 'MailController@copyTemplate'));
 	Route::post('/mail',array('as' => 'mail.index','uses' => 'MailController@index'));
 
