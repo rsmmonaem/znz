@@ -1,0 +1,426 @@
+@extends('layouts.default')
+
+@section('breadcrumb')
+    <ul class="breadcrumb">
+        <li><a href="/dashboard">{!! trans('messages.dashboard') !!}</a></li>
+        <li class="active">NOC</li>
+    </ul>
+@stop
+
+@section('content')
+    <style>
+        .form-section {
+            margin-bottom: 20px;
+        }
+
+        .report-table th,
+        .report-table td {
+            text-align: center;
+        }
+
+        .col-sm-4 control-label {
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .form-group {
+            display: flex !important;
+            flex-direction: row !important;
+            justify-content: space-between !important;
+        }
+        /* NOC Design */
+         * {
+            -webkit-print-color-adjust: exact !important;   /* Chrome, Safari 6 – 15.3, Edge */
+            color-adjust: exact !important;                 /* Firefox 48 – 96 */
+            print-color-adjust: exact !important;           /* Firefox 97+, Safari 15.4+ */
+            }
+            .noc-container {
+                padding: 30px;
+                border-radius: 5px;
+                position: relative;
+                margin: 20px auto;
+                width: 210mm;
+                height: 297mm;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                z-index: 1;
+            }
+
+            .noc-container::before {
+                    content: '';
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background-image: url('{{ URL::to(config('constants.upload_path.logo') . config('config.logo')) }}');
+                    background-size: 500px 500px !important; 
+                    background-size: cover;
+                    background-repeat: no-repeat !important;
+                    background-position: center;
+                    opacity: 0.2;
+                    z-index: -1; /* Ensures watermark is behind the text */
+            }
+            
+            .noc-header {
+                text-align: center;
+                font-weight: bold;
+                font-size: 25px;
+                text-decoration: underline;
+                margin-bottom: 40px;
+            }
+
+            .noc-body {
+                font-size: 18px;
+                line-height: 1.6;
+                position: relative;
+                z-index: 2;
+            }
+
+            .noc-body .highlight {
+                font-weight: bold;
+            }
+
+            .noc-signature {
+               margin-top: 300px;
+               font-size: 18px;
+            }
+
+            .noc-note {
+                font-size: 18px;
+                font-style: italic;
+                margin-top: 10px;
+            }
+
+            .signature-line {
+                display: inline-block;
+                margin-top: 30px;
+                font-weight: bold;
+            }
+
+            .noc-date {
+                text-align: right;
+                font-size: 18px;
+                margin-bottom: 20px;
+                font-weight: bold;
+            }
+
+            .noc-header {
+                text-align: center;
+                font-weight: bold;
+                font-size: 18px;
+                text-decoration: underline;
+                margin-bottom: 20px;
+            }
+
+            @media print {
+                body {
+                    margin: 0;
+                    padding: 0;
+                    width: 210mm; 
+                    height: 297mm;
+                }
+                .noc-container {
+                width: 100%;
+                  padding: 20mm;
+                }
+            }
+    </style>
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="box-info">
+                <h2>NOC</h2>
+                {{-- Form Container --}}
+                <div class="container">
+                    <!-- Filter Form Section -->
+                    <div class="row">
+                        <form>
+                            <div class="col-md-6">
+                                <div class="form-section">
+                                    <div class="form-group">
+                                        <label class="col-sm-4 control-label" for="group">Group</label>
+                                        <select class="form-control" name="group" id="group">
+                                            <option value="">J & Z Group</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-4 control-label" for="branch">Branch</label>
+                                        <select class="form-control" name="branch" id="branch">
+                                            <option value="">Select Branch</option>
+                                            @foreach ($branch as $b)
+                                                <option value="{{ $b->id }}">{{ $b->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-4 control-label" for="department">Department</label>
+                                        <select class="form-control" name="department" id="department">
+                                            <option value="">Select Department</option>
+                                            @foreach ($department as $d)
+                                                <option value="{{ $d->id }}">{{ $d->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-4 control-label" for="section">Section</label>
+                                        <select class="form-control" name="section" id="section">
+                                            <option value="">Select Section</option>
+                                            @foreach ($section as $s)
+                                                <option value="{{ $s->id }}">{{ $s->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-4 control-label" for="designation">Designation</label>
+                                        <select class="form-control" name="designation" id="designation">
+                                            <option value="">Select Designation</option>
+                                            @foreach ($designation as $d)
+                                                <option value="{{ $d->id }}">{{ $d->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-4 control-label" for="employeeID">Employee ID</label>
+                                        <select class="form-control" name="employeeID" id="employeeID">
+                                            <option value="">Select Employee ID</option>
+                                            @foreach ($employee as $e)
+                                                <option value="{{ $e->id }}">{{ $e->employee_code }} -
+                                                    {{ $e->first_name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label" for="reportType">Report Type</label>
+                                    {{-- <input type="text" class="form-control" id="reportType" value="Transfer History"
+                                        readonly> --}}
+                                    @include('common.reportSelect')
+                                </div>
+                            </div>
+                    </div>
+                    <button type="button" class="btn btn-primary" style="margin-bottom: 20px" id="getNOC">Generate
+                        NOC</button>
+                    </form>
+
+                     <!-- Report Table Section -->
+                    {{-- NOC Container --}}
+                    <button class="btn btn-primary" style="display: none;" id="print" style="margin-bottom: 20px" onclick="printNOC()">Print NOC</button>
+                    <div class="noc-container" style="display: none;" id="nocContent">
+                        <div class="noc-date">Date: {{ date('d-m-Y') }}</div>
+                        <div class="noc-header">No Objection Certificate (NOC)</div>
+                        <div class="noc-body">
+                            <p>This is to certify that <span class="highlight" id="employeeName"></span> has been our employee
+                                since
+                                <span class="highlight" id="joiningDate"></span> to <span class="highlight"
+                                    id="endingDate"></span></span> and
+                                his service length is <span class="highlight" id="serviceLength"></span>. His present
+                                designation is <span class="highlight" id="designation_name"></span>, in our company.
+                            </p>
+
+                            <p>We confirm that we have no objection to <span class="highlight empName"></span> pursuing
+                                other opportunities outside the organization. His conduct and performance have been commendable
+                                throughout his tenure with us.</p>
+
+                            <p class="noc-note"><strong>Note:</strong> This certificate has been issued upon request of the
+                                interested parties for reference purposes.</p>
+
+                            <div class="noc-signature">
+                                <div class="signature-line">__________________________</div>
+                                <p><span class="font-weight-bold">Saifda Islam Setu</span><br>Manager<br>HR & Business Development<br>J & Z Group</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {{-- End Form Containner --}}
+    </div>
+@stop
+
+@section('javascript')
+
+    <script>
+        $(document).ready(function() {
+            //Get NOC
+            $('#getNOC').on('click', function(e) {
+                e.preventDefault();
+                $('#getNOC').prop('disabled', true);
+                $('#getNOC').text('Processing...');
+                const FormData = {
+                    _token: "{{ csrf_token() }}",
+                    employeeId: $('#employeeID').val(),
+                    branch: $('#branch').val(),
+                    department: $('#department').val(),
+                    section: $('#section').val(),
+                    designation: $('#designation').val()
+                }
+                $.ajax({
+                    url: "/letter-noc",
+                    method: 'POST',
+                    data: FormData,
+                    success: function(data) {
+                        if (data.message) {
+                            toastr.error(data.message);
+                            $('#employeeName').text(' ');
+                            $('#joiningDate').text(' ');
+                            $('#endingDate').text(' ');
+                            $('#serviceLength').text(' ');
+                            $('#designation_name').text(' ');
+                            $('.empName').text(' ');
+                            btnControll();
+                            return;
+                        } else {
+                            toastr.success('Data Fetched Successfully');
+                            $('#employeeName').text(data.employee_name);
+                            $('#joiningDate').text(data.date_of_joining);
+                            $('#endingDate').text(data.entry_date);
+                            $('#serviceLength').text(data.date_diff);
+                            $('#designation_name').text(data.designation_name);
+                            $('.empName').text(data.employee_name);
+                            btnControll();
+                        }
+                    },
+                    error: function(xhr) {
+                        console.error('Error:', xhr.responseText);
+                        btnControll();
+                    }
+                });
+            });
+
+            function btnControll() {
+                $('#getNOC').prop('disabled', false);
+                $('#getNOC').text('Generate NOC');
+                $('#print').css('display', 'block');
+                $('#nocContent').css('display', 'block');
+            }
+        })
+    </script>
+
+    <script>
+        function printNOC() {
+            var printWindow = window.open('', '', 'width=1200,height=800');
+
+            // Write the HTML structure with the background image applied via style
+            printWindow.document.write('<html><head><title>Print NOC</title>');
+            printWindow.document.write('<style>');
+            printWindow.document.write(`
+            * {
+            -webkit-print-color-adjust: exact !important;   /* Chrome, Safari 6 – 15.3, Edge */
+            color-adjust: exact !important;                 /* Firefox 48 – 96 */
+            print-color-adjust: exact !important;           /* Firefox 97+, Safari 15.4+ */
+            }
+            .noc-container {
+                padding: 30px;
+                border-radius: 5px;
+                position: relative;
+                width: 210mm;
+                height: 297mm;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                z-index: 1;
+            }
+
+            .noc-container::before {
+                    content: '';
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background-image: url('{{ URL::to(config('constants.upload_path.logo') . config('config.logo')) }}');
+                    background-size: 500px 500px !important; 
+                    background-size: cover;
+                    background-repeat: no-repeat !important;
+                    background-position: center;
+                    opacity: 0.2;
+                    z-index: -1; /* Ensures watermark is behind the text */
+            }
+            
+            .noc-header {
+                text-align: center;
+                font-weight: bold;
+                font-size: 25px;
+                text-decoration: underline;
+                margin-bottom: 40px;
+            }
+
+            .noc-body {
+                font-size: 18px;
+                line-height: 1.6;
+                position: relative;
+                z-index: 2;
+            }
+
+            .noc-body .highlight {
+                font-weight: bold;
+            }
+
+            .noc-signature {
+                margin-top: 300px;
+            }
+
+            .noc-note {
+                font-size: 18px;
+                font-style: italic;
+                margin-top: 10px;
+            }
+
+            .signature-line {
+                display: inline-block;
+                margin-top: 30px;
+                font-weight: bold;
+            }
+
+            .noc-date {
+                text-align: right;
+                font-size: 18px;
+                margin-bottom: 20px;
+                font-weight: bold;
+            }
+
+            .noc-header {
+                text-align: center;
+                font-weight: bold;
+                font-size: 18px;
+                text-decoration: underline;
+                margin-bottom: 20px;
+            }
+
+                @media print {
+                    body {
+                        margin: 0;
+                        padding: 0;
+                        width: 210mm; 
+                        height: 297mm;
+                    }
+                    .noc-container {
+                        width: 100%;
+                        padding: 20mm;
+                    }
+                }
+            `);
+            printWindow.document.write('</style>');
+            printWindow.document.write('</head><body>');
+
+            // Add the nocContent wrapped in a container
+            printWindow.document.write('<div class="noc-container">');
+            printWindow.document.write(document.getElementById('nocContent').innerHTML);
+            printWindow.document.write('</div>');
+            printWindow.document.write('</body></html>');
+
+            printWindow.document.close();
+
+            // Wait for the content to load and then trigger print
+            printWindow.onload = function() {
+                // Ensure the background image is fully loaded
+                const img = new Image();
+                img.onload = function() {
+                    printWindow.print(); // Print after the image is loaded
+                };
+                img.src =
+                    'https://scontent.fdac5-2.fna.fbcdn.net/v/t39.30808-1/393121278_798706948724860_2546228729910779588_n.jpg?stp=c7.7.186.186a_dst-jpg_p200x200&_nc_cat=103&ccb=1-7&_nc_sid=f4b9fd&_nc_ohc=P_Qg84VXC5IQ7kNvgE1uXHJ&_nc_zt=24&_nc_ht=scontent.fdac5-2.fna&_nc_gid=APdhLEfV5m7g2iNTpKLaWX1&oh=00_AYAk_f9FoAQbtLvKHm28Y9ySQyO8yjNYhccDtt67wSepxQ&oe=67534096'; // Ensure this matches the URL used in the style
+            };
+        }
+    </script>
+
+@stop
