@@ -179,7 +179,6 @@
 <script>
     // Intisalize Select2
     $(document).ready(function() {
-        $('.select2m').select2();
         getData();
     });
     const amount = $('#amountnew').on('input', function() {

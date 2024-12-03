@@ -103,93 +103,49 @@ class EmployeeController extends Controller{
         $employee_graph_data = array('designation_wise_user_graph' => $designation_user_stat,'status_wise_user_graph' => $status_user_stat,'department_wise_user_graph' => $department_user_stat, 'role_wise_user_graph' => $role_user_stat);
 
         $assets = ['graph'];
-       
-        return view('employee.index',compact('col_heads','table_info','designations','roles','assets','employee_graph_data'));
+
+        $group = DB::table('com_group')->get();
+        $branch = Branch::all();
+        $department = Department::all();
+        $section = Section::all();
+        $employee = User::LeftJoin('profile', 'users.id', '=', 'profile.user_id')
+        ->select('users.first_name', 'users.id', 'profile.employee_code')
+        ->get();
+        $designation = Designation::all();
+        $grade = DB::table('grades')->get();
+        $category = DB::table('category')->get();
+        return view('employee.index',compact('category','grade','group', 'branch', 'department', 'section', 'designation', 'employee','col_heads','table_info','designations','roles','assets','employee_graph_data'));
     }
 
     public function lists(Request $request){
-
-        //     if (Entrust::can('manage_all_employee')){
-        //     $employees = DB::select(DB::raw('
-        //     SELECT
-        //         u.id AS user_id,
-        //         u.id AS user_id,
-        //         u.first_name AS user_name,
-        //         u.last_name as last_name,
-        //         u.email as email,
-        //         COALESCE(MAX(CASE WHEN cf.name = "bangla-name" THEN cfv.value END), "N/A") AS bangla_name,
-        //         COALESCE(MAX(CASE WHEN cf.name = "category" THEN cfv.value END), "N/A") AS category,
-        //         COALESCE(MAX(CASE WHEN cf.name = "job-nature" THEN cfv.value END), "N/A") AS job_nature,
-        //         COALESCE(MAX(CASE WHEN cf.name = "father-name" THEN cfv.value END), "N/A") AS father_name,
-        //         COALESCE(MAX(CASE WHEN cf.name = "mother-name" THEN cfv.value END), "N/A") AS mother_name,
-        //         COALESCE(MAX(CASE WHEN cf.name = "confirm-date" THEN cfv.value END), "N/A") AS confirm_date,
-        //         COALESCE(MAX(CASE WHEN cf.name = "religion-" THEN cfv.value END), "N/A") AS religion,
-        //         COALESCE(MAX(CASE WHEN cf.name = "height" THEN cfv.value END), "N/A") AS height,
-        //         COALESCE(MAX(CASE WHEN cf.name = "weight" THEN cfv.value END), "N/A") AS weight,
-        //         COALESCE(MAX(CASE WHEN cf.name = "employ-phone-" THEN cfv.value END), "N/A") AS employ_phone,
-        //         COALESCE(MAX(CASE WHEN cf.name = "nationality-" THEN cfv.value END), "N/A") AS nationality,
-        //         COALESCE(MAX(CASE WHEN cf.name = "blood-group" THEN cfv.value END), "N/A") AS blood_group,
-        //         COALESCE(MAX(CASE WHEN cf.name = "birth-" THEN cfv.value END), "N/A") AS birth,
-        //         COALESCE(MAX(CASE WHEN cf.name = "passport-" THEN cfv.value END), "N/A") AS passport,
-        //         COALESCE(MAX(CASE WHEN cf.name = "tin" THEN cfv.value END), "N/A") AS tin,
-        //         COALESCE(d.name, "N/A") AS designation_name,
-        //         COALESCE(dp.name, "N/A") AS department_name
-        //     FROM
-        //         users u
-        //     LEFT JOIN
-        //         custom_field_values cfv ON cfv.unique_id = u.id
-        //     LEFT JOIN
-        //         custom_fields cf ON cfv.field_id = cf.id
-        //     LEFT JOIN 
-        //         designations d ON u.designation_id = d.id
-        //     LEFT JOIN
-        //         departments dp ON d.department_id = dp.id
-        //     GROUP BY
-        //         u.id, u.first_name, d.name
-        //     ORDER BY
-        //         u.id desc
-        // '));
-        //     } else {
-        //         $employees =[];
-        //     }
-        //     // Prepare rows to match column headers
-        //     $rows = [];
-        //     foreach ($employees as $employee) {
-        //         $rows[] = [
-        //             '<div class="btn-group btn-group-xs">' .
-        //             '<a href="/employee/' . $employee->user_id . '" class="btn btn-default btn-xs" data-toggle="tooltip" title="' . trans('messages.view') . '"> <i class="fa fa-arrow-circle-right"></i></a> ' .
-        //             (Entrust::can('delete_employee') ? delete_form(['employee.destroy', $employee->user_id], 'employee', 1) : '') .
-        //             '</div>',
-        //             $employee->user_id,
-        //             $employee->user_name,
-        //             $employee->last_name,
-        //             // $employee->email,
-        //             $employee->bangla_name,
-        //             $employee->designation_name,
-        //             $employee->department_name,
-        //             $employee->category,
-        //             $employee->job_nature,
-        //             $employee->father_name,
-        //             $employee->mother_name,
-        //             $employee->confirm_date,
-        //             $employee->religion,
-        //             $employee->height,
-        //             $employee->weight,
-        //             $employee->employ_phone,
-        //             $employee->nationality,
-        //             $employee->blood_group,
-        //             $employee->birth,
-        //             $employee->passport,
-        //             $employee->tin,
-        //         ];
-        //     }
         if (Entrust::can('manage_all_employee'))
-            // $employees = User::with('profile', 'designation', 'designation.department')->get();
-         $employees = DB::table('users')
+        // $employees = User::with('profile', 'designation', 'designation.department')->get();
+            $employees = DB::table('users')
             ->leftJoin('profile', 'users.id', '=', 'profile.user_id')
             ->leftjoin('branchs', 'profile.branch_id', '=', 'branchs.id')
-            ->leftJoin('designations', 'users.designation_id', '=','designations.id')
+            ->leftJoin('designations', 'users.designation_id', '=', 'designations.id')
             ->leftJoin('departments', 'designations.department_id', '=', 'departments.id')
+            ->when($request->employeeId, function ($query) use ($request) {
+                return $query->where('users.id', '=', $request->employeeId);
+            })
+            ->when($request->designation, function ($query) use ($request) {
+                return $query->where('designations.id', '=', $request->designation);
+            })
+            ->when($request->branch, function ($query) use ($request) {
+                return $query->where('profile.branch_id', '=', $request->branch);
+            })
+            ->when($request->department, function ($query) use ($request) {
+                return $query->where('departments.id', '=', $request->department);
+            })
+            ->when($request->section, function ($query) use ($request) {
+                return $query->where('profile.section_id', '=', $request->section);
+            }) 
+            ->when($request->grade, function ($query) use ($request) {
+                return $query->where('profile.grade_id', '=', $request->grade);
+            })
+            ->when($request->category, function ($query) use ($request) {
+                return $query->where('profile.category', '=', $request->category);
+            })
             ->select(
                 'users.id',
                 'profile.employee_code',
@@ -211,38 +167,8 @@ class EmployeeController extends Controller{
             $employees = User::with('roles')->whereIn('designation_id', $childs)->get();
         } else
             $employees = [];
-
-        $data = json_encode($employees);
-        // return $data;
-        // die;
-        $rows = array();
-
-        foreach ($employees as $employee) {
-            // foreach ($employee->roles as $role)
-            //     $role_name = Helper::toWord($role->name);
-
-            $rows[] = array(
-                '<div class="btn-group btn-group-xs">' .
-                    '<a href="/employee/' . $employee->id . '" class="btn btn-default btn-xs" data-toggle="tooltip" title="' . trans('messages.view') . '"> <i class="fa fa-arrow-circle-right"></i></a> ' .
-                    (Entrust::can('delete_employee') ? delete_form(['employee.destroy', $employee->id], 'employee', 1) : '') .
-                    '</div>',
-                ($employee->employee_code != '') ? $employee->employee_code : trans('messages.na'),
-                $employee->first_name,
-                $employee->designation_name,
-                $employee->designation_name,
-                $employee->category,
-                $employee->date_of_joining,
-                $employee->date_of_birth,
-                $employee->blood_group,
-                $employee->job_nature,
-                $employee->contact_number,
-                $employee->gender,
-                $employee->branch_name
-            );
-        }
-        $list['aaData'] = $rows;
-        // Return the result as JSON for DataTable
-        return response()->json($list);
+        
+        return $employees;
     }
 
     public function profile($id = null){

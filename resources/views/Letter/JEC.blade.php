@@ -132,7 +132,7 @@
                     <div class="row">
                         <form>
                             <div class="col-md-6">
-                                <div class="form-section">
+                                  <div class="form-section">
                                     <div class="form-group">
                                         <label class="col-sm-4 control-label" for="group">Group</label>
                                         <select class="form-control" name="group" id="group">
@@ -141,39 +141,19 @@
                                     </div>
                                     <div class="form-group">
                                         <label class="col-sm-4 control-label" for="branch">Branch</label>
-                                        <select class="form-control" name="branch" id="branch">
-                                            <option value="">Select Branch</option>
-                                            @foreach ($branch as $b)
-                                                <option value="{{ $b->id }}">{{ $b->name }}</option>
-                                            @endforeach
-                                        </select>
+                                        <input type="text" class="form-control" id="branch_form" disabled>
                                     </div>
                                     <div class="form-group">
                                         <label class="col-sm-4 control-label" for="department">Department</label>
-                                        <select class="form-control" name="department" id="department">
-                                            <option value="">Select Department</option>
-                                            @foreach ($department as $d)
-                                                <option value="{{ $d->id }}">{{ $d->name }}</option>
-                                            @endforeach
-                                        </select>
+                                        <input type="text" class="form-control" id="department_form" disabled>
                                     </div>
                                     <div class="form-group">
                                         <label class="col-sm-4 control-label" for="section">Section</label>
-                                        <select class="form-control" name="section" id="section">
-                                            <option value="">Select Section</option>
-                                            @foreach ($section as $s)
-                                                <option value="{{ $s->id }}">{{ $s->name }}</option>
-                                            @endforeach
-                                        </select>
+                                       <input type="text" class="form-control" id="section_form" disabled>
                                     </div>
                                     <div class="form-group">
                                         <label class="col-sm-4 control-label" for="designation">Designation</label>
-                                        <select class="form-control" name="designation" id="designation">
-                                            <option value="">Select Designation</option>
-                                            @foreach ($designation as $d)
-                                                <option value="{{ $d->id }}">{{ $d->name }}</option>
-                                            @endforeach
-                                        </select>
+                                       <input type="text" class="form-control" id="designation_form" disabled>
                                     </div>
                                     <div class="form-group">
                                         <label class="col-sm-4 control-label" for="employeeID">Employee ID</label>
@@ -280,6 +260,23 @@
 
     <script>
         $(document).ready(function() {
+             $('#employeeID').on('change', function() {
+                var employeeId = $(this).val();
+                $.ajax({
+                    url: "/get-letter-user",
+                    method: 'POST',
+                    data: {
+                        _token: "{{ csrf_token() }}",
+                        employeeId: employeeId
+                    },
+                    success: function(data) {
+                        $('#department_form').val(data.department_name);
+                        $('#section_form').val(data.section_name);
+                        $('#designation_form').val(data.designation_name);
+                        $('#branch_form').val(data.branch_name);
+                    }
+                });
+            });
             //Get NOC
             $('#getNOC').on('click', function(e) {
                 e.preventDefault();

@@ -3,7 +3,7 @@
 @section('breadcrumb')
     <ul class="breadcrumb">
         <li><a href="/dashboard">{!! trans('messages.dashboard') !!}</a></li>
-        <li class="active">Incriment Letter </li>
+        <li class="active">Incriment and Promotion Letter </li>
     </ul>
 @stop
 
@@ -131,7 +131,7 @@
     <div class="row">
         <div class="col-sm-12">
             <div class="box-info">
-                <h2>Incriment Letter</h2>
+                <h2>Incriment and Promotion Letter</h2>
                 {{-- Form Container --}}
                 <div class="container">
                     <!-- Filter Form Section -->
@@ -147,39 +147,19 @@
                                     </div>
                                     <div class="form-group">
                                         <label class="col-sm-4 control-label" for="branch">Branch</label>
-                                        <select class="form-control" name="branch" id="branch">
-                                            <option value="">Select Branch</option>
-                                            @foreach ($branch as $b)
-                                                <option value="{{ $b->id }}">{{ $b->name }}</option>
-                                            @endforeach
-                                        </select>
+                                        <input type="text" class="form-control" id="branch_form" disabled>
                                     </div>
                                     <div class="form-group">
                                         <label class="col-sm-4 control-label" for="department">Department</label>
-                                        <select class="form-control" name="department" id="department">
-                                            <option value="">Select Department</option>
-                                            @foreach ($department as $d)
-                                                <option value="{{ $d->id }}">{{ $d->name }}</option>
-                                            @endforeach
-                                        </select>
+                                        <input type="text" class="form-control" id="department_form" disabled>
                                     </div>
                                     <div class="form-group">
                                         <label class="col-sm-4 control-label" for="section">Section</label>
-                                        <select class="form-control" name="section" id="section">
-                                            <option value="">Select Section</option>
-                                            @foreach ($section as $s)
-                                                <option value="{{ $s->id }}">{{ $s->name }}</option>
-                                            @endforeach
-                                        </select>
+                                       <input type="text" class="form-control" id="section_form" disabled>
                                     </div>
                                     <div class="form-group">
                                         <label class="col-sm-4 control-label" for="designation">Designation</label>
-                                        <select class="form-control" name="designation" id="designation">
-                                            <option value="">Select Designation</option>
-                                            @foreach ($designation as $d)
-                                                <option value="{{ $d->id }}">{{ $d->name }}</option>
-                                            @endforeach
-                                        </select>
+                                       <input type="text" class="form-control" id="designation_form" disabled>
                                     </div>
                                     <div class="form-group">
                                         <label class="col-sm-4 control-label" for="employeeID">Employee ID</label>
@@ -203,7 +183,7 @@
                             </div>
                     </div>
                     <button type="button" class="btn btn-primary" style="margin-bottom: 20px" id="getNOC">Generate
-                        Incriment Letter</button>
+                        Incriment and Promotion Letter</button>
                     </form>
 
                      <!-- Report Table Section -->
@@ -224,32 +204,37 @@
        
          <!-- Main Content -->
         <div class="content">
-            <p style="border: 1px solid #db0a0a !important; padding:7px; font-weight: bold; color: #db0a0a; width: 30%; margin-top: 10px">Private & Confidential</p>
-            <p class="date">{{ date('d-m-Y') }}</p>
-            <p> 
-                <strong><span class="empName"></span><br>ID: <span id="empID"></span><br>Department: <span class="department"></span><br>Designation: <span class="designation"></span>.</strong>
-            </p>
-            <p><strong>Subject:</strong> Annual Increment Letter.</p>
+            <div style="display: flex; justify-content: space-between">
+                <p class="date" style="margin-top: 10px">{{ date('d-m-Y') }}</p>
+                <p style="border: 1px solid #db0a0a !important; padding:7px; font-weight: bold; color: #db0a0a; width: 30%; margin-top: 10px">Private & Confidential</p>
+            </div>
+            <p><span class="empName"></span></p>
+            <p>ID: <span class="empID"></span></p>
+            <p>Department: <span class="department"></span></p>
+            <p>Section: <span class="Section_Name"></span></p>
+            <p>Designation: <span class="designation"></span></p>
+
+            <p><strong>Subject: About Increment & Promotion Letter.</strong></p>
+            <p>Dear,</p>
             <p>
-                Dear Mr. <span class="empName"></span>,<br><br>
-                It is with great pleasure that we inform you of the management's decision regarding your annual
-                increment for the year <span class="year"></span>. We acknowledge and commend your outstanding dedication and performance at 
-                <strong><span class="branch"></span>"</strong> in your respective position.<br><br>
-                After careful consideration, the management is pleased to approve a revised monthly gross 
-                salary of Taka <strong><span class="salary"></span></strong> for you, with an increment amount of Taka <strong><span class="increment"></span></strong>.
-                This increment will be effective from <strong><span class="effectiveDate"></span></strong>.<br><br>
-                We wish to extend our heartfelt congratulations on your splendid performance in the past year.<br><br>
-                We anticipate your continued dedication and efforts towards the prosperity of <strong><span class="branch"></span>"</strong>.<br><br>
-                Best wishes from J & Z Group.<br><br>
-                Sincerely,
+                It is with great pleasure that we inform you of the management's decision regarding your annual increment for the year <span class="year"></span>. We acknowledge and commend your outstanding dedication and performance at <strong><span class="branch"></span>"</strong> in your respective position.
             </p>
+            <p>
+                After careful consideration, the management is pleased to approve a revised monthly gross salary of Taka <span class="gross_salary"></span> for you and a promotion to the rank of <strong>'<span class="promotion_designation"></span>'</strong> with an increment amount of Taka <span class="incrementAmount"></span>. This increment will be effective from <strong>'<span class="effectiveDate"></span>'</strong>.
+            </p>
+            <p>
+                We wish to extend our heartfelt congratulations on your splendid performance in the past year.
+            </p>
+            <p>
+                We anticipate your continued dedication and efforts towards the prosperity of <strong><span class="branch"></span>"</strong>.</strong>
+            </p>
+            <p>Best wishes from J & Z Group.</p>
+            <p>Sincerely,</p>
             <p class="signature" style="margin-top: 100px">
-                ____________________________<br>
-                Executive Director<br>
-                <span class="branch"></span>.<br>
-                J&Z Group
+                 ____________________________<br>
+                <strong>Executive Director.</strong><br><span class="branch"></span><br>J & Z Group
             </p>
-            <p><strong>Copy:</strong><br>1. Personal copy.<br>2. Office copy.</p>
+            <p>Copy: 1. Personal copy.<br>2. Office copy.</p>
         </div>
 
 
@@ -275,6 +260,23 @@
 
     <script>
         $(document).ready(function() {
+            $('#employeeID').on('change', function() {
+                var employeeId = $(this).val();
+                $.ajax({
+                    url: "/get-letter-user",
+                    method: 'POST',
+                    data: {
+                        _token: "{{ csrf_token() }}",
+                        employeeId: employeeId
+                    },
+                    success: function(data) {
+                        $('#department_form').val(data.department_name);
+                        $('#section_form').val(data.section_name);
+                        $('#designation_form').val(data.designation_name);
+                        $('#branch_form').val(data.branch_name);
+                    }
+                });
+            });
             //Get NOC
             $('#getNOC').on('click', function(e) {
                 e.preventDefault();
@@ -289,7 +291,7 @@
                     designation: $('#designation').val()
                 }
                 $.ajax({
-                    url: "/letter-increment",
+                    url: "/letter-increment-promotion",
                     method: 'POST',
                     data: FormData,
                     success: function(data) {
@@ -298,21 +300,20 @@
                             btnControll();
                             return;
                         } else {
-                            toastr.success('Data Fetched Successfully');
-                            $('#joiningDate').text(data.date_of_joining);
-                            $('#endingDate').text(data.entry_date || 'N/A'); 
-                            $('#empID').text(data.employee_code);
-                            $('.designation').text(data.designation_name);
-                            $('.department').text(data.department_name);
-                            $('.increment').text(data.amount);
-                            $('.effectiveDate').text(data.effective_date);
-                            $('.empName').text(data.employee_name);
-                            $('.branch').text(data.branch_name);
-                            $('.salary').text(data.old_amount);
-                            const year = new Date(data.effective_date).getFullYear();
-                            console.log(year);
-                            $('.year').text(year);
-                            btnControll();
+                                toastr.success('Data Fetched Successfully');
+                                $('.empName').text(data.employee_name);
+                                $('.empID').text(data.employee_code || 'N/A'); 
+                                $('.department').text(data.department_name);
+                                $('#Section_Name').text(data.section_name);
+                                $('.designation').text(data.designation_name);
+                                $('.branch').text(data.branch_name);
+                                $('.effectiveDate').text(data.effective_date);
+                                $('.gross_salary').text(data.slary_slab_gross);
+                                $('.promotion_designation').text(data.new_designation);
+                                $('.incrementAmount').text(data.increment_amount);
+                                const year = new Date(data.effective_date).getFullYear();
+                                $('.year').text(year);
+                                btnControll();
                         }
                     },
                     error: function(xhr) {
@@ -324,7 +325,7 @@
 
             function btnControll() {
                 $('#getNOC').prop('disabled', false);
-                $('#getNOC').text('Generate NOC');
+                $('#getNOC').text('Generate Increment & Promotion Letter');
                 $('#print').css('display', 'block');
                 $('#certificateContent').css('display', 'block');
             }
@@ -336,7 +337,7 @@
             var printWindow = window.open('', '', 'width=1200,height=800');
 
             // Write the HTML structure with the background image applied via style
-            printWindow.document.write('<html><head><title>Print Incriment Letter</title>');
+            printWindow.document.write('<html><head><title>Print Increment & Promotion Letter</title>');
             printWindow.document.write('<style>');
             printWindow.document.write(`
             * {

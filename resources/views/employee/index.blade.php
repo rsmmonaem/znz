@@ -100,7 +100,7 @@
 			@endif
 
 			<div class="col-sm-12">
-				<div class="box-info full">
+				<div class="box-info full" style="padding-left:30px; padding-right:30px">
 					<h2><strong>{!! trans('messages.list_all') !!}</strong> {!! trans('messages.employee') !!}
 						<div class="additional-btn">
 							@if(Entrust::can('create_employee'))
@@ -108,11 +108,137 @@
 							@endif
 						</div>
 					</h2>
-					@include('common.datatable',['col_heads' => $col_heads])
+					  <div class="panel-section">
+                        <form>
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label for="group">Group</label>
+                                        <select class="form-control" id="group">
+                                            <option value="">Select</option>
+                                            @foreach ($group as $g)
+                                                <option value="{{ $g->id }}" selected>{{ $g->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="branch">Branch</label>
+                                        <select class="form-control" id="branch">
+                                            <option value="">Select</option>
+                                            @foreach ($branch as $b)
+                                                <option value="{{ $b->id }}">{{ $b->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="department">Department</label>
+                                        <select class="form-control" id="department">
+                                            <option value="">Select</option>
+                                            @foreach ($department as $d)
+                                                <option value="{{ $d->id }}">{{ $d->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+									
+									<div class="form-group">
+                                        <label for="department">Designation</label>
+                                        <select class="form-control" id="designation">
+                                            <option value="">Select</option>
+                                            @foreach ($designation as $d)
+                                                <option value="{{ $d->id }}">{{ $d->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="employeeId">Employee ID</label>
+                                        <select class="form-control" id="employeeId">
+                                            <option value="">Select</option>
+                                            @foreach ($employee as $e)
+                                                <option value="{{ $e->id }}">{{ $e->first_name }} -
+                                                    {{ $e->employee_code }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+								<div class="col-md-6">
+								   <div class="form-group">
+                                        <label for="section">Section</label>
+                                        <select class="form-control" id="section">
+                                            <option value="">Select</option>
+                                            @foreach ($section as $s)
+                                                <option value="{{ $s->id }}">{{ $s->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+									
+									<div class="form-group">
+                                        <label for="grade">Grade</label>
+                                        <select class="form-control" id="grade">
+                                            <option value="">Select</option>
+                                            @foreach ($grade as $s)
+                                                <option value="{{ $s->id }}">{{ $s->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+									
+									<div class="form-group">
+                                        <label for="grade">Category</label>
+                                        <select class="form-control" id="category">
+                                            <option value="">Select</option>
+                                            @foreach ($category as $s)
+                                                <option value="{{ $s->name }}">{{ $s->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+								</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <button type="button" class="btn btn-primary pull-center" id="submit">Check</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+
+					  {{-- @include('common.datatable',['col_heads' => $col_heads]) --}}
+					<!-- Add a scrollable container for the table -->
+                    <div class="table-responsive" id="table-container" style="display: none">
+                        <table id="employeeTable" class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+								    <th>Action</th>
+                                    <th>SL No</th>
+									<th>ID</th>
+									<th>Name</th>
+									<th>Designation</th>
+									<th>Department</th>
+									<th>Category</th>
+									<th>Date of Joining</th>
+									<th>Date of Birth</th>
+									<th>Blood Group</th>
+									<th>Job Nature</th>
+									<th>Contact Number</th>
+									<th>Gender</th>
+									<th>Branch</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Dynamic data should populate here -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- End of scrollable container -->
+
+
+					</div>
 				</div>
 			</div>
 		</div>
-		<div class="row">
+		{{-- <div class="row">
 			<div class="col-sm-6">
 				<div class="box-info">
 					<h2><strong>{!! trans('messages.employee') !!}</strong> {!! trans('messages.statistics') !!} (Designation Wise)</h2>
@@ -137,13 +263,126 @@
 					<div id="role_wise_user_graph"></div>
 				</div>
 			</div>
-		</div>
+		</div> --}}
 
 	@stop
 
 	@section('javascript')
 	<script type="text/javascript">
 		$(document).ready(function() {
+			$('#submit').on('click', function(){
+				const table_container = $('#table-container');
+				$('#submit').attr("disabled", true);
+                $('#submit').text('Processing...');
+                let formData = {
+                    group: $('#group').val(),
+                    branch: $('#branch').val(),
+                    department: $('#department').val(),
+                    section: $('#section').val(),
+                    employeeId: $('#employeeId').val(),
+                    formDate: $('#formDate').val(),
+                    toDate: $('#toDate').val(),
+					designation: $('#designation').val(),
+					category: $('#category').val(),
+					grade: $('#grade').val()
+                };
+				$.ajax({
+					url: '/employee/lists',
+					method: 'post',
+					data: formData,
+					headers: {
+						'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') // Include CSRF token
+					},
+					success: function (data) {
+						table_container.removeAttr("style")
+						$('#submit').attr("disabled", false);
+                        $('#submit').text('Check');
+						populateEmployeeTable(data);
+					},
+					error: function (xhr, status, error) {
+						$('#submit').attr("disabled", false);
+                        $('#submit').text('Check');
+					}
+				});
+			});
+
+
+			function populateEmployeeTable(data) {
+				const datatable = $('#employeeTable');
+				datatable.DataTable().destroy(); // Destroy existing table instance if exists
+				let tableBody = $('#employeeTable tbody');
+				tableBody.empty(); // Clear existing rows
+
+				// Append the data row
+				data.forEach((item, index) => {
+					const deleteAction = `
+						<form method="POST" action="/employee/${item.id}" style="display:inline;">
+							<input type="hidden" name="_method" value="DELETE">
+							<input type="hidden" name="_token" value="${$('meta[name="csrf-token"]').attr('content')}">
+							<button type="submit" class="btn btn-danger btn-xs" title="Delete">
+								<i class="fa fa-trash"></i>
+							</button>
+						</form>`;
+
+					const actions = `
+						<div class="btn-group btn-group-xs">
+							<a href="/employee/${item.id}" class="btn btn-default btn-xs" data-toggle="tooltip" title="View">
+								<i class="fa fa-arrow-circle-right"></i>
+							</a>
+							${deleteAction}
+						</div>`;
+
+					tableBody.append(`
+						<tr>
+							<td>${actions}</td>
+							<td>${index + 1}</td>
+							<td>${item.employee_code || 'N/A'}</td>
+							<td>${item.first_name || 'N/A'}</td>
+							<td>${item.designation_name || 'N/A'}</td>
+							<td>${item.department_name || 'N/A'}</td>
+							<td>${item.category || 'N/A'}</td>
+							<td>${item.date_of_joining || 'N/A'}</td>
+							<td>${item.date_of_birth || 'N/A'}</td>
+							<td>${item.blood_group || 'N/A'}</td>
+							<td>${item.job_nature || 'N/A'}</td>
+							<td>${item.contact_number || 'N/A'}</td>
+							<td>${item.gender || 'N/A'}</td>
+							<td>${item.branch_name || 'N/A'}</td>
+						</tr>
+					`);
+				});
+
+				const table = datatable.DataTable({
+					lengthMenu: [10, 20, 50, 100],
+					paging: true,
+					autoWidth: true,
+					dom: 'Bfrtip',
+					buttons: [
+						{
+							extend: 'excelHtml5',
+							text: 'Export to Excel',
+							title: 'Employee Details',
+						},
+						{
+							extend: 'print',
+							text: 'Print',
+							title: 'Employee Details',
+							customize: function (win) {
+								$(win.document.body)
+									.css('font-size', '10pt')
+									.find('table')
+									.addClass('compact')
+									.css('font-size', 'inherit');
+							},
+						},
+					],
+					columnDefs: [
+						{ targets: [0], orderable: true }, // SL No sortable
+					],
+				});
+			}
+
+
 			$('#employee_code').attr("disabled", true) 
 
 			$('#first_name').on('change', function () {

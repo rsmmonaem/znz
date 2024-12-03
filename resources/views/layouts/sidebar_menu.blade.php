@@ -38,6 +38,9 @@
 									@if(Entrust::can('promotion_increment_aprrove'))
 									<li {!! (in_array('promotion_increment_approval',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/increment-and-promotion-approval') !!}"><i class="fa fa-angle-right"></i> {!! trans('messages.promotion_increment_approval') !!} </a></li>
 									@endif
+									@if(Entrust::can('promoted_employee_list'))
+									<li {!! (in_array('promoted_employee_list',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/promoted-employee') !!}"><i class="fa fa-angle-right"></i> {!! trans('messages.promoted_employee_list') !!} </a></li>
+									@endif
 								</ul>
 							</li> 
 							@endif

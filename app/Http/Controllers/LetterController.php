@@ -52,11 +52,28 @@ class LetterController extends Controller {
         $section = Section::all();
         $designation = Designation::all();
         $employee = User::LeftJoin('profile', 'users.id', '=', 'profile.user_id')->select('users.first_name', 'users.id', 'profile.employee_code')->get();
-        return view('Letter.IncrementAndPromotion', compact('branch', 'department', 'section', 'employee', 'designation'));
+        return view('Letter.Increment', compact('branch', 'department', 'section', 'employee', 'designation'));
     }
 
     public function IncrementPOST(Request $request) {
         return $this->LetterHelpers->IncrementPOST($request);
     }
 
+    public function IncrementPromotion()
+    {
+        $branch = Branch::all();
+        $department = Department::all();
+        $section = Section::all();
+        $designation = Designation::all();
+        $employee = User::LeftJoin('profile', 'users.id', '=', 'profile.user_id')->select('users.first_name', 'users.id', 'profile.employee_code')->get();
+        return view('Letter.IncrementAndPromotion', compact('branch', 'department', 'section', 'employee', 'designation'));
+    }
+    
+    public function IncrementPromotionPOST(Request $request) {
+        return $this->LetterHelpers->IncrementPromotionPOST($request);
+    }
+
+    public function GetLetterUser(Request $request) {
+        return $this->LetterHelpers->GetLetterUser($request);
+    }
 }

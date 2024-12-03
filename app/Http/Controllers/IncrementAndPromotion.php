@@ -155,6 +155,7 @@ class IncrementAndPromotion extends Controller{
     }
 
     public function approve(Request $request){
+      DB::beginTransaction();
       try {
         // Step 1: Update the status and approval date
         IncrementsPromotions::whereIn('id', $request->ids)
@@ -166,8 +167,13 @@ class IncrementAndPromotion extends Controller{
         // Step 2: Fetch the user info with the new designation
         $userinfo = IncrementsPromotions::whereIn('increments_promotions.id', $request->ids)
           ->leftJoin('designations as d', 'increments_promotions.designation', '=', 'd.name')
-          ->select('increments_promotions.*', 'd.id as new_designation_id')
+          ->leftJoin('users', 'increments_promotions.employee_id', '=', 'users.id')
+          ->leftJoin('salary_slab as s', 'users.id', '=', 's.user_id')
+          ->join(DB::raw('(SELECT MAX(id) as id, user_id FROM salary_slab GROUP BY user_id) latest_salary'), 's.id', '=', 'latest_salary.id')
+          ->select('increments_promotions.*', 'd.id as new_designation_id', 's.gross')
           ->get();
+
+        // return $userinfo;
 
         // Step 3: Loop through each record and create contracts and salary records
         foreach ($userinfo as $value) {
@@ -177,7 +183,7 @@ class IncrementAndPromotion extends Controller{
             'designation_id' => $value->new_designation_id,
             'description' => $value->remark,
             'from_date' => $value->entry_date,
-            'to_date' => $value->effective_date,
+            'to_date' => Carbon::parse($value->entry_date)->addYears(1),
             'contract_type_id' => 1,
             'title' => 'Contact '. $value->id
           ];
@@ -188,18 +194,49 @@ class IncrementAndPromotion extends Controller{
           if (!$contract->id) {
               throw new Exception("Failed to create contract for employee ID: {$value->employee_id}");
           }
-          // return $contract->id;
-          // Prepare salary data
-          // $contract->salary()->create([
-          //   'user_id' => $value->employee_id,
-          //   'salary_type_id' => 1,
-          //   'amount' => $value->amount + $value->old_amount,
-          // ]);
-        }
 
+          $totalBasic = $value->gross * 50 / 100;
+          $totalHouseRent = $value->gross * 28 / 100;
+          $totalMedical = $value->gross * 9 / 100;
+          $totalConveyance = $value->gross * 8 / 100;
+          $totalOthers = $value->gross * 5 / 100;
+
+          $salary_type_ids = ['1', '2', '12','8','13'];
+          $salaryAmount = [
+            'basic' => $totalBasic,
+            'house_rent' => $totalHouseRent,
+            'medical' => $totalMedical,
+            'conveyance' => $totalConveyance,
+            'others' => $totalOthers
+          ];
+
+          // return $salaryAmount;
+          // Map salary types to their respective amounts
+          $salary_mapping = array_combine($salary_type_ids, array_values($salaryAmount));
+
+          // Iterate over the mapping to save data type-wise
+          foreach ($salary_type_ids as $index => $type_id) {
+            $amount = isset($salary_mapping[$type_id]) ? $salary_mapping[$type_id] : 0;
+            $salary = new Salary();
+            $salary->contract_id = $contract->id;
+            $salary->salary_type_id = $type_id;
+            $salary->amount = $amount ?: 0;
+            $salary->user_id = $value->employee_id;
+            $salary->save();
+          }
+            DB::table('salary_slab')->insert([
+              'gross' => $value->gross,
+              'user_id' => $value->employee_id,
+              'entrydate'=> $value->entry_date,
+              'effactive_date' => $value->effective_date,
+              'status' => $request->management ? $request->management : 'all'
+            ]);
+        }
+        DB::commit();
         // Return a success response
         return response()->json(['message' => 'Employee data updated successfully.']);
       } catch (Exception $e) {
+        DB::rollBack();
         // Return the error message in case of an exception
         return response()->json(['message' => $e->getMessage()]);
       }
@@ -265,4 +302,47 @@ class IncrementAndPromotion extends Controller{
       return $dataa;
     }
 
+    public function promotedEmployee(){
+    $group = DB::table('com_group')->get();
+    $branch = Branch::all();
+    $department = Department::all();
+    $section = Section::all();
+    $employee = User::LeftJoin('profile', 'users.id', '=', 'profile.user_id')
+      ->select('users.first_name', 'users.id', 'profile.employee_code')
+      ->get();
+    $designation = Designation::all();
+      return view('increment-and-promotion.promoted-employee',compact('group','branch', 'department', 'section','designation','employee'));
+    }
+    public function promotedEmployeePOST(Request $request){
+    $userids = IncrementsPromotions::leftJoin('users', 'increments_promotions.employee_id', '=', 'users.id')
+      ->leftJoin('profile', 'users.id', '=', 'profile.user_id')
+      ->leftJoin('designations', 'users.designation_id', '=', 'designations.id')
+      ->leftJoin('departments', 'designations.department_id', '=', 'departments.id')
+      ->leftJoin('branchs', 'profile.branch_id', '=', 'branchs.id')
+      ->leftJoin('sections', 'profile.section_id', '=', 'sections.id')
+      ->when($request->employeeId, function ($query) use ($request) {
+        return $query->where('users.id', '=', $request->employeeId);
+      })
+      ->when($request->branch, function ($query) use ($request) {
+        return $query->where('profile.branch_id', '=', $request->branch);
+      })
+      ->when($request->department, function ($query) use ($request) {
+        return $query->where('departments.id', '=', $request->department);
+      })
+      ->when($request->section, function ($query) use ($request) {
+        return $query->where('profile.section_id', '=', $request->section);
+      })
+      ->when($request->formDate && $request->toDate, function ($query) use ($request) {
+        return $query->whereBetween('increments_promotions.entry_date', [$request->formDate, $request->toDate]);
+      })
+      ->select('users.id', 'profile.employee_code', 'users.first_name', 'designations.name as designation', 'departments.name as department', 'branchs.name as branch', 'sections.name as section', 'increments_promotions.amount as promotedAmount', 'increments_promotions.designation as promotedDesignation', 'increments_promotions.id', 'profile.date_of_joining', 'increments_promotions.old_amount', 'increments_promotions.promotion', 'increments_promotions.increment')
+      ->where('promotion', '=', '1')
+      ->where('increments_promotions.status', '=', 'approved')
+      ->groupBy('users.id') // Group by user ID for unique records
+      ->orderBy('increments_promotions.entry_date', 'desc') // Order by the latest entry date
+      ->get();
+
+    return $userids;
+
+    }
 }
