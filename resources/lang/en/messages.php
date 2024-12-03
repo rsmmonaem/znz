@@ -788,6 +788,7 @@
   'promotion_increment'=>'Promotion/Increment',
   'promotion_increment_approval'=> 'Approval Panel',
   'promotion_increment_report'=>'Promotion/Increment Report',
+  'promoted_employee_list'=>'Promoted Employee List',
 
   'Salary' => 'Salary',
   'salary_slab' => 'Salary Slab',

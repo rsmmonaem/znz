@@ -384,6 +384,9 @@ Route::group(['middleware' => ['auth','license','account_valid']], function () {
 	Route::post('/increment-and-promotion-report', 'IncrementAndPromotion@reportPost');
 	// Increment And Promotion
 
+	Route::get('promoted-employee', 'IncrementAndPromotion@promotedEmployee');
+	Route::post('promoted-employee', 'IncrementAndPromotion@promotedEmployeePOST');
+	
 	// All Letter NOC Increment and Promotion, Job Expreince
 	Route::get('/letter-noc', 'LetterController@NOC');
 	Route::get('/letter-jec', 'LetterController@JEC');
