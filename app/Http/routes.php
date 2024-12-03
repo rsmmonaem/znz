@@ -392,6 +392,11 @@ Route::group(['middleware' => ['auth','license','account_valid']], function () {
 	// Letter Increment and Promotion
 	Route::get('/letter-increment', 'LetterController@Increment');
 	Route::post('/letter-increment', 'LetterController@IncrementPOST');
+	// Letter Increment and Promotion
+	Route::get('/letter-increment-promotion', 'LetterController@IncrementPromotion');
+	Route::post('/letter-increment-promotion', 'LetterController@IncrementPromotionPOST');
+
+	Route::post('/get-letter-user', 'LetterController@getLetterUser');
 
 	Route::post('/copy-template',array('as' => 'copy-template','uses' => 'MailController@copyTemplate'));
 	Route::post('/mail',array('as' => 'mail.index','uses' => 'MailController@index'));

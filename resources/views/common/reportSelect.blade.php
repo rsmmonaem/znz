@@ -13,4 +13,5 @@
     <option value="{{ url('letter-noc') }}" {{ Request::is('letter-noc') ? 'selected' : '' }}>NOC Letter</option>
     <option value="{{ url('letter-jec') }}" {{ Request::is('letter-jec') ? 'selected' : '' }} >JEC Letter</option>
     <option value="{{ url('letter-increment') }}" {{ Request::is('letter-increment') ? 'selected' : '' }}>Incriment Letter</option>
+    <option value="{{ url('letter-increment-promotion') }}" {{ Request::is('letter-increment-promotion') ? 'selected' : '' }}>Incriment and Promotion Letter</option>
 </select>

@@ -103,4 +103,58 @@ class LetterHelpers {
         ->first();
         return $userData;
     }
+
+    public function IncrementPromotionPOST($request){
+        $userData = User::leftJoin('profile', 'users.id', '=', 'profile.user_id')
+        ->leftJoin('designations', 'users.designation_id', '=', 'designations.id')
+        ->leftJoin('sections', 'profile.section_id', '=', 'sections.id')
+        ->leftJoin('increments_promotions', 'users.id', '=', 'increments_promotions.employee_id')
+        ->leftJoin('departments', 'designations.department_id', '=', 'departments.id')
+        ->leftJoin('branchs', 'profile.branch_id', '=', 'branchs.id')
+        ->leftJoin('salary_slab', 'users.id', '=', 'salary_slab.user_id')
+        ->select(
+            'users.id',
+            'users.first_name as employee_name',
+            'profile.employee_code',
+            'profile.date_of_joining',
+            'designations.name as designation_name',
+            'departments.name as department_name',
+            'sections.name as section_name.',
+            'increments_promotions.effective_date',
+            'increments_promotions.amount as increment_amount',
+            'increments_promotions.designation as new_designation',
+            'branchs.name as branch_name',
+            'salary_slab.gross as slary_slab_gross'
+        )
+        ->where('users.id', '=', $request->employeeId)
+        ->where('increments_promotions.increment', '=', 1)
+        ->where('increments_promotions.promotion', '=', 1)
+        ->where('increments_promotions.status', '=', 'approved')
+        ->latest('increments_promotions.id')
+        ->latest('salary_slab.id')
+        ->first();
+        return $userData;
+    }
+
+
+    public function GetLetterUser($request) {
+        $userData = User::leftJoin('profile', 'users.id', '=', 'profile.user_id')
+        ->leftJoin('designations', 'users.designation_id', '=', 'designations.id')
+        ->leftJoin('departments', 'designations.department_id', '=', 'departments.id')
+        ->leftJoin('branchs', 'profile.branch_id', '=', 'branchs.id')
+        ->leftJoin('sections', 'profile.section_id', '=', 'sections.id')
+        ->leftJoin('employee_separations', 'users.id', '=', 'employee_separations.employee_id')
+        ->select(
+            'users.id',
+            'users.first_name as employee_name',
+            'designations.name as designation_name',
+            'departments.name as department_name',
+            'branchs.name as branch_name',
+            'sections.name as section_name'
+        )
+        ->where('users.id', '=', $request->employeeId)
+        ->latest('employee_separations.id')
+        ->first();
+        return $userData;
+    }
 }
