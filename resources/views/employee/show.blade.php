@@ -81,7 +81,7 @@
 									<div class="col-sm-6">
 				    				  	<div class="form-group flex-form-group">
 										    {!! Form::label('employee_code',trans('messages.employee_code'))!!}
-											{!! Form::input('text','employee_code',isset($employee->Profile->employee_code) ? $employee->Profile->employee_code : '',['class'=>'form-control','placeholder'=>trans('messages.employee_code')])!!}
+											{!! Form::input('text','employee_code',isset($employee->Profile->employee_code) ? $employee->Profile->employee_code : '',['class'=>'form-control','placeholder'=>trans('messages.employee_code'),'readonly'])!!}
 										</div>	
 								  	</div>
 									<div class="col-sm-6">
