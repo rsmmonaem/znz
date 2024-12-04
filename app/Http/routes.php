@@ -274,6 +274,10 @@ Route::group(['middleware' => ['auth','license','account_valid']], function () {
 
 	Route::model('leave','\App\Leave');
 	Route::post('/leave/lists','LeaveController@lists');
+	Route::get('/leave/lists-manager', 'LeaveController@listLeave');
+	Route::post('/leave/lists-manager', 'LeaveController@listsManager');
+	Route::post('/leave/update-leave-status', 'LeaveController@updateLeaveStatus');
+
 	Route::resource('/leave', 'LeaveController'); 
 	Route::post('/update-leave-status/{id}', ['as' => 'leave.update-status', 'uses' => 'LeaveController@updateStatus']);
     Route::get('leave-check', 'LeaveController@Leavecheck');

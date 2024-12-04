@@ -91,10 +91,10 @@
 										@if (Entrust::can('salary_advance'))
 											<li {!! (in_array('salary_advance',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/salary-advance') !!}"><i class="fa fa-angle-right"></i> {!! trans('messages.salary_advance') !!} </a></li>
 										@endif
-										@if (Entrust::can('payroll'))
+										@if (Entrust::can('Salary_Process'))
 											<li {!! (in_array('/slary-process',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/slary-process') !!}"><i class="fa fa-angle-right"></i> Salary Process </a></li>
 										@endif
-										@if (Entrust::can('payroll'))
+										@if (Entrust::can('Salary_Sheet'))
 											<li {!! (in_array('/slary-shit',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/slary-shit') !!}"><i class="fa fa-angle-right"></i> Salary Sheet </a></li>
 										@endif
 									</ul>
@@ -173,12 +173,21 @@
 											in_array('leave',$menu) ||
 											in_array('leave',$menu)
 								     ) ? 'class="visible"' : '' !!}>
+									@if(Entrust::can('manage_all_leave'))
 									<li {!! (in_array('/leave',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/leave') !!}"><i class="fa fa-angle-right"></i> {!! trans('messages.leave_request') !!} </a>
 									</li>
+									@endif
 									<li {!! (in_array('/leave-check',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/leave-check') !!}"><i class="fa fa-angle-right"></i> {!! trans('messages.leave_blance_check') !!} </a>
 									</li>
-									<li {!! (in_array('/leave-apply',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/leave-apply') !!}"><i class="fa fa-angle-right"></i> {!! trans('messages.leave_apply') !!} </a>
-									</li>
+									@if (Entrust::can('request_leave'))	
+										<li {!! (in_array('/leave-apply',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/leave-apply') !!}"><i class="fa fa-angle-right"></i> {!! trans('messages.leave_apply') !!} </a>
+										</li>
+									@endif
+									@if (Entrust::can('manage_leave'))	
+										<li {!! (in_array('leave-lists-manager',$menu)) ? 'class="active"' : '' !!} class="no-sort">
+											<a href="{!! URL::to('/leave/lists-manager') !!}"><i class="fa fa-angle-right"></i> Manage Leave </a>
+										</li>
+									@endif
 								</ul>
 							</li> 
 

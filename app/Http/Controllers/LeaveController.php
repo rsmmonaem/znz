@@ -818,5 +818,53 @@ Class LeaveController extends Controller{
 	}
 
 
+
+	public function listLeave()
+	{
+		return view('leave.manager');
+	}
+	public function listsManager(Request $request)
+	{
+		if (Entrust::can('manage_leave'))
+		$leaves = Leave::orderBy('leaves.status', 'desc')
+		->where('recommendID', '=', Auth::user()->id)
+			->leftJoin('leave_types', 'leaves.leave_type_id', '=', 'leave_types.id')
+			->leftJoin('users', 'leaves.user_id', '=', 'users.id')
+			->leftJoin('profile', 'users.id', '=', 'profile.user_id')
+			->LeftJoin('designations', 'users.designation_id', '=', 'designations.id')
+			->leftJoin('departments', 'designations.department_id', '=', 'departments.id')
+			->select(
+			    'leaves.id',
+				'profile.employee_code as employee_id',
+				'designations.name as designation_name',
+				'departments.name as department_name',
+				'users.first_name',
+				'leave_types.name as lname',
+				'leaves.status',
+				'leaves.from_date',
+				'leaves.to_date',
+				'leaves.balance',
+				'leaves.appliedDays'
+			)
+			->where('recomstatus', '=', null)
+			->get();
+		elseif (Entrust::can('manage_subordinate_leave')) {
+			$child_designations = Helper::childDesignation(Auth::user()->designation_id, 1);
+			$child_users = User::whereIn('designation_id', $child_designations)->pluck('id')->all();
+			array_push($child_users, Auth::user()->id);
+			$leaves = Leave::whereIn('user_id', $child_users)->get();
+		} else
+			$leaves = Leave::where('recommendID', '=', Auth::user()->id)->get();
+
+		return $leaves;
+	}
+	public function updateLeaveStatus(Request $request) {
+		$leave = Leave::where('id', $request->id)->first();
+		$leave->recomstatus = $request->status;
+		$leave->recomRemark = $request->remark;
+		$leave->recomdate = date('Y-m-d');
+		$leave->save();
+		return response()->json(['message' => trans('messages.leave') . ' ' . trans('messages.status_updated'), 'status' => 'success']);
+	}
 }
 ?>
