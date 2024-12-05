@@ -186,7 +186,16 @@
                             // Handle success
                             $icon.removeClass('rotate');
                             console.log(response);
-                            toastr.success(response.message);
+                            if (response.processed_employee_ids.length > 0) {
+                                for (let i = 0; i < response.processed_employee_ids.length; i++) {
+                                    const id = response.processed_employee_ids[i]; 
+                                    const message = `The salary for ID No: ${id} has been successfully processed.`;
+                                    toastr.success(message);
+                                }
+                            }else{
+                                toastr.warning("No employees were processed");
+                            }
+                            // toastr.success(response.message + response.processed_employee_ids);
                         },
                         error: function() {
                             // Handle error
