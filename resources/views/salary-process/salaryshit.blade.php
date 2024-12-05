@@ -109,6 +109,7 @@
                                     <th rowspan="2">Advance</th>
                                     <th rowspan="2">Provident Fund</th>
                                     <th rowspan="2">TAX</th>                                    <th rowspan="2">Arrear Amount</th>
+                                    <th rowspan="2">OT Amount</th>
                                     <th rowspan="2">Net Payable</th>
                                     <th rowspan="2">Bank Asia A/C No.</th>
                                     <th rowspan="2">Remarks</th>
@@ -139,6 +140,7 @@
                                     <td id="total-provident-fund"></td>
                                     <td id="total-tax"></td>
                                     <td id="total-arrear"></td>
+                                    <td id="total-otamount"></td>
                                     <td id="total-net-payable"></td>
                                     <td colspan="2"></td>
                                 </tr>
@@ -205,6 +207,14 @@
                         let conveyance = salaryData[4]?.amount || '0.00';
                         let others = salaryData[8]?.amount || '0.00';
 
+
+                        const netPayable = 
+                            parseFloat(item.net_salary || 0) +
+                            parseFloat(item.arrear_amount || 0) +
+                            parseFloat(item.ot_amount || 0) -
+                            parseFloat(item.tax_amount || 0) -
+                            parseFloat(item.provident_fund || 0) -
+                            parseFloat(item.advance_salary || 0);
                         // Append row to the table
                         tableBody.append(`
                             <tr>
@@ -225,7 +235,8 @@
                                 <td>${item.provident_fund}</td>
                                 <td>${item.tax_amount || '0.00'}</td>
                                 <td class="arrear-amount" data-name="${item.first_name}" data-arrear-amount="${item.arrear_amount}" data-id="${item.id}" >${item.arrear_amount}</td>
-                                <td class="net-payable" data-id="${item.id}" data-netpayable="${item.net_salary}">${parseFloat(item.net_salary) + parseFloat(item.arrear_amount)}</td>
+                                <td class="ot-amount" data-id="${item.id}" >${item.ot_amount ? item.ot_amount : '0.00'}</td>
+                                <td class="net-payable" data-id="${item.id}" data-netpayable="${item.net_salary}">${parseFloat(netPayable).toFixed(2)}</td>
                                 <td>${item.account_number || ' '}</td>
                                 <td>${item.remarks || ' '}</td>
                             </tr>
@@ -243,12 +254,12 @@
                             {
                                 extend: 'excelHtml5',
                                 text: 'Export to Excel',
-                                title: 'Salary Report', // The title of the exported Excel file
+                                title: 'Salary Sheet', // The title of the exported Excel file
                             },
                             {
                                 extend: 'print',
                                 text: 'Print',
-                                title: 'Salary Report', // The title of the printed document
+                                title: 'Salary Sheet', // The title of the printed document
                                 customize: function (win) {
                                     $(win.document.body)
                                         .css('font-size', '8pt')
@@ -314,8 +325,10 @@
                             var totalArrear = api.column(16).data().reduce(function(a, b) {
                                 return parseFloat(a) + parseFloat(b);
                             }, 0);
-
-                            var totalNetPayable = api.column(17).data().reduce(function(a, b) {
+                            var totalArrear = api.column(17).data().reduce(function(a, b) {
+                                return parseFloat(a) + parseFloat(b);
+                            }, 0);
+                            var totalNetPayable = api.column(18).data().reduce(function(a, b) {
                                 return parseFloat(a) + parseFloat(b);
                             }, 0);
 
@@ -332,7 +345,8 @@
                             $('#total-provident-fund').html(totalProvidentFund);
                             $('#total-tax').html(totalTax);
                             $('#total-arrear').html(totalArrear);
-                            $('#total-net-payable').html(totalNetPayable);
+                            $('#total-otamount').html(totalArrear);
+                            $('#total-net-payable').html(parseFloat(totalNetPayable).toFixed(2));
                         }
                         
                     });

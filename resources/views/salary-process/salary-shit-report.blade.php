@@ -218,6 +218,7 @@ function populateSalaryTable(data) {
         totalTaxAmount = 0,
         totalArrearAmount = 0,
         totalNetPayable = 0;
+        totalOT = 0;
 
     // Build the main table HTML
     let tableHTML = `
@@ -277,6 +278,7 @@ function populateSalaryTable(data) {
                         <th>Provident Fund</th>
                         <th>Tax Amount</th>
                         <th>Arrear Amount</th>
+                        <th>OT Amount</th>
                         <th>Net Payable</th>
                         <th>Account Number</th>
                         <th>Remarks</th>
@@ -308,6 +310,7 @@ function populateSalaryTable(data) {
         totalProvidentFund += parseFloat(item.provident_fund || 0);
         totalTaxAmount += parseFloat(item.tax_amount || 0);
         totalArrearAmount += parseFloat(item.arrear_amount || 0);
+        totalOT += parseFloat(item.ot_amount || 0);
         totalNetPayable += netPayable;
 
         tableHTML += `
@@ -329,7 +332,8 @@ function populateSalaryTable(data) {
                 <td>${item.provident_fund || '0.00'}</td>
                 <td>${item.tax_amount || '0.00'}</td>
                 <td>${item.arrear_amount || '0.00'}</td>
-                <td>${netPayable.toFixed(2)}</td>
+                <td>${item.ot_amount || '0.00'}</td>
+                <td>${netPayable + parseFloat(item.ot_amount || 0)}</td>
                 <td>${item.account_number || ''}</td>
                 <td>${item.remarks || ''}</td>
             </tr>
@@ -350,6 +354,7 @@ function populateSalaryTable(data) {
                         <td>${totalProvidentFund.toFixed(2)}</td>
                         <td>${totalTaxAmount.toFixed(2)}</td>
                         <td>${totalArrearAmount.toFixed(2)}</td>
+                        <td>${totalOT.toFixed(2)}</td>
                         <td>${totalNetPayable.toFixed(2)}</td>
                         <td colspan="2"></td>
                     </tr>
@@ -394,6 +399,7 @@ function populateSalaryTable(data) {
                         <th>Total Provident Fund</th>
                         <th>Total Tax Amount</th>
                         <th>Total Arrear</th>
+                        <th>Total OT</th>
                         <th>Total Net Payable</th>
                     </tr>
                 </thead>
@@ -411,6 +417,7 @@ function populateSalaryTable(data) {
                         <td>${totalProvidentFund.toFixed(2)}</td>
                         <td>${totalTaxAmount.toFixed(2)}</td>
                         <td>${totalArrearAmount.toFixed(2)}</td>
+                        <td>${totalOT.toFixed(2)}</td>
                         <td>${totalNetPayable.toFixed(2)}</td>
                     </tr>
                 </tbody>

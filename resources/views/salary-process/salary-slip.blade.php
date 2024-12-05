@@ -472,13 +472,21 @@
     
     // Loop through employee salary data to generate payslips content
     data.employee_salary_data.forEach(employee => {
+        const netPayable = 
+            parseFloat(employee.net_salary || 0) +
+            parseFloat(employee.arrear_amount || 0) +
+            parseFloat(employee.ot_amount || 0) -
+            parseFloat(employee.tax_amount || 0) -
+            parseFloat(employee.provident_fund || 0) -
+            parseFloat(employee.advance_salary || 0);
+        // HTML structure for a single payslip
         const payslip = `
             <div class="wrapper">
                 <div class="payslip">
                     <!-- Header -->
                     <div class="header">
                         <div class="logo">
-                            <img src="{{ URL::to(config('constants.upload_path.logo') . config('config.logo')) }}" alt="Logo">
+                             ${data.branch.id == 7 ? 'Mohakhali Branch' : `<img src="{{ URL::to(config('constants.upload_path.logo') . config('config.logo')) }}" alt="Logo">`}
                         </div>
                         <div class="company-details">
                             <h3>${data.branch.name ?? ''}</h3>
@@ -529,7 +537,7 @@
                                     <td>${employee.salaryData[0]?.head || '-'}</td>
                                     <td>${formatCurrency(employee.salaryData[0]?.amount || 0)}</td>
                                     <td>OT Amount</td>
-                                    <td></td>
+                                    <td>${employee.ot_amount?employee.ot_amount:' '}</td>
                                 </tr>
                                 <tr>
                                     <td>${employee.salaryData[1]?.head || '-'}</td>
@@ -563,7 +571,7 @@
                                 </tr>
                                 <tr>
                                     <td colspan="1"><strong>Total Payable</strong></td>
-                                    <td colspan="3" style="text-align: right; margin-right: 20px"><strong>${formatCurrency(employee.net_salary)}</strong></td>
+                                    <td colspan="3" style="text-align: right; margin-right: 20px"><strong>${parseFloat(employee.net_salary) + parseFloat(employee.ot_amount || 0) + parseFloat(employee.arrear_amount || 0)}</strong></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -597,15 +605,26 @@
                                 </tr>
                                 <tr>
                                     <td colspan="1"><strong>Total Deduction</strong></td>
-                                    <td colspan="3" style="text-align: right; margin-right: 20px"><strong>${parseFloat(employee.advance_salary) + parseFloat(employee.provident_fund) + parseFloat(employee.total_absents_fee)}</strong></td>
+                                    <td colspan="3" style="text-align: right; margin-right: 20px"><strong>${parseFloat(employee.advance_salary) + parseFloat(employee.provident_fund) + parseFloat(employee.total_absents_fee)}</strong></td>${employee.total_absents_fee}
                                 </tr> 
                                 <tr>
                                     <td colspan="1"><strong>Net Payable:</strong></td>
-                                    <td colspan="3" style="text-align: right; margin-right: 20px"><strong>${formatCurrency(employee.net_salary)}</strong></td>
+                                    <td colspan="3" style="text-align: right; margin-right: 20px">
+                                    <strong>
+                                        ${ 
+                                            parseFloat(employee.net_salary || 0) +
+                                            parseFloat(employee.ot_amount || 0) -
+                                            parseFloat(employee.tax_amount || 0) -
+                                            parseFloat(employee.provident_fund || 0) -
+                                            parseFloat(employee.total_absents_fee || 0) -
+                                            parseFloat(employee.advance_salary || 0)
+                                        }
+                                    </strong>
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td colspan="1"><strong>Salary in Words:</strong></td>
-                                    <td colspan="3"><strong>${numberToWords(employee.net_salary)}</strong></td>
+                                    <td colspan="3"><strong>${numberToWords(netPayable)}</strong></td>
                                 </tr>
                             </tbody>
                         </table>
