@@ -58,7 +58,8 @@
     <script>
 		$(document).ready(function() {
             getSeparationData();
-
+            $('body').attr('aria-hidden', 'true'); // Hide background content
+  		    $(this).removeAttr('aria-hidden');  
         // Handle form submission
 		$('.Spacial-Holiday-save').on('click', function(e){
 			  e.preventDefault(); 
@@ -90,43 +91,6 @@
                 }
             });
 		});
-
-        $('.Update_Spacial_Holiday').on('click', function() {
-            console.log('clicked');
-            
-            // Collect form data
-            const formData = {
-                date: $('[name="date"]').val(),
-                branch: $('[name="branch"]').val(),
-                description: $('#description').val(),
-            };
-            
-            // Get the ID from the button's data-id attribute
-            const id = $(this).data('id');
-            
-            // Check if ID is set
-            if (!id) {
-                console.error('ID is missing.');
-                return;
-            }
-            
-            // Perform the AJAX request
-            $.ajax({
-                url: '/spacial-holiday/' + id,
-                type: 'PUT',
-                data: formData,
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}', 
-                },
-                success: function(response) {
-                    getSeparationData();
-                    toastr.success('Spacial Holiday Updated Successfully');
-                },
-                error: function(xhr) {
-                    console.error('Error:', xhr.responseText);
-                }
-            });
-        });
 
         $(document).on('click', '#deleteHoliday', function(e) {
             e.preventDefault();

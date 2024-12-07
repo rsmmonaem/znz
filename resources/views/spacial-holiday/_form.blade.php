@@ -4,12 +4,14 @@
         {!! Form::input('text', 'date', isset($holiday->date) ? $holiday->date : '', [
             'class' => 'form-control mdatepicker',
             'placeholder' => trans('messages.date'),
+            'id' => 'date',
             'readonly' => 'true',
         ]) !!}
     @else
         {!! Form::input('text', 'date', isset($holiday->date) ? $holiday->date : '', [
             'class' => 'form-control datepicker',
             'placeholder' => trans('messages.date'),
+            'id' => 'date',
             'readonly' => 'true',
         ]) !!}
     @endif
@@ -40,7 +42,7 @@
     <span class="countdown"></span>
 </div>
 {{ App\Classes\Helper::getCustomFields('holiday-form', $custom_field_values) }}
-{!! Form::button(
+{!! Form::submit(
     isset($buttonText) ? $buttonText : trans('messages.save'), 
     [
         'class' => 'btn btn-primary Spacial-Holiday-save',
@@ -48,3 +50,46 @@
         'data-id' => isset($holiday->id) ? $holiday->id : ''
     ]
 ) !!}
+
+<script>
+document.querySelector('.Update_Spacial_Holiday').addEventListener('click', function() {
+    // Collect form data
+    const formData = {
+        date: document.querySelector('[name="date"]').value,
+        branch: document.querySelector('[name="branch"]').value,
+        description: document.getElementById('description').value,
+    };
+
+    // Get the ID from the button's data-id attribute
+    const id = this.getAttribute('data-id');
+
+    // Check if ID is set
+    if (!id) {
+        console.error('ID is missing.');
+        return;
+    }
+
+    // Perform the AJAX request
+    fetch(`/spacial-holiday/${id}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}', // Include CSRF token
+        },
+        body: JSON.stringify(formData),
+    })
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then((data) => {
+            getSeparationData();
+            toastr.success('Spacial Holiday Updated Successfully');
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
+});
+</script>

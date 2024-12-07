@@ -44,6 +44,7 @@ Class SpacialHolidayController extends Controller{
 	public function edit($id){
 
 		$holiday = SpacialHoliday::find($id);
+		// $branches = Branch::all(); // Fetch all branches
 		if(!Entrust::can('edit_holiday'))
             return view('common.error',['message' => trans('messages.permission_denied')]);
 
@@ -89,7 +90,9 @@ Class SpacialHolidayController extends Controller{
 		return redirect()->back()->withSuccess(trans('messages.holiday').' '.trans('messages.added'));		
 	}
 
-	public function update(HolidayRequest $request,Holiday $holiday){
+	public function update(Request $request, $id){
+
+		$holiday = SpacialHoliday::find($id);
 
 		if(!Entrust::can('edit_holiday'))
             return view('common.error',['message' => trans('messages.permission_denied')]);
@@ -123,7 +126,7 @@ Class SpacialHolidayController extends Controller{
             $response = ['message' => trans('messages.holiday').' '.trans('messages.updated'), 'status' => 'success']; 
             return response()->json($response, 200, array('Access-Controll-Allow-Origin' => '*'));
         }
-		return redirect('/holiday')->withSuccess(trans('messages.holiday').' '.trans('messages.updated'));
+		return redirect('/spacial-holiday')->withSuccess(trans('messages.holiday').' '.trans('messages.updated'));
 	}
 
 	public function destroy(Request $request, $id){
