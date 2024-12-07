@@ -223,7 +223,12 @@ Route::group(['middleware' => ['auth','license','account_valid']], function () {
 	
 	Route::model('holiday','\App\Holiday');
 	Route::post('/holiday/lists','HolidayController@lists');
-	Route::resource('/holiday', 'HolidayController'); 
+	Route::resource('/holiday', 'HolidayController');
+
+	// Spacial Holiday
+	Route::resource('/spacial-holiday', 'SpacialHolidayController');
+	Route::post('/spacial-holiday/lists', 'SpacialHolidayController@lists');
+	Route::post('/spacial-holiday/{id}', 'SpacialHolidayController@destroy');
 	
 	Route::model('award','\App\Award');
 	Route::post('/award/lists','AwardController@lists');
