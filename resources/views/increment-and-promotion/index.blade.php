@@ -85,7 +85,7 @@
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label>Entry Date</label>
-                                        <input type="date" id="entry_date" class="form-control">
+                                        <input type="date" id="entry_date" class="form-control" value="{{ date('Y-m-d') }}">
                                     </div>
                                     <div class="form-group">
                                         <label>Effective Date</label>

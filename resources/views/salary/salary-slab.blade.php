@@ -120,7 +120,7 @@
                             <form>
                                 <div class="form-group">
                                     <label for="entryDate">Entry Date</label>
-                                    <input type="date" id="entryDate" class="form-control">
+                                    <input type="date" id="entryDate" class="form-control" value="{{ date('Y-m-d') }}">
                                 </div>
                                 <div class="form-group">
                                     <label for="effectiveDate">Effective Date</label>

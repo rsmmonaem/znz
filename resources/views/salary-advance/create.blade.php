@@ -86,7 +86,7 @@
                             <div class="col-sm-6">
                                 <div class="form-group">
                                     <label for="entryDate">Entry Date</label>
-                                    <input type="date" class="form-control" id="entryDate">
+                                    <input type="date" class="form-control" id="entryDate" value="{{ date('Y-m-d') }}">
                                 </div>
                                 <div class="form-group">
                                     <label for="separationAriseDate">Separation Arise Date</label>

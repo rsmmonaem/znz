@@ -95,7 +95,7 @@
                                 <div class="form-group">
                                     <label for="entryDate">Entry Date</label>
                                     <input type="date" class="form-control" id="entryDate" name="entryDate"
-                                        value="{{ $separation->entry_date }}">
+                                        value="{{ $separation->entry_date }}" >
                                 </div>
                                 <div class="form-group">
                                     <label for="separationAriseDate">Separation Arise Date</label>
