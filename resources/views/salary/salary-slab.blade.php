@@ -3,7 +3,7 @@
 @section('breadcrumb')
     <ul class="breadcrumb">
         <li><a href="/dashboard">{!! trans('messages.dashboard') !!}</a></li>
-        <li class="active">{!! trans('messages.promotion_increment') !!}</li>
+        <li class="active">Salary Slab</li>
     </ul>
 @stop
 
@@ -74,7 +74,7 @@
                                     <select id="group" class="form-control">
                                         <option value="">Select</option>
                                         @foreach ($group as $g)
-                                            <option value="{{ $g->id }}">{{ $g->name }}</option>
+                                            <option value="{{ $g->id }}" selected>{{ $g->name }}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -131,25 +131,47 @@
                                     <input type="text" id="gross" class="form-control">
                                 </div>
                                 <div class="form-group">
-                                    <label>Basic %</label>
-                                    <input type="text" class="form-control" id="basic" disabled value="50">
+                                    <label>Basic </label>
+                                    <input type="text" class="form-control" id="basic1" disabled value="">
+                                    <input type="hidden" class="form-control" id="basic" disabled value="50">
                                 </div>
                                 <div class="form-group">
-                                    <label>House Rent %</label>
-                                    <input type="text" class="form-control" id="houseRent" disabled value="28">
+                                    <label>House Rent </label>
+                                    <input type="text" class="form-control" id="houseRent1" disabled value="">
+                                    <input type="hidden" class="form-control" id="houseRent" disabled value="28">
                                 </div>
                                 <div class="form-group">
-                                    <label>Medical %</label>
-                                    <input type="text" class="form-control" id="medical" disabled value="9">
+                                    <label>Medical </label>
+                                    <input type="text" class="form-control" id="medical1" disabled value="">
+                                    <input type="hidden" class="form-control" id="medical" disabled value="9">
                                 </div>
                                 <div class="form-group">
-                                    <label>Conveyance %</label>
-                                    <input type="text" class="form-control" id="conveyance" disabled value="8">
+                                    <label>Conveyance </label>
+                                    <input type="text" class="form-control" id="conveyance1" disabled value="">
+                                    <input type="hidden" class="form-control" id="conveyance" disabled value="8">
                                 </div>
                                 <div class="form-group">
-                                    <label>Others %</label>
-                                    <input type="text" class="form-control" id="others" disabled value="5">
+                                    <label>Others </label>
+                                    <input type="text" class="form-control" id="others1" disabled value="">
+                                    <input type="hidden" class="form-control" id="others" disabled value="5">
                                 </div>
+                                <script>
+                                const basic = document.getElementById('basic1');
+                                const houseRent = document.getElementById('houseRent1');
+                                const medical = document.getElementById('medical1');
+                                const conveyance = document.getElementById('conveyance1');
+                                const others = document.getElementById('others1');
+                                const grossInput = document.getElementById('gross'); 
+
+                                grossInput.addEventListener('input', () => {
+                                const gross = parseFloat(grossInput.value) || 0; 
+                                    basic.value = (gross * 0.50).toFixed();        
+                                    houseRent.value = (gross * 0.28).toFixed();
+                                    medical.value = (gross * 0.09).toFixed();
+                                    conveyance.value = (gross * 0.08).toFixed();
+                                    others.value = (gross * 0.05).toFixed();
+                                });
+                                </script>
                                 <div class="radio-group">
                                     <label><input type="radio" name="management" value="management"> Management</label>
                                     <label><input type="radio" name="management" value="corporate"> Corporate</label>
@@ -161,11 +183,11 @@
 
                     <div class="action-buttons">
                         <button class="btn btn-success" id="saveData">Save</button>
-                        <button class="btn btn-danger">Close</button>
+                        <button class="btn btn-danger" id="close" type="reset">Close</button>
                     </div>
 
                     <!-- Table Section -->
-                    <div class="table-container">
+                    <div class="table-container" style="display: none;">
                         <table class="table table-bordered table-striped" id="salaryTable">
                             <thead>
                                 <tr>
@@ -195,7 +217,7 @@
 @section('javascript')
     <script>
         $(document).ready(function() {
-            getData();
+            // getData();
             $('#employeeId').on('change', function() {
                 var employeeId = $(this).val();
                 $.ajax({
@@ -241,9 +263,9 @@
                     success: function(data) {
                         $('#saveData').attr('disabled', false);
                         $('#saveData').text('Save');
-                        console.log(data);
+                        console.log(data.data);
                         toastr.success(data.message || 'Slab created successfully.');
-                        getData();
+                        getData(data.data);
                     },
                     error: function() {
                         $('#saveData').attr('disabled', false);
@@ -255,11 +277,21 @@
             })
         })
 
-        function getData(){
+        $('#close').on('click', function() {
+            $('#saveData').attr('disabled', false);
+            $('#saveData').text('Save');
+            $('#salaryTable_wrapper').hide();
+            $('#tableData').empty();
+        })
+
+        
+        function getData(id=null){
           $.ajax({
-                url: "/slary-slab-list", // The route to fetch data
+                url: "/slary-slab-list?id=" + id, 
                 method: "GET",
                 success: function (data) {
+                    const salaryTable_wrapper = $('.table-container');
+                    salaryTable_wrapper.show();
                     const datatable = $('#salaryTable');
                     // Destroy the existing DataTable to reinitialize with new data
                     datatable.DataTable().destroy();
