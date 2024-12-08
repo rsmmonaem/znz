@@ -206,10 +206,10 @@ Class SalaryController extends Controller{
        return view('salary.salary-slab',compact('employee','group','branch'));
     }
 
-    public function SalarySlabList()
+    public function SalarySlabList(Request $request)
     {
         // Get all users with their profiles
-        $users = \App\User::with('profile')->get();
+        $users = \App\User::with('profile')->where(['users.id' => $request->query('id')])->get();
 
         // Fetch earning salary types only once
         $earning_salary_types = \App\SalaryType::where('salary_type', '=', 'earning')->get();
@@ -328,10 +328,10 @@ Class SalaryController extends Controller{
             ]);
             $this->logActivity(['module' => 'salary', 'activity' => 'activity_added', 'secondary_id' => $employee_id]);
             DB::commit();
-            return response()->json(['success']);
+            return response()->json(['success', 'data' => $employee_id]);
         }catch(Exception $e){
             DB::rollBack();
-            return response()->json(['message' => $e->getMessage(), 'status' => 'error'], 200, array('Access-Controll-Allow-Origin' => '*'));
+            return response()->json(['message' => $e->getMessage(), 'status' => 'error', 'data' => $employee_id], 200, array('Access-Controll-Allow-Origin' => '*'));
         }
     }
 
