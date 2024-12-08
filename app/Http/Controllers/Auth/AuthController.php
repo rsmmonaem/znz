@@ -104,8 +104,18 @@ class AuthController extends Controller
             return redirect('/dashboard')->withErrors(trans('messages.permission_denied'));
         }
 
+        // $user->fill($request->all());
+        // $user->password = bcrypt($request->input('password'));
+        // Fill the user object with validated data
         $user->fill($request->all());
-        $user->password = bcrypt($request->input('password'));
+
+        // Handle nullable username
+        $user->username = $request->input('username') ? $request->input('username') : 'nonUser'. $request->input('employee_code');
+        // Handle nullable email
+        $user->email = $request->input('email') ? $request->input('email') : null;
+
+        // Hash and set the password
+        $user->password = bcrypt($request->input('password')) ? bcrypt($request->input('password')) : null;
         $user->save();
         $profile = new Profile;
         $profile->user()->associate($user);

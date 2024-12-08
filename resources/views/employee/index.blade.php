@@ -383,8 +383,8 @@
 			}
 
 
-			$('#employee_code').attr("disabled", true) 
-
+			// $('#employee_code').attr("disabled", true) 
+			$('#employee_code').prop('readonly', true);	
 			$('#first_name').on('change', function () {
 				$.ajax({
 					url: '/employee/latest-id',
@@ -394,7 +394,7 @@
 					},
 					success: function (data) {
 						if (data.employee_code) {
-							$('#employee_code').val(data.employee_code);
+							$('#employee_code').val(data.employee_code).attr('value', data.employee_code);
 						}
 					},
 					error: function (xhr, status, error) {

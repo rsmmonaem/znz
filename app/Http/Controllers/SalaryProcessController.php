@@ -61,7 +61,6 @@ class SalaryProcessController extends Controller
             $user_ids = $data->pluck('users.id');
             $processedEmployeeIds = [];
 
-            return $user_ids;
             // Handle salary processing for each user
             foreach ($user_ids as $user_id) {
                 // Check if salary already exists for the employee in the given date range
@@ -84,7 +83,7 @@ class SalaryProcessController extends Controller
                     }
                 } else {
                     // Call appropriate salary process method
-                    $processedId = $this->SalaryProcess($user_id, $request->formDate, $request->toDate, $request->remarks);
+                    $processedId = $this->SalaryProcess($user_id, $request->formDate, $request->toDate, $request->remarks, $request->branch);
                     if ($processedId !== null) {
                         $processedEmployeeIds[] = $processedId;  // Collect successfully processed employee IDs
                     }
@@ -107,7 +106,7 @@ class SalaryProcessController extends Controller
     }
 
 
-    public function SalaryProcess($employeeId, $formDate, $toDate, $remarks)
+    public function SalaryProcess($employeeId, $formDate, $toDate, $remarks, $branch_id = null)
     {
         // Get Employee
         $User = User::LeftJoin('profile', 'users.id', '=', 'profile.user_id')
@@ -129,6 +128,13 @@ class SalaryProcessController extends Controller
         $holidays = DB::table('holidays')
         ->whereBetween('date', [$formDate, $toDate])
         // ->where('user_id', $employeeId)
+        ->distinct('date') 
+        ->count('date');
+
+        // Holidays
+        $spacial_holidays = DB::table('spacial_holidays')
+        ->whereBetween('date', [$formDate, $toDate])
+        ->where('branch', $branch_id)
         ->distinct('date') 
         ->count('date');
 
@@ -211,7 +217,7 @@ class SalaryProcessController extends Controller
         ->select('salary_advance.grossValue', 'salary_advance.grossOption')
         ->first();
 
-        $totalWorkedDays = $getTotalPresent + $holidays + $leave + $totalFridays;
+        $totalWorkedDays = $getTotalPresent + $holidays + $leave + $totalFridays + $spacial_holidays;
         $totalAbsents = $TotalDays - $totalWorkedDays;
         $perdaysAmount =  $salaryslab ? $salaryslab->gross / $TotalDays : 0;
         $GrossAmountSalaryPerDays = $perdaysAmount * $totalWorkedDays;
@@ -520,96 +526,6 @@ class SalaryProcessController extends Controller
         return view('salary-process.salaryshit', compact('group','branch','department','section','employee','designation'));
     }
 
-    // public function SalaryShitPost(Request $request){
-    //     $data = DB::table('employee_salary_details')
-    //     ->leftjoin('users', 'employee_salary_details.employee_id', '=', 'users.id')
-    //     ->leftjoin('profile', 'users.id', '=', 'profile.user_id')
-    //     // ->leftjoin('salary_slab', 'employee_salary_details.employee_id', '=', 'salary_slab.user_id')
-    //     ->leftjoin('designations', 'users.designation_id', '=', 'designations.id')
-    //     ->leftjoin('bank_accounts', 'employee_salary_details.employee_id','=','bank_accounts.user_id')
-    //     ->orderBy('employee_salary_details.id', 'desc')
-    //     // ->orderBy('bank_accounts.id', 'desc')
-    //     ->select(
-    //         'employee_salary_details.id',
-    //         'users.id as user_id',
-    //         'users.first_name',
-    //         'designations.name as designation',
-    //         'profile.date_of_joining',
-    //         'profile.employee_code',
-    //         'employee_salary_details.total_worked_days',
-    //         'employee_salary_details.gross_salary',
-    //         'employee_salary_details.net_salary',
-    //         'employee_salary_details.advance_salary',
-    //         'employee_salary_details.provident_fund',
-    //         'employee_salary_details.tax_amount',
-    //         'employee_salary_details.arrear_amount',
-    //         'bank_accounts.account_number',
-    //         'employee_salary_details.remarks'
-    //     )
-    //     ->get();
-
-    //     // Get the latest bank account ID for each user
-    //     $latestBankAccounts = DB::table('bank_accounts')
-    //     ->select('user_id', DB::raw('MAX(id) as latest_id'))
-    //     ->groupBy('user_id')
-    //     ->get();
-    //     // Create a lookup array for latest bank account IDs
-    //     $latestBankAccountsLookup = [];
-    //     foreach ($latestBankAccounts as $account) {
-    //         $latestBankAccountsLookup[$account->user_id] = $account->latest_id;
-    //     }
-
-    //     // Prepare a collection to store the latest salary data for each user
-    //     $latestSalaryData = [];
-
-    //     foreach ($data as $record) {
-    //         // Get the latest bank account for the user
-    //         $latestBankAccountId = isset($latestBankAccountsLookup[$record->user_id]) ? $latestBankAccountsLookup[$record->user_id] : null;
-
-    //         if ($latestBankAccountId) {
-    //             // Fetch the latest bank account details for this user
-    //             $bankAccount = DB::table('bank_accounts')
-    //                 ->where('id', $latestBankAccountId)
-    //                 ->first();
-
-    //             // Attach the bank account number to the record
-    //             $record->account_number = $bankAccount ? $bankAccount->account_number : null;
-    //         } else {
-    //             // If no bank account is found, set account number to null
-    //             $record->account_number = null;
-    //         }
-    //         // Fetch latest salary data for the specific user
-    //         $salaryData = DB::table('salary')
-    //             ->join('salary_types', 'salary.salary_type_id', '=', 'salary_types.id')
-    //             ->where('salary.user_id', $record->user_id)
-    //             ->where('salary_types.salary_type', 'earning')
-    //             ->select(
-    //                 'salary.id',
-    //                 // 'salary.contract_id',
-    //                 'salary.salary_type_id',
-    //                 'salary.amount',
-    //                 'salary.created_at',
-    //                 // 'salary.updated_at',
-    //                 'salary_types.head',
-    //                 'salary_types.salary_type'
-    //             )
-    //             ->orderBy('salary.salary_type_id')
-    //             ->orderBy('salary.created_at', 'desc')
-    //             ->get();
-
-    //         // Filter unique salary types
-    //         $salaryData = collect($salaryData)->unique('salary_type_id');
-
-    //         // Store the unique salary data in the collection
-    //         $latestSalaryData[$record->user_id] = $salaryData;
-    //     }
-
-    //     // Add the latest salary data to the main collection
-    //     foreach ($data as $record) {
-    //         $record->salaryData = $latestSalaryData[$record->user_id];
-    //     }
-    //     return $data;
-    // }
     public function SalaryShitPost(Request $request)
     {
         // return $request->all();
