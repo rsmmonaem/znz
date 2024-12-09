@@ -706,7 +706,7 @@ class EmployeeController extends Controller{
       try{
             EmployeeTransfer::create($request->all());
             Profile::where('user_id', $request->femployee)->update(['branch_id' => $request->tbranch, 'section_id' => $request->tsection]);
-            Designation::where('id', $request->fdesignation)->update(['department_id' => $request->tdepartment]);
+            // Designation::where('id', $request->fdesignation)->update(['department_id' => $request->tdepartment]);
             User::where('id', $request->femployee)->update(['designation_id' => $request->tdesignation]);
             DB::commit();
             return response()->json(['status' => 'success', 'message' => trans('Employee Transfered Successfully')]);
@@ -733,7 +733,7 @@ class EmployeeController extends Controller{
             'users.status'
         )
             ->leftJoin('users', 'employeetransfer.femployee', '=', 'users.id')
-            ->leftJoin('designations', 'employeetransfer.fdesignation', '=', 'designations.id')
+            ->leftJoin('designations', 'employeetransfer.tdesignation', '=', 'designations.id')
             ->leftJoin('profile', 'users.id', '=', 'profile.user_id')  // Assuming 'profiles' is the table and relationship for employee_code
             ->orderBy('employeetransfer.id', 'desc')
             ->get();

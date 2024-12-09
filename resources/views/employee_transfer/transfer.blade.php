@@ -347,6 +347,7 @@
                 success: function(response) {
                     console.log(response);
                     $('#employeeName').val(response.name);
+                    $('select[name="fbranch"]').val(1).trigger('change');
                     $('#employeeDesignation').val(response.designation);
                     $('#employeeDesignationID').val(response.designation_id);
                 },
