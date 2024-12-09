@@ -2,8 +2,14 @@
 	
 <div class="container">
 	<div class="logo-brand header sidebar rows">
-		<div class="logo">
-			<h1><a href="{!! URL::to('/') !!}">{!! config('config.application_name').' '.config('code.version') !!}</a></h1>
+		<div class="logo" style="text-align: center">
+			<style>
+				.sidebar-inner .media {
+					margin: 10px -15px 0 -15px !important;
+				}
+			</style>
+			<h1>Welcome to J & Z Group</h1>
+			{{-- <h1><a href="{!! URL::to('/') !!}">{!! config('config.application_name').' '.config('code.version') !!}</a></h1> --}}
 		</div>
 	</div>
 	@include('layouts.sidebar')

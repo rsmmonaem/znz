@@ -11,15 +11,15 @@
 						</a>
 							{!! trans('messages.welcome_back') !!},
 							<h4 class="media-heading"><strong>{!! Auth::user()->full_name!!} </strong></h4>
-							<h6>{!! Auth::user()->Designation->full_designation !!}</h6>
+							{{-- <h6>{!! Auth::user()->Designation->full_designation !!}</h6> --}}
 							<div class="clear"></div>
-							<span style="font-size:12px;">
+							{{-- <span style="font-size:12px;">
 
 							<a href="/profile" style="font-size:12px;color:#fff;">{{ trans('messages.my').' '.trans('messages.profile') }}</a>
 
 							@if(showDateTime(Auth::user()->last_login))
 							| {!! trans('messages.last_login') !!} <br />{!! showDateTime(Auth::user()->last_login).' '.trans('messages.from').' '.Auth::user()->last_login_ip !!}</span>
-							@endif
+							@endif --}}
 
 						</div>
 					</div> 
