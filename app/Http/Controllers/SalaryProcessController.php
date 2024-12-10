@@ -131,10 +131,10 @@ class SalaryProcessController extends Controller
         ->distinct('date') 
         ->count('date');
 
-        // Holidays
+        //Spacial Holidays
         $spacial_holidays = DB::table('spacial_holidays')
         ->whereBetween('date', [$formDate, $toDate])
-        ->where('branch', $branch_id)
+        ->where('user_id', $employeeId)
         ->distinct('date') 
         ->count('date');
 
@@ -308,6 +308,13 @@ class SalaryProcessController extends Controller
             ->distinct('date')
             ->count('date');
 
+        //Spacial Holidays
+        $spacial_holidays = DB::table('spacial_holidays')
+        ->whereBetween('date', [$formDate, $toDate])
+        ->where('user_id', $employeeId)
+        ->distinct('date')
+        ->count('date');
+
         // Leave
         $leave = DB::table('leaves')
         ->whereBetween('from_date', [$formDate, $toDate])
@@ -442,7 +449,7 @@ class SalaryProcessController extends Controller
         }
 
 
-        $totalWorkedDays = $getTotalPresent + $holidays + $leave + $totalFridays;
+        $totalWorkedDays = $getTotalPresent + $holidays + $leave + $totalFridays + $spacial_holidays;
         $totalAbsents = $TotalDays - $totalWorkedDays;
         $perdaysAmount =  $salaryslab ? $salaryslab->gross / $TotalDays : 0;
         $GrossAmountSalaryPerDays = $perdaysAmount * $totalWorkedDays;
