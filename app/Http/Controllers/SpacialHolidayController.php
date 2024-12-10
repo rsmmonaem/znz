@@ -84,7 +84,7 @@ Class SpacialHolidayController extends Controller{
 		}
 		if ($request->employee_id) {
 			$employeeIds = is_array($request->employee_id) ? $request->employee_id : explode(',', $request->employee_id);
-			$data->whereIn('users.id', $employeeIds);
+			$data->whereIn('profile.employee_code', $employeeIds);
 		}
 		if ($request->section) {
 			$data->where('profile.section_id', '=', $request->section);

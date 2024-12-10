@@ -1123,6 +1123,7 @@ Class ClockController extends Controller{
 
 	public function updateAttendance(Request $request){
 
+
 		$user_id = ($request->input('user_id')) ? : Auth::user()->id;
 		$date = ($request->input('date')) ? : date('Y-m-d');
 
@@ -1145,10 +1146,11 @@ Class ClockController extends Controller{
 		if($date_of_leaving && $date_of_leaving < $date)
 			return redirect()->back()->withErrors(trans('messages.inactive_employee'));
 
-		$clocks = Clock::where('date','=',$date)
-			->whereUserId($user_id)
-			->orderBy('clock_in')
-			->get();
+		$clocks = Clock::leftJoin('users', 'clocks.user_id', '=', 'users.id')
+			// ->orderBy('clock_in')
+			->latest('clocks.id')
+			->paginate(10);
+		// return $clocks;
 
 		if(!Entrust::can('update_attendance'))
 			return redirect('/dashboard')->withErrors(trans('messages.permission_denied'));
@@ -1199,6 +1201,56 @@ Class ClockController extends Controller{
         return view('employee.update_attendance',compact('users','assets','user','date','clocks','my_shift','menu','label'));
 	}
 
+	public function postUpdateAttendance(Request $request){
+		$data = User::leftJoin('profile', 'users.id', '=', 'profile.user_id')
+		->leftJoin('designations', 'users.designation_id', '=', 'designations.id')
+		->leftJoin('sections', 'profile.section_id', '=', 'sections.id')
+		->leftJoin('branchs', 'profile.branch_id', '=', 'branchs.id')
+		->leftJoin('departments', 'designations.department_id', '=', 'departments.id');
+
+		// Apply filters based on the request
+		if ($request->branch) {
+			$data->where('profile.branch_id', $request->branch);
+		}
+		if ($request->department) {
+			$data->where('designations.department_id', $request->department);
+		}
+		if ($request->designation) {
+			$data->where('designations.id', $request->designation);
+		}
+		if (!empty($request->employee_id)) {
+			$employeeIds = is_array($request->employee_id) ? $request->employee_id : explode(',', $request->employee_id);
+			$data->whereIn('profile.employee_code', $employeeIds);
+		}
+		if ($request->section) {
+			$data->where('profile.section_id', $request->section);
+		}
+		$data = $data->select('users.id');
+		$user_ids = $data->pluck('users.id')->toArray();
+		$dates = $request->input('date') ? explode(',', $request->input('date')) : [];
+		$clock_in = date('Y-m-d H:i', strtotime($request->input('clock_in')));
+		$clock_out = date('Y-m-d H:i', strtotime($request->input('clock_out')));
+		foreach ($user_ids as $user_id) {
+			foreach ($dates as $date) {
+				$clock = new Clock;
+				$clock->clock_in = $clock_in;
+				$clock->clock_out = $clock_out;
+				$clock->user_id = $user_id;
+				$clock->date = $date;
+				$clock->save();
+			}
+		}
+
+		return response()->json(['success' => true, 'data' => $user_ids]);
+	}
+
+	public function  postUpdateAttendanceIDs() {
+		return Clock::leftJoin('users', 'clocks.user_id', '=', 'users.id')
+		// ->orderBy('clock_in')
+		->latest('clocks.id')
+		->select('clocks.id', 'clocks.clock_in', 'clocks.clock_out', 'users.first_name','clocks.date')
+		->get();
+	}
 	public function uploadAttendance(AttendanceUploadRequest $request){
 		
 		if(!Entrust::can('upload_attendance'))
