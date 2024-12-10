@@ -63,11 +63,18 @@
         // Handle form submission
 		$('.Spacial-Holiday-save').on('click', function(e){
 			  e.preventDefault(); 
+            const multiple_id = $('input[name="multiple_id"]').val();
+            const multiple_id_array = multiple_id.split(',').map(id => id.trim()).filter(id => id !== "");
             // Get data from form fields by name
             const formData = {
                 date: $('[name="date"]').val(),
                 branch: $('[name="branch"]').val(),
                 description: $('#description').val(),
+                designation: $('[name="designation"]').val(),
+                department: $('[name="department"]').val(),
+                section: $('[name="section"]').val(),
+                status: $('[name="status"]').val(),
+                employee_id: multiple_id_array,
             };
 
            // Send AJAX request

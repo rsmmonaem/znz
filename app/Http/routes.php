@@ -324,6 +324,9 @@ Route::group(['middleware' => ['auth','license','account_valid']], function () {
 	Route::post('/upload-attendance',array('as' => 'clock.upload-attendance','uses' => 'ClockController@uploadAttendance'));
 
 	Route::get('/update-attendance','ClockController@updateAttendance');
+	Route::post('/post-update-attendance', 'ClockController@postUpdateAttendance');
+	Route::post('/post-update-attendance-list', 'ClockController@postUpdateAttendanceIDs');
+
 	Route::post('/update-attendance',array('as' => 'clock.update-attendance','uses' => 'ClockController@updateAttendance'));
 	Route::post('/clock/{user_id}/{date}',array('as' => 'clock.clock-update','uses' => 'ClockController@clock'));
 	Route::post('/clock/{user_id}/{date}/{clock_id?}',array('as' => 'clock.clock-update','uses' => 'ClockController@clock'));

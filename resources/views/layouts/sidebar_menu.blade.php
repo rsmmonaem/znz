@@ -152,11 +152,11 @@
 											in_array('shift_detail',$menu) ||
 											in_array('update_attendance',$menu)
 								) ? 'class="visible"' : '' !!}>
-									<li {!! (in_array('daily_attendance',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/attendance') !!}"><i class="fa fa-angle-right"></i> {!! trans('messages.daily_attendance') !!} </a></li>
+									{{-- <li {!! (in_array('daily_attendance',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/attendance') !!}"><i class="fa fa-angle-right"></i> {!! trans('messages.daily_attendance') !!} </a></li>
 									<li {!! (in_array('date_wise_attendance',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/date-wise-attendance') !!}"><i class="fa fa-angle-right"></i> {!! trans('messages.date_wise').' '.trans('messages.attendance') !!} </a></li>
 									<li {!! (in_array('date_wise_summary_attendance',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/date-wise-summary-attendance') !!}"><i class="fa fa-angle-right"></i> <small>{!! trans('messages.date_wise').' '.trans('messages.summary').' '.trans('messages.attendance') !!}</small> </a></li>
-									<li {!! (in_array('shift_detail',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/shift-detail') !!}"><i class="fa fa-angle-right"></i> {!! trans('messages.shift_detail') !!} </a></li>
-									@if(Entrust::can('update_attendance'))
+									<li {!! (in_array('shift_detail',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/shift-detail') !!}"><i class="fa fa-angle-right"></i> {!! trans('messages.shift_detail') !!} </a></li>--}}
+									@if(Entrust::can('update_attendance')) 
 									<li {!! (in_array('update_attendance',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/update-attendance') !!}"><i class="fa fa-angle-right"></i> {!! trans('messages.update_attendance') !!} </a></li>
 									@endif
 									
