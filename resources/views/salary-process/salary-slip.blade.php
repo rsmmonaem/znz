@@ -605,7 +605,7 @@
                                 </tr>
                                 <tr>
                                     <td colspan="1"><strong>Total Deduction</strong></td>
-                                    <td colspan="3" style="text-align: right; margin-right: 20px"><strong>${parseFloat(employee.advance_salary) + parseFloat(employee.provident_fund) + parseFloat(employee.total_absents_fee)}</strong></td>${employee.total_absents_fee}
+                                    <td colspan="3" style="text-align: right; margin-right: 20px"><strong>${parseFloat(employee.advance_salary) + parseFloat(employee.provident_fund) + parseFloat(employee.total_absents_fee)}</strong></td>
                                 </tr> 
                                 <tr>
                                     <td colspan="1"><strong>Net Payable:</strong></td>
@@ -616,7 +616,6 @@
                                             parseFloat(employee.ot_amount || 0) -
                                             parseFloat(employee.tax_amount || 0) -
                                             parseFloat(employee.provident_fund || 0) -
-                                            parseFloat(employee.total_absents_fee || 0) -
                                             parseFloat(employee.advance_salary || 0)
                                         }
                                     </strong>
@@ -624,7 +623,7 @@
                                 </tr>
                                 <tr>
                                     <td colspan="1"><strong>Salary in Words:</strong></td>
-                                    <td colspan="3"><strong>${numberToWords(netPayable)}</strong></td>
+                                    <td colspan="3"><strong>${numberToWords(Math.round(employee.net_salary || 0))}</strong></td>
                                 </tr>
                             </tbody>
                         </table>

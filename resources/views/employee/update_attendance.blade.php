@@ -28,11 +28,7 @@
 					    {!! Form::label('date',trans('messages.date'),[])!!}
 						{!! Form::input('text','date',$date,['class'=>'form-control datepicker','placeholder'=>trans('messages.date'),'readonly' => 'true'])!!}
 					  </div> --}}
-                <div class="form-group">
-                    {!! Form::label('date', trans('Branch'), []) !!}
-                    <select class="form-control" name="branch" id="branch">
-                        <option value="">Select Branch</option>
-                        @php
+                         @php
                             $branch = \App\Branch::all();
                             $department = \App\Department::all();
                             $section = \App\Section::all();
@@ -41,44 +37,39 @@
                                 ->select('users.first_name', 'users.id', 'profile.employee_code')
                                 ->get();
                         @endphp
-                        @foreach ($branch as $b)
-                            <option value="{{ $b->id }}"
-                                {{ isset($holiday->branch) && $holiday->branch == $b->id ? 'selected' : '' }}>
-                                {{ $b->name }}
-                            </option>
+                <div class="form-group">
+                    <label>Employee</label>
+                    <select class="form-control" name="empolyee_id" id="empolyee_id">
+                        <option value="">Select Employee</option>
+                        @foreach ($employee as $e)
+                            <option value="{{ $e->id }}">{{ $e->first_name }} - {{ $e->employee_code }}</option>
                         @endforeach
                     </select>
                 </div>
+
                 <div class="form-group">
+                    <label>Name</label>
+                    <input type="text" name="name" id="repname" class="form-control" placeholder="Name" readonly>
+                </div>
+               <div class="form-group">
                     <label>Department</label>
-                    <select class="form-control" name="department">
-                        <option value="">Select Department</option>
-                        @foreach ($department as $d)
-                            <option value="{{ $d->id }}">{{ $d->name }}</option>
-                        @endforeach
-                    </select>
+                    <input type="text" name="department" id="repdepartment" class="form-control" placeholder="Department" readonly>
                 </div>
-                <div class="form-group">
-                    <label>Section</label>
-                    <select class="form-control" name="section">
-                        <option value="">Select Section</option>
-                        @foreach ($section as $s)
-                            <option value="{{ $s->id }}">{{ $s->name }}</option>
-                        @endforeach
-                    </select>
-                </div>
+                
                 <div class="form-group">
                     <label>Designation</label>
-                    <select class="form-control" name="designation">
-                        <option value="">Select Designation</option>
-                        @foreach ($designation as $d)
-                            <option value="{{ $d->id }}">{{ $d->name }}</option>
-                        @endforeach
-                    </select>
+                    <input type="text" name="designation" id="repdesignation" class="form-control" placeholder="Designation" readonly>
                 </div>
+
                 <div class="form-group">
                     <label>Employee IDs</label>
-                    <input type="text" name="multiple_id" class="form-control" placeholder="ID1, ID2, ID3">
+                    <select class="form-control" name="multiple_id" id="multiple_id" multiple>
+                        <option value="">Select Employee</option>
+                        @foreach ($employee as $e)
+                            <option value="{{ $e->id }}">{{ $e->first_name }} - {{ $e->employee_code }}</option>
+                        @endforeach
+                    </select>
+                    {{-- <input type="text" name="multiple_id" class="form-control" placeholder="ID1, ID2, ID3"> --}}
                 </div>
 				<div class="form-group">
 					{!! Form::label('date', trans('messages.date'), []) !!}
@@ -179,19 +170,41 @@
 	<script type="text/javascript">
 		$(document).ready(function() {
 			displaydata();
+
+            // GetUser Data
+            $('#empolyee_id').on('change', function() {
+                $.ajax({
+                    url: '/UserData',
+                    type: 'POST',
+                    data: {
+                        employeeId: $(this).val(),
+                    },
+                    success: function(data) {
+                        $('#repname').val(data.first_name);
+                        $('#repdepartment').val(data.department);
+                        $('#repdesignation').val(data.designation);
+                    }
+                })
+            })
 			// save-attendance
 			$('#save-attendance').click(function() {
+                if($('#date').val() == '' || $('#clock_in').val() == '' || $('#clock_out').val() == '') {
+                    toastr.error('Please fill all the fields');
+                    return false;
+                }
+                else
 				$('#save-attendance').attr('disabled', true);
 				$('#save-attendance').text('Processing...');
-			    const multiple_id = $('input[name="multiple_id"]').val();
-                const multiple_id_array = multiple_id.split(',').map(id => id.trim()).filter(id => id !== "");
+			    // const multiple_id = $('input[name="multiple_id"]').val();
+                // const multiple_id_array = multiple_id.split(',').map(id => id.trim()).filter(id => id !== "");
 				const FormDate = {
-					employee_id: multiple_id_array,
-					branch: $('[name="branch"]').val(),
-					description: $('#description').val(),
-					designation: $('[name="designation"]').val(),
-					department: $('[name="department"]').val(),
-					section: $('[name="section"]').val(),
+					employee_ids: $('#multiple_id').val(),  
+					employee_id: $('#empolyee_id').val(),
+					// branch: $('[name="branch"]').val(),
+					// description: $('#description').val(),
+					// designation: $('[name="designation"]').val(),
+					// department: $('[name="department"]').val(),
+					// section: $('[name="section"]').val(),
 					date: $('#date').val(),
 					clock_in: $('#clock_in').val(),
 					clock_out: $('#clock_out').val(),
@@ -201,6 +214,8 @@
 					type: 'POST',
 					data: FormDate,
 					success: function(data) {
+                        console.log(data);
+                        
 						displaydata();
 						toastr.success('Attendance Updated Successfully');
 						$('#save-attendance').attr('disabled', false);
