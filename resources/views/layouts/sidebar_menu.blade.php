@@ -109,7 +109,7 @@
 									</ul>
 							</li>
 							
-							{{-- <li {!! (in_array('appraisal',$menu)) ? 'class="active"' : '' !!} {!! menuAttr($menus,'appraisal') !!}><a href="#"><i class="fa fa-graduation-cap icon"></i><i class="fa fa-angle-double-down i-right"></i> {!! trans('messages.appraisal') !!}</a>
+						 <li data-position="28" {!! (in_array('appraisal',$menu)) ? 'class="active"' : '' !!} {!! menuAttr($menus,'appraisal') !!}><a href="#"><i class="fa fa-graduation-cap icon"></i><i class="fa fa-angle-double-down i-right"></i> {!! trans('messages.appraisal') !!}</a>
 								<ul {!! (in_array('appraisal_user',$menu) ||
 											in_array('appraisal_user_edit',$menu) ||
 											in_array('appraisal_user_view',$menu) ||
@@ -119,7 +119,7 @@
 								</ul>
 							</li>
 							
-							<li {!! (in_array('appraisal_rating',$menu)) ? 'class="active"' : '' !!} {!! menuAttr($menus,'appraisal_rating') !!}><a href="#"><i class="fa fa-star icon"></i><i class="fa fa-angle-double-down i-right"></i> {!! trans('messages.appraisal_rating_menu') !!}</a>
+							<li data-position="29" {!! (in_array('appraisal_rating',$menu)) ? 'class="active"' : '' !!} {!! menuAttr($menus,'appraisal_rating') !!}><a href="#"><i class="fa fa-star icon"></i><i class="fa fa-angle-double-down i-right"></i> {!! trans('messages.appraisal_rating_menu') !!}</a>
 								<ul {!! (in_array('appraisal_rating',$menu) ||
 											in_array('appraisal_rating_edit',$menu) ||
 											in_array('appraisal_rating_view',$menu) ||
@@ -135,7 +135,7 @@
 								</ul>
 							</li>
 							
-							<li {!! (in_array('appraisal_review',$menu)) ? 'class="active"' : '' !!} {!! menuAttr($menus,'appraisal_review') !!}><a href="#"><i class="fa fa-star-o icon"></i><i class="fa fa-angle-double-down i-right"></i> {!! trans('messages.appraisal_review_menu') !!}</a>
+							<li data-position="30" {!! (in_array('appraisal_review',$menu)) ? 'class="active"' : '' !!} {!! menuAttr($menus,'appraisal_review') !!}><a href="#"><i class="fa fa-star-o icon"></i><i class="fa fa-angle-double-down i-right"></i> {!! trans('messages.appraisal_review_menu') !!}</a>
 								<ul {!! (in_array('appraisal_review',$menu) 
 								) ? 'class="visible"' : '' !!}>
 									<li {!! (in_array('appraisal_review',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/appraisal_review') !!}"><i class="fa fa-angle-right"></i> {!! trans('messages.appraisal_review') !!} </a></li>
@@ -143,7 +143,7 @@
 									
 								</ul>
 							</li>
-							 --}}
+							 
 							
 							<li data-position="23" {!! (in_array('attendance',$menu)) ? 'class="active"' : '' !!} {!! menuAttr($menus,'attendance') !!}><a href="#"><i class="fa fa-book icon"></i><i class="fa fa-angle-double-down i-right"></i> {!! trans('messages.attendance') !!}</a>
 								<ul {!! (in_array('daily_attendance',$menu) ||
