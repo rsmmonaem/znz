@@ -13,6 +13,7 @@ use Entrust;
 use App\Profile;
 use App\Classes\Helper;
 use Auth;
+use Illuminate\Support\Facades\DB;
 
 class AuthController extends Controller
 {
@@ -95,7 +96,7 @@ class AuthController extends Controller
     }
 
     public function postRegister(RegisterRequest $request, User $user){
-        
+        // return $request->all();
         if(!Entrust::can('create_employee')){
             if($request->has('ajax_submit')){
                 $response = ['message' => trans('messages.permission_denied'), 'status' => 'error']; 
@@ -107,6 +108,8 @@ class AuthController extends Controller
         // $user->fill($request->all());
         // $user->password = bcrypt($request->input('password'));
         // Fill the user object with validated data
+        DB::beginTransaction();
+        try{
         $user->fill($request->all());
 
         // Handle nullable username
@@ -122,8 +125,12 @@ class AuthController extends Controller
         $profile->employee_code = $request->input('employee_code');
         $profile->date_of_joining = $request->input('date_of_joining');
         $profile->save();
+        if($request->input('role_id'))
         $user->attachRole($request->input('role_id'));
-
+        DB::commit();
+        }catch(\Exception $e){
+            DB::rollback();
+        }
         if($request->has('send_welcome_email')){
             $template = \App\Template::whereCategory('welcome_email')->first();
             $body = $template->body;

@@ -384,7 +384,7 @@ Route::group(['middleware' => ['auth','license','account_valid']], function () {
 	// Increment And Promotion
 	Route::get('/increment-and-promotion', 'IncrementAndPromotion@index');
 	Route::get('/increment-and-promotion-approval', 'IncrementAndPromotion@ApprovalPanel');
-	Route::post('/get-employee-details/{id}', 'IncrementAndPromotion@getUserData');
+	// Route::post('/get-employee-details/{id}', 'IncrementAndPromotion@getUserData');
 	Route::post('/increment-and-promotion','IncrementAndPromotion@store');
 	Route::get('/increment-and-promotion-data', 'IncrementAndPromotion@getIncrementAndPromotionData');
 	Route::delete('/increment-and-promotion/{id}', 'IncrementAndPromotion@destroy');

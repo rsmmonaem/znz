@@ -779,7 +779,7 @@
   'leave_apply' => 'Apply Leave',
   'leave_repot' => 'Leave Report',
   'grade' => 'Grade',
-  'attandance_report' => 'Attendance Report',
+  'attandance_report' => 'Mothly Attendance Report',
   'reports' => 'Reports',
   'daily-attendance-report' => 'Daily Attendance Report',
   'lwp' => 'LWP',

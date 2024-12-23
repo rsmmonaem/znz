@@ -25,6 +25,7 @@
 					</div> 
 					<div id="sidebar-menu">
 						<ul id="sidebar-menu-list">
+							@include('layouts.sidebar_menu')
 						</ul>
 						<div class="clear"></div>
 					</div>

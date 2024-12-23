@@ -26,16 +26,16 @@ class EmployeeRequest extends Request
         return [
                     'first_name' => 'required',
                     'last_name' => 'required',
-                    'role_id' => 'sometimes|required',
-                    'designation_id' => 'sometimes|required',
-                    'email' => 'required|unique:users,email,'.$employee->id,
-                    'date_of_birth' => 'sometimes|date',
-                    'gender' => 'required',
-                    'marital_status' => 'required',
-                    'date_of_birth' => 'date',
-                    'date_of_joining' => 'sometimes|date|after:date_of_birth',
-                    'date_of_leaving' => 'sometimes|date|after:date_of_joining',
-                    'employee_code' => 'sometimes|required|unique:profile,employee_code,'.$employee->Profile->id.',id'
+                    // 'role_id' => 'sometimes|required',
+                    // 'designation_id' => 'sometimes|required',
+                    // 'email' => 'required|unique:users,email,'.$employee->id,
+                    // 'date_of_birth' => 'sometimes|date',
+                    // 'gender' => 'required',
+                    // 'marital_status' => 'required',
+                    // 'date_of_birth' => 'date',
+                    // 'date_of_joining' => 'sometimes|date|after:date_of_birth',
+                    // 'date_of_leaving' => 'sometimes|date|after:date_of_joining',
+                    // 'employee_code' => 'sometimes|required|unique:profile,employee_code,'.$employee->Profile->id.',id'
                 ];
     }
 

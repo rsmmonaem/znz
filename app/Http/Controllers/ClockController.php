@@ -1146,12 +1146,6 @@ Class ClockController extends Controller{
 		if($date_of_leaving && $date_of_leaving < $date)
 			return redirect()->back()->withErrors(trans('messages.inactive_employee'));
 
-		$clocks = Clock::leftJoin('users', 'clocks.user_id', '=', 'users.id')
-			// ->orderBy('clock_in')
-			->latest('clocks.id')
-			->paginate(10);
-		// return $clocks;
-
 		if(!Entrust::can('update_attendance'))
 			return redirect('/dashboard')->withErrors(trans('messages.permission_denied'));
 
@@ -1198,7 +1192,17 @@ Class ClockController extends Controller{
 
         $assets = ['timepicker'];
         $menu = ['attendance','update_attendance'];
-        return view('employee.update_attendance',compact('users','assets','user','date','clocks','my_shift','menu','label'));
+		$clockUp = Clock::leftJoin('users', 'clocks.user_id', '=', 'users.id')
+			->select(
+				'clocks.*',
+				'users.first_name as user_name',
+				DB::raw("TIME_FORMAT(clock_in, '%h:%i %p') as formatted_clock_in"),
+				DB::raw("TIME_FORMAT(clock_out, '%h:%i %p') as formatted_clock_out")
+			)
+			->latest('clocks.id')
+			->paginate(15);
+		// return $clocks;
+        return view('employee.update_attendance',compact('users','assets','user','date', 'clockUp'));
 	}
 
 	public function postUpdateAttendance(Request $request){
