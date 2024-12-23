@@ -28,7 +28,7 @@
         @if (Entrust::can('list_holiday'))
             <div class="col-sm-8">
                 <div class="box-info full">
-                    <h2><strong>{!! trans('messages.list_all') !!}</strong> Spacial Holiday</h2>
+                    <h2><strong>{!! trans('messages.list_all') !!}</strong> Special Holiday</h2>
                     {{-- @include('common.datatable',['col_heads' => $col_heads]) --}}
 				<div class="table-responsive" style="margin:20px">	
                     <table class="table table-bordered table-striped" id="datatable">

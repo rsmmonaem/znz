@@ -548,6 +548,7 @@ Class LeaveController extends Controller{
 			return $query->where('profile.branch_id', '=', $request->branch);
 		})
 		// ->where('profile.branch_id', $branch)
+		->select('users.id', 'users.first_name as name', 'profile.employee_code as employee_id')
 		->first();
         // return $user;
 		$contract = \App\Contract::whereUserId($user->id)
@@ -629,6 +630,7 @@ Class LeaveController extends Controller{
 		$user = \App\User::leftJoin('profile', 'users.id', '=', 'profile.user_id')
 		->where('users.id', $request->user_id)
 		// ->where('profile.branch_id', $branch)
+		->select('users.id', 'users.first_name as name', 'profile.employee_code as employee_id')
 		->first();
 
 		$date = date('Y-m-d'); 
@@ -663,89 +665,74 @@ Class LeaveController extends Controller{
 
 	public function leaveStore(Request $request, Leave $leave){
 		// return $request->all();
-		$user_id = $request->input('user_id');
-		$from_date = $request->input('from_date');
-		$to_date = $request->input('to_date');
-        $user = \App\User::find($user_id);
-		// return $user;
-		$contract = \App\Contract::whereUserId($user->id)
-		->where('from_date', '<=', $from_date)
-		->where('to_date', '>=', $to_date)
-		->first();
-    //    return $contract;
-	// 	if (!$contract) {
-	// 		if ($request->has('ajax_submit')) {
-	// 			$response = ['message' => trans('messages.contract_period_not_found'), 'status' => 'error'];
-	// 			return response()->json($response, 200, array('Access-Controll-Allow-Origin' => '*'));
-	// 		}
-	// 		return redirect()->back()->withErrors(trans('messages.contract_period_not_found'));
-	// 	}
+		try{
+			$user_id = $request->input('user_id');
+			$from_date = $request->input('from_date');
+			$to_date = $request->input('to_date');
+			$user = \App\User::find($user_id);
+			$contract = \App\Contract::whereUserId($user->id)
+			->where('from_date', '<=', $from_date)
+			->where('to_date', '>=', $to_date)
+			->first();
 
-		$user_leave = \App\UserLeave::whereContractId($contract->id)
-		->whereLeaveTypeId($request->input('leave_type_id'))
-		->first();
+			$user_leave = \App\UserLeave::whereContractId($contract->id)
+			->whereLeaveTypeId($request->input('leave_type_id'))
+			->first();
 
-		// return $user_leave;
-		// if (!$user_leave) {
-		// 	if ($request->has('ajax_submit')) {
-		// 		$response = ['message' => trans('messages.leave_not_defined'), 'status' => 'error'];
-		// 		return response()->json($response, 200, array('Access-Controll-Allow-Origin' => '*'));
-		// 	}
-		// 	return redirect()->back()->withErrors(trans('messages.leave_not_defined'));
-		// }
+			$leave_request_count = (strtotime($to_date) - strtotime($from_date)) / (60 * 60 * 24) + 1;
+			$leave_type = LeaveType::find($request->input('leave_type_id'));
+			$leave_balance = $user_leave->leave_count - $user_leave->leave_used;
+			// return $leave_balance;
+			if ($leave_balance <= $leave_request_count) 
+			// 	return "if";
+			// 	if ($request->has('ajax_submit')) {
+			// 		$response = ['message' => trans('messages.only') . ' ' . $leave_balance . ' ' . $leave_type->name . ' ' . trans('messages.remaining'), 'status' => 'error'];
+			// 		return response()->json($response, 200, array('Access-Controll-Allow-Origin' => '*'));
+			// 	}
+			// 	return redirect()->back()->withErrors(trans('messages.only') . ' ' . $leave_balance . ' ' . $leave_type->name . ' ' . trans('messages.remaining'));
+			// }else{
+			// 	return true;
 
-		$leave_request_count = (strtotime($to_date) - strtotime($from_date)) / (60 * 60 * 24) + 1;
-		$leave_type = LeaveType::find($request->input('leave_type_id'));
-		$leave_balance = $user_leave->leave_count - $user_leave->leave_used;
-		// return $leave_balance;
-		if ($leave_balance <  $leave_request_count) {
+			$leaves = Leave::where('user_id', '=', $user_id)
+			->where(function ($query) use ($from_date, $to_date) {
+				$query->where(function ($query) use ($from_date, $to_date) {
+					$query->where('from_date', '>=', $from_date)
+						->where('from_date', '<=', $to_date);
+				})->orWhere(function ($query)  use ($from_date, $to_date) {
+					$query->where('to_date', '>=', $from_date)
+						->where('to_date', '<=', $to_date);
+				});
+			})->count();
+			if ($leaves) {
+				if ($request->has('ajax_submit')) {
+					$response = ['message' => trans('messages.leave_requested_for_this_period'), 'status' => 'error'];
+					return response()->json($response, 200, array('Access-Controll-Allow-Origin' => '*'));
+				}
+				// return redirect()->back()->withInput()->withErrors(trans('messages.leave_requested_for_this_period'));
+				return $response = ['message' => 'Already' . ' ' . trans('messages.requested'), 'status' => 'error'];
+			}
+
+			$data = $request->all();
+			// return $data;
+			$data['user_id'] = $user_id;
+			$leave->fill($data);
+			$leave->status = 'pending';
+			$leave->balance = $request->input('balance');
+			$leave->appliedDays = $request->input('appliedDays');
+			$leave->branch = $request->input('branch');
+			$leave->recommendID = $request->input('recommendID');
+			$leave->remarks = $request->input('reason');
+			$leave->save();
+			$this->logActivity(['module' => 'leave', 'unique_id' => $leave->id, 'activity' => 'activity_added']);
+			return $response = ['message' => trans('messages.leave') . ' ' . trans('messages.requested'), 'status' => 'success'];
+			// Helper::storeCustomField($this->form, $leave->id, $data);
+
 			if ($request->has('ajax_submit')) {
-				$response = ['message' => trans('messages.only') . ' ' . $leave_balance . ' ' . $leave_type->name . ' ' . trans('messages.remaining'), 'status' => 'error'];
+				$response = ['message' => trans('messages.leave') . ' ' . trans('messages.requested'), 'status' => 'success'];
 				return response()->json($response, 200, array('Access-Controll-Allow-Origin' => '*'));
 			}
-			return redirect()->back()->withErrors(trans('messages.only') . ' ' . $leave_balance . ' ' . $leave_type->name . ' ' . trans('messages.remaining'));
-		}
-
-		$leaves = Leave::where('user_id', '=', $user_id)
-		->where(function ($query) use ($from_date, $to_date) {
-			$query->where(function ($query) use ($from_date, $to_date) {
-				$query->where('from_date', '>=', $from_date)
-				->where('from_date', '<=', $to_date);
-			})->orWhere(function ($query)  use ($from_date, $to_date) {
-				$query->where('to_date', '>=', $from_date)
-				->where('to_date', '<=', $to_date);
-			});
-		})->count();
-
-		// return $leaves;
-
-		if ($leaves) {
-			if ($request->has('ajax_submit')) {
-				$response = ['message' => trans('messages.leave_requested_for_this_period'), 'status' => 'error'];
-				return response()->json($response, 200, array('Access-Controll-Allow-Origin' => '*'));
-			}
-			// return redirect()->back()->withInput()->withErrors(trans('messages.leave_requested_for_this_period'));
-			return $response = ['message' => 'Already' . ' ' . trans('messages.requested'), 'status' => 'error'];
-		}
-
-		$data = $request->all();
-		// return $data;
-		$data['user_id'] = $user_id;
-		$leave->fill($data);
-		$leave->status = 'pending';
-		$leave->balance = $request->input('balance');
-		$leave->appliedDays = $request->input('appliedDays');
-		$leave->branch = $request->input('branch');
-		$leave->recommendID = $request->input('recommendID');
-		$leave->remarks = $request->input('reason');
-		$leave->save();
-		$this->logActivity(['module' => 'leave', 'unique_id' => $leave->id, 'activity' => 'activity_added']);
-		 return $response = ['message' => trans('messages.leave') . ' ' . trans('messages.requested'), 'status' => 'success'];
-		// Helper::storeCustomField($this->form, $leave->id, $data);
-
-		if ($request->has('ajax_submit')) {
-			$response = ['message' => trans('messages.leave') . ' ' . trans('messages.requested'), 'status' => 'success'];
-			return response()->json($response, 200, array('Access-Controll-Allow-Origin' => '*'));
+		}catch (\Exception $e) {
+			return response()->json(['message' => $e->getMessage(), 'status' => 'error']);
 		}
 	}
 

@@ -329,7 +329,7 @@
 							<a href="/employee/${item.id}" class="btn btn-default btn-xs" data-toggle="tooltip" title="View">
 								<i class="fa fa-arrow-circle-right"></i>
 							</a>
-							${deleteAction}
+							${item.id == 1 ? '' : deleteAction}
 						</div>`;
 
 					tableBody.append(`

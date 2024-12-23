@@ -12,7 +12,7 @@
         @if (Entrust::can('create_employee'))
             <div class="col-sm-12">
                 <div class="box-info full">
-                    <h2><strong>{!! trans('messages.employee_report') !!}</strong>
+                    <h2><strong>Report for Employee Database</strong>
                         <div class="additional-btn">
                             {{-- @if (Entrust::can('create_employee'))
 							<a href="#" data-toggle="collapse" data-target="#box-detail"><button class="btn btn-sm btn-primary"><i class="fa fa-plus icon"></i> {!! trans('messages.add_new') !!}</button></a>
@@ -22,7 +22,7 @@
 
                     <div class="container">
                         <div class="form-container">
-                            <h3>Report for Employee Database</h3>
+                            {{-- <h3>Report for Employee Database</h3> --}}
                             <form class="form-horizontal">
                                 <div class="form-group">
                                     <label class="col-sm-2 control-label">Group</label>
@@ -193,7 +193,7 @@
 
     // Collect form values
     const group = document.querySelector('select[name="group"]').value;
-    const report_type = document.querySelector('select[name="report_type"]').value;
+    //const report_type = document.querySelector('select[name="report_type"]').value;
     const branch = document.querySelector('select[name="branch"]').value;
     const category = document.querySelector('select[name="category"]').value;
     const department = document.querySelector('select[name="department"]').value;
@@ -207,7 +207,7 @@
 
     const formData = {
         group: group,
-        report_type: report_type,
+        //report_type: report_type,
         branch: branch,
         category: category,
         department: department,
@@ -304,7 +304,7 @@
                             <div class="center-item">
                                 <h4>Head Office</h4>
                                 <p>Address : {{ config('config.address_1') }}</p>
-                                <p>Name of the Report</p>
+                                <p>Empoyee Report</p>
                             </div>
                         </div>
                         <table class="table table-bordered table-striped">

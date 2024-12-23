@@ -130,7 +130,7 @@
                 </div> --}}
 
                 <div class="table-responsive">
-                    <table class="table table-hover table-striped" id="clock-list-table">
+                    <table class="table table-hover table-striped">
                         <thead>
                             <tr>
                                 <th>Name</th>
@@ -140,12 +140,27 @@
                                 <th>{!! trans('messages.option') !!}</th>
                             </tr>
                         </thead>
-                        <tbody id="clock-list-table-body">
-                            @foreach ($clocks as $clock)
+                        <tbody>
+                            @foreach ($clockUp as $clock)
                                 <tr>
-                                    <td>{{ $clock->first_name }}</td>
-                                    <td>{!! showDateTime($clock->clock_in) !!}</td>
-                                    <td>{!! showDateTime($clock->clock_out) !!}</td>
+                                    <td>{{ $clock->user_name }}</td>
+                                    <td data-clock-in="{{ $clock->clock_in }}" class="time-clock-in"></td>
+                                    <td data-clock-out="{{ $clock->clock_out }}" class="time-clock-out"></td>
+                                     <script>
+                                        document.addEventListener('DOMContentLoaded', function() {
+                                            document.querySelectorAll('.time-clock-in').forEach(td => {
+                                            const datetime = td.getAttribute('data-clock-in');
+                                            const formattedTime = new Date(datetime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+                                            td.textContent = formattedTime;
+                                        });
+
+                                        document.querySelectorAll('.time-clock-out').forEach(td => {
+                                            const datetime = td.getAttribute('data-clock-out');
+                                            const formattedTime = new Date(datetime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+                                            td.textContent = formattedTime;
+                                        });
+                                        })
+                                    </script>
                                     <td>{{ $clock->date }}</td>
                                     <td>
                                         <div class="btn-group btn-group-xs">
@@ -161,6 +176,7 @@
                         </tbody>
                     </table>
                 </div>
+                {{ $clockUp->links() }}
             </div>
         </div>
     </div>
