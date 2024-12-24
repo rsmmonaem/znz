@@ -100,7 +100,7 @@
         </div>
         <div class="col-sm-8">
             <div class="box-info">
-                <h2><strong>{!! trans('messages.update_attendance') !!}</strong></h2>
+                <h2><strong>Attendance View</strong></h2>
               {{--   <h4>{!! $user->full_name_with_designation !!}</h4>
                 <p><strong>{!! showDate($date) . ' ' . $label !!}</strong></p>
                 <p><strong>Office Shift: {!! showDateTime($my_shift->in_time) !!} to {!! showDateTime($my_shift->out_time) !!}</strong></p> --}}
@@ -128,9 +128,19 @@
                     </div>
                     {!! Form::close() !!}
                 </div> --}}
+                <div class="form-group">
+                    <label>Employee ID</label>
+                    <select class="form-control" name="get_empl_id" id="get_empl_id">
+                        <option value="">Select Employee</option>
+                        @foreach ($employee as $e)
+                            <option value="{{ $e->id }}">{{ $e->first_name }} - {{ $e->employee_code }}</option>
+                        @endforeach
+                    </select>
+                    {{-- <input type="text" name="multiple_id" class="form-control" placeholder="ID1, ID2, ID3"> --}}
+                </div>
 
                 <div class="table-responsive">
-                    <table class="table table-hover table-striped">
+                    <table class="table table-hover table-striped" id="clock-list-table">
                         <thead>
                             <tr>
                                 <th>Name</th>
@@ -140,27 +150,12 @@
                                 <th>{!! trans('messages.option') !!}</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            @foreach ($clockUp as $clock)
+                        <tbody id="clock-list-table-body">
+                            {{-- @foreach ($clockUp as $clock)
                                 <tr>
                                     <td>{{ $clock->user_name }}</td>
                                     <td data-clock-in="{{ $clock->clock_in }}" class="time-clock-in"></td>
                                     <td data-clock-out="{{ $clock->clock_out }}" class="time-clock-out"></td>
-                                     <script>
-                                        document.addEventListener('DOMContentLoaded', function() {
-                                            document.querySelectorAll('.time-clock-in').forEach(td => {
-                                            const datetime = td.getAttribute('data-clock-in');
-                                            const formattedTime = new Date(datetime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
-                                            td.textContent = formattedTime;
-                                        });
-
-                                        document.querySelectorAll('.time-clock-out').forEach(td => {
-                                            const datetime = td.getAttribute('data-clock-out');
-                                            const formattedTime = new Date(datetime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
-                                            td.textContent = formattedTime;
-                                        });
-                                        })
-                                    </script>
                                     <td>{{ $clock->date }}</td>
                                     <td>
                                         <div class="btn-group btn-group-xs">
@@ -172,11 +167,11 @@
                                         </div>
                                     </td>
                                 </tr>
-                            @endforeach
+                            @endforeach --}}
                         </tbody>
                     </table>
                 </div>
-                {{ $clockUp->links() }}
+                {{-- {{ $clockUp->links() }} --}}
             </div>
         </div>
     </div>
@@ -185,8 +180,9 @@
 @section('javascript')
 	<script type="text/javascript">
 		$(document).ready(function() {
-			displaydata();
-
+            $('#get_empl_id').on('change', function() {
+                displaydata(this.value);
+            })
             // GetUser Data
             $('#empolyee_id').on('change', function() {
                 $.ajax({
@@ -245,10 +241,13 @@
 				});
 			});
 
-			function displaydata() {
+			function displaydata(id) {
 				$.ajax({
 					url: "/post-update-attendance-list",
 					type: 'POST',
+                    data: {
+                        employeeId: id,
+                    },
 					success: function(data) {
 						const datatable = $('#clock-list-table');
 						datatable.DataTable().destroy();
@@ -257,9 +256,9 @@
 						// Loop through each separation record and append a row
 						data.forEach(function(separation) {
 							var row = `<tr>
-								<td>${separation.first_name}</td>
-								<td>${separation.clock_in || ' '}</td>
-								<td>${separation.clock_out}</td> 
+								<td>${separation.user_name}</td>
+								<td>${separation.formatted_clock_in || ' '}</td>
+								<td>${separation.formatted_clock_out || ' '}</td> 
 								<td>${separation.date || ' '}</td> 
 								<td>
 									<div class="btn-group btn-group-xs">
@@ -273,9 +272,9 @@
 							</tr>`;
 							tableBody.append(row);
 						});
-						datatable.DataTable({
-							lengthMenu: [10, 20, 50, 100],
-						})
+						// datatable.DataTable({
+						// 	lengthMenu: [10, 20, 50, 100],
+						// })
 					},
 					error(xhr) {
 						console.error('Error:', xhr.responseText);

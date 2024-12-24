@@ -409,7 +409,7 @@ Class SalaryController extends Controller{
             $data['cash_amount'] = $oldData->cash_amount - $oldData->old_bank;
             $data['bank_amount'] = $oldData->old_bank;
         }else if($request->status == 1){
-            $data['cash_amount'] = $oldData->cash_amount + $oldData->old_bank;
+            $data['cash_amount'] = $oldData->cash_amount + $oldData->bank_amount;
             $data['old_bank'] = $oldData->bank_amount;
             $data['bank_amount'] = 0;
         }
@@ -418,7 +418,7 @@ Class SalaryController extends Controller{
 
         return response()->json(['message' => 'Status Update Successfully']);
     }
-     public function  salaryReport() {
+     public function salaryReport() {
         $group = DB::table('com_group')->get();
         $branch = Branch::all();
         $department = Department::all();
@@ -466,7 +466,7 @@ Class SalaryController extends Controller{
             ->leftJoin('sections', 'profile.section_id', '=', 'sections.id')
             ->leftJoin('grades', 'profile.grade_id', '=', 'grades.id')
             ->when(!empty($request->employeeId), function ($query) use ($request) {
-                return $query->where('profile.employee_code', $request->employeeId);
+                return $query->where('users.id', $request->employeeId);
             })
             ->when(!empty($request->branch), function ($query) use ($request) {
                 return $query->where('profile.branch_id', $request->branch);

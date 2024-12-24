@@ -1239,11 +1239,16 @@ Class ClockController extends Controller{
 			return response()->json(['success' => true, 'data' => $user_ids]);
 	}
 
-	public function  postUpdateAttendanceIDs() {
+	public function  postUpdateAttendanceIDs(Request $request) {
 		return Clock::leftJoin('users', 'clocks.user_id', '=', 'users.id')
-		// ->orderBy('clock_in')
-		->latest('clocks.id')
-		->select('clocks.id', 'clocks.clock_in', 'clocks.clock_out', 'users.first_name','clocks.date')
+			->select(
+				'clocks.*',
+				'users.first_name as user_name',
+				DB::raw("TIME_FORMAT(clock_in, '%h:%i %p') as formatted_clock_in"),
+				DB::raw("TIME_FORMAT(clock_out, '%h:%i %p') as formatted_clock_out")
+			)
+		->where('users.id', $request->employeeId)
+		->limit(30)
 		->get();
 	}
 	public function uploadAttendance(AttendanceUploadRequest $request){

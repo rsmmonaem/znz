@@ -5,7 +5,13 @@
 			  </div>
 			  <div class="form-group">
 			    {!! Form::label('top_designation_id',trans('messages.top_designation'),[])!!}
-				{!! Form::select('top_designation_id', [null =>trans('messages.select_one')] + $top_designations,(isset($designation->top_designation_id) && $designation->top_designation_id != 1) ? $designation->top_designation_id : '',['class'=>'form-control input-xlarge select2me','placeholder'=>trans('messages.select_one')])!!}
+				{{-- {!! Form::select('top_designation_id', [null =>trans('messages.select_one')] + $top_designations,(isset($designation->top_designation_id) && $designation->top_designation_id != 1) ? $designation->top_designation_id : '',['class'=>'form-control input-xlarge select2me','placeholder'=>trans('messages.select_one')])!!} --}}
+				<select name="top_designation_id" id="top_designation_id" class="form-control input-xlarge select2me">
+					<option value="">Select Section</option>
+					@foreach ($top_designations as $top_designation)
+						<option value="{{$top_designation->id}}">{{$top_designation->name}}</option>
+					@endforeach
+				</select>
 			  </div>
 			  <div class="form-group">
 			    {!! Form::label('name',trans('messages.designation'),[])!!}

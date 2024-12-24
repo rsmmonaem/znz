@@ -43,7 +43,7 @@
                                     {{-- <select class="form-control" id="branch">
                                             <option value="">Select Branch</option>
                                             @foreach ($branch as $b)
-                                                <option value="{{ $b->id }}">{{ $b->name }}</option>
+                                                <option value="{{ $b->id }}" {{ $b->id == $data->branch_id ? 'selected' : '' }}>{{ $b->name }}</option>
                                             @endforeach
                                         </select> --}}
                                     <input type="text" id="branch" class="form-control" placeholder="Branch" readonly>
@@ -104,7 +104,7 @@
                                     <select class="form-control" id="categorynew">
                                         <option value="">Select Category</option>
                                         @foreach ($catregory as $c)
-                                            <option value="{{ $c }}" {{ $c == $data->category ? 'selected' : '' }}>{{ $c }}</option>
+                                            <option value="{{ $c->name }}" {{ $c->name == $data->category ? 'selected' : '' }}>{{ $c->name }}</option>
                                         @endforeach
                                     </select>
                                 </div>

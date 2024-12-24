@@ -21,7 +21,7 @@ class IncrementAndPromotion extends Controller{
      public function index(){
         $branch = Branch::all();
         $grade = Grade::all();
-        $catregory = ['stuff', 'owner'];
+        $catregory = DB::table('category')->get();
         $designation = Designation::all();
         $employee = User::LeftJoin('profile', 'users.id', '=', 'profile.user_id')
         ->select('users.first_name', 'users.id', 'profile.employee_code')
@@ -32,7 +32,7 @@ class IncrementAndPromotion extends Controller{
         $branch = Branch::all();
         $department = Department::all();
         $section = Section::all();
-        $catregory = ['stuff', 'owner'];
+        $catregory = DB::table('category')->get();
         return view('increment-and-promotion.approval-panel',compact('branch', 'department', 'section', 'catregory'));
      }
 
@@ -45,9 +45,11 @@ class IncrementAndPromotion extends Controller{
          ->LeftJoin('contracts', 'users.id', '=', 'contracts.user_id')
          ->LeftJoin('salary', 'contracts.id', '=', 'salary.contract_id')
          ->LeftJoin('grades', 'profile.grade_id', '=', 'grades.id')
+         ->leftJoin('salary_slab','users.id','=','salary_slab.user_id')
          ->where('users.id', '=', $id)
-         ->where('salary.salary_type_id', '=', 1)
-         ->select('users.id', 'users.first_name', 'profile.employee_code as employee_code', 'profile.date_of_joining', 'designations.name as designation', 'sections.name as section', 'branchs.name as branch', 'salary.amount', 'profile.category', 'grades.name as grade_name')
+        //  ->where('salary.salary_type_id', '=', 1)
+         ->select('users.id', 'users.first_name', 'profile.employee_code as employee_code', 'profile.date_of_joining', 'designations.name as designation', 'sections.name as section', 'branchs.name as branch', 'salary_slab.gross as amount', 'profile.category', 'grades.name as grade_name')
+         ->latest('salary_slab.id')
          ->first();
          return $user;
      }
@@ -83,7 +85,7 @@ class IncrementAndPromotion extends Controller{
         ->LeftJoin('profile', 'users.id', '=', 'profile.user_id')
         ->LeftJoin('designations', 'users.designation_id', '=', 'designations.id')
         ->LeftJoin('grades', 'increments_promotions.grade', '=', 'grades.id')
-        ->select('profile.employee_code', 'users.first_name', 'increments_promotions.*', 'designations.name as designation', 'grades.name as grade_name')
+        ->select('profile.employee_code', 'users.first_name', 'increments_promotions.*', 'designations.name as predesignation', 'grades.name as grade_name')
         ->orderby('increments_promotions.id', 'desc')
         ->get();
         return $data;
@@ -93,7 +95,7 @@ class IncrementAndPromotion extends Controller{
       $data = IncrementsPromotions::find($id);
       $branch = Branch::all();
       $grade = Grade::all();
-      $catregory = ['stuff', 'owner'];
+      $catregory = DB::table('category')->get();
       $designation = Designation::all();
       $employee = User::LeftJoin('profile', 'users.id', '=', 'profile.user_id')
          ->LeftJoin('designations', 'users.designation_id', '=', 'designations.id')
@@ -195,11 +197,17 @@ class IncrementAndPromotion extends Controller{
               throw new Exception("Failed to create contract for employee ID: {$value->employee_id}");
           }
 
-          $totalBasic = $value->gross * 50 / 100;
-          $totalHouseRent = $value->gross * 28 / 100;
-          $totalMedical = $value->gross * 9 / 100;
-          $totalConveyance = $value->gross * 8 / 100;
-          $totalOthers = $value->gross * 5 / 100;
+          User::find($value->employee_id)->update([
+              'designation_id' => $value->new_designation_id
+          ]);
+
+          $salaryAmounts = $value->amount + $value->gross;
+          // Prepare salary data
+          $totalBasic = $salaryAmounts * 50 / 100;
+          $totalHouseRent = $salaryAmounts * 28 / 100;
+          $totalMedical = $salaryAmounts * 9 / 100;
+          $totalConveyance = $salaryAmounts * 8 / 100;
+          $totalOthers = $salaryAmounts * 5 / 100;
 
           $salary_type_ids = ['1', '2', '12','8','13'];
           $salaryAmount = [
@@ -225,7 +233,7 @@ class IncrementAndPromotion extends Controller{
             $salary->save();
           }
             DB::table('salary_slab')->insert([
-              'gross' => $value->gross,
+              'gross' => $salaryAmounts,
               'user_id' => $value->employee_id,
               'entrydate'=> $value->entry_date,
               'effactive_date' => $value->effective_date,

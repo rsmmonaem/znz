@@ -184,12 +184,13 @@
 									
 									<div class="form-group">
                                         <label for="grade">Category</label>
-                                        <select class="form-control" id="category">
+                                        {{-- <select class="form-control" id="category">
                                             <option value="">Select</option>
                                             @foreach ($category as $s)
                                                 <option value="{{ $s->name }}">{{ $s->name }}</option>
                                             @endforeach
-                                        </select>
+                                        </select> --}}
+										 @include('common.category')
                                     </div>
 								</div>
                             </div>
@@ -316,7 +317,7 @@
 				// Append the data row
 				data.forEach((item, index) => {
 					const deleteAction = `
-						<form method="POST" action="/employee/${item.id}" style="display:inline;">
+						<form method="POST" onsubmit="return confirm('Are you sure?')" action="/employee/${item.id}" style="display:inline;">
 							<input type="hidden" name="_method" value="DELETE">
 							<input type="hidden" name="_token" value="${$('meta[name="csrf-token"]').attr('content')}">
 							<button type="submit" class="btn btn-danger btn-xs" title="Delete">

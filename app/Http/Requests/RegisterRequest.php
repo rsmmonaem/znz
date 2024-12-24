@@ -28,7 +28,7 @@ class RegisterRequest extends Request
             'last_name' => 'required',
             'designation_id' => 'required',
             'date_of_joining' => 'required|date',
-            // 'role_id' => '', // Optional field, no rules needed
+            'role_id' => '', // Optional field, no rules needed
             // 'password' => 'confirmed|min:6', // Optional if not required
             'employee_code' => 'required|unique:profile',
             // 'email' => 'email|max:255|unique:users', // Optional by default

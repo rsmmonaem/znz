@@ -134,14 +134,15 @@
                             </div>
                             <div class="form-group">
                                 <label for="category">Category</label>
-                                <select class="form-control" id="category">
+                                {{-- <select class="form-control" id="category">
                                     <option value="">Select Category</option>
                                     @foreach ($category as $c)
                                         <option value="{{ $c->id }}">{{ $c->name }}</option>
                                     @endforeach
-                                    {{-- <otion value="owner">Owner</option>
-                                    <option value="staff">Staff</option> --}}
-                                </select>
+                                    <otion value="owner">Owner</option>
+                                    <option value="staff">Staff</option>
+                                </select> --}}
+                                 @include('common.category')
                             </div>
                             <div class="form-group">
                                 <label for="type">Type</label>
@@ -292,7 +293,7 @@
                 <td>${employee.user_info.gross || 0}</td>`;
 
         // Add salary types dynamically
-        const salaryTypes = ['Basic Salary', 'House Rent', 'Medical', 'Other'];
+        const salaryTypes = ['Basic Salary', 'House Rent', 'Medical', 'Others'];
         salaryTypes.forEach(type => {
             const salary = employee.salaries.find(s => s.salary_type.trim() === type);
             content += `<td>${salary ? salary.amount : 0}</td>`;

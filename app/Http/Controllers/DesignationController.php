@@ -6,6 +6,7 @@ use Entrust;
 use App\Classes\Helper;
 use App\Designation;
 use Auth;
+use Illuminate\Support\Facades\DB;
 
 Class DesignationController extends Controller{
     use BasicController;
@@ -23,9 +24,9 @@ Class DesignationController extends Controller{
 		array_push($child_designations, Auth::user()->designation_id);
 
 		if(Entrust::can('manage_all_designation'))
-			$top_designations = Designation::all()->pluck('full_designation','id')->all();
+			$top_designations = DB::table('sections')->get();
 		elseif(Entrust::can('manage_subordinate_designation'))
-			$top_designations = Designation::whereIn('id',$child_designations)->get()->pluck('full_designation','id')->all();
+			$top_designations =  DB::table('sections')->get();
 		else
 			$top_designations = [];
 
@@ -33,7 +34,7 @@ Class DesignationController extends Controller{
         		trans('messages.option'),
         		trans('messages.designation'),
         		trans('messages.department'),
-        		trans('messages.top_designation'));
+        		trans('Section'));
         $col_heads = Helper::putCustomHeads($this->form, $col_heads);
         $table_info = array(
 			'source' => 'designation',
@@ -48,7 +49,9 @@ Class DesignationController extends Controller{
 			return redirect('/dashboard')->withErrors(trans('messages.permission_denied'));
 
 		if(Entrust::can('manage_all_designation'))
-			$designations = Designation::all();
+			$designations = Designation::LeftJoin('sections', 'designations.section_id', '=', 'sections.id')
+		->select('designations.*', 'sections.name as top_designation')
+		->get();
 		elseif(Entrust::can('manage_subordinate_designation')){
 			$child_designations = Helper::childDesignation(Auth::user()->designation_id,1);
 			$designations = Designation::whereIn('id',$child_designations)->get();
@@ -67,7 +70,7 @@ Class DesignationController extends Controller{
 				'</div>',
 				$designation->name.' '.(($designation->is_hidden) ? '<span class="label label-danger">'.trans('messages.default').'</span>' : ''),
 				$designation->Department->name,
-				($designation->top_designation_id) ? $designation->Parent->full_designation : '<i class="fa fa-times"></i>'
+				isset($designation->top_designation) ? $designation->top_designation : '<i class="fa fa-times"></i>'
 			);
 			$id = $designation->id;
 
@@ -121,9 +124,15 @@ Class DesignationController extends Controller{
 		}
 
 		$data = $request->all();
-
-		$data['top_designation_id'] = ($request->input('top_designation_id')) ? : null;
-		$designation->fill($data)->save();
+		// dd($data);
+		$designation::create([
+			'name' => $request->input('name'),
+			'department_id' => $request->input('department_id'),
+			'section_id' => $request->input('top_designation_id')
+		]);
+		// // $data['top_designation_id'] = ($request->input('top_designation_id')) ? : null;
+		// $data['section_id'] = ($request->input('top_designation_id')) ? : null;
+		// $designation->fill($data)->save();
 
 		Helper::storeCustomField($this->form,$designation->id, $data);
 
@@ -133,7 +142,7 @@ Class DesignationController extends Controller{
         	\App\Setup::whereModule('designation')->whereCompleted(0)->update(['completed' => 1]);
 
         if($request->has('ajax_submit')){
-        	$new_data = array('value' => $designation->full_designation,'id' => $designation->id,'field' => 'top_designation_id');
+        	$new_data = '';
             $response = ['message' => trans('messages.designation').' '.trans('messages.added'), 'status' => 'success','new_data' => $new_data]; 
 	        if(config('config.application_setup_info') && defaultRole()){
 	        	$setup_data = Helper::setupInfo();

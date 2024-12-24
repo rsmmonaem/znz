@@ -51,11 +51,12 @@
 
                                     <label class="col-sm-2 control-label">Category</label>
                                     <div class="col-sm-4">
-                                        <select class="form-control" name="category">
+                                        {{-- <select class="form-control" name="category">
                                             <option value="">Select</option>
                                             <option value="Owner">Owner</option>
                                             <option value="Staff">Staff</option>
-                                        </select>
+                                        </select> --}}
+                                         @include('common.category')
                                     </div>
                                 </div>
 
