@@ -117,15 +117,28 @@
 
                                     <label class="col-sm-2 control-label">Employee ID</label>
                                     <div class="col-sm-4">
-                                        <input type="text" name="employee_id" class="form-control">
+                                        {{-- <input type="text" name="employee_id" class="form-control"> --}}
+                                        <select class="form-control" name="employee_id" id="employee_id">
+                                            <option value="">Select</option>
+                                            @foreach ($employee as $e)
+                                                <option value="{{ $e->employee_code }}">{{ $e->first_name }} - {{ $e->employee_code }}</option>
+                                            @endforeach
+                                        </select>
                                     </div>
                                 </div>
 
                                 <div class="form-group">
                                     <label class="col-sm-2 control-label">Multiple ID</label>
                                     <div class="col-sm-4">
-                                        <input type="text" name="multiple_id" class="form-control"
-                                            placeholder="ID1, ID2, ID3">
+                                        {{-- <input type="text" name="multiple_id" class="form-control"
+                                            placeholder="ID1, ID2, ID3"> --}}
+
+                                        <select class="form-control" name="multiple_id" id="multiple_id" multiple>
+                                            <option value="">Select</option>
+                                            @foreach ($employee as $e)
+                                                <option value="{{ $e->employee_code }}">{{ $e->first_name }} - {{ $e->employee_code }}</option>
+                                            @endforeach
+                                        </select>
                                     </div>
                                 </div>
 
@@ -202,9 +215,9 @@
     const section = document.querySelector('select[name="section"]').value;
     const grade = document.querySelector('select[name="grade"]').value;
     const designation = document.querySelector('select[name="designation"]').value;
-    const employee_id = document.querySelector('input[name="employee_id"]').value;
-    const multiple_id = document.querySelector('input[name="multiple_id"]').value;
-    const multiple_id_array = multiple_id.split(',').map(id => id.trim()).filter(id => id !== "");
+    const employee_id = document.querySelector('#employee_id').value;
+    const multiple_id = $('#multiple_id').val();
+    // const multiple_id_array = multiple_id.split(',').map(id => id.trim()).filter(id => id !== "");
 
     const formData = {
         group: group,
@@ -217,7 +230,7 @@
         grade: grade,
         designation: designation,
         employee_id: employee_id,
-        multiple_id: multiple_id_array
+        multiple_id: multiple_id
     };
 
     console.log(formData);

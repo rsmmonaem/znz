@@ -607,9 +607,9 @@ class EmployeeController extends Controller{
         $section = Section::select('name','id')->get();
         $grade = Grade::select('name','id')->get();
         $report_type = ReportType::select('name','id')->get();
-
+        $employee = User::leftJoin('profile', 'users.id', '=', 'profile.user_id')->select('users.first_name', 'users.id', 'profile.employee_code')->get();
         
-        return view('employee.employee_report',compact('brach','departments','designation','section','grade','report_type'));
+        return view('employee.employee_report',compact('employee','brach','departments','designation','section','grade','report_type'));
     }
 
     public function EmployeeReportPOST(Request $request){
