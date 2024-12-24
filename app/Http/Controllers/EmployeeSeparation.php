@@ -182,7 +182,7 @@ class EmployeeSeparation extends Controller
         ->LeftJoin('designations', 'users.designation_id', '=', 'designations.id')
         ->leftJoin('sections', 'profile.section_id', '=', 'sections.id')
         ->LeftJoin('branchs', 'profile.branch_id', '=', 'branchs.id')
-        ->select('users.id', 'users.first_name', 'profile.employee_code', 'profile.date_of_joining', 'designations.name as designation', 'sections.name as section', 'branchs.name as branch')
+        ->select('users.id', 'users.first_name', 'profile.employee_code', 'profile.date_of_joining', 'designations.name as designation', 'sections.name as section', 'branchs.name as branch','profile.category')
         ->where('users.id', '=', $id)->first();
         return $user;
     }

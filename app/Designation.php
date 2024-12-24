@@ -7,7 +7,8 @@ class Designation extends Eloquent {
 	protected $fillable = [
 							'department_id',
 							'name',
-                            'top_designation_id'
+                            'top_designation_id',
+                            'section_id'
 						];
 	protected $primaryKey = 'id';
 	protected $table = 'designations';

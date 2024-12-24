@@ -111,8 +111,14 @@
 									<div class="col-sm-6">
 									  <div class="form-group flex-form-group">
 									    {!! Form::label('category',trans('messages.category'),['class' => 'control-label'])!!}
-										{!! Form::select('category', [null=>trans('messages.select_one')] + $type ,($employee->Profile->category) ? $employee->Profile->category : '',['class'=>'form-control input-xlarge select2me','placeholder'=>trans('messages.select_one')])!!}
-									  </div>
+										{{-- {!! Form::select('category', [null=>trans('messages.select_one')] + $type ,($employee->Profile->category) ? $employee->Profile->category : '',['class'=>'form-control input-xlarge select2me','placeholder'=>trans('messages.select_one')])!!} --}}
+										<select name="category" id="category" class="form-control input-xlarge select2me">
+											<option value="">Select One</option>
+											@foreach ($type as $type)
+												<option value="{{ $type->name }}" {{ $employee->Profile->category == $type->name ? 'selected' : '' }}>{{ $type->name }}</option>
+											@endforeach
+										</select>
+									  </div> 
 								  	</div>
 
 									{{-- Job Nature --}}

@@ -41,13 +41,13 @@
                                     </div>
                                     <div class="form-group">
                                         <label>Branch</label>
-                                        {{-- <select class="form-control" id="branch">
+                                        <select class="form-control" id="branch">
                                             <option value="">Select Branch</option>
                                             @foreach ($branch as $b)
                                                 <option value="{{ $b->id }}">{{ $b->name }}</option>
                                             @endforeach
-                                        </select> --}}
-                                        <input type="text" id="branch" class="form-control" placeholder="Branch" readonly>
+                                        </select>
+                                        {{-- <input type="text" id="branch" class="form-control" placeholder="Branch" readonly> --}}
                                     </div>
                                     <div class="form-group">
                                         <label>Employee ID</label>
@@ -65,7 +65,7 @@
                                     </div>
                                     <div class="form-group">
                                         <label>Designation</label>
-                                        <input type="text" id="designation" class="form-control" placeholder="Designation" readonly>
+                                        <input type="text" id="designations" class="form-control" placeholder="Designation" readonly>
                                     </div>
                                     <div class="form-group">
                                         <label>Date of Joining</label>
@@ -105,9 +105,10 @@
                                         <select class="form-control" id="categorynew">
                                             <option value="">Select Category</option>
                                             @foreach ($catregory as $c)
-                                                <option value="{{ $c }}">{{ $c }}</option>
+                                                <option value="{{ $c->name }}">{{ $c->name }}</option>
                                             @endforeach
                                         </select>
+                                        {{-- @include('common.category') --}}
                                     </div>
                                     <div class="form-group">
                                         <label>Grade</label>
@@ -128,7 +129,7 @@
                                         <select class="form-control" id="designation">
                                             <option value="">Select Designation</option>
                                             @foreach ($designation as $d)
-                                                <option value="{{ $d->id }}">{{ $d->name }}</option>
+                                                <option value="{{ $d->name }}">{{ $d->name }}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -155,6 +156,7 @@
                                     <th>X</th>
                                     <th>Emp ID</th>
                                     <th>Designation</th>
+                                    <th>Promoted Designation</th>
                                     <th>Grade</th>
                                     <th>Category</th>
                                     <th>Entry Date</th>
@@ -254,6 +256,7 @@
                                 </div>
                             </td>
                             <td>${inandpro.employee_code}</td>
+                            <td>${inandpro.predesignation}</td>
                             <td>${inandpro.designation}</td>
                             <td>${inandpro.grade_name}</td>
                             <td>${inandpro.category}</td>
@@ -307,7 +310,7 @@
                     $('#name').val(data.first_name);
                     // $('#employee_id').val(data.id);
                     $('#branch').val(data.branch);
-                    $('#designation').val(data.designation);
+                    $('#designations').val(data.designation);
                     $('#date_of_joining').val(data.date_of_joining);
                     $('#category').val(data.category);
                     $('#salary').val(Math.round(data.amount));
@@ -317,7 +320,7 @@
                 }
             });
         } else {
-            $('#designation').val('');
+            $('#designations').val('');
             $('#date_of_joining').val('');
             $('#category').val('');
             $('#salary').val('');

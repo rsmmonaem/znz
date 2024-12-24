@@ -110,10 +110,11 @@
                                 <div class="form-group row">
                                     <label class="col-sm-4 control-label">Category</label>
                                     <div class="col-sm-8">
-                                        <select class="form-control" name="category" id="category">
+                                        {{-- <select class="form-control" name="category" id="category">
                                             <option value="staff">staff</option>
                                             <option value="owner">owner</option>
-                                        </select>
+                                        </select> --}}
+                                         @include('common.category')
                                     </div>
                                 </div>
 

@@ -92,12 +92,13 @@
                                 <div class="form-group">
                                     <label for="category">Category</label>
                                     {{-- <input type="text" id="category" class="form-control" placeholder="Enter Category"> --}}
-                                    <select class="form-control" id="category">
+                                    {{-- <select class="form-control" id="category">
                                         <option value="">Select Category</option>
                                         @foreach ($catregory as $c)
                                             <option value="{{ $c }}">{{ $c }}</option>
                                         @endforeach
-                                    </select>
+                                    </select> --}}
+                                     @include('common.category')
                                 </div>
                                 <div class="form-group">
                                     <label for="approvalDate">Approval Date</label>

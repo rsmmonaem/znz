@@ -108,11 +108,7 @@
                             </div>
                             <div class="form-group">
                                 <label for="category">Category</label>
-                                <select class="form-control" id="category">
-                                    <option value="">Select Category</option>
-                                    <option value="Owner">Owner</option>
-                                    <option value="Staff">Staff</option>
-                                </select>
+                                 @include('common.category')
                             </div>
                             <div class="form-group">
                                 <label for="category">Shift</label>

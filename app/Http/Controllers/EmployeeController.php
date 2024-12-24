@@ -227,7 +227,7 @@ class EmployeeController extends Controller{
 
         $assets = ['rte'];
         $menu = ['employee'];
-        $type = ['Owner' => 'Owner', 'Staff' => 'Staff'];
+        $type = DB::table('category')->get();
         $riligion = ['Islam' => 'Islam', 'Hinduism' => 'Hinduism', 'Christianity' => 'Christianity', 'Buddhism' => 'Buddhism', 'Judaism' => 'Judaism', 'Sikhism' => 'Sikhism', 'Jainism' => 'Jainism'];
         $brach = Branch::all()->pluck('name','id')->all();
         $section = Section::all()->pluck('name','id')->all();
