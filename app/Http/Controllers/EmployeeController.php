@@ -607,9 +607,9 @@ class EmployeeController extends Controller{
         $section = Section::select('name','id')->get();
         $grade = Grade::select('name','id')->get();
         $report_type = ReportType::select('name','id')->get();
-
+        $employee = User::leftJoin('profile', 'users.id', '=', 'profile.user_id')->select('users.first_name', 'users.id', 'profile.employee_code')->get();
         
-        return view('employee.employee_report',compact('brach','departments','designation','section','grade','report_type'));
+        return view('employee.employee_report',compact('employee','brach','departments','designation','section','grade','report_type'));
     }
 
     public function EmployeeReportPOST(Request $request){
@@ -808,19 +808,18 @@ class EmployeeController extends Controller{
         $designation = Designation::select('name', 'id')->get();
         $employee = User::leftJoin('profile', 'users.id', '=', 'profile.user_id')
         ->select('users.first_name', 'users.id', 'profile.employee_code')
-        ->get();
+        ->get(); 
         return view('employee_transfer.report',compact('branch','department','section','designation','employee'));
     }
 
     public function reportData(Request $request){
-        $user_id = Profile::where('employee_code', $request->employeeID)
-            ->select('user_id')
-            ->first();
-        // return $request->all();
-        $user_id = $user_id ? $user_id->user_id : null;
-        $data = EmployeeTransfer::when($user_id, function ($query) use ($user_id) {
-            return $query->where('femployee','=' , $user_id); 
+
+        $data = EmployeeTransfer::when($request->employeeID, function ($query) use ($request) {
+            return $query->where('femployee', '=', $request->employeeID);
         })
+        // when($user_id, function ($query) use ($user_id) {
+        //     return $query->where('femployee','=' , $user_id); 
+        // })
         ->when($request->branch, function ($query) use ($request) {
            return $query->where('tbranch','=', $request->branch); 
         })
