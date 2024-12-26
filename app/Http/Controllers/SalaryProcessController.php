@@ -64,15 +64,15 @@ class SalaryProcessController extends Controller
             // Handle salary processing for each user
             foreach ($user_ids as $user_id) {
                 // Check if salary already exists for the employee in the given date range
-                $exists = DB::table('employee_salary_details')
-                    ->where('employee_id', $user_id)
-                    ->where('form_date', $request->formDate)
-                    ->where('to_date', $request->toDate)
-                    ->exists();
+                // $exists = DB::table('employee_salary_details')
+                //     ->where('employee_id', $user_id)
+                //     ->where('form_date', $request->formDate)
+                //     ->where('to_date', $request->toDate)
+                //     ->exists();
 
-                if ($exists) {
-                    continue; // Skip if already processed
-                }
+                // if ($exists) {
+                //     continue; // Skip if already processed
+                // }
 
                 // Handle special case for branch ID 7
                 if ($request->branch == env('BRANCH_ID')) {
@@ -266,14 +266,15 @@ class SalaryProcessController extends Controller
             ->where('form_date', $formDate)
             ->where('to_date', $toDate)
             ->exists();
-
-        if (!$exists) {
-            // Insert the new record into the database
-            DB::table('employee_salary_details')->insert($TableData);
-            return $employeeId;  // Return the processed employee ID for successful insertion
-        } else {
-            return null;  // Return null if the record already exists
-        }
+        DB::table('employee_salary_details')->insert($TableData);
+        return $employeeId;
+        // if (!$exists) {
+        //     // Insert the new record into the database
+        //     DB::table('employee_salary_details')->insert($TableData);
+        //     return $employeeId;  // Return the processed employee ID for successful insertion
+        // } else {
+        //     return null;  // Return null if the record already exists
+        // }
         // if (!$exists) {
         //     // Insert new record if not exists
         //     DB::table('employee_salary_details')->insert($TableData);
@@ -502,20 +503,22 @@ class SalaryProcessController extends Controller
             'ot_amount' => $overtimeSalery
         ];
 
+        DB::table('employee_salary_details')->insert($TableData);
+        return $employeeId;
         // Check if record exists for the same employee and date range
-        $exists = DB::table('employee_salary_details')
-        ->where('employee_id', $employeeId)
-            ->where('form_date', $formDate)
-            ->where('to_date', $toDate)
-            ->exists();
+        // $exists = DB::table('employee_salary_details')
+        // ->where('employee_id', $employeeId)
+        //     ->where('form_date', $formDate)
+        //     ->where('to_date', $toDate)
+        //     ->exists();
 
-        if (!$exists) {
-            // Insert the new record into the database
-            DB::table('employee_salary_details')->insert($TableData);
-            return $employeeId;  // Return the processed employee ID for successful insertion
-        } else {
-            return null;  // Return null if the record already exists
-        }
+        // if (!$exists) {
+        //     // Insert the new record into the database
+        //     DB::table('employee_salary_details')->insert($TableData);
+        //     return $employeeId;  // Return the processed employee ID for successful insertion
+        // } else {
+        //     return null;  // Return null if the record already exists
+        // }
     }
 
     public function indexSalaryShit(){
@@ -769,9 +772,15 @@ class SalaryProcessController extends Controller
 
         // Create a lookup array for the latest bank account IDs
         $latestBankAccountsLookup = [];
+        
         foreach ($latestBankAccounts as $account) {
             $latestBankAccountsLookup[$account->user_id] = $account->latest_id;
         }
+        $latestIds = DB::table('employee_salary_details')
+        ->selectRaw('MAX(id) as latest_id') 
+        ->groupBy('employee_id');
+
+        $uniqueLatestIds = $latestIds->pluck('latest_id'); 
 
         // Fetch employee salary details and related user data
         $data = DB::table('employee_salary_details')
@@ -782,6 +791,7 @@ class SalaryProcessController extends Controller
             $join->on('employee_salary_details.employee_id', '=', 'bank_accounts.user_id')
             ->whereIn('bank_accounts.id', $latestBankAccountsLookup);
         })
+        ->whereIn('employee_salary_details.id', $uniqueLatestIds)
         ->whereIn('users.id', $user_ids)
             ->orderBy('employee_salary_details.id', 'desc')
             ->select(
