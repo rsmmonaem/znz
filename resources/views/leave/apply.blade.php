@@ -23,9 +23,13 @@
                         <div class="form-group row">
                             <label class="col-sm-2 control-label" for="group">Group</label>
                             <div class="col-sm-4">
-                                 <section class="form-control">
-                                    <option>J & J Group</option>
-                                </section>
+                                @php $group = DB::table('com_group')->get();  @endphp
+                                <select class="form-control" id="group">
+                                    <option value="">Select Group</option>
+                                    @foreach ($group as $g)
+                                      <option value="{{ $g->id }}" selected>{{ $g->name }}</option>
+                                    @endforeach
+                                </select>
                             </div>
                         </div>
 
