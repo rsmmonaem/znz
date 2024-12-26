@@ -1123,7 +1123,6 @@ Class ClockController extends Controller{
 
 	public function updateAttendance(Request $request){
 
-
 		$user_id = ($request->input('user_id')) ? : Auth::user()->id;
 		$date = ($request->input('date')) ? : date('Y-m-d');
 
@@ -1240,16 +1239,48 @@ Class ClockController extends Controller{
 	}
 
 	public function  postUpdateAttendanceIDs(Request $request) {
-		return Clock::leftJoin('users', 'clocks.user_id', '=', 'users.id')
-			->select(
-				'clocks.*',
-				'users.first_name as user_name',
-				DB::raw("TIME_FORMAT(clock_in, '%h:%i %p') as formatted_clock_in"),
-				DB::raw("TIME_FORMAT(clock_out, '%h:%i %p') as formatted_clock_out")
-			)
-		->where('users.id', $request->employeeId)
-		->limit(30)
-		->get();
+		if (!empty($request->branch_id) || !empty($request->employee_id) || !empty($request->department_id) || !empty($request->designation_id) || !empty($request->section_id)) {
+			$query = DB::table('clocks')
+				->leftJoin('users', 'clocks.user_id', '=', 'users.id')
+				->leftJoin('profile', 'users.id', '=', 'profile.user_id')
+				->leftJoin('designations', 'users.designation_id', '=', 'designations.id')
+				->leftJoin('departments', 'designations.department_id', '=', 'departments.id')
+				->select(
+					'clocks.*',
+					'users.first_name as user_name',
+					DB::raw("TIME_FORMAT(clock_in, '%h:%i %p') as formatted_clock_in"),
+					DB::raw("TIME_FORMAT(clock_out, '%h:%i %p') as formatted_clock_out")
+				);
+
+			// Add conditional filters
+			if (!empty($request->employee_id)) {
+				$query->where('users.id', $request->employee_id);
+			}
+
+			if (!empty($request->branch_id)) {
+				$query->where('profile.branch_id', $request->branch_id);
+			}
+
+			if (!empty($request->department_id)) {
+				$query->where('departments.id', $request->department_id);
+			}
+
+			if (!empty($request->designation_id)) {
+				$query->where('designations.id', $request->designation_id);
+			}
+
+			if (!empty($request->section_id)) {
+				$query->where('profile.section_id', $request->section_id);
+			}
+
+			// Finalize the query
+			$getData = $query
+				->orderBy('clocks.date', 'asc')
+				->limit(30)
+				->get();
+
+			return $getData;
+		}
 	}
 	public function uploadAttendance(AttendanceUploadRequest $request){
 		
