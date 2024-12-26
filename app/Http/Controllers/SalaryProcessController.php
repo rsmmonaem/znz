@@ -661,6 +661,17 @@ class SalaryProcessController extends Controller
         } catch (\Exception $e) {
             return response()->json(['error' => 'Failed to update arrear amount.']);
         }
+    }   
+    
+    public function UpdateTaxAmount(Request $request){
+        try {
+            DB::table('employee_salary_details')
+            ->where('id', $request->id)
+            ->update(['tax_amount' => $request->tax_amount]);
+            return response()->json(['success' => 'Tax Amount Updated Successfully.']);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to update tax amount.']);
+        }
     }
 
     public function  SalarySlip() {

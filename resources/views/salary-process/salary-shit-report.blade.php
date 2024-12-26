@@ -250,6 +250,9 @@ function populateSalaryTable(data) {
                     font-weight: bold;
                     background-color: #fff;
                 }
+                .page-break {
+                  page-break-before: always;
+                }
             </style>
         </head>
         <body>
@@ -295,8 +298,15 @@ function populateSalaryTable(data) {
         let medical = parseFloat(salaryData[6]?.amount || 0);
         let conveyance = parseFloat(salaryData[4]?.amount || 0);
         let others = parseFloat(salaryData[8]?.amount || 0);
-        let netPayable = parseFloat(item.net_salary || 0) + parseFloat(item.arrear_amount || 0);
+        // let netPayable = parseFloat(item.net_salary || 0) + parseFloat(item.arrear_amount || 0);
 
+         const netPayable = 
+            parseFloat(item.net_salary || 0) +
+            parseFloat(item.arrear_amount || 0) +
+            parseFloat(item.ot_amount || 0) -
+            parseFloat(item.tax_amount || 0) -
+            parseFloat(item.provident_fund || 0) -
+            parseFloat(item.advance_salary || 0);
         // Update totals
         totalWorkedDays += parseFloat(item.total_worked_days || 0);
         totalGrossSalary += parseFloat(item.gross_salary || 0);
@@ -333,7 +343,7 @@ function populateSalaryTable(data) {
                 <td>${item.tax_amount || '0.00'}</td>
                 <td>${item.arrear_amount || '0.00'}</td>
                 <td>${item.ot_amount || '0.00'}</td>
-                <td>${netPayable + parseFloat(item.ot_amount || 0)}</td>
+                <td>${netPayable}</td>
                 <td>${item.account_number || ''}</td>
                 <td>${item.remarks || ''}</td>
             </tr>
@@ -383,6 +393,8 @@ function populateSalaryTable(data) {
                      <td class="footer-section" style="border: 1px solid #ffffff;">APPROVED BY EDM/MD/CHAIRMAN</td>
                  </tr>
              </table>
+
+            <div class="page-break"></div>
             <h2>SUMMARY</h2>
             <table>
                 <thead>
