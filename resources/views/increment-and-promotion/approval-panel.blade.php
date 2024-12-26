@@ -54,8 +54,12 @@
                                 <!-- Form Fields -->
                                 <div class="form-group">
                                     <label for="group">Group</label>
-                                    <select class="form-control">
-                                        <option value="J & J Group">J & J Group</option>
+                                     @php $group = DB::table('com_group')->get();  @endphp
+                                    <select class="form-control" id="group">
+                                        <option value="">Select Group</option>
+                                        @foreach ($group as $g)
+                                            <option value="{{ $g->id }}" selected>{{ $g->name }}</option>
+                                        @endforeach
                                     </select>
                                 </div>
                                 <div class="form-group">
@@ -144,7 +148,7 @@
 @section('javascript')
     <script type="text/javascript">
         $(document).ready(function() {
-            GetData();
+            // GetData();
         });
 
         $('#search').on('click', function() {
@@ -221,9 +225,6 @@
                         tableBody.append(row);
                     });
                     datatable.DataTable({
-                        // order: [
-                        //     [1, 'desc']
-                        // ],
                         lengthMenu: [10, 20, 50, 100],
                     })
                 },
