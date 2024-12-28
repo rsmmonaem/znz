@@ -30,13 +30,14 @@
                         ->select('users.first_name', 'users.id', 'profile.employee_code')
                         ->get();
                 @endphp
+                @include('common.branch')
                 <div class="form-group">
                     <label>Employee</label>
                     <select class="form-control" name="empolyee_id" id="empolyee_id">
                         <option value="">Select Employee</option>
-                        @foreach ($employee as $e)
+                        {{-- @foreach ($employee as $e)
                             <option value="{{ $e->id }}">{{ $e->first_name }} - {{ $e->employee_code }}</option>
-                        @endforeach
+                        @endforeach --}}
                     </select>
                 </div>
 
@@ -60,9 +61,9 @@
                     <label>Employee IDs</label>
                     <select class="form-control" name="multiple_id" id="multiple_id" multiple>
                         <option value="">Select Employee</option>
-                        @foreach ($employee as $e)
+                        {{-- @foreach ($employee as $e)
                             <option value="{{ $e->id }}">{{ $e->first_name }} - {{ $e->employee_code }}</option>
-                        @endforeach
+                        @endforeach --}}
                     </select>
                     {{-- <input type="text" name="multiple_id" class="form-control" placeholder="ID1, ID2, ID3"> --}}
                 </div>
@@ -190,6 +191,19 @@
 @section('javascript')
     <script type="text/javascript">
         $(document).ready(function() {
+            // Configure toastr options for auto-hide
+            toastr.options = {
+                "closeButton": true,              // Show close button
+                "debug": false,                   // Disable debug mode
+                "newestOnTop": false,             // Notifications are not stacked on top
+                "progressBar": true,              // Show progress bar
+                "positionClass": "toast-top-right", // Position of notifications
+                "preventDuplicates": true,        // Prevent duplicate messages
+                "timeOut": "0",                   // Disable auto-hide
+                "extendedTimeOut": "0",        // Extra time on hover (in ms)
+                "showDuration": "1000",            // Animation time to show (in ms)
+                "hideDuration": "1000"             // Animation time to hide (in ms)
+            };
             $('#get-attendance').on('click', function() {
                 $('#get-attendance').attr('disabled', true);
                 $('#get-attendance').text('Processing...');
@@ -244,10 +258,16 @@
                     type: 'POST',
                     data: FormDate,
                     success: function(data) {
-                        console.log(data);
+                         // Notify for inserted records
+                        data.inserted_records.forEach(function(record) {
+                            toastr.success(`Date ${record.date}: Attendance Added Successfully for Employee Code ${record.employee_code}`);
+                        });
 
-                        displaydata();
-                        toastr.success('Attendance Updated Successfully');
+                        // Notify for updated records
+                        data.updated_records.forEach(function(record) {
+                            toastr.warning(`Date ${record.date}: Attendance Updated Successfully for Employee Code ${record.employee_code}`);
+                        });
+
                         $('#save-attendance').attr('disabled', false);
                         $('#save-attendance').text('Save Attendance');
                     },
@@ -259,6 +279,40 @@
                 });
             });
 
+            $('#branch_id').on('change', function() {
+                $.ajax({
+                    url: '/branch-employees',
+                    type: 'POST',
+                    data: {
+                        branch_id: $(this).val(),
+                    },
+                    success: function(data) {
+                        $('#multiple_id').empty();
+                        $('#empolyee_id').empty();
+                        $('#multiple_id').append($('<option>', {
+                            value: '',
+                            text: 'Select Employee'
+                        }));
+                        data.forEach(function(employee) {
+                            $('#multiple_id').append($('<option>', {
+                                value: employee.id,
+                                text: employee.employee_code + ' - ' + employee.employee_name
+                            }));
+                        });
+
+                        $('#empolyee_id').append($('<option>', {
+                            value: '',
+                            text: 'Select Employee'
+                        }));
+                        data.forEach(function(employee) {
+                            $('#empolyee_id').append($('<option>', {
+                                value: employee.id,
+                                text: employee.employee_code + ' - ' + employee.employee_name
+                            }));
+                        });
+                    }
+                })
+            })
             function displaydata(FormData) {
                 $.ajax({
                     url: "/post-update-attendance-list",
@@ -301,3 +355,4 @@
         });
     </script>
 @stop
+ 

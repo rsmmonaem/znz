@@ -9,6 +9,10 @@ Route::post('/sidebar', 'DashboardController@sidebar');
 Route::get('/test','DashboardController@test');
 Route::post('/job-application', array('as' => 'job-application.store','uses' => 'JobApplicationController@store'));
 
+// Common Dependency Routes 
+Route::post('branch-employees', 'CommonDependencyController@branchEmployees');
+
+// End Common Dependency Routes
 Route::post('/clock/in', array('as' => 'clock.in', 'uses' => 'ClockController@in'));
 Route::post('/clock/out', array('as' => 'clock.out', 'uses' => 'ClockController@out'));
 	

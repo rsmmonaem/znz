@@ -1225,17 +1225,62 @@ Class ClockController extends Controller{
 			$dates = $request->input('date') ? explode(',', $request->input('date')) : [];
 			$clock_in = date('Y-m-d H:i', strtotime($request->input('clock_in')));
 			$clock_out = date('Y-m-d H:i', strtotime($request->input('clock_out')));
+
+			$updated_records = [];
+			$inserted_records = [];
+
 			foreach ($user_ids as $user_id) {
+				// Load the user's profile to get the employee_code
+				$user = User::with('profile')->find($user_id);
+
+				if (!$user || !$user->profile) {
+					continue; // Skip if user or profile doesn't exist
+				}
+
+				$employee_code = $user->profile->employee_code;
+
 				foreach ($dates as $date) {
-					$clock = new Clock;
-					$clock->clock_in = $clock_in;
-					$clock->clock_out = $clock_out;
-					$clock->user_id = $user_id;
-					$clock->date = $date;
-					$clock->save();
+					// Check if the record exists
+					$clock = Clock::where('user_id', $user_id)
+						->where('date', $date)
+						->first();
+
+					if ($clock) {
+						// Update existing record
+						$clock->clock_in = $clock_in;
+						$clock->clock_out = $clock_out;
+						$clock->save();
+
+						// Track updated record with ID and employee_code
+						$updated_records[] = [
+							'id' => $clock->id,
+							'date' => $date,
+							'employee_code' => $employee_code,
+						];
+					} else {
+						// Insert new record
+						$clock = new Clock;
+						$clock->clock_in = $clock_in;
+						$clock->clock_out = $clock_out;
+						$clock->user_id = $user_id;
+						$clock->date = $date;
+						$clock->save();
+
+						// Track inserted record with ID and employee_code
+						$inserted_records[] = [
+							'id' => $clock->id,
+							'date' => $date,
+							'employee_code' => $employee_code,
+						];
+					}
 				}
 			}
-			return response()->json(['success' => true, 'data' => $user_ids]);
+
+			// Return the response with details of updated and inserted records
+			return response()->json([
+				'updated_records' => $updated_records,
+				'inserted_records' => $inserted_records,
+			]);
 	}
 
 	public function  postUpdateAttendanceIDs(Request $request) {
