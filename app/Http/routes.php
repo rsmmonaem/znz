@@ -213,6 +213,7 @@ Route::group(['middleware' => ['auth','license','account_valid']], function () {
 	Route::post('/contract/lists','ContractController@lists');
 	Route::resource('/contract', 'ContractController'); 
 	Route::post('/contract/{id}',array('uses' => 'ContractController@store','as' => 'contract.store'));
+
 	Route::post('/get-user-leave','ProfileController@getLeave');
 	Route::post('leave/check', 'LeaveController@Leavecheckvalue');
 	Route::post('getuserData', 'LeaveController@getuserData');
@@ -234,6 +235,14 @@ Route::group(['middleware' => ['auth','license','account_valid']], function () {
 	Route::post('/spacial-holiday/lists', 'SpacialHolidayController@lists');
 	Route::post('/spacial-holiday/{id}', 'SpacialHolidayController@destroy');
 	
+	// Time Proid
+	Route::get('/LeaveBulk', 'LeaveBulkController@index');
+	Route::post('/LeaveBulk', 'LeaveBulkController@store');
+	Route::get('/LeaveBulk-show', 'LeaveBulkController@show');
+	Route::post('/LeaveBulk-delete', 'LeaveBulkController@destroy');
+	Route::get('/LeaveBulk/{id}/edit', 'LeaveBulkController@edit');
+	Route::post('/LeaveBulk-update', 'LeaveBulkController@update');
+
 	Route::model('award','\App\Award');
 	Route::post('/award/lists','AwardController@lists');
 	Route::resource('/award', 'AwardController'); 

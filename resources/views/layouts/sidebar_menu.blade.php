@@ -185,6 +185,10 @@
 										<li {!! (in_array('/leave-apply',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/leave-apply') !!}"><i class="fa fa-angle-right"></i> {!! trans('messages.leave_apply') !!} </a>
 										</li>
 									@endif
+									@if (Entrust::can('request_leave'))	
+										<li {!! (in_array('/LeaveBulk',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/LeaveBulk') !!}"><i class="fa fa-angle-right"></i> {!! trans('Set Leave') !!} </a>
+										</li>
+									@endif
 									@if (Entrust::can('manage_leave'))	
 										<li {!! (in_array('leave-lists-manager',$menu)) ? 'class="active"' : '' !!} class="no-sort">
 											<a href="{!! URL::to('/leave/lists-manager') !!}"><i class="fa fa-angle-right"></i> Manage Leave </a>
