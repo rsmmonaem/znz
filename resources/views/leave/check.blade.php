@@ -17,8 +17,8 @@
                         </div> --}}
                 </h2>
                 <div class="container">
-                    <h3 class="text-center">Leave Management</h3>
-                    <h4 class="text-center">Leave Balance Check</h4>
+                    {{-- <h3 class="text-center">Leave Management</h3>
+                    <h4 class="text-center">Leave Balance Check</h4> --}}
                     {{-- Check Form --}}
                     @include('leave._check')
                     {{-- End Check Form --}}
