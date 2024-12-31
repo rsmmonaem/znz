@@ -12,9 +12,12 @@ use App\LeaveType;
 use App\User;
 use Auth;
 use App\Classes\Helper;
+use App\Classes\Helpers;
 use App\Department;
 use App\Designation;
+use App\Profile;
 use App\Section;
+use Carbon\Carbon;
 
 Class LeaveController extends Controller{
     use BasicController;
@@ -529,7 +532,7 @@ Class LeaveController extends Controller{
 		// return $employee;
 		return view('leave.check', compact('branch', 'employee'));
 	}
-
+	
 	/**
 	 * Shows the leave balance for a given employee.
 	 * 
@@ -551,24 +554,27 @@ Class LeaveController extends Controller{
 		->select('users.id', 'users.first_name as name', 'profile.employee_code as employee_id')
 		->first();
         // return $user;
-		$contract = \App\Contract::whereUserId($user->id)
-			->where('from_date', '<=', $date)
-			->where('to_date', '>=', $date)
-			->first();
+		// $contract = \App\Contract::whereUserId($user->id)
+		// 	->where('from_date', '<=', $date)
+		// 	->where('to_date', '>=', $date)
+		// 	->first();
+		$contract = DB::table('leave_manage')
+		->where('financial_year', $financialYear)
+		->first();
 		// return $contract;
 		$leave_types = \App\LeaveType::all();
 		$raw_data = array();
 		$data = '';
 
 		if (!$contract)
-		return '<div class="alert alert-danger"><i class="fa fa-times icon"></i> ' . 'No Contract Found' . '</div>';
+		return '<div class="alert alert-danger"><i class="fa fa-times icon"></i> ' . 'No Leave Found' . '</div>';
 
-		$data .= '<p style="margin-left:20px">' . trans('messages.contract_period') . ': <strong>' . showDate($contract->from_date) . ' ' . trans('messages.to') . ' ' . showDate($contract->to_date) . '</strong></p>';
+		// $data .= '<p style="margin-left:20px">' . trans('messages.contract_period') . ': <strong>' . showDate($contract->from_date) . ' ' . trans('messages.to') . ' ' . showDate($contract->to_date) . '</strong></p>';
+		$helpers = new Helpers();
 		foreach ($leave_types as $leave_type) {
 			$name = $leave_type->name;
-			$used = ($contract->UserLeave->whereLoose('leave_type_id', $leave_type->id)->count()) ? $contract->UserLeave->whereLoose('leave_type_id', $leave_type->id)->first()->leave_used : 0;
-			$allotted = ($contract->UserLeave->whereLoose('leave_type_id', $leave_type->id)->count()) ? $contract->UserLeave->whereLoose('leave_type_id', $leave_type->id)->first()->leave_count : 0;
-
+			$used = $helpers->GetUserLeavesReaming($user->id, $financialYear, $leave_type->id);
+			$allotted = $helpers->GetUserLeaves($user->id, $financialYear, $leave_type->id);
 			if ($allotted) {
 				$used_percentage = ($allotted) ? ($used / $allotted) * 100 : 0;
 				$data .= '<tr>
