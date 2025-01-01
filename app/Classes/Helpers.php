@@ -30,8 +30,18 @@ class Helpers{
         $leave = Leave::where('user_id', $id)
         ->where('approved_date', '>', $year)
         ->where('status', '=', 'approved')
-        ->where('leave_type_id', $leave_type_id)->count();
-        return $leave;
+        ->where('leave_type_id', $leave_type_id)
+        ->get();
+
+        $totalLeaveDays = 0;
+        foreach ($leave as $leave) {
+            $from = \Carbon\Carbon::parse($leave->from_date);
+            $to = \Carbon\Carbon::parse($leave->to_date);  
+            $daysDifference = $from->diffInDays($to); 
+            // Add to the total leave days
+            $totalLeaveDays += $daysDifference;
+        }
+        return $totalLeaveDays;
     }
 
 
