@@ -85,12 +85,18 @@
                                         </select>
                                     </div>
                                 </div>
-
+                                
                                 <div class="form-group row">
                                     <label class="col-sm-4 control-label">Employee ID</label>
                                     <div class="col-sm-8">
-                                        <input type="text" id="employeeID" class="form-control"
-                                            placeholder="Employee ID">
+                                        {{-- <input type="text" id="employeeID" class="form-control"
+                                            placeholder="Employee ID"> --}}
+                                        <select class="form-control" name="employeeID" id="employeeID">
+                                            <option value="">Select Employee ID</option>
+                                            @foreach ($employee as $e)
+                                                <option value="{{ $e->employee_code }}">{{ $e->employee_code }} - {{ $e->first_name }}</option>
+                                            @endforeach
+                                        </select>
                                     </div>
                                 </div>
                             </div>

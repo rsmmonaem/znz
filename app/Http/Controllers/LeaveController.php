@@ -757,7 +757,10 @@ Class LeaveController extends Controller{
         $designation = Designation::all();
 		$section = Section::all();
 		$status = ['pending','approved','rejectd'];
-		return view('leave.report', compact('branch','leaveType','department','designation','section','status'));
+		$employee = User::leftJoin('profile', 'users.id', '=', 'profile.user_id')
+		->select('users.first_name', 'users.id', 'profile.employee_code')
+		->get();
+		return view('leave.report', compact('employee','branch','leaveType','department','designation','section','status'));
 	}
 
 	public function LeaveReportPOST(Request $request){
