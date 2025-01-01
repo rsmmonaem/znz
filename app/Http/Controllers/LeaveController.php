@@ -23,6 +23,10 @@ Class LeaveController extends Controller{
     use BasicController;
 
 	protected $form = 'leave-form';
+	private $helpers;
+	public function __construct(){
+		$this->helpers = new Helpers();
+	}
 
 	public function index(Leave $leave){
 
@@ -72,8 +76,9 @@ Class LeaveController extends Controller{
 			'title' => 'Leave List',
 			'id' => 'leave_table'
 		);
- 
-		return view('leave.index',compact('col_heads','menu','leave_types','table_info','leave_graph','assets'));
+
+		$leaves  = Leave::orderBy('status', 'desc')->paginate(10);
+		return view('leave.index',compact('leaves','col_heads','menu','leave_types','table_info','leave_graph','assets'));
 	}
 
 	public function lists(Request $request){
@@ -419,14 +424,14 @@ Class LeaveController extends Controller{
           	return redirect('/dashboard')->withErrors(trans('messages.permission_denied'));
 		}
 
-		$contract = \App\Contract::whereUserId($leave->user_id)
-			->where('from_date','<=',$leave->from_date)
-			->where('to_date','>=',$leave->to_date)
-			->first();
+		// $contract = \App\Contract::whereUserId($leave->user_id)
+		// 	->where('from_date','<=',$leave->from_date)
+		// 	->where('to_date','>=',$leave->to_date)
+		// 	->first();
 
-		$user_leave = \App\UserLeave::whereContractId($contract->id)
-			->whereLeaveTypeId($leave->leave_type_id)
-			->first();
+		// $user_leave = \App\UserLeave::whereContractId($contract->id)
+		// 	->whereLeaveTypeId($leave->leave_type_id)
+		// 	->first();
 
 
     	$f_date = $leave->from_date;
@@ -445,9 +450,12 @@ Class LeaveController extends Controller{
 		$leave_type = LeaveType::find($leave->leave_type_id);
 		$previously_approved_date = ($leave->approved_date) ? explode(',',$leave->approved_date) : [];
 
+		$financial_year = date('Y');
 		$adjustable_date = count($approved_date) - count($previously_approved_date);
-
-		$leave_balance = $user_leave->leave_count - $user_leave->leave_used;
+		$used = $this->helpers->GetUserLeavesReaming($leave->user_id, $financial_year, $leave_type->id);
+		$allotted = $this->helpers->GetUserLeaves($leave->user_id, $financial_year, $leave_type->id);
+		$leave_balance = $allotted - $used;
+		
 		if($adjustable_date > 0 && $leave_balance < $adjustable_date && $request->input('status') == 'approved'){
 	        if($request->has('ajax_submit')){
 	            $response = ['message' => trans('messages.only').' '.$leave_balance.' '.$leave_type->name.' '.trans('messages.remaining'), 'status' => 'error']; 
@@ -456,10 +464,10 @@ Class LeaveController extends Controller{
 			return redirect()->back()->withErrors(trans('messages.only').' '.$leave_balance.' '.$leave_type->name.' '.trans('messages.remaining'));
 		}
 
-		if($request->input('status') == 'approved')
-			$user_leave->increment('leave_used',$adjustable_date);
-		else
-			$user_leave->decrement('leave_used',count($previously_approved_date));
+		// if($request->input('status') == 'approved')
+		// 	$user_leave->increment('leave_used',$adjustable_date);
+		// else
+		// 	$user_leave->decrement('leave_used',count($previously_approved_date));
 
 		$leave->status = ($request->input('status')) ? : 'pending';
 		$leave->admin_remarks = $request->input('admin_remarks');
@@ -570,11 +578,10 @@ Class LeaveController extends Controller{
 		return '<div class="alert alert-danger"><i class="fa fa-times icon"></i> ' . 'No Leave Found' . '</div>';
 
 		// $data .= '<p style="margin-left:20px">' . trans('messages.contract_period') . ': <strong>' . showDate($contract->from_date) . ' ' . trans('messages.to') . ' ' . showDate($contract->to_date) . '</strong></p>';
-		$helpers = new Helpers();
 		foreach ($leave_types as $leave_type) {
 			$name = $leave_type->name;
-			$used = $helpers->GetUserLeavesReaming($user->id, $financialYear, $leave_type->id);
-			$allotted = $helpers->GetUserLeaves($user->id, $financialYear, $leave_type->id);
+			$used = $this->helpers->GetUserLeavesReaming($user->id, $financialYear, $leave_type->id);
+			$allotted = $this->helpers->GetUserLeaves($user->id, $financialYear, $leave_type->id);
 			if ($allotted) {
 				$used_percentage = ($allotted) ? ($used / $allotted) * 100 : 0;
 				$data .= '<tr>
@@ -632,29 +639,26 @@ Class LeaveController extends Controller{
 	}
 
 	public function LeaveRemaining(Request $request){
-		// return $request->leaveType;
 		$user = \App\User::leftJoin('profile', 'users.id', '=', 'profile.user_id')
 		->where('users.id', $request->user_id)
 		// ->where('profile.branch_id', $branch)
 		->select('users.id', 'users.first_name as name', 'profile.employee_code as employee_id')
 		->first();
 
-		$date = date('Y-m-d'); 
-		$contract = \App\Contract::whereUserId($user->id)
-			->where('from_date', '<=', $date)
-			->where('to_date', '>=', $date)
-			->first();
+		$financialYear = date('Y'); 
+		$contract = DB::table('leave_manage')
+		->where('financial_year', $financialYear)
+		->first();
         // return $contract;
 		if (!$contract) {
-			return response()->json(['error' => 'Contract not found Selected Employee, Please Change Employee'], 404);
+			return response()->json(['error' => 'No Leave Found'], 404);
 		}
 		$leave_types = \App\LeaveType::where('id', '=', $request->leaveType) 
 		->get();
 		$leave_data = [];
 		foreach ($leave_types as $leave_type) {
-			$userLeave = $contract->UserLeave->where('leave_type_id', $leave_type->id)->first();
-			$used = $userLeave ? $userLeave->leave_used : 0;
-			$allotted = $userLeave ? $userLeave->leave_count : 0;
+			$used = $this->helpers->GetUserLeavesReaming($user->id, $financialYear, $leave_type->id);
+			$allotted = $this->helpers->GetUserLeaves($user->id, $financialYear, $leave_type->id);
 			$remaining = $allotted - $used;
 
 			if ($allotted > 0) {
@@ -676,28 +680,25 @@ Class LeaveController extends Controller{
 			$from_date = $request->input('from_date');
 			$to_date = $request->input('to_date');
 			$user = \App\User::find($user_id);
-			$contract = \App\Contract::whereUserId($user->id)
-			->where('from_date', '<=', $from_date)
-			->where('to_date', '>=', $to_date)
-			->first();
+			$financialYear = date('Y');
 
-			$user_leave = \App\UserLeave::whereContractId($contract->id)
-			->whereLeaveTypeId($request->input('leave_type_id'))
-			->first();
+
+			// $contract = \App\Contract::whereUserId($user->id)
+			// ->where('from_date', '<=', $from_date)
+			// ->where('to_date', '>=', $to_date)
+			// ->first();
+
+			// $user_leave = \App\UserLeave::whereContractId($contract->id)
+			// ->whereLeaveTypeId($request->input('leave_type_id'))
+			// ->first();
 
 			$leave_request_count = (strtotime($to_date) - strtotime($from_date)) / (60 * 60 * 24) + 1;
 			$leave_type = LeaveType::find($request->input('leave_type_id'));
-			$leave_balance = $user_leave->leave_count - $user_leave->leave_used;
-			// return $leave_balance;
+			$used = $this->helpers->GetUserLeavesReaming($user->id, $financialYear, $leave_type->id);
+			$allotted = $this->helpers->GetUserLeaves($user->id, $financialYear, $leave_type->id);
+			$leave_balance = $used - $allotted;
+
 			if ($leave_balance <= $leave_request_count) 
-			// 	return "if";
-			// 	if ($request->has('ajax_submit')) {
-			// 		$response = ['message' => trans('messages.only') . ' ' . $leave_balance . ' ' . $leave_type->name . ' ' . trans('messages.remaining'), 'status' => 'error'];
-			// 		return response()->json($response, 200, array('Access-Controll-Allow-Origin' => '*'));
-			// 	}
-			// 	return redirect()->back()->withErrors(trans('messages.only') . ' ' . $leave_balance . ' ' . $leave_type->name . ' ' . trans('messages.remaining'));
-			// }else{
-			// 	return true;
 
 			$leaves = Leave::where('user_id', '=', $user_id)
 			->where(function ($query) use ($from_date, $to_date) {
@@ -709,6 +710,7 @@ Class LeaveController extends Controller{
 						->where('to_date', '<=', $to_date);
 				});
 			})->count();
+			
 			if ($leaves) {
 				if ($request->has('ajax_submit')) {
 					$response = ['message' => trans('messages.leave_requested_for_this_period'), 'status' => 'error'];
