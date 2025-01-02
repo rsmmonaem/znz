@@ -182,14 +182,14 @@
 									  </div>
 									</div>
 									@endif
-									@if(Entrust::can('manage_all_employee') && !$role->is_hidden)
+									{{-- @if(Entrust::can('manage_all_employee') && !$role->is_hidden)
 										<div class="col-sm-6">
 										  <div class="form-group flex-form-group">
 										    {!! Form::label('role_id',trans('messages.role'),['class' => 'control-label'])!!}
 											{!! Form::select('role_id', [null=>trans('messages.select_one')] + $roles, isset($role->id) ? $role->id : '',['class'=>'form-control input-xlarge select2me','placeholder'=>trans('messages.role')])!!}
 										  </div>
 										</div>
-									@endif
+									@endif --}}
 								  </div>
 								  <div class="row">
 									{{-- Gender --}}
