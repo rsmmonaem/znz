@@ -10,8 +10,8 @@
 								     ) ? 'class="visible"' : '' !!}>
 									<li {!! (in_array('employee_list',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/employee') !!}"><i class="fa fa-angle-right"></i> {!! trans('messages.employee_list') !!} </a></li>
 									<li {!! (in_array('employee_transfer',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/employee/transfer') !!}"><i class="fa fa-angle-right"></i> {!! trans('messages.employee_transfer') !!} </a></li>
-									{{-- <li {!! (in_array('employee_report',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/employee/report') !!}"><i class="fa fa-angle-right"></i> {!! trans('messages.employee_report') !!} </a></li>
-									<li {!! (in_array('employee_transfer_report',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('employee-transfer/report') !!}"><i class="fa fa-angle-right"></i> {!! trans('messages.employee_transfer_report') !!} </a></li> --}}
+									 <li {!! (in_array('employee-create',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('employee-create') !!}"><i class="fa fa-angle-right"></i> {!! trans('Create Employee') !!} </a></li>
+									{{--<li {!! (in_array('employee_transfer_report',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('employee-transfer/report') !!}"><i class="fa fa-angle-right"></i> {!! trans('messages.employee_transfer_report') !!} </a></li> --}}
 								</ul>
 							</li> 
 							@endif
