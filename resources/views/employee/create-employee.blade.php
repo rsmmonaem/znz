@@ -53,7 +53,7 @@
                                     </div>
                                 </div>
                                     <!-- Profile Picture -->
-                                <div class="col-sm-6 text-right">
+                                {{-- <div class="col-sm-6 text-right">
                                     <div class="image-container" style="position: relative; display: inline-block;">
                                     <img src="{{ URL::to(config('constants.upload_path.profile_image') . 'blank_profile.webp') }}"
                                         alt="Profile Picture" class="imagePreview rounded-circle" id="Up_preview"
@@ -69,7 +69,7 @@
                                 <input class="form-control" id="imageInput" name="photo" type="file" accept="image/*"
                                     onchange="Up_preview.src = window.URL.createObjectURL(this.files[0])"
                                     style="display: none;" >
-                                </div>
+                                </div> --}}
                             </div>
                             <!-- End Row 1 -->
 
