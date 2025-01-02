@@ -79,7 +79,7 @@
                                     </select>
                                 </div>
                                 <div class="form-group">
-                                    <label for="branch">Branch</label>
+                                    <label for="branch">Branch <span class="text-danger">*</span></label>
                                     <select id="branch" class="form-control">
                                         <option value="">Select</option>
                                         @foreach ($branch as $b)
@@ -88,7 +88,7 @@
                                     </select>
                                 </div>
                                 <div class="form-group">
-                                    <label for="employeeId">Employee ID</label>
+                                    <label for="employeeId">Employee ID <span class="text-danger">*</span></label>
                                     <select id="employeeId" class="form-control select2me">
                                         <option value="">Select</option>
                                         @foreach ($employee as $e)
@@ -119,15 +119,15 @@
                         <div class="panel-right">
                             <form>
                                 <div class="form-group">
-                                    <label for="entryDate">Entry Date</label>
+                                    <label for="entryDate">Entry Date <span class="text-danger">*</span></label>
                                     <input type="date" id="entryDate" class="form-control" value="{{ date('Y-m-d') }}">
                                 </div>
                                 <div class="form-group">
-                                    <label for="effectiveDate">Effective Date</label>
+                                    <label for="effectiveDate">Effective Date <span class="text-danger">*</span></label>
                                     <input type="date" id="effectiveDate" class="form-control">
                                 </div>
                                 <div class="form-group">
-                                    <label for="gross">Gross</label>
+                                    <label for="gross">Gross <span class="text-danger">*</span></label>
                                     <input type="text" id="gross" class="form-control">
                                 </div>
                                 <div class="form-group">
@@ -243,6 +243,27 @@
                 e.preventDefault();
                 $('#saveData').attr('disabled', true);
                 $('#saveData').text('Saving...');
+                if(!$('#branch').val()) {
+                    return validate('Please select a branch.');
+                }
+                if (!$('#employeeId').val()) {
+                    return validate('Please select an employee.');
+                }
+                if (!$('#entryDate').val()) {
+                   return validate('Please select an entry date.');
+                }
+                if (!$('#effectiveDate').val()) {
+                    return validate('Please select an effective date.');
+                }
+                if(!$('#gross').val()) {
+                    return validate('Please enter a gross amount.');
+                }
+                
+                function validate(data) {
+                    $('#saveData').attr('disabled', false);
+                    $('#saveData').text('Save');
+                    return toastr.error(data);
+                }
                 const FormData = {
                     employeeId: $('#employeeId').val(),
                     entryDate: $('#entryDate').val(),
