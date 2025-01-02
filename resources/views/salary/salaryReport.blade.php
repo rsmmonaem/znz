@@ -270,6 +270,7 @@
                         <th>Basic</th>
                         <th>House Rent</th>
                         <th>Medical</th>
+                        <th>Conveyance</th>
                         <th>Other</th>
                     </tr>
                 </thead>
@@ -293,7 +294,7 @@
                 <td>${employee.user_info.gross || 0}</td>`;
 
         // Add salary types dynamically
-        const salaryTypes = ['Basic Salary', 'House Rent', 'Medical', 'Others'];
+        const salaryTypes = ['Basic Salary', 'House Rent', 'Medical','Conveyance', 'Others'];
         salaryTypes.forEach(type => {
             const salary = employee.salaries.find(s => s.salary_type.trim() === type);
             content += `<td>${salary ? salary.amount : 0}</td>`;
