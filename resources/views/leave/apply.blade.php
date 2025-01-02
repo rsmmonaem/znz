@@ -93,10 +93,38 @@
                                 <input type="text" class="form-control" id="balance" placeholder="Balance" readonly>
                             </div>
                             <div class="col-sm-2">
-                                <input type="text" class="form-control" id="appliedDays" placeholder="Applied Days">
+                                <input type="text" class="form-control" id="appliedDays" readonly placeholder="Applied Days">
                             </div>
                         </div>
 
+                        <script type="text/javascript">
+                        // Function to calculate the difference in days between two dates
+function calculateDateDifference() {
+    const startDate = document.getElementById('fromDate').value;
+    const endDate = document.getElementById('toDate').value;
+
+    // Check if both dates are selected
+    if (startDate && endDate) {
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+
+        // Calculate the difference in milliseconds
+        const diffInTime = end - start;
+        
+        // Convert milliseconds to days
+        const diffInDays = diffInTime / (1000 * 3600 * 24); 
+
+        // Update the displayed difference
+        document.getElementById('appliedDays').value = Math.abs(diffInDays - 1);
+    } else {
+        document.getElementById('appliedDays').value = ' ';
+    }
+}
+// Add event listeners to update the difference on input change
+document.getElementById('fromDate').addEventListener('change', calculateDateDifference);
+document.getElementById('toDate').addEventListener('change', calculateDateDifference);
+
+                        </script>
                         <div class="form-group row">
                             <label class="col-sm-2 control-label">Recommend Person Branch</label>
                             {{-- <label class="col-sm-2 control-label" for="recommendBranch"></label> --}}
