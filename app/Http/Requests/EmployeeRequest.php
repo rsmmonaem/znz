@@ -26,7 +26,7 @@ class EmployeeRequest extends Request
         return [
                     'first_name' => 'required',
                     'last_name' => 'required',
-                    'role_id' => 'sometimes|required',
+                    // 'role_id' => 'sometimes|required',
                     'designation_id' => 'sometimes|required',
                     // 'email' => 'required|unique:users,email,'.$employee->id,
                     // 'date_of_birth' => 'sometimes|date',
