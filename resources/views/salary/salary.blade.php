@@ -57,7 +57,7 @@
                                         </select>
                                     </div>
                                     <div class="form-group">
-                                        <label for="branch">Branch</label>
+                                        <label for="branch">Branch <span class="text-danger">*</span></label>
                                         <select class="form-control" id="branch">
                                             <option value="">Select</option>
                                             @foreach ($branch as $b)
@@ -84,7 +84,7 @@
                                         </select>
                                     </div>
                                     <div class="form-group">
-                                        <label for="employeeId">Employee ID</label>
+                                        <label for="employeeId">Employee ID <span class="text-danger">*</span></label>
                                         <select class="form-control" style="width: 100%" id="employeeId">
                                             <option value="">Select</option>
                                             @foreach ($employee as $e)
@@ -112,15 +112,15 @@
                                 </div>
                                 <div class="col-sm-6">
                                     <div class="form-group">
-                                        <label for="entryDate">Entry Date</label>
+                                        <label for="entryDate">Entry Date <span class="text-danger">*</span></label>
                                         <input type="date" class="form-control" id="entryDate" value="{{ date('Y-m-d') }}">
                                     </div>
                                     <div class="form-group">
-                                        <label for="effectiveDate">Effective Date</label>
+                                        <label for="effectiveDate">Effective Date <span class="text-danger">*</span></label>
                                         <input type="date" class="form-control" id="effectiveDate">
                                     </div>
                                     <div class="form-group">
-                                        <label for="bankAmount">Bank Amount</label>
+                                        <label for="bankAmount">Bank Amount<span class="text-danger">*</span></label>
                                         <input type="text" class="form-control" id="bankAmount">
                                     </div>
                                     {{-- <div class="form-group">
@@ -190,6 +190,12 @@
                     }
                 });
             })
+             function validate(data) {
+                toastr.error(data);
+                $('#saveData').attr('disabled', false);
+                $('#saveData').text('Save');
+                return false;
+            }
             // Save Data
             $('#saveData').on('click', function() {
                 $('#saveData').attr('disabled', true);
@@ -201,8 +207,19 @@
                     gross: $('#gross').val(),
                     bankAmount: $('#bankAmount').val(),
                     remarks: $('#remarks').val(),
-
                 };
+                if(FormData.employeeId === '') {
+                    return validate('Please select employee');
+                }
+                if(FormData.entryDate === '') {
+                    return validate('Please select entry date');
+                }
+                if(FormData.effectiveDate === '') {
+                    return validate('Please select effective date');
+                }
+                if(FormData.bankAmount === '') {
+                    return validate('Please enter bank amount');
+                }
                 $.ajax({
                     url: '/salary-bank-part-create',
                     type: 'POST',

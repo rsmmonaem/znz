@@ -50,7 +50,7 @@
                                         {{-- <input type="text" id="branch" class="form-control" placeholder="Branch" readonly> --}}
                                     </div>
                                     <div class="form-group">
-                                        <label>Employee ID</label>
+                                        <label>Employee ID <span class="text-danger">*</span></label>
                                         <select class="form-control select2m" id="employee_id">
                                             <option value="">Select Employee</option>
                                             @foreach ($employee as $e)
@@ -84,15 +84,15 @@
                                 <!-- Right Side -->
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label>Entry Date</label>
+                                        <label>Entry Date <span class="text-danger">*</span></label>
                                         <input type="date" id="entry_date" class="form-control" value="{{ date('Y-m-d') }}">
                                     </div>
                                     <div class="form-group">
-                                        <label>Effective Date</label>
+                                        <label>Effective Date <span class="text-danger">*</span></label>
                                         <input type="date" id="effective_date" class="form-control">
                                     </div>
                                     <div class="form-group">
-                                        <label>Type</label><br>
+                                        <label>Type <span class="text-danger">*</span></label><br>
                                         <label class="checkbox-inline">
                                             <input type="checkbox" id="promotion"> Promotion
                                         </label>
@@ -101,7 +101,7 @@
                                         </label>
                                     </div>
                                     <div class="form-group">
-                                        <label>Emp Category</label>
+                                        <label>Emp Category <span class="text-danger">*</span></label>
                                         <select class="form-control" id="categorynew">
                                             <option value="">Select Category</option>
                                             @foreach ($catregory as $c)
@@ -111,7 +111,7 @@
                                         {{-- @include('common.category') --}}
                                     </div>
                                     <div class="form-group">
-                                        <label>Grade</label>
+                                        <label>Grade <span class="text-danger">*</span></label>
                                         <select class="form-control" id="grade">
                                             <option value="">Select Grade</option>
                                             @foreach ($grade as $g)
@@ -125,7 +125,7 @@
                                          <p id="new_salary"></p>
                                     </div>
                                     <div class="form-group">
-                                        <label>Promoted Designation</label>
+                                        <label>Promoted Designation <span class="text-danger">*</span></label>
                                         <select class="form-control" id="designation">
                                             <option value="">Select Designation</option>
                                             @foreach ($designation as $d)
@@ -189,6 +189,13 @@
         const final = parseInt(oldamount) + parseInt(amount);
         $('#new_salary').html(`<strong class="text-danger">New Salary Amount: </strong><span>${final}</span>`);
     });
+
+    function validate(data) {
+        $('#savedata').attr('disabled', false);
+        $('#savedata').text('Save');
+        toastr.error(data);
+        return false;
+    }
     // SaveDate Increment And Promotion
     $('#savedata').on('click', function() {
         $('#savedata').attr('disabled', true);
@@ -216,6 +223,31 @@
             designation: designation,
             remark: remark,
             old_amount: oldamount
+        }
+
+        if(formData.employee_id === ''){
+            validate('Please select employee');
+            return false;
+        }
+        if(formData.entry_date === ''){
+            validate('Please select entry date');
+            return false;
+        }
+        if(formData.effective_date === ''){
+            validate('Please select effective date');
+            return false;
+        }
+        if(formData.category === ''){
+            validate('Please select category');
+            return false;
+        }
+        if(formData.grade === ''){
+            validate('Please select grade');
+            return false;
+        }
+        if(formData.designation === ''){
+            validate('Please select designation');
+            return false;
         }
         $.ajax({
             url: '/increment-and-promotion',

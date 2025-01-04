@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Routing\Router;
+
 Route::get('/', 'Auth\AuthController@getLogin');
 Route::get('/whats-new',function(){
 	return view('whats_new');
@@ -429,6 +431,15 @@ Route::group(['middleware' => ['auth','license','account_valid']], function () {
 
 	Route::post('/get-letter-user', 'LetterController@getLetterUser');
 
+	// WHD
+	Route::get('/whd', 'WhdController@index');
+	Route::post('/whd_lists', 'WhdController@lists');
+	Route::get('/whd-create', 'WhdController@create');
+	Route::post('/whd-create', 'WhdController@store');
+	// Route::get('/whd/{id}/edit', 'WhdController@edit');
+	// Route::post('/whd/{id}', 'WhdController@update')->name('whd.update');
+	Route::delete('/whd/{id}', 'WhdController@destroy');
+	
 	Route::post('/copy-template',array('as' => 'copy-template','uses' => 'MailController@copyTemplate'));
 	Route::post('/mail',array('as' => 'mail.index','uses' => 'MailController@index'));
 
