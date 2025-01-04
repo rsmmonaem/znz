@@ -50,6 +50,12 @@
                    date : $('#date').val(),
                    _token: $('meta[name="csrf-token"]').attr('content')
                };
+               if(formData.branch_id == 0) {
+                   return validate('Please select branch');
+               }
+               if(formData.date == '') {
+                   return validate('Please select date');
+               }
                $.ajax({
                    url: '/whd-create',
                    type: 'POST',
@@ -61,6 +67,10 @@
                    }
                });
            });
+           function validate(data) {
+               $('#save').attr('disabled', false).text('Save WHD');
+               return toastr.error(data);
+           }
         });
     </script>
 @stop
