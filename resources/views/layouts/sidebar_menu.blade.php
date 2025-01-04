@@ -169,6 +169,9 @@
 							@if(Entrust::can('spacial_holiday'))
 							 <li data-position="27" {!! (in_array('spacial-holiday',$menu)) ? 'class="active"' : '' !!} {!! menuAttr($menus,'spacial_holiday') !!}><a href="{!! URL::to('/spacial-holiday') !!}"><i class="fa fa-fighter-jet icon"></i> {!! trans('Special Holiday') !!}</a></li>
 							@endif
+							@if(Entrust::can('whd'))
+							 <li data-position="27" {!! (in_array('whd',$menu)) ? 'class="active"' : '' !!} {!! menuAttr($menus,'whd') !!}><a href="{!! URL::to('/whd') !!}"><i class="fa fa-fighter-jet icon"></i> WHD </a></li>
+							@endif
                           
 							<li {!! (in_array('leave',$menu)) ? 'class="active"' : '' !!} {!! menuAttr($menus,'leave') !!}><a href="#"><i class="fa fa-coffee icon"></i> <i class="fa fa-angle-double-down i-right"></i> {!! trans('messages.leave') !!}</a>
 							    <ul {!! (in_array('leave',$menu) ||

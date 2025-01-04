@@ -123,10 +123,10 @@
                             <label>Employee ID</label>
                             <select class="form-control" name="get_empl_id" id="get_empl_id">
                                 <option value="">Select Employee</option>
-                                @foreach ($employee as $e)
+                                {{-- @foreach ($employee as $e)
                                     <option value="{{ $e->id }}">{{ $e->first_name }} - {{ $e->employee_code }}
                                     </option>
-                                @endforeach
+                                @endforeach --}}
                             </select>
                         </div>
                          <div class="form-group">
@@ -212,6 +212,10 @@
             //     "showDuration": "1000",            // Animation time to show (in ms)
             //     "hideDuration": "1000"             // Animation time to hide (in ms)
             // };
+           $('#branch_id_view').on('change', function() {
+                HandleBranchWiseEmployees($(this).val(), '#get_empl_id');
+                $('#get_empl_id').val('').trigger('change');
+           });
             $('#get-attendance').on('click', function() {
                 $('#get-attendance').attr('disabled', true);
                 $('#get-attendance').text('Processing...');
@@ -299,6 +303,8 @@
             });
 
             $('#branch_id').on('change', function() {
+                $('#empolyee_id').val('').trigger('change');
+                $('#multiple_id').val('').trigger('change');
                 $.ajax({
                     url: '/branch-employees',
                     type: 'POST',
@@ -360,7 +366,7 @@
                                                 class='btn btn-xs btn-default' data-toggle="modal" data-target="#myModal">
                                             <i class='fa fa-edit' data-toggle="tooltip" title="{!! trans('messages.edit') !!}"></i> 
 										</a>
-										<form method="POST" action="http://znz.test/clock/${separation.id}" accept-charset="UTF-8" class="form-inline" id="_${separation.id}"><input name="_method" type="hidden" value="DELETE"><input name="_token" type="hidden" value=""><button data-toggle="tooltip" title="" class="btn btn-danger btn-xs" data-submit-confirm-text="Yes" type="submit" data-original-title="Delete"><i class="fa fa-trash-o"></i> </button></form>
+										<form method="POST" action="/clock/${separation.id}" accept-charset="UTF-8" class="form-inline" id="_${separation.id}"><input name="_method" type="hidden" value="DELETE"><input name="_token" type="hidden" value=""><button data-toggle="tooltip" title="" class="btn btn-danger btn-xs" data-submit-confirm-text="Yes" type="submit" data-original-title="Delete"><i class="fa fa-trash-o"></i> </button></form>
                                     </div>
 								</td>
 							</tr>`;
