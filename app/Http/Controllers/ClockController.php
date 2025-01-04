@@ -296,7 +296,7 @@ Class ClockController extends Controller{
 			if($clock_out)
 			$query2->where('id','!=',$clock_id);
 		}
-
+ 
 		$clock_in_count = $query1->count();
 		if($clock_out)
 		$clock_out_count = $query2->count();
@@ -1587,7 +1587,13 @@ Class ClockController extends Controller{
        $category = ['staff', 'owner'];
 	   $designation = Designation::all();
 	   $shift = OfficeShift::all();
-	   return view('attendance.report',compact('branch','section','department','category','designation','shift'));
+	   $employee = User::leftJoin(
+		   'profile',
+		   'users.id',
+		   '=',
+		   'profile.user_id'
+	   )->select('users.first_name', 'users.id', 'profile.employee_code')->get();
+	   return view('attendance.report',compact('employee','branch','section','department','category','designation','shift'));
 	}
 
 	// Attendance Report POST method
@@ -1721,6 +1727,7 @@ Class ClockController extends Controller{
 				'users.first_name',
 				'designations.name as designation_name',
 				'departments.name as department_name',
+				'profile.category',
 				'sections.name as section_name',
 				'branchs.name as branch_name'
 			)
@@ -1835,6 +1842,7 @@ Class ClockController extends Controller{
 				'name' => $Profiles ? $Profiles->first_name : 'N/A',
 				'designation' => $Profiles ? $Profiles->designation_name : 'N/A',
 				'department' => $Profiles ? $Profiles->department_name : 'N/A',
+				'category' => $Profiles ? $Profiles->category : 'N/A',
 				'section' => $Profiles ? $Profiles->section_name : 'N/A',
 				'branch' => $Profiles ? $Profiles->branch_name : 'N/A',
 				'day' => Carbon::parse($date)->format('D'),
@@ -1860,10 +1868,17 @@ Class ClockController extends Controller{
 		$branch = Branch::all();
 		$section = Section::all();
 		$department = Department::all();
-		$category = ['staff', 'owner'];
+		// $category = ['staff', 'owner'];
+		$category = DB::table('category')->get();
 		$designation = Designation::all();
 		$shift = OfficeShift::all();
-		return view('attendance.daily-report', compact('branch', 'section', 'department', 'category', 'designation', 'shift'));
+		$employee = User::leftJoin(
+			'profile',
+			'users.id',
+			'=',
+			'profile.user_id'
+		)->get();
+		return view('attendance.daily-report', compact('employee', 'branch', 'section', 'department', 'category', 'designation', 'shift'));
 
 	}
 
