@@ -95,7 +95,13 @@
                             </div>
                             <div class="form-group">
                                 <label for="employeeId">Employee ID(Single & Multiple)</label>
-                                <input type="text" class="form-control" name="employeeId" id="employeeId" placeholder="ID1,ID2,ID3">
+                                {{-- <input type="text" class="form-control" name="employeeId" id="employeeId" placeholder="ID1,ID2,ID3"> --}}
+                                <select class="form-control" name="employeeId" id="employeeId" multiple>
+                                    <option value="">Select Employee</option>
+                                    @foreach ($employee as $e)
+                                        <option value="{{ $e->employee_code }}">{{ $e->first_name }} - {{ $e->employee_code }}</option>
+                                    @endforeach
+                                </select>
                             </div>
                         </div>
                         <div class="col-md-6 form-section">
@@ -181,7 +187,7 @@
                 const section_id = $('#section').val();
                 const category_id = $('#category').val();
                 const designation_id = $('#designation').val();
-                const employee_id = $('input[name="employeeId"]').val();
+                const employee_id = $('select[name="employeeId"]').val();
                 const startDate = $('#startDate').val();
                 const $endDate = $('#endDate').val();
                 const shift_id = $('#shift_id').val();
@@ -254,7 +260,7 @@
                                     </div>
                                     <div class="center-item">
                                         <h4>{{ config('config.company_name') }}</h4>
-                                        <p>Daily Attendance Report (Date)</p>
+                                        <p>Monthly Attendance Report (Date)</p>
                                         <p>Branch: {{ Auth::user()->profile->branch->name }}</p>
                                         <p>Date: <strong id="date">${response.startDate} to ${response.toDate}</strong></p>
                                     </div>
@@ -290,7 +296,7 @@
                                 <td>${attendance.name || 'N/A'}</td>
                                 <td>${attendance.department || 'N/A'}</td>
                                 <td>${attendance.section || 'N/A'}</td>
-                                <td>${attendance.branch || 'N/A'}</td>
+                                <td>${attendance.category || 'N/A'}</td>
                                 <td>${attendance.designation || 'N/A'}</td>
                                 <td>${attendance.shift_in || 'N/A'}</td>
                                 <td>${attendance.shift_out || 'N/A'}</td>

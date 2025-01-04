@@ -95,7 +95,16 @@
                             </div>
                             <div class="form-group">
                                 <label for="employeeId">Employee ID</label>
-                                <input type="text" class="form-control" name="employeeId" id="employeeId">
+                                {{-- <input type="text" class="form-control" name="employeeId" id="employeeId">                             --}}
+                                <select class="form-control" name="employeeId" id="employeeId">
+                                  
+                                    <option value="">Select Employee</option>
+                                    @foreach ($employee as $e)
+                                        <option value="{{ $e->employee_code }}">{{ $e->employee_code }} -
+                                        {{ $e->first_name }}
+                                        </option>
+                                    @endforeach
+                                </select>
                             </div>
                         </div>
                         <div class="col-md-6 form-section">
@@ -176,7 +185,7 @@
                 const section_id = $('#section').val();
                 const category_id = $('#category').val();
                 const designation_id = $('#designation').val();
-                const employee_id = $('input[name="employeeId"]').val();
+                const employee_id = $('select[name="employeeId"]').val();
                 const startDate = $('#startDate').val();
                 const $endDate = $('#endDate').val();
                 const shift_id = $('#shift_id').val();
@@ -212,7 +221,7 @@
                         var content = `
                         <html>
                             <head>
-                                <title>Monthly Attendance Report</title>
+                                <title>Daily Attendance Report</title>
                                 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.5.2/css/bootstrap.min.css">
                                 <style>
                                     .center-item {
@@ -285,7 +294,7 @@
                                 <td>${attendance.name || 'N/A'}</td>
                                 <td>${attendance.department || 'N/A'}</td>
                                 <td>${attendance.section || 'N/A'}</td>
-                                <td>${attendance.branch || 'N/A'}</td>
+                                <td>${attendance.category || 'N/A'}</td>
                                 <td>${attendance.designation || 'N/A'}</td>
                                 <td>${attendance.shift_in || 'N/A'}</td>
                                 <td>${attendance.shift_out || 'N/A'}</td>
