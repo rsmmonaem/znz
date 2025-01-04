@@ -16,6 +16,7 @@ class SalaryProcessController extends Controller
 {
     public function index()
     {
+        // return $weeklyHolidays = [Carbon::FRIDAY];
         $group = DB::table('com_group')->get();
         $branch = Branch::all();
         $department = Department::all();
@@ -116,7 +117,8 @@ class SalaryProcessController extends Controller
         ->LeftJoin('branchs', 'profile.branch_id', '=', 'branchs.id')
         ->where('users.id', '=', $employeeId)
         ->select('users.id', 'profile.employee_code', 'users.first_name', 'designations.name as designation', 'departments.name as department', 'sections.name as section', 'branchs.name as branch')
-        ->get();
+        ->first();
+        // return $User->employee_code;
         // Total Present
         $getTotalPresent = DB::table('clocks')
         ->whereBetween('date', [$formDate, $toDate])
@@ -267,7 +269,7 @@ class SalaryProcessController extends Controller
             ->where('to_date', $toDate)
             ->exists();
         DB::table('employee_salary_details')->insert($TableData);
-        return $employeeId;
+        return $User->employee_code;
         // if (!$exists) {
         //     // Insert the new record into the database
         //     DB::table('employee_salary_details')->insert($TableData);

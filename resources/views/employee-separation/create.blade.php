@@ -85,7 +85,7 @@
                             </div>
                             <div class="col-sm-6">
                                 <div class="form-group">
-                                    <label for="entryDate">Entry Date</label>
+                                    <label for="entryDate">Entry Date <span class="text-danger">*</span></label>
                                     <input type="date" class="form-control" id="entryDate" value="{{ date('Y-m-d') }}">
                                 </div>
                                 <div class="form-group">
@@ -97,7 +97,7 @@
                                     <input type="date" class="form-control" id="lastWorkingDay">
                                 </div>
                                 <div class="form-group">
-                                    <label for="effectiveDate">Effective Date</label>
+                                    <label for="effectiveDate">Effective Date <span class="text-danger">*</span></label>
                                     <input type="date" class="form-control" id="effectiveDate">
                                 </div>
                                 <div class="form-group">
@@ -202,6 +202,26 @@
                 shortDay: $('#shortDay').val()
             };
 
+            if(!formData.employeeId){
+                return validate('Please select an employee.');
+            }
+
+            if(!formData.entryDate){
+                return validate('Please select an entry date.');
+            }
+
+            if(!formData.separationAriseDate){
+                return validate('Please select a separation arise date.');
+            }
+
+            if(!formData.lastWorkingDay){
+                return validate('Please select a last working day.');
+            }
+
+            if(!formData.effectiveDate){
+                return validate('Please select an effective date.');
+            }
+
             // Make AJAX POST request
             $.ajax({
                 url: '/employee-separation', // Endpoint to handle the request
@@ -252,6 +272,10 @@
             });
         });
 
+        function validate(data) {
+            $('#saveData').attr('disabled', false).text('Save');
+            return toastr.error(data);
+        }
         $(document).ready(function() {
             getSeparationData();
         })
