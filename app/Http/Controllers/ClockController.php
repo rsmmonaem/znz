@@ -1205,79 +1205,101 @@ Class ClockController extends Controller{
 	}
 
 	public function postUpdateAttendance(Request $request){
-			$data = User::leftJoin('profile', 'users.id', '=', 'profile.user_id')
-			->leftJoin('designations', 'users.designation_id', '=', 'designations.id')
-			->leftJoin('sections', 'profile.section_id', '=', 'sections.id')
-			->leftJoin('branchs', 'profile.branch_id', '=', 'branchs.id')
-			->leftJoin('departments', 'designations.department_id', '=', 'departments.id');
+		$data = User::leftJoin('profile', 'users.id', '=', 'profile.user_id')
+		->leftJoin('designations', 'users.designation_id', '=', 'designations.id')
+		->leftJoin('sections', 'profile.section_id', '=', 'sections.id')
+		->leftJoin('branchs', 'profile.branch_id', '=', 'branchs.id')
+		->leftJoin('departments', 'designations.department_id', '=', 'departments.id');
 
-			// Apply filters based on the request
-			if (!empty($request->employee_id)) {
-				// $employeeIds = is_array($request->employee_id) ? $request->employee_id : explode(',', $request->employee_id);
-				$data->where('users.id', $request->employee_id);
+		if (!empty($request->employee_id)) {
+			$data->where('users.id', $request->employee_id);
+		}
+
+		if (!empty($request->employee_ids)) {
+			$data->whereIn('users.id', $request->employee_ids);
+		}
+
+		$data = $data->select('users.id');
+		$user_ids = $data->pluck('users.id')->toArray();
+
+		$dates = [];
+
+		$form_date = $request->input('form_date');
+		$to_date = $request->input('to_date');
+
+		if (!$form_date || !$to_date) {
+			return response()->json(['error' => 'Both form_date and to_date are required.'], 400);
+		}
+
+		try {
+			$start_date = Carbon::createFromFormat('Y-m-d', $form_date);
+			$end_date = Carbon::createFromFormat('Y-m-d', $to_date);
+
+			if ($start_date > $end_date) {
+				return response()->json(['error' => 'Start date must be before or equal to end date.'], 400);
 			}
-			if (!empty($request->employee_ids)) {
-				$data->whereIn('users.id', $request->employee_ids);
+
+			$clock_in = Carbon::createFromFormat('h:i A', $request->input('clock_in'))->format('Y-m-d H:i:s');
+			$clock_out = Carbon::createFromFormat('h:i A', $request->input('clock_out'))->format('Y-m-d H:i:s');
+
+		} catch (\Exception $e) {
+			return response()->json(['error' => 'Invalid date or time format.'], 400);
+		}
+
+		while ($start_date <= $end_date) {
+			$dates[] = [
+				'date' => $start_date->format('Y-m-d'),
+				'clock_in' => $clock_in,
+				'clock_out' => $clock_out,
+			];
+			$start_date->addDay();
+		}
+
+		$updated_records = [];
+		$inserted_records = [];
+
+		foreach ($user_ids as $user_id) {
+			$user = User::with('profile')->find($user_id);
+
+			if (!$user || !$user->profile) {
+				continue;
 			}
-			$data = $data->select('users.id');
-			$user_ids = $data->pluck('users.id')->toArray();
 
-			$dates = $request->input('date') ? explode(',', $request->input('date')) : [];
-			$clock_in = date('Y-m-d H:i', strtotime($request->input('clock_in')));
-			$clock_out = date('Y-m-d H:i', strtotime($request->input('clock_out')));
+			$employee_code = $user->profile->employee_code;
 
-			$updated_records = [];
-			$inserted_records = [];
+			foreach ($dates as $date) {
+				$clock = Clock::where('user_id', $user_id)
+					->where('date', $date['date'])
+					->first();
 
-			foreach ($user_ids as $user_id) {
-				// Load the user's profile to get the employee_code
-				$user = User::with('profile')->find($user_id);
+				if ($clock) {
+					$clock->clock_in = $date['clock_in'];
+					$clock->clock_out = $date['clock_out'];
+					$clock->save();
 
-				if (!$user || !$user->profile) {
-					continue; // Skip if user or profile doesn't exist
+					$updated_records[] = [
+						'id' => $clock->id,
+						'date' => $date['date'],
+						'employee_code' => $employee_code,
+					];
+				} else {
+					$clock = new Clock;
+					$clock->clock_in = $date['clock_in'];
+					$clock->clock_out = $date['clock_out'];
+					$clock->user_id = $user_id;
+					$clock->date = $date['date'];
+					$clock->save();
+
+					$inserted_records[] = [
+						'id' => $clock->id,
+						'date' => $date['date'],
+						'employee_code' => $employee_code,
+					];
 				}
-
-				$employee_code = $user->profile->employee_code;
-
-				foreach ($dates as $date) {
-					// Check if the record exists
-					$clock = Clock::where('user_id', $user_id)
-						->where('date', $date)
-						->first();
-
-					if ($clock) {
-						// Update existing record
-						$clock->clock_in = $clock_in;
-						$clock->clock_out = $clock_out;
-						$clock->save();
-
-						// Track updated record with ID and employee_code
-						$updated_records[] = [
-							'id' => $clock->id,
-							'date' => $date,
-							'employee_code' => $employee_code,
-						];
-					} else {
-						// Insert new record
-						$clock = new Clock;
-						$clock->clock_in = $clock_in;
-						$clock->clock_out = $clock_out;
-						$clock->user_id = $user_id;
-						$clock->date = $date;
-						$clock->save();
-
-						// Track inserted record with ID and employee_code
-						$inserted_records[] = [
-							'id' => $clock->id,
-							'date' => $date,
-							'employee_code' => $employee_code,
-						];
-					}
-				}
 			}
+		}
 
-			// Return the response with details of updated and inserted records
-			return response()->json([
+		return response()->json([
 				'updated_records' => $updated_records,
 				'inserted_records' => $inserted_records,
 			]);
@@ -1317,11 +1339,17 @@ Class ClockController extends Controller{
 			if (!empty($request->section_id)) {
 				$query->where('profile.section_id', $request->section_id);
 			}
+			if(!empty($request->form_date)){
+				$query->where('clocks.date','>=', $request->form_date);
+			}
+			if(!empty($request->to_date)){
+				$query->where('clocks.date','<=', $request->to_date);
+			}
 
 			// Finalize the query
 			$getData = $query
 				->orderBy('clocks.date', 'asc')
-				->limit(30)
+				// ->limit(30) 
 				->get();
 
 			return $getData;
