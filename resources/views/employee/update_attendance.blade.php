@@ -61,13 +61,9 @@
                     <label>Employee IDs</label>
                     <select class="form-control" name="multiple_id" id="multiple_id" multiple>
                         <option value="">Select Employee</option>
-                        {{-- @foreach ($employee as $e)
-                            <option value="{{ $e->id }}">{{ $e->first_name }} - {{ $e->employee_code }}</option>
-                        @endforeach --}}
                     </select>
-                    {{-- <input type="text" name="multiple_id" class="form-control" placeholder="ID1, ID2, ID3"> --}}
                 </div>
-                <div class="form-group">
+                {{-- <div class="form-group">
                     {!! Form::label('date', trans('messages.date'), []) !!}
                     {!! Form::input('text', 'date', isset($holiday->date) ? $holiday->date : '', [
                         'class' => 'form-control mdatepicker',
@@ -75,19 +71,23 @@
                         'id' => 'date',
                         'readonly' => 'true',
                     ]) !!}
+                </div> --}}
+                <div class="form-group">
+                    <label>Form Date</label>
+                    <input type="date" name="form_date" id="form_date" class="form-control">
                 </div>
-                <div class="form-group">{!! Form::input('text', 'clock_in', '', [
-                    'class' => 'form-control datetimepicker',
-                    'id' => 'clock_in',
-                    'placeholder' => trans('messages.clock_in'),
-                    'readonly' => true,
-                ]) !!}</div>
-                <div class="form-group">{!! Form::input('text', 'clock_out', '', [
-                    'class' => 'form-control datetimepicker',
-                    'id' => 'clock_out',
-                    'placeholder' => trans('messages.clock_out'),
-                    'readonly' => true,
-                ]) !!}</div>
+                <div class="form-group mb-2">
+                    <label>To Date</label>
+                    <input type="date" name="to_date" id="to_date" class="form-control">
+                </div>
+                <div class="form-group">
+                 <label>In Time</label>
+                 <input class="timepicker form-control" id="clock_in" type="text">
+                </div>
+                <div class="form-group">
+                 <label>Out Time</label>
+                 <input class="timepicker form-control" id="clock_out" type="text">
+                </div>
                 <div class="form-group">
                     <button type="button" class="btn btn-primary" id="save-attendance">{!! trans('messages.submit') !!}</button>
                 </div>
@@ -129,6 +129,10 @@
                                 @endforeach
                             </select>
                         </div>
+                         <div class="form-group">
+                            <label>Form Date</label>
+                            <input type="date" name="form_date_get" id="form_date_get" class="form-control">
+                        </div>
                     </div>
                     <div class="col-sm-6">
                         <div class="form-group">
@@ -159,6 +163,10 @@
                                     <option value="{{ $s->id }}">{{ $s->name }}</option>
                                 @endforeach
                             </select>
+                        </div>
+                        <div class="form-group">
+                            <label>To Date</label>
+                            <input type="date" name="to_date_get" id="to_date_get" class="form-control">
                         </div>
                     </div>
                     <div class="col-sm-12">
@@ -192,18 +200,18 @@
     <script type="text/javascript">
         $(document).ready(function() {
             // Configure toastr options for auto-hide
-            toastr.options = {
-                "closeButton": true,              // Show close button
-                "debug": false,                   // Disable debug mode
-                "newestOnTop": false,             // Notifications are not stacked on top
-                "progressBar": true,              // Show progress bar
-                "positionClass": "toast-top-right", // Position of notifications
-                "preventDuplicates": true,        // Prevent duplicate messages
-                "timeOut": "0",                   // Disable auto-hide
-                "extendedTimeOut": "0",        // Extra time on hover (in ms)
-                "showDuration": "1000",            // Animation time to show (in ms)
-                "hideDuration": "1000"             // Animation time to hide (in ms)
-            };
+            // toastr.options = {
+            //     "closeButton": true,              // Show close button
+            //     "debug": false,                   // Disable debug mode
+            //     "newestOnTop": false,             // Notifications are not stacked on top
+            //     "progressBar": true,              // Show progress bar
+            //     "positionClass": "toast-top-right", // Position of notifications
+            //     "preventDuplicates": true,        // Prevent duplicate messages
+            //     "timeOut": "0",                   // Disable auto-hide
+            //     "extendedTimeOut": "0",        // Extra time on hover (in ms)
+            //     "showDuration": "1000",            // Animation time to show (in ms)
+            //     "hideDuration": "1000"             // Animation time to hide (in ms)
+            // };
             $('#get-attendance').on('click', function() {
                 $('#get-attendance').attr('disabled', true);
                 $('#get-attendance').text('Processing...');
@@ -213,16 +221,23 @@
                     department_id: $('#department_id_view').val(),
                     designation_id: $('#designation_id_view').val(),
                     section_id: $('#section_id_view').val(),
+                    form_date: $('#form_date_get').val(),
+                    to_date: $('#to_date_get').val()
                 }
                 displaydata(FormData);
             })
+
             // GetUser Data
-            $('#empolyee_id').on('change', function() {
+             $('#empolyee_id').on('change', function() {
+                 var employee_id = $(this).val();
+                 GetData(employee_id);
+             });
+            function GetData(employee_id) {
                 $.ajax({
                     url: '/UserData',
                     type: 'POST',
                     data: {
-                        employeeId: $(this).val(),
+                        employeeId: employee_id,
                     },
                     success: function(data) {
                         $('#repname').val(data.first_name);
@@ -230,38 +245,42 @@
                         $('#repdesignation').val(data.designation);
                     }
                 })
-            })
+            }
             // save-attendance
             $('#save-attendance').click(function() {
                 if ($('#date').val() == '' || $('#clock_in').val() == '' || $('#clock_out').val() == '') {
                     toastr.error('Please fill all the fields');
                     return false;
                 } else
-                    $('#save-attendance').attr('disabled', true);
+                $('#save-attendance').attr('disabled', true);
                 $('#save-attendance').text('Processing...');
                 // const multiple_id = $('input[name="multiple_id"]').val();
                 // const multiple_id_array = multiple_id.split(',').map(id => id.trim()).filter(id => id !== "");
                 const FormDate = {
                     employee_ids: $('#multiple_id').val(),
                     employee_id: $('#empolyee_id').val(),
-                    // branch: $('[name="branch"]').val(),
-                    // description: $('#description').val(),
-                    // designation: $('[name="designation"]').val(),
-                    // department: $('[name="department"]').val(),
-                    // section: $('[name="section"]').val(),
-                    date: $('#date').val(),
+                    form_date: $('#form_date').val(),
+                    to_date: $('#to_date').val(),
                     clock_in: $('#clock_in').val(),
                     clock_out: $('#clock_out').val(),
                 };
+
+                if (FormDate.form_date == '' || FormDate.to_date == '' || FormDate.clock_in == '' || FormDate.clock_out == '') {
+                    toastr.error('Please fill all the fields');
+                    $('#save-attendance').attr('disabled', false);
+                    $('#save-attendance').text('Save Attendance');
+                    return false;
+                }
                 $.ajax({
                     url: "/post-update-attendance",
                     type: 'POST',
                     data: FormDate,
                     success: function(data) {
                          // Notify for inserted records
-                        data.inserted_records.forEach(function(record) {
-                            toastr.success(`Date ${record.date}: Attendance Added Successfully for Employee Code ${record.employee_code}`);
-                        });
+                         toastr.success('Attendance Added Successfully.');
+                        // data.inserted_records.forEach(function(record) {
+                        //     toastr.success(`Date ${record.date}: Attendance Added Successfully for Employee Code ${record.employee_code}`);
+                        // });
 
                         // Notify for updated records
                         data.updated_records.forEach(function(record) {
@@ -287,8 +306,11 @@
                         branch_id: $(this).val(),
                     },
                     success: function(data) {
+                        $('#multiple_id').val('');
+                        $('#empolyee_id').val('');
                         $('#multiple_id').empty();
                         $('#empolyee_id').empty();
+                        GetData(null);
                         $('#multiple_id').append($('<option>', {
                             value: '',
                             text: 'Select Employee'
