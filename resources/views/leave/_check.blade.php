@@ -41,9 +41,9 @@
          <div class="col-sm-4">
              <select class="form-control select2me select2-offscreen" id="employeeID">
                  <option value="">Select Employee ID</option>
-                 @foreach ($employee as $e)
+                 {{-- @foreach ($employee as $e)
                      <option value="{{ $e->id }}">{{ $e->employee_id }}</option>
-                 @endforeach
+                 @endforeach --}}
              </select>
          </div>
      </div>

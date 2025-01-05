@@ -53,10 +53,10 @@
                                         <label>Employee ID <span class="text-danger">*</span></label>
                                         <select class="form-control select2m" id="employee_id">
                                             <option value="">Select Employee</option>
-                                            @foreach ($employee as $e)
+                                            {{-- @foreach ($employee as $e)
                                                 <option value="{{ $e->id }}">{{ $e->first_name }} -
                                                     {{ $e->employee_code }}</option>
-                                            @endforeach
+                                            @endforeach --}}
                                         </select>
                                     </div>
                                     <div class="form-group">
@@ -181,6 +181,11 @@
 <script>
     // Intisalize Select2
     $(document).ready(function() {
+            $('#branch').on('change', function() {
+                var branch_id = $(this).val();
+                $('#employee_id').val('').trigger('change');
+                HandleBranchWiseEmployees(branch_id, '#employee_id');
+            });
         getData();
     });
     const amount = $('#amountnew').on('input', function() {
@@ -198,6 +203,7 @@
     }
     // SaveDate Increment And Promotion
     $('#savedata').on('click', function() {
+
         $('#savedata').attr('disabled', true);
         $('#savedata').text('Please Wait...');
         const employee_id = $('#employee_id').val();

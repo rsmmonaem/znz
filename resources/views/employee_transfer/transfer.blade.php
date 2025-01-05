@@ -107,10 +107,10 @@
                                     <label>Employee ID</label>
                                     <select id="employeeId" class="form-control select2me select2-offscreen" name="femployee">
                                         <option value="">Select Employee ID</option>
-                                        @foreach ($employee as $e)
+                                        {{-- @foreach ($employee as $e)
                                             <option value="{{ $e->id }}">{{ $e->first_name }} -
                                                 {{ $e->employee_code }}</option>
-                                        @endforeach
+                                        @endforeach --}}
                                     </select>
                                 </div>
                                 <div class="form-group">
@@ -270,6 +270,11 @@
         })
         $(document).ready(function() {
             getTransferData();
+            $('select[name="fbranch"]').on('change', function() {
+                var branch_id = $(this).val();
+                $('#employeeId').val('').trigger('change');
+                HandleBranchWiseEmployees(branch_id, '#employeeId');
+            });
         });
 
         async function getTransferData() {
@@ -351,7 +356,7 @@
                 success: function(response) {
                     console.log(response);
                     $('#employeeName').val(response.name);
-                    $('select[name="fbranch"]').val(1).trigger('change');
+                    // $('select[name="fbranch"]').val(1).trigger('change');
                     $('#employeeDesignation').val(response.designation);
                     $('#employeeDesignationID').val(response.designation_id);
                 },
