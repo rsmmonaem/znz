@@ -11,7 +11,7 @@ use App\User;
 use Illuminate\Http\Request;
 use App\WHD;
 use Illuminate\Support\Facades\DB;
-
+ 
 class whdController extends Controller{
 
     public function index(){

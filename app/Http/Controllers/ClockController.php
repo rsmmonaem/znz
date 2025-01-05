@@ -25,7 +25,9 @@ use App\Leave;
 use App\OfficeShift;
 use App\Profile;
 use App\Section;
+use App\SpacialHoliday;
 use App\UserShift;
+use App\WHD;
 use Carbon\Carbon;
 use Validator;
 
@@ -1691,6 +1693,9 @@ Class ClockController extends Controller{
 			case '7': 
 				$status_to_filter = 'HLD';
 				break;
+			case '8': 
+				$status_to_filter = 'SPHD';
+				break;
 			default: // All statuses
 				$status_to_filter = null;
 				break;
@@ -1742,7 +1747,12 @@ Class ClockController extends Controller{
 	{
 	    $startDate = Carbon::parse($startDat);
 		$endDate = Carbon::parse($endDat);
-		$weeklyHolidays = [Carbon::FRIDAY];
+		$weeklyHolidays = WHD::whereBetween('date', [$startDate, $endDate])
+		->where('user_id', $userId)
+		->pluck('date')
+		->toArray();
+
+		// return $weeklyHolidays;
 		// Fetch user profile details
 		$Profiles = Profile::where('user_id', '=', $userId)
 			->LeftJoin('users', 'profile.user_id', '=', 'users.id')
@@ -1811,10 +1821,15 @@ Class ClockController extends Controller{
 			}
 		}
 
+		$spacialHolidays = SpacialHoliday::whereBetween('date', [$startDate, $endDate])
+		->where('user_id', $userId)
+		->pluck('date') // Extract only the date column
+		->toArray();
 		// Map the data to the calendar range
-		$result = $dateRange->map(function ($date) use ($attendances, $leaveDays, $holidays, $weeklyHolidays, $shiftTime, $Profiles) {
+		$result = $dateRange->map(function ($date) use ($attendances, $leaveDays, $holidays, $weeklyHolidays, $shiftTime, $Profiles, $spacialHolidays) {
 			$attendance = $attendances->get($date);
 			$dayOfWeek = Carbon::parse($date)->dayOfWeek;
+			// return $dayOfWeek;
 			$status = 'Absent'; // Default status
 
 			$earliestClockIn = 'N/A';
@@ -1827,8 +1842,10 @@ Class ClockController extends Controller{
 			}elseif (in_array($date, $holidays)) {
 				$status = 'HLD';
 			} 
-			elseif (in_array($dayOfWeek, $weeklyHolidays)) {
+			elseif (in_array($date, $weeklyHolidays)) {
 				$status = $attendance ? 'OT' : 'WHD';
+			}elseif (in_array($date, $spacialHolidays)) {
+				$status = $attendance ? 'OT' : 'SPHD';
 			} elseif ($attendance && $attendance->count() > 0) {
 				// Get earliest clock-in and latest clock-out
 				$earliestClockIn = Carbon::parse($attendance->min('clock_in'))->format('H:i:s');
@@ -1974,6 +1991,9 @@ Class ClockController extends Controller{
 				break;
 			case '7':
 				$status_to_filter = 'HLD';
+				break;
+			case '8':
+				$status_to_filter = 'SPHD';
 				break;
 			default: // All statuses
 				$status_to_filter = null;

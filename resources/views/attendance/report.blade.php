@@ -157,6 +157,8 @@
                                         Leave</label>
                                     <label class="radio-inline"><input type="radio" name="status" value="7">
                                         Holiday</label>
+                                    <label class="radio-inline"><input type="radio" name="status" value="8">
+                                        SPHD</label>
                                    {{-- <label class="radio-inline"><input type="radio" name="status" value="8">
                                         Overtime</label> --}}
                                 </div>
@@ -316,11 +318,14 @@
                                         content += `
                                         
                                        <tr class="totals-row">
-    <td colspan="3" style="text-align:center;">
+    <td colspan="2" style="text-align:center;">
         Total Present = ${response.filtered_totals.find(status => status.status === "P")?.count || 0}
     </td>
-    <td colspan="3" style="text-align:center;">
+    <td colspan="2" style="text-align:center;">
         Total Absent = ${response.filtered_totals.find(status => status.status === "Absent")?.count || 0}
+    </td>
+    <td colspan="2" style="text-align:center;">
+        Total SPHD = ${response.filtered_totals.find(status => status.status === "SPHD")?.count || 0}
     </td>
     <td colspan="2" style="text-align:center;">
         Total WHD = ${response.filtered_totals.find(status => status.status === "WHD")?.count || 0}
