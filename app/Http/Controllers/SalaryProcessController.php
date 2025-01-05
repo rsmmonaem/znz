@@ -10,6 +10,7 @@ use App\Section;
 use App\User;
 use App\Designation;
 use App\UserShift;
+use App\WHD;
 use Carbon\Carbon;
 
 class SalaryProcessController extends Controller
@@ -161,18 +162,18 @@ class SalaryProcessController extends Controller
         $TotalDays = $startDate->diffInDays($endDate);
 
         // Define an array of weekly holidays
-        $weeklyHolidays = [Carbon::FRIDAY];
+        // $weeklyHolidays = [Carbon::FRIDAY];
 
         // Initialize an array to store the Friday dates
-        $fridays = [];
+        $fridays = WHD::where('user_id', $employeeId)->whereBetween('date', [$formDate, $toDate])->pluck('date')->toArray();
         // Loop through the date range
-        while ($startDate <= $endDate) {
-            if (in_array($startDate->dayOfWeek, $weeklyHolidays)) {
-                $fridays[] = $startDate->format('Y-m-d');  // Store the Friday date in the array
-            }
-            // Move to the next day
-            $startDate->addDay();
-        }
+        // while ($startDate <= $endDate) {
+        //     if (in_array($startDate->dayOfWeek, $weeklyHolidays)) {
+        //         $fridays[] = $startDate->format('Y-m-d');  // Store the Friday date in the array
+        //     }
+        //     // Move to the next day
+        //     $startDate->addDay();
+        // }
         // Total Fridays
         $totalFridays = count($fridays);
         // Sarary Slab
