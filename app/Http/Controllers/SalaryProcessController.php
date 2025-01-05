@@ -63,6 +63,10 @@ class SalaryProcessController extends Controller
             $user_ids = $data->pluck('users.id');
             $processedEmployeeIds = [];
 
+            // $startDate = Carbon::parse($request->formDate);
+            // $endDate = Carbon::parse($request->toDate);
+            // $TotalDays = $startDate->diffInDays($endDate) + 1;
+            // return $TotalDays;
             // Handle salary processing for each user
             foreach ($user_ids as $user_id) {
                 // Check if salary already exists for the employee in the given date range
@@ -159,7 +163,7 @@ class SalaryProcessController extends Controller
         // Total Days Of Month
         $startDate = Carbon::parse($formDate);
         $endDate = Carbon::parse($toDate); 
-        $TotalDays = $startDate->diffInDays($endDate);
+        $TotalDays = $startDate->diffInDays($endDate) + 1;
 
         // Define an array of weekly holidays
         // $weeklyHolidays = [Carbon::FRIDAY];
@@ -824,7 +828,7 @@ class SalaryProcessController extends Controller
                 'employee_salary_details.arrear_amount',
                 'bank_accounts.account_number', // Only the latest bank account
                 'employee_salary_details.remarks',
-                 DB::raw('DATEDIFF(employee_salary_details.to_date, employee_salary_details.form_date) as date_difference'), // Calculate date difference
+                 DB::raw('DATEDIFF(employee_salary_details.to_date, employee_salary_details.form_date) + 1 as date_difference'), // Calculate date difference
                 'employee_salary_details.total_absents_fee',
                 'employee_salary_details.created_at',
                 'employee_salary_details.ot_amount'
