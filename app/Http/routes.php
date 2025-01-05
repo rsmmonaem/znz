@@ -166,7 +166,9 @@ Route::group(['middleware' => ['auth','license','account_valid']], function () {
 
 	Route::get('employee-create', 'EmpoloyeeCreate@index');
 	Route::post('employee-create', 'EmpoloyeeCreate@store');
-    
+
+	Route::get('employee-blood-group', 'EmpoloyeeCreate@bloodGroup');
+    Route::post('employee-blood-group', 'EmpoloyeeCreate@bloodReport');
 	Route::get('employee-transfer/report','EmployeeController@report');
 	Route::post('reportData', 'EmployeeController@reportData');
 	// Emplyee Education Added

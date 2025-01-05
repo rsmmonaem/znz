@@ -1,6 +1,7 @@
 <select class="form-control" id="report-select" onchange="handleSelectChange()">
     <option value="">Select Option</option>
     <option value="{{ url('employee/report') }}" {{ Request::is('employee/report') ? 'selected' : '' }}>Employee Report</option>
+    <option value="{{ url('employee-blood-group') }}" {{ Request::is('employee-blood-group') ? 'selected' : '' }}>Employee Blood Group</option>
     <option value="{{ url('employee-transfer/report') }}" {{ Request::is('employee-transfer/report') ? 'selected' : '' }}>Employee Transfer Report</option>
     <option value="{{ url('attendance-report') }}" {{ Request::is('attendance-report') ? 'selected' : '' }}>Monthly Attendance Report</option>
     <option value="{{ url('daily-attendance-report') }}" {{ Request::is('daily-attendance-report') ? 'selected' : '' }}>Daily Attendance Report</option>
