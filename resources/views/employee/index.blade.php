@@ -154,10 +154,10 @@
                                         <label for="employeeId">Employee ID</label>
                                         <select class="form-control" id="employeeId">
                                             <option value="">Select</option>
-                                            @foreach ($employee as $e)
+                                            {{-- @foreach ($employee as $e)
                                                 <option value="{{ $e->id }}">{{ $e->first_name }} -
                                                     {{ $e->employee_code }}</option>
-                                            @endforeach
+                                            @endforeach --}}
                                         </select>
                                     </div>
                                 </div>
@@ -271,6 +271,11 @@
 	@section('javascript')
 	<script type="text/javascript">
 		$(document).ready(function() {
+			 $('#branch').on('change', function() {
+				var branch_id = $(this).val();
+				$('#femployee').val('').trigger('change');
+				HandleBranchWiseEmployees(branch_id, '#femployee');
+			});
 			$('#submit').on('click', function(){
 				const table_container = $('#table-container');
 				$('#submit').attr("disabled", true);

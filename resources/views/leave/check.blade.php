@@ -77,6 +77,11 @@
 @section('javascript')
     <script type="text/javascript">
         $(document).ready(function() {
+             $('#branch').on('change', function() {
+                var branch_id = $(this).val();
+                $('#employeeID').val('').trigger('change');
+                HandleBranchWiseEmployees(branch_id, '#employeeID');
+            });
             $('#employeeID').change(function() {
                 var employee_id = $(this).val();
                 // Start Employee Data

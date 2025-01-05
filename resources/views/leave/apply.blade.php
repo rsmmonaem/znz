@@ -143,9 +143,9 @@ document.getElementById('toDate').addEventListener('change', calculateDateDiffer
                             <div class="col-sm-4">
                                 <select class="form-control select2me select2-offscreen" id="recommendID">
                                     <option value="">Select ID</option>
-                                    @foreach ($employee as $e)
+                                    {{-- @foreach ($employee as $e)
                                         <option value="{{ $e->id }}">{{ $e->employee_id }}</option>
-                                    @endforeach
+                                    @endforeach --}}
                                 </select>
                             </div>
                         </div>
@@ -186,6 +186,12 @@ document.getElementById('toDate').addEventListener('change', calculateDateDiffer
 
 @section('javascript')
   <script type="text/javascript">
+     $('#recommendBranch').on('change', function() {
+        var branch_id = $(this).val();
+        $('#recommendID').val('').trigger('change');
+        HandleBranchWiseEmployees(branch_id, '#recommendID');
+    });
+    
     const employeeName = $('#employeeName').val();
     const employeeDesignation = $('#employeeDesignation').val();
     $('#employeeID').change(function() {
