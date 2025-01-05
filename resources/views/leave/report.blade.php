@@ -93,9 +93,9 @@
                                             placeholder="Employee ID"> --}}
                                         <select class="form-control" name="employeeID" id="employeeID">
                                             <option value="">Select Employee ID</option>
-                                            @foreach ($employee as $e)
+                                            {{-- @foreach ($employee as $e)
                                                 <option value="{{ $e->employee_code }}">{{ $e->employee_code }} - {{ $e->first_name }}</option>
-                                            @endforeach
+                                            @endforeach --}}
                                         </select>
                                     </div>
                                 </div>
@@ -231,6 +231,12 @@
     <script>
         $(document).ready(function() {
             $('select').select2();
+            
+              $('#branch').on('change', function() {
+            var branch_id = $(this).val();
+            $('#employeeID').val('').trigger('change');
+            HandleBranchWiseEmployees(branch_id, '#employeeID', true);
+        });
             // get form data
 $('#getData').on('click', function(e) {
     e.preventDefault();

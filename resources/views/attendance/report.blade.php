@@ -98,9 +98,9 @@
                                 {{-- <input type="text" class="form-control" name="employeeId" id="employeeId" placeholder="ID1,ID2,ID3"> --}}
                                 <select class="form-control" name="employeeId" id="employeeId" multiple>
                                     <option value="">Select Employee</option>
-                                    @foreach ($employee as $e)
+                                    {{-- @foreach ($employee as $e)
                                         <option value="{{ $e->employee_code }}">{{ $e->first_name }} - {{ $e->employee_code }}</option>
-                                    @endforeach
+                                    @endforeach --}}
                                 </select>
                             </div>
                         </div>
@@ -179,6 +179,11 @@
 @section('javascript')
     <script>
         $(document).ready(function() {
+            $('#branch').on('change', function() {
+                var branch_id = $(this).val();
+                $('#employeeId').val('').trigger('change');
+                HandleBranchWiseEmployees(branch_id, '#employeeId', true);
+            });
             $('#getData').on('click', function() {
                 $('#getData').prop('disabled', true);
                 $('#getData').text('Please Wait...');
