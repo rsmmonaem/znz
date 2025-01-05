@@ -120,9 +120,9 @@
                                         {{-- <input type="text" name="employee_id" class="form-control"> --}}
                                         <select class="form-control" name="employee_id" id="employee_id">
                                             <option value="">Select</option>
-                                            @foreach ($employee as $e)
+                                            {{-- @foreach ($employee as $e)
                                                 <option value="{{ $e->employee_code }}">{{ $e->first_name }} - {{ $e->employee_code }}</option>
-                                            @endforeach
+                                            @endforeach --}}
                                         </select>
                                     </div>
                                 </div>
@@ -135,9 +135,9 @@
 
                                         <select class="form-control" name="multiple_id" id="multiple_id" multiple>
                                             <option value="">Select</option>
-                                            @foreach ($employee as $e)
+                                            {{-- @foreach ($employee as $e)
                                                 <option value="{{ $e->employee_code }}">{{ $e->first_name }} - {{ $e->employee_code }}</option>
-                                            @endforeach
+                                            @endforeach --}}
                                         </select>
                                     </div>
                                 </div>
@@ -161,6 +161,15 @@
 
 @section('javascript')
     <script>
+        $('select[name="branch"]').on('change', function() {
+            var branch_id = $(this).val();
+            $('#employee_id').val('').trigger('change');
+            $('#multiple_id').val('').trigger('change');
+            HandleBranchWiseEmployees(branch_id, '#employee_id', true);
+            HandleBranchWiseEmployees(branch_id, '#multiple_id', true);
+            $('#multiple_id').val('').trigger('change');
+        });
+
         document.addEventListener('DOMContentLoaded', function() {
             // Print Section
             document.getElementById('print').addEventListener('click', function() {
