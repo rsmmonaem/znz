@@ -155,4 +155,80 @@ class EmpoloyeeCreate extends Controller
     private function MakeProfile($request , $user_id){
 
     }
+
+    public function bloodGroup(Request $request) {
+        $group = DB::table('com_group')->get();
+        $brach = Branch::all();
+        $departments = Department::all();
+        $section = Section::all();
+        $designation = Designation::all();
+        $category = DB::table('category')->get();
+        $grade = Grade::all();
+       return view('employee.blood_employee_report', compact('group', 'brach', 'departments', 'section', 'designation', 'category', 'grade'));
+    }
+
+    public function bloodReport(Request $request) {
+        if ($request->ajax()) {
+            $query = Profile::leftJoin('users', 'profile.user_id', '=', 'users.id')
+            ->leftJoin('designations', 'users.designation_id', '=', 'designations.id')
+            ->leftJoin('departments', 'designations.department_id', '=', 'departments.id')
+            ->leftJoin('branchs', 'profile.branch_id', '=', 'branchs.id')
+            ->leftJoin('sections', 'profile.section_id', '=', 'sections.id')
+            ->leftJoin('grades', 'profile.grade_id', '=', 'grades.id')
+            ->select(
+                'users.id',
+                'profile.employee_code',
+                'users.first_name',
+                'designations.name as designation_name',
+                'departments.name as department_name',
+                'profile.category',
+                'profile.date_of_joining',
+                'profile.date_of_birth',
+                'profile.blood_group',
+                'profile.job_nature',
+                'profile.contact_number',
+                'profile.gender',
+                'branchs.name as branch_name',
+                'sections.name as section_name',
+                'grades.name as grade_name'
+            );
+            if ($request->branch != '') {
+                $query->where('profile.branch_id', $request->branch);
+            }
+            if ($request->section != '') {
+                $query->where('profile.section_id', $request->section);
+            }
+            if ($request->grade != '') {
+                $query->where('profile.grade_id', $request->grade);
+            }
+            if ($request->gender != '') {
+                $query->where('profile.gender', $request->gender);
+            }
+
+            if ($request->category != '') {
+                $query->where('profile.category', $request->category);
+            }
+
+            if ($request->employee_id != '') {
+                $query->where('profile.employee_code', '=', $request->employee_id);
+            }
+
+            if (
+                $request->designation != ''
+            ) {
+                $query->where('users.designation_id', $request->designation);
+            }
+
+            if ($request->department != '') {
+                $query->where('designations.department_id', $request->department);
+            }
+
+            if ($request->blood_group != '') {
+                $query->where('profile.blood_group', $request->blood_group);
+            }
+            $profile = $query->get();
+
+            return response()->json($profile);
+        }
+    }
 }
