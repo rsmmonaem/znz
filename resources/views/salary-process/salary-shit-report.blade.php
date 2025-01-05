@@ -64,10 +64,10 @@
                                         <label for="employeeId">Employee ID</label>
                                         <select class="form-control" id="employeeId">
                                             <option value="">Select</option>
-                                            @foreach ($employee as $e)
+                                            {{-- @foreach ($employee as $e)
                                                 <option value="{{ $e->id }}">{{ $e->first_name }} -
                                                     {{ $e->employee_code }}</option>
-                                            @endforeach
+                                            @endforeach --}}
                                         </select>
                                     </div>
                                 </div>
@@ -161,6 +161,11 @@
 @section('javascript')
     <script>
             $(document).ready(function() {
+                 $('#branch').on('change', function() {
+                    var branch_id = $(this).val();
+                    $('#employeeId').val('').trigger('change');
+                    HandleBranchWiseEmployees(branch_id, '#employeeId');
+                });
                 const table_container = $('#table-container');
                 // Fetch data via AJAX
                 $('#submit').on('click', function(e) {
