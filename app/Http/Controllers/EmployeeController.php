@@ -865,6 +865,7 @@ class EmployeeController extends Controller{
         } else {
             $newCode = 1;
         }
-        return response()->json(['employee_code' => $newCode]);
+        $newCodeFormatted = str_pad($newCode, 3, '0', STR_PAD_LEFT);
+        return response()->json(['employee_code' => $newCodeFormatted]);
     }
 }
