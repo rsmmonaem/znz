@@ -9,6 +9,37 @@
 	
 	@section('content')
 		<div class="row">
+			<div class="col-md-12">
+				<div class="box-info">
+					<div class="container">
+						<h2 class="text-center">Employee Permission Settings</h2>
+					</div>
+					<div class="clear"></div>
+					<div class="form">
+						<div class="form-group">
+							<select name="employee_id" id="employee_id" class="form-control">
+								<option value="">Select Employee</option>
+								@foreach($employees as $employee)
+								<option value="{{ $employee->id }}">{{ $employee->name.'-'.$employee->employee_id }}</option>
+								@endforeach
+							</select>
+						</div>
+						<div class="form-group">
+							<select name="role_id" id="role_id" class="form-control">
+								<option value="">Select Role</option>
+								@foreach($roles as $role)
+								<option value="{{ $role->id }}">{{ $role->name }}</option>
+								@endforeach
+							</select>
+						</div>
+						<div class="form-group">
+							<button class="btn btn-primary" id="save_permission">Save</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="row">
 			<div class="col-sm-12">
 				<div class="box-info full">
 					<h2><strong>{!! trans('messages.manage'). '</strong> '.trans('messages.permission') !!}</h2>
@@ -49,3 +80,28 @@
 			</div>
 		</div>
 	@stop
+@section('javascript')
+	<script type="text/javascript">
+		$(document).ready(function() {
+			$('#save_permission').on('click',function(e){
+				const FormData = {
+					employee_id: $('#employee_id').val(),
+					role_id: $('#role_id').val()
+				}
+				e.preventDefault();
+				$.ajax({
+					url: '/save-user-role',
+					data: FormData,
+					type: 'POST',
+					success: function(data){
+						if(data.status == 'success'){
+							toastr.success(data.message);
+						}else{
+							toastr.error(data.message);
+						}
+					}	
+				});
+			});
+		});
+	</script>
+@stop

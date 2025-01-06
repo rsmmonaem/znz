@@ -8,6 +8,9 @@ use Entrust;
 use App\Classes\Helper;
 use Illuminate\Http\Request;
 use App\Http\Requests\ConfigurationTimeRequest;
+use App\Role;
+use App\User;
+use Illuminate\Support\Facades\DB as FacadesDB;
 use Validator;
 use Swift_SmtpTransport;
 use Swift_TransportException;
@@ -38,7 +41,10 @@ Class ConfigController extends Controller{
         	->pluck('detail','id');
         $category = null;
 
-		return view('configuration.permission',compact('permissions','permission_role','category'));
+		$employees = User::leftJoin('profile', 'users.id', '=', 'profile.user_id')->select('users.id', 'users.first_name as name', 'profile.employee_code as employee_id')->get();
+		$roles = Role::all();
+
+		return view('configuration.permission',compact('permissions','permission_role','category', 'employees', 'roles'));
 	}
 
 	public function api(Request $request){
@@ -379,5 +385,16 @@ Class ConfigController extends Controller{
 	    }
         return redirect('/dashboard');
 	}
+
+	public function permissionSave(Request $request){
+		$data = $request->all();
+		// return $data;
+		DB::table('role_user')->insert([
+			'user_id' => $data['employee_id'],
+			'role_id' => $data['role_id']
+		]);
+		return response()->json(['message' => 'Permission Updated', 'status' => 'success'], 200, array('Access-Controll-Allow-Origin' => '*'));
+	}
+
 }
 ?>
