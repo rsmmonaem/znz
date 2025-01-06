@@ -115,12 +115,11 @@ Class BranchController extends Controller{
 
         if($request->has('ajax_submit')){
         	// $new_data = array('value' => $designation->full_designation,'id' => $designation->id,'field' => 'top_designation_id');
-            $response = ['message' => trans('messages.designation').' '.trans('messages.added'), 'status' => 'success','new_data' => $data]; 
+            $response = ['message' => 'Branch '.' '.trans('messages.added'), 'status' => 'success','new_data' => $data]; 
 	        // if(config('config.application_setup_info') && defaultRole()){
 	        // 	$setup_data = Helper::setupInfo();
 	        // 	$response['setup_data'] = $setup_data;
 	        // }
-          
             return response()->json($response, 200, array('Access-Controll-Allow-Origin' => '*'));
         }
 		return redirect()->back()->withSuccess(trans('messages.designation').' '.trans('messages.added'));		
