@@ -512,6 +512,7 @@
                             toastr.success('User, Profile, and Bank Account created successfully!');
                             $('#save-employee').attr('disabled', false);
                             $('#save-employee').text('Save');
+                            clearFormFields();
                             // location.reload();
                         } else {
                             $('#save-employee').attr('disabled', false);
@@ -536,6 +537,14 @@
                 $('#save-employee').attr('disabled', false);
                 $('#save-employee').text('Save');
                 return toastr.error(data);
+            }
+
+            function clearFormFields() {
+                $('input[type="text"], input[type="email"], input[type="number"], input[type="date"], select').val('');
+                $('textarea').val('');
+                $('select').val('').trigger('change');
+                $('input[type="file"]').val(null);
+                $('input[type="checkbox"], input[type="radio"]').prop('checked', false);
             }
         });
     </script>
