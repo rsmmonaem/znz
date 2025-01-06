@@ -80,6 +80,7 @@ class SalaryProcessController extends Controller
                 //     continue; // Skip if already processed
                 // }
 
+
                 // Handle special case for branch ID 7
                 if ($request->branch == env('BRANCH_ID')) {
                     // Call the SalaryProcess method to process salary for each user
@@ -183,6 +184,7 @@ class SalaryProcessController extends Controller
         // Sarary Slab
         $salaryslab = DB::table('salary_slab')
         ->where('user_id', $employeeId)
+        ->where('effactive_date', '<', $toDate)
         ->select('gross')
         ->latest('id')
         ->first();
@@ -211,33 +213,25 @@ class SalaryProcessController extends Controller
         $deductionsData = $deductionsData->unique('salary_type_id');
 
         $advanceSalary = DB::table('salary_advance')
-        ->leftjoin('salary_advance_months', 'salary_advance.id', '=', 'salary_advance_months.salary_advance_id')
+        ->leftJoin('salary_advance_months', 'salary_advance.id', '=', 'salary_advance_months.salary_advance_id')
         ->where('employeeId', $employeeId)
-        ->whereBetween('salary_advance.session', [
-            date('Y', strtotime($formDate)),
-            date('Y', strtotime($toDate))
-        ])
-        ->whereBetween('salary_advance_months.month', [
-            date('m', strtotime($formDate)),
-            date('m', strtotime($toDate))
-        ])
-        ->select('salary_advance.grossValue', 'salary_advance.grossOption')
-        ->first();
+        ->where('salary_advance.effectiveDate', '<', $formDate)
+        ->select('salary_advance.grossValue', 'salary_advance.grossOption', 'salary_advance_months.month', 'salary_advance_months.amount')
+        ->get();
+        $monthNumber = (int)date('m', strtotime($toDate));
+        $advanceAmount = 0;
+        foreach ($advanceSalary as $record) {
+            if ($record->month === $monthNumber) {
+                $advanceAmount = $record->amount;
+                break; 
+            }
+        }
 
         $totalWorkedDays = $getTotalPresent + $holidays + $leave + $totalFridays + $spacial_holidays;
         $totalAbsents = $TotalDays - $totalWorkedDays;
         $perdaysAmount =  $salaryslab ? $salaryslab->gross / $TotalDays : 0;
         $GrossAmountSalaryPerDays = $perdaysAmount * $totalWorkedDays;
         $TotalDiductionAmount = $perdaysAmount * $totalAbsents;
-
-        $advanceAmount = '';
-        if ($advanceSalary) {
-            if ($advanceSalary->grossOption == 'percentage') {
-                $advanceAmount = $GrossAmountSalaryPerDays * ($advanceSalary->grossValue / 100);
-            } else {
-                $advanceAmount = $advanceSalary->grossValue;
-            }
-        }
 
         $GrossSalaryAmountAfterAdvance = $GrossAmountSalaryPerDays - $advanceAmount;
         // return $deductionsData->where('salary_type_id', 5);

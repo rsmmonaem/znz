@@ -43,7 +43,7 @@
                                     <input type="text" class="form-control" id="designation" value="" disabled />
                                 </div>
                                 <div class="form-group">
-                                    <label for="employeeId">Employee ID</label>
+                                    <label for="employeeId">Employee ID <span class="text-danger">*</span></label>
                                     <select class="form-control select2me" id="employeeId">
                                         <option value="">Select Employee ID</option>
                                         @foreach ($employee as $e)
@@ -58,15 +58,18 @@
                               </div>
 
                                 <div class="form-group">
-                                    <label for="month">Month</label>
-                                    <select class="form-control select2me" id="month" multiple>
-                                        <option value="">Select</option>
-                                        <!-- Add month options dynamically -->
-                                        @for ($month = 1; $month <= 12; $month++)
-                                            <option value="{{ $month }}">{{ date('F', mktime(0, 0, 0, $month, 1)) }}
-                                            </option>
-                                        @endfor
-                                    </select>
+                                    <label for="month">Month <span class="text-danger">*</span></label>
+                                    <div class="form-group">
+                                        <label for="months">Select Months and Amounts:</label>
+                                        <div class="row">
+                                            @for ($month = 1; $month <= 12; $month++)
+                                                <div class="col-md-4">
+                                                    <label>{{ date('F', mktime(0, 0, 0, $month, 1)) }}</label>
+                                                    <input type="number" name="months[{{ $month }}]" class="form-control" placeholder="Enter amount" min="0">
+                                                </div>
+                                            @endfor
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -79,11 +82,11 @@
                                     <input type="date" class="form-control" id="date" value="{{ date('Y-m-d') }}" />
                                 </div>
                                 <div class="form-group">
-                                    <label for="effectiveDate">Effective Date</label>
+                                    <label for="effectiveDate">Effective Date <span class="text-danger">*</span></label>
                                     <input type="date" class="form-control" id="effectiveDate" />
                                 </div>
                                 <div class="form-group radio-group">
-                                    <label>Gross</label>
+                                    <label>Gross <span class="text-danger">*</span></label>
                                     <div>
                                         <label><input type="radio" name="grossOption" value="fixed" />
                                             Fixed</label>
@@ -133,17 +136,47 @@
     <script>
         $(document).ready(function() {
             GetData();
+            function Validate(data) {
+                $('#saveData').attr('disabled', false).text('Save');
+                return toastr.error(data);
+            }
             $('#saveData').click(function() {
                 $('#saveData').attr('disabled', true).text('Saving...');
+                let monthsData = {};
+                $('input[name^="months"]').each(function() {
+                    let month = $(this).attr('name').replace('months[', '').replace(']', ''); 
+                    let amount = $(this).val(); 
+                    if (amount) {
+                        monthsData[month] = amount; 
+                    }
+                });
                 var formData = {
                     'employeeId': $('#employeeId').val(),
                     'date': $('#date').val(),
                     'effectiveDate': $('#effectiveDate').val(),
-                    'month': $('#month').val(),
+                    'months': monthsData,
                     'grossOption': $('input[name="grossOption"]:checked').val(),
                     'grossValue': $('input[name="grossValue"]').val(),
                     'remarks': $('#remarks').val(),
+                    
                 };
+
+                if(formData.employeeId === '') {
+                    return Validate('Please select employee');
+                }
+                if(formData.date === '') {
+                    return Validate('Please select date');
+                }
+                if(formData.effectiveDate === '') {
+                    return Validate('Please select effective date');
+                }
+                // if(formData.grossOption != 'checked') {
+                //     return Validate('Please select gross option');
+                // }
+                if(formData.grossValue === '') {
+                    return Validate('Please enter gross value');
+                }
+
                 $.ajax({
                     url: '/salary-advance-create',
                     type: 'POST',

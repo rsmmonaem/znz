@@ -84,14 +84,21 @@ class SalaryAdvanceController extends Controller
                 'grossValue' => $request->grossValue,
             ]);
 
-            $months =  $request->month;
-            // return $months;
-            foreach ($months as $month) {
-                DB::table('salary_advance_months')->insert([
-                    'salary_advance_id' => $salary_advance_id,
-                    'month' => $month
-                ]);
+            //    return $request->all();
+            $months = $request->months;
+            if (!is_array($months)) {
+                throw new \Exception('Invalid months data. Expected an array.');
             }
+            foreach ($months as $month => $amount) {
+                if ($amount > 0) {
+                    DB::table('salary_advance_months')->insert([
+                        'salary_advance_id' => $salary_advance_id,
+                        'month' => $month,
+                        'amount' => $amount
+                    ]);
+                }
+            }
+
             DB::commit();
             return response()->json(['success', 'Salary Advance added successfully.']);
         }catch(Exception $e) {
