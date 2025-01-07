@@ -356,6 +356,9 @@
 
                 </div>
 
+                @php 
+                  $division = DB::table('divisions')->get();
+                @endphp
                 @include('employee.Create_page.PresentAdd')
 
                 @include('employee.Create_page.PermanentAdd')
@@ -378,6 +381,36 @@
 
 @section('javascript')
     <script>
+           getDistricts('#division', '#district');
+           getDistricts('#pres_division', '#pres_district');
+            // Division Change
+           function getDistricts(divisionElement, districtElement) {
+            $(divisionElement).change(function() {
+                var division_id = $(this).find('option:selected').data('id'); // Get selected division id
+
+                if (division_id) {
+                    // Make an AJAX request to get the districts
+                    $.ajax({
+                        url: '/get-districts/' + division_id,
+                        type: 'GET',
+                        dataType: 'json',
+                        success: function(data) {
+                            // Empty the district dropdown and add a default option
+                            $(districtElement).empty().append('<option value="">Select District</option>');
+                            
+                            // Loop through the returned districts and append them to the dropdown
+                            $.each(data, function(key, value) {
+                                $(districtElement).append('<option value="' + value.id + '">' + value.name + '</option>');
+                            });
+                        }
+                    });
+                } else {
+                    // If no division is selected, reset the district dropdown
+                    $(districtElement).empty().append('<option value="">Select District</option>');
+                }
+            });
+        }
+
         $(document).on('click', '.panel-heading', function() {
             // Toggle the plus/minus icon
             var icon = $(this).find('.fa');

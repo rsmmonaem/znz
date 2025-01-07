@@ -24,8 +24,14 @@
                  <div class="col-sm-4">
                      <div class="form-group flex-form-group">
                          <label for="division">Division</label>
-                         <input class="form-control" placeholder="Division" name="division" type="text"
-                             value="" id="division">
+                         {{-- <input class="form-control" placeholder="Division" name="division" type="text"
+                             value="" id="division"> --}}
+                        <select class="form-control" name="division" id="division">
+                            <option value="">Select Division</option>
+                            @foreach ($division as $division)
+                                <option data-id="{{ $division->id }}" value="{{ $division->name }}">{{ $division->name }}</option>
+                            @endforeach
+                        </select>
                      </div>
                  </div>
                  <div class="col-sm-4">
@@ -38,8 +44,11 @@
                  <div class="col-sm-4">
                      <div class="form-group flex-form-group">
                          <label for="district">District</label>
-                         <input class="form-control" placeholder="District" name="district" type="text"
-                             value="" id="district">
+                         {{-- <input class="form-control" placeholder="District" name="district" type="text"
+                             value="" id="district"> --}}
+                        <select class="form-control" name="district" id="district">
+                            <option value="">Select District</option>
+                        </select>
                      </div>
                  </div>
                  <div class="col-sm-4">

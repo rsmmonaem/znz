@@ -2,6 +2,10 @@
 
 use Illuminate\Routing\Router;
 
+Route::get('/get-districts/{id}', function ($id) {
+	$districts = DB::table('districts')->where('division_id', $id)->get();
+	return response()->json($districts);
+});
 Route::get('/', 'Auth\AuthController@getLogin');
 Route::get('/whats-new',function(){
 	return view('whats_new');
