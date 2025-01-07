@@ -210,7 +210,7 @@
                                             title="Designation" tabindex="-1">
                                             <option value="">Select One</option>
                                             @foreach ($designations as $d)
-                                                <option value="{{ $d->id }}">{{ $d->name }}</option>
+                                                <option value="{{ $d->id }}">{{ $d->name }} ({{ $d->department_name }})</option>
                                             @endforeach
                                         </select>
                                     </div>
