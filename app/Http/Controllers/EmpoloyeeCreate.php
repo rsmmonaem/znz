@@ -22,7 +22,9 @@ class EmpoloyeeCreate extends Controller
 {
     public function index()
     {
-        $designations = Designation::all();
+        $designations = Designation::LeftJoin('departments', 'designations.department_id', '=', 'departments.id')
+        ->select('designations.*', 'departments.name as department_name')
+        ->get();
         $departments = Department::all();
         $branches = Branch::all();
         $sections = Section::all();
