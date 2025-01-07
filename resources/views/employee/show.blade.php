@@ -310,6 +310,12 @@
 											{!! Form::input('text','tin',isset($employee->Profile->tin) ? $employee->Profile->tin : '',['class'=>'form-control','placeholder'=>trans('messages.tin')])!!}
 										</div>
 									</div>
+									@php 
+									   $division = DB::table('divisions')->get();
+									   $division2 = DB::table('divisions')->get();
+									   $district = DB::table('districts')->get();
+									   $district2 = DB::table('districts')->get();
+								    @endphp
 									{{-- Present Address --}}
 									<div class="row">
 										<h2>{!! trans('messages.present_address') !!}</h2>
@@ -327,13 +333,21 @@
 												{!! Form::input('text','pres_road',isset($employee->Profile->pres_road) ? $employee->Profile->pres_road : '',['class'=>'form-control','placeholder'=>trans('messages.road')])!!}
 											</div>
 										</div>
+										
 										{{-- Divition --}}
 										<div class="col-sm-4">
 											<div class="form-group flex-form-group">
 											    {!! Form::label('pres_division',trans('messages.division'))!!}
-												{!! Form::input('text','pres_division',isset($employee->Profile->pres_division) ? $employee->Profile->pres_division : '',['class'=>'form-control','placeholder'=>trans('messages.division')])!!}
+												{{-- {!! Form::input('text','pres_division',isset($employee->Profile->pres_division) ? $employee->Profile->pres_division : '',['class'=>'form-control','placeholder'=>trans('messages.division')])!!} --}}
+											    <select class="form-control input-xlarge select2me" name="pres_division" id="pres_division">
+													<option value="">Select One</option>
+													 @foreach ($division as $division)
+														<option data-id="{{ $division->id }}" value="{{ $division->name }}" {{ $employee->Profile->pres_division == $division->name ? 'selected' : '' }}>{{ $division->name }}</option>
+													@endforeach
+												</select>
 											</div>
 										</div>
+										
 										{{-- Post --}}
 										<div class="col-sm-4">
 											<div class="form-group flex-form-group">
@@ -345,7 +359,13 @@
 										<div class="col-sm-4">
 											<div class="form-group flex-form-group">
 											    {!! Form::label('pres_district',trans('messages.district'))!!}
-												{!! Form::input('text','pres_district',isset($employee->Profile->pres_district) ? $employee->Profile->pres_district : '',['class'=>'form-control','placeholder'=>trans('messages.district')])!!}
+												{{-- {!! Form::input('text','pres_district',isset($employee->Profile->pres_district) ? $employee->Profile->pres_district : '',['class'=>'form-control','placeholder'=>trans('messages.district')])!!} --}}
+											    <select class="form-control input-xlarge select2me" name="pres_district" id="pres_district">
+													<option value="">Select One</option>
+													 @foreach ($district as $district)
+														<option data-id="{{ $district->id }}" value="{{ $district->name }}" {{ $employee->Profile->pres_district == $district->name ? 'selected' : '' }}>{{ $district->name }}</option>
+													@endforeach
+												</select>
 											</div>
 										</div>
 										{{-- Thana --}}
@@ -391,7 +411,15 @@
 										<div class="col-sm-4">
 											<div class="form-group flex-form-group">
 											    {!! Form::label('division',trans('messages.division'))!!}
-												{!! Form::input('text','division',isset($employee->Profile->perm_division) ? $employee->Profile->perm_division : '',['class'=>'form-control','placeholder'=>trans('messages.division')])!!}
+												{{-- {!! Form::input('text','division',isset($employee->Profile->perm_division) ? $employee->Profile->perm_division : '',['class'=>'form-control','placeholder'=>trans('messages.division')])!!} --}}
+											    <select class="form-control input-xlarge select2me" name="division" id="division">{{$employee->Profile->perm_division}}
+													<option value="">Select One</option>
+													 @foreach ($division2 as $division)
+														<option data-id="{{ $division->id }}" value="{{ $division->name }}" 
+															{{ $employee->Profile->perm_division == $division->name ? 'selected' : ' ' }}>
+															{{ $division->name }}</option>
+													@endforeach
+												</select>
 											</div>
 										</div>
 										{{-- Post --}}
@@ -405,7 +433,15 @@
 										<div class="col-sm-4">
 											<div class="form-group flex-form-group">
 											    {!! Form::label('district',trans('messages.district'))!!}
-												{!! Form::input('text','district',isset($employee->Profile->perm_district) ? $employee->Profile->perm_district : '',['class'=>'form-control','placeholder'=>trans('messages.district')])!!}
+												{{-- {!! Form::input('text','district',isset($employee->Profile->perm_district) ? $employee->Profile->perm_district : '',['class'=>'form-control','placeholder'=>trans('messages.district')])!!} --}}
+											    <select class="form-control input-xlarge select2me" name="district" id="district">
+													<option value="">Select One</option>
+													 @foreach ($district2 as $district)
+														<option data-id="{{ $district->id }}" value="{{ $district->name }}" 
+															{{ $employee->Profile->perm_district == $district->name ? 'selected' : ' ' }}>
+															{{ $district->name }}</option>
+													@endforeach
+												</select>
 											</div>
 										</div>
 										{{-- Thana --}}
@@ -716,4 +752,38 @@
 				</div>
 			</div>
 		</div>
+	@stop
+
+	@section('javascript')
+		<script type="text/javascript">
+		   getDistricts('#division', '#district');
+           getDistricts('#pres_division', '#pres_district');
+            // Division Change
+           function getDistricts(divisionElement, districtElement) {
+            $(divisionElement).change(function() {
+                var division_id = $(this).find('option:selected').data('id'); // Get selected division id
+
+                if (division_id) {
+                    // Make an AJAX request to get the districts
+                    $.ajax({
+                        url: '/get-districts/' + division_id,
+                        type: 'GET',
+                        dataType: 'json',
+                        success: function(data) {
+                            // Empty the district dropdown and add a default option
+                            $(districtElement).empty().append('<option value="">Select District</option>');
+                            
+                            // Loop through the returned districts and append them to the dropdown
+                            $.each(data, function(key, value) {
+                                $(districtElement).append('<option value="' + value.name + '">' + value.name + '</option>');
+                            });
+                        }
+                    });
+                } else {
+                    // If no division is selected, reset the district dropdown
+                    $(districtElement).empty().append('<option value="">Select District</option>');
+                }
+            });
+        }
+		</script>
 	@stop
