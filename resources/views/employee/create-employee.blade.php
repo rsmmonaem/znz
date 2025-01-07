@@ -400,7 +400,7 @@
                             
                             // Loop through the returned districts and append them to the dropdown
                             $.each(data, function(key, value) {
-                                $(districtElement).append('<option value="' + value.id + '">' + value.name + '</option>');
+                                $(districtElement).append('<option value="' + value.name + '">' + value.name + '</option>');
                             });
                         }
                     });
