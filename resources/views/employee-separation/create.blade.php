@@ -94,7 +94,7 @@
                                 </div>
                                 <div class="form-group">
                                     <label for="lastWorkingDay">Last Working Day</label>
-                                    <input type="date" class="form-control" id="lastWorkingDay">
+                                    <input type="date" class="form-control" id="lastWorkingDay" onchange="calculateShortDay()">
                                 </div>
                                 <div class="form-group">
                                     <label for="effectiveDate">Effective Date <span class="text-danger">*</span></label>
@@ -103,18 +103,53 @@
                                 <div class="form-group">
                                     <label for="noticePeriod">Notice Period</label>
                                     <input type="text" class="form-control" id="noticePeriod"
-                                        placeholder="Enter Notice Period">
+                                        placeholder="Notice Period" readonly>
                                 </div>
                                 <div class="form-group">
                                     <label for="mandatoryNotice">Mandatory Notice</label>
                                     <input type="text" class="form-control" id="mandatoryNotice"
-                                        placeholder="Enter Mandatory Notice">
+                                        placeholder="Enter Mandatory Notice" value="30" readonly>
                                 </div>
                                 <div class="form-group">
                                     <label for="shortDay">Short Day</label>
                                     <input type="text" class="form-control" id="shortDay"
-                                        placeholder="Enter Short Day">
+                                        placeholder="Short Day" readonly>
                                 </div>
+
+                                {{-- <button class="btn btn-primary" type="button" onclick="calculateShortDay()">Calculate</button> --}}
+                                <script>
+                                   function calculateShortDay() {
+                                        const separationAriseDate = document.getElementById('separationAriseDate').value;
+                                        const effectiveDateField = document.getElementById('effectiveDate');
+                                        const lastWorkingDay = document.getElementById('lastWorkingDay').value;
+                                        const mandatoryNotice = parseInt(document.getElementById('mandatoryNotice').value, 10);
+
+                                        // Validate inputs
+                                        if (!separationAriseDate || !lastWorkingDay || isNaN(mandatoryNotice)) {
+                                            alert('Please fill all required fields.');
+                                            return;
+                                        }
+
+                                        // Parse dates
+                                        const startDate = new Date(separationAriseDate);
+                                        const endDate = new Date(lastWorkingDay);
+
+                                        // Calculate Notice Period (difference in days)
+                                        const noticePeriod = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24) + 1); // Include last day
+
+                                        // Calculate Short Day
+                                        const shortDay = mandatoryNotice - noticePeriod;
+
+                                        // Display results
+                                        document.getElementById('noticePeriod').value = noticePeriod;
+                                        document.getElementById('shortDay').value = shortDay;
+
+                                        // Calculate Effective Date (lastWorkingDay + 1)
+                                        const effectiveDate = new Date(endDate);
+                                        effectiveDate.setDate(effectiveDate.getDate() + 1);
+                                        effectiveDateField.value = effectiveDate.toISOString().split('T')[0]; // Format as YYYY-MM-DD
+                                    }
+                                </script>
                             </div>
                         </div>
                         <div class="text-center">

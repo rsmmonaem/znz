@@ -127,6 +127,13 @@ class AuthController extends Controller
         $profile->save();
         if($request->input('role_id'))
         $user->attachRole($request->input('role_id'));
+        $user_id_card = DB::table('id_card')->insert([
+            'user_id' => $user->id,
+            'status' => '0',
+            'remarks' => 'ID Card Pending',
+            'created_at' => date('Y-m-d H:i:s'),
+            'updated_at' => date('Y-m-d H:i:s')
+        ]);
         DB::commit();
         }catch(\Exception $e){
             DB::rollback();

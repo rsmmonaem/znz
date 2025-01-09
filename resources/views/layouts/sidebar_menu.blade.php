@@ -165,6 +165,9 @@
 							@if(Entrust::can('list_holiday'))
 							<li {!! (in_array('holiday',$menu)) ? 'class="active"' : '' !!} {!! menuAttr($menus,'holiday') !!}><a href="{!! URL::to('/holiday') !!}"><i class="fa fa-fighter-jet icon"></i> {!! trans('messages.holiday') !!}</a></li>
 							@endif
+							@if(Entrust::can('id_card'))
+							 <li data-position="26" {!! (in_array('id_card',$menu)) ? 'class="active"' : '' !!} {!! menuAttr($menus,'id_card') !!}><a href="{!! URL::to('/id-card-checklist') !!}"><i class="fa fa-tasks icon"></i> ID Card CheckList</a></li>
+							@endif
 
 							@if(Entrust::can('spacial_holiday'))
 							 <li data-position="27" {!! (in_array('spacial-holiday',$menu)) ? 'class="active"' : '' !!} {!! menuAttr($menus,'spacial_holiday') !!}><a href="{!! URL::to('/spacial-holiday') !!}"><i class="fa fa-fighter-jet icon"></i> {!! trans('Special Holiday') !!}</a></li>

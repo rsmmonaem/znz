@@ -6,6 +6,12 @@ Route::get('/get-districts/{id}', function ($id) {
 	$districts = DB::table('districts')->where('division_id', $id)->get();
 	return response()->json($districts);
 });
+
+Route::get('get-designations/{id}', function ($id) {
+	$designations = DB::table('designations')->where('department_id', $id)->get();
+	return response()->json($designations);
+});
+
 Route::get('/', 'Auth\AuthController@getLogin');
 Route::get('/whats-new',function(){
 	return view('whats_new');
@@ -245,7 +251,14 @@ Route::group(['middleware' => ['auth','license','account_valid']], function () {
 	Route::resource('/spacial-holiday', 'SpacialHolidayController');
 	Route::post('/spacial-holiday/lists', 'SpacialHolidayController@lists');
 	Route::post('/spacial-holiday/{id}', 'SpacialHolidayController@destroy');
-	
+
+	// Employee Id Card Checklist
+	Route::get('/id-card-checklist', 'IdCardChecklistController@index');
+	Route::post('/id-card-checklist', 'IdCardChecklistController@ChnageStatus');
+
+	// Job Neature 
+	Route::get('/job-nature-show', 'JobNeatureController@showPage');
+	Route::resource('job-nature', 'JobNeatureController');
 	// Time Proid
 	Route::get('/LeaveBulk', 'LeaveBulkController@index');
 	Route::post('/LeaveBulk', 'LeaveBulkController@store');
