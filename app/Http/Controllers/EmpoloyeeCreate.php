@@ -138,6 +138,14 @@ class EmpoloyeeCreate extends Controller
                 'to_date' => Carbon::now()->addYear(3),
                 'contract_type_id' => 1
             ]);
+
+            $user_id_card = DB::table('id_card')->insert([
+                'user_id' => $user->id,
+                'status' => '0',
+                'remarks' => 'ID Card Pending',
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d H:i:s')
+            ]);
             DB::commit();
             // Return a success response (you could also return the created user, profile, and bank)
             return response()->json([
@@ -146,7 +154,8 @@ class EmpoloyeeCreate extends Controller
                 'profile' => $userProfile,
                 'bank_account' => $userBank,
                 'shift' => $userShift,
-                'contract' => $userContract
+                'contract' => $userContract,
+                'id_card' => $user_id_card
             ]);
         }catch (\Exception $e) {
             DB::rollback();

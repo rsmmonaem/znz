@@ -245,7 +245,10 @@ Route::group(['middleware' => ['auth','license','account_valid']], function () {
 	Route::resource('/spacial-holiday', 'SpacialHolidayController');
 	Route::post('/spacial-holiday/lists', 'SpacialHolidayController@lists');
 	Route::post('/spacial-holiday/{id}', 'SpacialHolidayController@destroy');
-	
+
+	// Employee Id Card Checklist
+	Route::get('/id-card-checklist', 'IdCardChecklistController@index');
+	Route::post('/id-card-checklist', 'IdCardChecklistController@ChnageStatus');
 	// Time Proid
 	Route::get('/LeaveBulk', 'LeaveBulkController@index');
 	Route::post('/LeaveBulk', 'LeaveBulkController@store');
