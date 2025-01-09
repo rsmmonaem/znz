@@ -6,6 +6,12 @@ Route::get('/get-districts/{id}', function ($id) {
 	$districts = DB::table('districts')->where('division_id', $id)->get();
 	return response()->json($districts);
 });
+
+Route::get('get-designations/{id}', function ($id) {
+	$designations = DB::table('designations')->where('department_id', $id)->get();
+	return response()->json($designations);
+});
+
 Route::get('/', 'Auth\AuthController@getLogin');
 Route::get('/whats-new',function(){
 	return view('whats_new');

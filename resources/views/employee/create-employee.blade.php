@@ -209,17 +209,35 @@
                             <div class="row">
                                 <!-- Designation -->
                                 <div class="col-sm-6">
-                                    <div class="form-group flex-form-group">
-                                        <label for="designation_id" class="control-label">Designation <span
-                                                class="text-danger">*</span></label>
-                                        <select class="form-control input-xlarge select2me select2-offscreen"
-                                            placeholder="Designation" id="designation_id" name="designation_id"
-                                            title="Designation" tabindex="-1">
-                                            <option value="">Select One</option>
-                                            @foreach ($designations as $d)
-                                                <option value="{{ $d->id }}">{{ $d->name }} ({{ $d->department_name }})</option>
-                                            @endforeach
-                                        </select>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group flex-form-group">
+                                                <label for="date_of_brith">Department <span
+                                                        class="text-danger">*</span></label>
+                                                <select class="form-control input-xlarge select2me select2-offscreen"
+                                                    placeholder="Select One" id="department_id" name="department_id"
+                                                    title="Department" tabindex="-1" onchange="getDesignations()">
+                                                    <option value="">Select One</option>
+                                                    @foreach ($departments as $d)
+                                                        <option value="{{ $d->id }}">{{ $d->name }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group flex-form-group">
+                                                <label for="designation_id" class="control-label">Designation <span
+                                                        class="text-danger">*</span></label>
+                                                <select class="form-control input-xlarge select2me select2-offscreen"
+                                                    placeholder="Designation" id="designation_id" name="designation_id"
+                                                    title="Designation" tabindex="-1">
+                                                    <option value="">Select One</option>
+                                                    {{-- @foreach ($designations as $d)
+                                                        <option value="{{ $d->id }}">{{ $d->name }} ({{ $d->department_name }})</option>
+                                                    @endforeach --}}
+                                                </select>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="col-sm-6">
@@ -388,6 +406,26 @@
 
 @section('javascript')
     <script>
+        function getDesignations() {
+            var department_id = $('#department_id').val();
+            $('#designation_id').val('').trigger('change');
+            if (department_id) {
+                $.ajax({
+                    url: '/get-designations/' + department_id,
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function(data) {
+                        $('#designation_id').empty().append('<option value="">Select Designation</option>');
+                        $.each(data, function(key, value) {
+                            $('#designation_id').append('<option value="' + value.id + '">' + value.name + '</option>');
+                        });
+                    }
+                });
+            } else {
+                $('#designation_id').empty().append('<option value="">Select Designation</option>');
+            }
+        };
+        // Get Districts
            getDistricts('#division', '#district');
            getDistricts('#pres_division', '#pres_district');
             // Division Change
