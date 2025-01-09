@@ -8,9 +8,13 @@ class Section extends Eloquent {
 							'id',
 							'name',
                             'description',
+	                     	'department_id'
 						];
 	protected $primaryKey = 'id';
 	protected $table = 'sections';
 
+	public function department() {
+		return $this->belongsTo('App\Department');
+	}
 
 }

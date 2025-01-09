@@ -40,6 +40,7 @@
 									<th>#</th>
 									<th>Name</th>
 									<th>Description</th>
+									<th>Department</th>
 								</tr>
 							</thead>
 							<tbody>
@@ -50,6 +51,7 @@
 										<td>{{ $designation->id }}</td>
 										<td>{{ $designation->name }}</td>
 										<td>{{ $designation->description }}</td>
+										<th>{{ @$designation->department->name }}</th>
 									</tr>
 								@endforeach
 							</tbody>
