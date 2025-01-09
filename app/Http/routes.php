@@ -249,6 +249,10 @@ Route::group(['middleware' => ['auth','license','account_valid']], function () {
 	// Employee Id Card Checklist
 	Route::get('/id-card-checklist', 'IdCardChecklistController@index');
 	Route::post('/id-card-checklist', 'IdCardChecklistController@ChnageStatus');
+
+	// Job Neature 
+	Route::get('/job-nature-show', 'JobNeatureController@showPage');
+	Route::resource('job-nature', 'JobNeatureController');
 	// Time Proid
 	Route::get('/LeaveBulk', 'LeaveBulkController@index');
 	Route::post('/LeaveBulk', 'LeaveBulkController@store');

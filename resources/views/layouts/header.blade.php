@@ -55,6 +55,9 @@
 										<li><a href="/sections">{!! trans('messages.section') !!}</a></li>
 									@endif
 									@if(Entrust::can('list_department'))
+										<li><a href="/job-nature-show">Job Nature</a></li>
+									@endif
+									@if(Entrust::can('list_department'))
 										<li><a href="/grades">{!! trans('messages.grade') !!}</a></li>
 									@endif
 									@if(Entrust::can('list_designation'))

@@ -115,8 +115,15 @@
                                 <div class="col-sm-6">
                                     <div class="form-group">
                                         <label for="job_nature" class="control-label">Job Nature</label>
-                                        <input class="form-control" placeholder="Job Nature" name="job_nature"
-                                            type="text" value="" id="job_nature">
+                                        {{-- <input class="form-control" placeholder="Job Nature" name="job_nature"
+                                            type="text" value="" id="job_nature"> --}}
+                                        @php $job_nature = DB::table('job-nature')->get(); @endphp
+                                        <select name="job_nature" id="job_nature" class="form-control">
+                                            <option value="">Select One</option>
+                                            @foreach ($job_nature as $type)
+                                                <option value="{{ $type->name }}">{{ $type->name }}</option>
+                                            @endforeach
+                                        </select>
                                     </div>
                                 </div>
                             </div>
