@@ -43,7 +43,8 @@ class SalaryProcessController extends Controller
             // Apply filters if present
             if ($request->branch || $request->department || $request->section) {
                 $data->whereNotIn('users.id', function ($query) {
-                    $query->select('employee_id')->from('employee_separations');
+                    $query->select('employee_id')->from('employee_separations')
+                    ->where('effective_date', '>', Carbon::now());
                 });
             }
             if ($request->branch) {
