@@ -219,7 +219,6 @@
                     text-align: center;
                     margin: 0px 0;
                     font-size: 1.2rem;
-                    font-style: italic; 
                 }
                 table {
                     width: 100%;
@@ -246,14 +245,13 @@
         <body>
               <div class="header">
                         <div class="logo">
-                             ${data.branch?.id == 7 ? 'Mohakhali Branch' : `<img src="{{ URL::to(config('constants.upload_path.logo') . config('config.logo')) }}" alt="Logo">`}
+                            <img src="{{ URL::to(config('constants.upload_path.logo') . config('config.logo')) }}" alt="Logo">
                         </div>
                         <div class="company-details">
-                            <h3 class="bold">${data.branch?.name ?? ''}</h3>
-                            <p class="bold">${data.branch?.description ?? ''}</p>
+                           <h1 class="title">J & Z Group</h1>
+                           <h2 class="title">Salary Summary</h2>
                         </div>
                     </div>       
-            <h2 class="title">Salary Summary</h2>
             <table>
                 <thead>
                     <tr>
