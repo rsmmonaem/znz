@@ -16,4 +16,5 @@
     <option value="{{ url('letter-increment') }}" {{ Request::is('letter-increment') ? 'selected' : '' }}>Increment Letter</option>
     <option value="{{ url('letter-increment-promotion') }}" {{ Request::is('letter-increment-promotion') ? 'selected' : '' }}>Increment and Promotion Letter</option>
     <option value="{{ url('salary-summary') }}" {{ Request::is('salary-summary') ? 'selected' : '' }}>Salary Summary</option>
+    <option value="{{ url('salary-bank-statement') }}" {{ Request::is('salary-bank-statement') ? 'selected' : '' }}>Salary Bank Statement</option>
 </select>

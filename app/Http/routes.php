@@ -417,9 +417,13 @@ Route::group(['middleware' => ['auth','license','account_valid']], function () {
 	Route::post('get-user-data-salary', 'SalaryController@getGrossSalary');
 
 	Route::post('SalaryReportPOST', 'SalaryController@SalaryReportPOST');
-
+    
+	// Salary Summary
 	Route::get('salary-summary', 'SalarySummary@salarySummary');
 	Route::post('salary-summary', 'SalarySummary@salarySummaryPost');
+
+	Route::get('salary-bank-statement', 'SalarySummary@SalaryBankStatement');
+	Route::post('salary-bank-statement', 'SalarySummary@SalaryBankStatementPost');
 	// Salary Bank Transfer
 	Route::get('salary-bank-transfer', 'SalarySummary@SalaryBankTransfer');
 	Route::post('salary-bank-transfer', 'SalarySummary@SalaryBankTransferPost');

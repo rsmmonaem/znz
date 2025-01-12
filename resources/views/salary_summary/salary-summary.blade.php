@@ -8,12 +8,6 @@
 
 @section('content')
     <style>
-        /* .table th, .table td {
-            text-align: center;
-        }
-        .container {
-            margin-top: 20px;
-        } */
         .report-buttons {
             margin-top: 20px;
         }
