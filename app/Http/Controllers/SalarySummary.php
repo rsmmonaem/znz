@@ -169,4 +169,84 @@ class SalarySummary extends Controller
             'month' => Carbon::create()->month($request->month)->format('F'),
         ]);
     }
+
+    public function SalaryTransferGlance(Request $request){
+        $group = DB::table('com_group')->get();
+        $branch = Branch::all();
+        $designation = Designation::all();
+        $department = Department::all();
+        $section = Section::all();
+        $category = DB::table('category')->get();
+        return view('salary_summary.salary-transfer-glace', compact('group', 'category', 'branch', 'designation', 'department', 'section'));
+    }
+
+    public function SalaryTransferGlancePost(Request $request){
+        $branchData = Branch::where('id', $request->branch)->first();
+        $data = DB::table('employee_salary_details')
+            ->leftJoin('users', 'employee_salary_details.employee_id', '=', 'users.id')
+            ->leftJoin('profile', 'users.id', '=', 'profile.user_id')
+            ->leftJoin('sections', 'profile.section_id', '=', 'sections.id')
+            ->leftJoin('branchs', 'profile.branch_id', '=', 'branchs.id')
+            ->leftJoin('designations', 'users.designation_id', '=', 'designations.id')
+            ->leftJoin('departments', 'designations.department_id', '=', 'departments.id')
+            ->leftJoin('category', 'profile.category', '=', 'category.id')
+            ->leftJoin(
+                DB::raw('(SELECT * FROM salary_bank WHERE effective_date <= CURDATE() AND status = 0 AND id IN (SELECT MAX(id) FROM salary_bank GROUP BY user_id)) as latest_salary_bank'),
+                'profile.user_id',
+                '=',
+                'latest_salary_bank.user_id'
+            )
+            ->select(
+                'branchs.name as branch_name',
+                'profile.employee_code',
+                'users.first_name',
+                'designations.name as designation_name',
+                'departments.name as department_name',
+                'sections.name as section_name',  
+                // 'salary_slab.gross',
+                'employee_salary_details.total_absents_fee as attendance_deduction',
+                'employee_salary_details.tax_amount as tax_amount',
+                'employee_salary_details.arrear_amount as arrear_amount',
+                'employee_salary_details.provident_fund as provident_fund',
+                'employee_salary_details.advance_salary as advance_salary',
+                'employee_salary_details.net_salary as net_salary',
+                'employee_salary_details.ot_amount as ot_amount',
+                'employee_salary_details.gross_salary as gross_salary',
+                'latest_salary_bank.bank_amount as salary_bank_amount',
+                'latest_salary_bank.cash_amount as salary_cash_amount'
+                )
+            ->when($request->branch, function ($query) use ($request) {
+                return $query->where('branchs.id', $request->branch);
+            })
+            ->when($request->department, function ($query) use ($request) {
+                return $query->where('designations.department_id', $request->department);
+            })
+            ->when($request->designation, function ($query) use ($request) {
+                return $query->where('users.designation_id', $request->designation);
+            })
+            ->when($request->section, function ($query) use ($request) {
+                return $query->where('profile.section_id', $request->section);
+            })
+            ->when($request->employee, function ($query) use ($request) {
+                return $query->where('profile.user_id', $request->employee);
+            })
+            ->when($request->month, function ($query) use ($request) {
+                // Parse the month and get the month number
+                $month = $request->month;
+                return $query->whereRaw('MONTH(employee_salary_details.to_date) = ?', [$month]);
+            })
+            ->when($request->financialYear, function ($query) use ($request) {
+                // Parse the financialYear as a Carbon instance and get the year
+                $year = $request->financialYear;
+                return $query->whereRaw('YEAR(employee_salary_details.to_date) = ?', [$year]);
+            })
+            
+        ->get();
+        return response()->json([
+            'data' => $data,
+            'branch' => $branchData,
+            'financialYear' => $request->financialYear,
+            'month' => Carbon::create()->month($request->month)->format('F'),
+        ]);
+    }
 }
