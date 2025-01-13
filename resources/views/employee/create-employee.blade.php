@@ -284,11 +284,25 @@
                                 <!-- Date of Joining -->
                                 <div class="col-sm-6">
                                     <div class="form-group flex-form-group">
-                                        <label for="date_of_joining">Date of Joining <span
-                                                class="text-danger">*</span></label>
-                                        <input class="form-control datepicker" placeholder="Date of Joining"
-                                            readonly="true" name="date_of_joining" type="text" value=""
-                                            id="date_of_joining">
+                                        <label for="date_of_joining">Date of Joining <span class="text-danger">*</span></label>
+                                        <input class="form-control datepicker" placeholder="Date of Joining" readonly="true" name="date_of_joining" type="text" value="" id="date_of_joining">
+                                    </div>
+
+                                    <div class="form-group flex-form-group d-flex justify-content-between">
+                                        <label for="joining_period">Joining Period</label>
+                                        <div>
+                                            <label>
+                                                <input type="radio" name="joining_period" value="3_month" id="3_month"> 3 Months
+                                            </label>
+                                            <label>
+                                                <input type="radio" name="joining_period" value="6_month" id="6_month"> 6 Months
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group flex-form-group">
+                                        <label for="confirm_date">Confirm Date</label>
+                                        <input class="form-control" placeholder="Confirm Date" readonly="true" name="confirm_date" type="text" value="" id="confirm_date">
                                     </div>
                                 </div>
                                 <!-- Religion -->
@@ -624,6 +638,31 @@
                 $('input[type="file"]').val(null);
                 $('input[type="checkbox"], input[type="radio"]').prop('checked', false);
             }
+
+            $('input[name="joining_period"]').on('change', function() {
+                console.log('Joining period changed');
+                var joinDate = $('#date_of_joining').val();  // Get the date of joining value
+                var confirmDateField = $('#confirm_date');
+                
+                if (joinDate && this.checked) {
+                    var joiningDate = new Date(joinDate);
+
+                    // Add 3 months or 6 months based on selected radio button
+                    if (this.value === '3_month') {
+                        joiningDate.setMonth(joiningDate.getMonth() + 3);
+                    } else if (this.value === '6_month') {
+                        joiningDate.setMonth(joiningDate.getMonth() + 6);
+                    }
+
+                    // Format the confirm date
+                    var formattedDate = joiningDate.toLocaleDateString();
+
+                    // Set the confirm date
+                    confirmDateField.val(formattedDate);
+                } else {
+                    confirmDateField.val("");  // Clear confirm date if no joining date or radio button is not selected
+                }
+            });
         });
     </script>
 @stop

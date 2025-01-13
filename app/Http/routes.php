@@ -424,6 +424,9 @@ Route::group(['middleware' => ['auth','license','account_valid']], function () {
 
 	Route::get('salary-bank-statement', 'SalarySummary@SalaryBankStatement');
 	Route::post('salary-bank-statement', 'SalarySummary@SalaryBankStatementPost');
+
+	Route::get('salary-transfer-glance', 'SalarySummary@SalaryTransferGlance');
+	Route::post('salary-transfer-glance', 'SalarySummary@SalaryTransferGlancePost');
 	// Salary Bank Transfer
 	Route::get('salary-bank-transfer', 'SalarySummary@SalaryBankTransfer');
 	Route::post('salary-bank-transfer', 'SalarySummary@SalaryBankTransferPost');
