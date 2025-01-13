@@ -221,26 +221,89 @@
 								   </div>
 								  <div class="row">
 									{{-- Date of Joining --}}
-								  	<div class="col-sm-6">
-										<div class="form-group flex-form-group">
-										    {!! Form::label('date_of_joining',trans('messages.date_of_joining'))!!}
-											{!! Form::input('text','date_of_joining',isset($employee->Profile->date_of_joining) ? $employee->Profile->date_of_joining : '',['class'=>'form-control datepicker','placeholder'=>trans('messages.date_of_joining'),'readonly' => 'true'])!!}
-										</div>
-									</div>
-									{{-- Date of Leaving --}}
-								  	{{-- <div class="col-sm-6">
-										<div class="form-group flex-form-group">
-										    {!! Form::label('date_of_leaving',trans('messages.date_of_leaving'))!!}
-											{!! Form::input('text','date_of_leaving',isset($employee->Profile->date_of_leaving) ? $employee->Profile->date_of_leaving : '',['class'=>'form-control datepicker','placeholder'=>trans('messages.date_of_leaving'),'readonly' => 'true'])!!}
-										</div>
-									</div> --}}
-									{{-- Employ Confirm Date --}}
+								  	{{-- Date of Joining --}}
 									<div class="col-sm-6">
 										<div class="form-group flex-form-group">
-										    {!! Form::label('empoloyee_confirm',trans('messages.empoloyee_confirm'))!!}
-											{!! Form::input('text','empoloyee_confirm',isset($employee->Profile->confirm_date) ? $employee->Profile->confirm_date : '',['class'=>'form-control datepicker','placeholder'=>trans('messages.empoloyee_confirm'),'readonly' => 'true'])!!}
+											{!! Form::label('date_of_joining', trans('messages.date_of_joining')) !!}
+											{!! Form::input('date', 'date_of_joining', isset($employee->Profile->date_of_joining) ? $employee->Profile->date_of_joining : '', ['class' => 'form-control', 'placeholder' => trans('messages.date_of_joining'), 'id' => 'date_of_joining']) !!}
 										</div>
 									</div>
+
+									{{-- Employee Confirm Date --}}
+									<div class="col-sm-6">
+										<div class="form-group flex-form-group d-flex justify-content-between">
+											<label for="joining_period">Joining Period</label>
+											<div>
+												<label>
+													<input type="radio" name="joining_period" value="3_month" id="3_month"> 3 Months
+												</label>
+												<label>
+													<input type="radio" name="joining_period" value="6_month" id="6_month"> 6 Months
+												</label>
+											</div>
+										</div>
+										<div class="form-group flex-form-group">
+											{!! Form::label('empoloyee_confirm', trans('messages.empoloyee_confirm')) !!}
+											{!! Form::input('text', 'empoloyee_confirm', isset($employee->Profile->confirm_date) ? $employee->Profile->confirm_date : '', ['class' => 'form-control datepicker', 'placeholder' => trans('messages.empoloyee_confirm'), 'readonly' => 'true', 'id' => 'confirm_date']) !!}
+										</div>
+									</div>
+									<script>
+										// Function to calculate and set the Confirm Date
+										function setConfirmDate() {
+											const joiningDateInput = document.getElementById('date_of_joining');
+											const confirmDateInput = document.getElementById('confirm_date');
+											const joiningPeriodRadios = document.querySelectorAll('input[name="joining_period"]');
+
+											// Check if Date of Joining is selected
+											if (!joiningDateInput.value) {
+												confirmDateInput.value = ''; // Clear Confirm Date if Joining Date is empty
+												return;
+											}
+
+											const joiningDateParts = joiningDateInput.value.split('-'); // Split the date (YYYY-MM-DD)
+											const joiningDate = new Date(joiningDateParts[0], joiningDateParts[1] - 1, joiningDateParts[2]); // Month is 0-based
+
+											if (isNaN(joiningDate.getTime())) {
+												confirmDateInput.value = ''; // Clear Confirm Date if Joining Date is invalid
+												console.warn("Invalid 'Date of Joining'.");
+												return;
+											}
+
+											// Determine the number of months to add based on the selected radio button
+											let monthsToAdd = 0;
+											joiningPeriodRadios.forEach((radio) => {
+												if (radio.checked) {
+													if (radio.value === '3_month') {
+														monthsToAdd = 3;
+													} else if (radio.value === '6_month') {
+														monthsToAdd = 6;
+													}
+												}
+											});
+
+											if (monthsToAdd > 0) {
+												// Add months to the joining date
+												joiningDate.setMonth(joiningDate.getMonth() + monthsToAdd);
+
+												// Format the resulting date as YYYY-MM-DD
+												const year = joiningDate.getFullYear();
+												const month = String(joiningDate.getMonth() + 1).padStart(2, '0'); // Month is 0-based
+												const day = String(joiningDate.getDate()).padStart(2, '0');
+												confirmDateInput.value = `${year}-${month}-${day}`;
+											} else {
+												confirmDateInput.value = ''; // Clear if no period is selected
+												console.warn("No 'Joining Period' selected.");
+											}
+										}
+
+										// Event listeners
+										document.getElementById('date_of_joining').addEventListener('change', setConfirmDate);
+										document.querySelectorAll('input[name="joining_period"]').forEach((radio) => {
+											radio.addEventListener('change', setConfirmDate);
+										});
+									</script>
+
+
 									{{-- Rilegion --}}
                                    <div class="col-sm-6">
 				    				  	<div class="form-group flex-form-group">
