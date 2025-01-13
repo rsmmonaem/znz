@@ -283,13 +283,7 @@
                                 </div>
                                 <!-- Date of Joining -->
                                 <div class="col-sm-6">
-                                    <div class="form-group flex-form-group">
-                                        <label for="date_of_joining">Date of Joining <span class="text-danger">*</span></label>
-                                        <input class="form-control datepicker" placeholder="Date of Joining" readonly="true" name="date_of_joining" type="text" value="" id="date_of_joining">
-                                    </div>
-
                                     <div class="form-group flex-form-group d-flex justify-content-between">
-                                        <label for="joining_period">Joining Period</label>
                                         <div>
                                             <label>
                                                 <input type="radio" name="joining_period" value="3_month" id="3_month"> 3 Months
@@ -299,12 +293,69 @@
                                             </label>
                                         </div>
                                     </div>
-
+                                    <div class="form-group flex-form-group">
+                                        <label for="date_of_joining">Date of Joining <span class="text-danger">*</span></label>
+                                        <input class="form-control" name="date_of_joining" type="date" value="" id="date_of_joining">
+                                    </div>
                                     <div class="form-group flex-form-group">
                                         <label for="confirm_date">Confirm Date</label>
                                         <input class="form-control" placeholder="Confirm Date" readonly="true" name="confirm_date" type="text" value="" id="confirm_date">
                                     </div>
                                 </div>
+                               <script>
+                                    function setConfirmDate() {
+                                        const joiningDateInput = document.getElementById('date_of_joining');
+                                        const confirmDateInput = document.getElementById('confirm_date');
+                                        const joiningPeriodRadios = document.querySelectorAll('input[name="joining_period"]');
+
+                                        // Check if Date of Joining is selected
+                                        if (!joiningDateInput.value) {
+                                            confirmDateInput.value = ''; // Clear Confirm Date if Joining Date is empty
+                                            return;
+                                        }
+
+                                        const joiningDateParts = joiningDateInput.value.split('-'); // Split the date (YYYY-MM-DD)
+                                        const joiningDate = new Date(joiningDateParts[0], joiningDateParts[1] - 1, joiningDateParts[2]); // Month is 0-based
+
+                                        if (isNaN(joiningDate.getTime())) {
+                                            confirmDateInput.value = ''; // Clear Confirm Date if Joining Date is invalid
+                                            console.warn("Invalid 'Date of Joining'.");
+                                            return;
+                                        }
+
+                                        // Determine the number of months to add based on the selected radio button
+                                        let monthsToAdd = 0;
+                                        joiningPeriodRadios.forEach((radio) => {
+                                            if (radio.checked) {
+                                                if (radio.value === '3_month') {
+                                                    monthsToAdd = 3;
+                                                } else if (radio.value === '6_month') {
+                                                    monthsToAdd = 6;
+                                                }
+                                            }
+                                        });
+
+                                        if (monthsToAdd > 0) {
+                                            // Add months to the joining date
+                                            joiningDate.setMonth(joiningDate.getMonth() + monthsToAdd);
+
+                                            // Format the resulting date as YYYY-MM-DD
+                                            const year = joiningDate.getFullYear();
+                                            const month = String(joiningDate.getMonth() + 1).padStart(2, '0'); // Month is 0-based
+                                            const day = String(joiningDate.getDate()).padStart(2, '0');
+                                            confirmDateInput.value = `${year}-${month}-${day}`;
+                                        } else {
+                                            confirmDateInput.value = ''; // Clear if no period is selected
+                                            console.warn("No 'Joining Period' selected.");
+                                        }
+                                    }
+
+                                    // Event listeners
+                                    document.getElementById('date_of_joining').addEventListener('change', setConfirmDate);
+                                    document.querySelectorAll('input[name="joining_period"]').forEach((radio) => {
+                                        radio.addEventListener('change', setConfirmDate);
+                                    });
+                                </script>
                                 <!-- Religion -->
                                 <div class="col-sm-6">
                                     <div class="form-group flex-form-group">
@@ -535,6 +586,7 @@
                     date_of_birth: $('#date_of_birth').val(),
                     nationality: $('#nationality').val(),
                     blood_group: $('#blood_group').val(),
+                    confirm_date: $('#confirm_date').val(),
                     // Present Address
                     pres_house: $('#pres_house').val(),
                     pres_road: $('#pres_road').val(),
@@ -638,31 +690,6 @@
                 $('input[type="file"]').val(null);
                 $('input[type="checkbox"], input[type="radio"]').prop('checked', false);
             }
-
-            $('input[name="joining_period"]').on('change', function() {
-                console.log('Joining period changed');
-                var joinDate = $('#date_of_joining').val();  // Get the date of joining value
-                var confirmDateField = $('#confirm_date');
-                
-                if (joinDate && this.checked) {
-                    var joiningDate = new Date(joinDate);
-
-                    // Add 3 months or 6 months based on selected radio button
-                    if (this.value === '3_month') {
-                        joiningDate.setMonth(joiningDate.getMonth() + 3);
-                    } else if (this.value === '6_month') {
-                        joiningDate.setMonth(joiningDate.getMonth() + 6);
-                    }
-
-                    // Format the confirm date
-                    var formattedDate = joiningDate.toLocaleDateString();
-
-                    // Set the confirm date
-                    confirmDateField.val(formattedDate);
-                } else {
-                    confirmDateField.val("");  // Clear confirm date if no joining date or radio button is not selected
-                }
-            });
         });
     </script>
 @stop

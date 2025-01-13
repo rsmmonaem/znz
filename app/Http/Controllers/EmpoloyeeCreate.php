@@ -76,6 +76,7 @@ class EmpoloyeeCreate extends Controller
                 'date_of_retirement' => $request->date_of_retirement,
                 'contact_number' => $request->contact_number,
                 'photo' => $request->photo,
+                'confirm_date' => Carbon::parse($request->confirm_date)->format('Y-m-d'),
                 // Persent address
                 'pres_house' => $request->pres_house,
                 'pres_road' => $request->pres_road,
