@@ -20,4 +20,5 @@
     <option value="{{ url('salary-transfer-glance') }}" {{ Request::is('salary-transfer-glance') ? 'selected' : '' }}>Salary Transfer at a Glance</option>
     <option value="{{ url('gender-wise-report') }}" {{ Request::is('gender-wise-report') ? 'selected' : '' }}>Gender Wise Report</option>
     <option value="{{ url('religion-wise-report') }}" {{ Request::is('religion-wise-report') ? 'selected' : '' }}>Religion Wise Report</option>
+    <option value="{{ url('designation-wise-report') }}" {{ Request::is('designation-wise-report') ? 'selected' : '' }}>Designation Wise Report</option>
 </select>
