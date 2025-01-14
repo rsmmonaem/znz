@@ -8,29 +8,29 @@ use Illuminate\Support\Facades\DB;
 
 class ReportController extends Controller
 {
+    private function getCommonData()
+    {
+        return [
+            'groups' => DB::table('com_group')->get(),
+            'branches' => DB::table('branchs')->get(),
+            'departments' => DB::table('departments')->get(),
+            'designation' => DB::table('designations')->get(),
+            'section' => DB::table('sections')->get(),
+        ];
+    }
     public function GenderWiseRport()
     {
-        $groups = DB::table('com_group')->get();
-        $branches = DB::table('branchs')->get();
-        $departments = DB::table('departments')->get();
-        $designation = DB::table('designations')->get();
-        $section = DB::table('sections')->get();
-        return view('employee.report.GenderWiseReport', compact('groups', 'branches', 'departments', 'designation', 'section'));
+        return view('employee.report.GenderWiseReport', $this->getCommonData());
     }
 
     public function ReligionWiseRport()
     {
-        $groups = DB::table('com_group')->get();
-        $branches = DB::table('branchs')->get();
-        $departments = DB::table('departments')->get();
-        $designation = DB::table('designations')->get();
-        $section = DB::table('sections')->get();
-        return view('employee.report.ReligionWiseReport',compact('groups', 'branches', 'departments', 'designation', 'section'));
+        return view('employee.report.ReligionWiseReport', $this->getCommonData());
     }
 
     public function DesignationWiseRport()
     {
-        return view('reports.index');
+        return view('employee.report.DesignationWiseReport', $this->getCommonData());
     }
 
     public function GenderWiseRportPOST(Request $request){
@@ -41,14 +41,19 @@ class ReportController extends Controller
         return $this->GetReport($request, $request->reliagion, 'religion');
     }
 
-    public function GetReport($request, $type=null, $key=null){
+    public function DesignationWiseRportPOST(Request $request){
+        return $this->GetReport($request, null, 'grade_id');
+    }
+
+    private function GetReport($request, $type=null, $key=null){
         $branch = Branch::where('id', $request->branch)->first();
         $data = User::LeftJoin('profile', 'users.id', '=', 'profile.user_id')
         ->LeftJoin('designations', 'users.designation_id', '=', 'designations.id')
         ->LeftJoin('sections', 'profile.section_id', '=', 'sections.id')
         ->LeftJoin('branchs', 'profile.branch_id', '=', 'branchs.id')
         ->LeftJoin('departments', 'designations.department_id', '=', 'departments.id')
-        ->select('profile.employee_code', 'users.first_name', 'departments.name as department', 'designations.name as designation', 'sections.name as section', 'branchs.name as branch', 'profile.'.$key);
+        ->leftJoin('grades', 'profile.grade_id', '=', 'grades.id')
+        ->select('profile.employee_code', 'users.first_name', 'departments.name as department', 'designations.name as designation', 'sections.name as section', 'branchs.name as branch', 'profile.'. $key , 'grades.name as grade');
         if ($request->branch) {
             $data->where('profile.branch_id', '=', $request->branch);
         }
