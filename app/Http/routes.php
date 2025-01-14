@@ -246,9 +246,13 @@ Route::group(['middleware' => ['auth','license','account_valid']], function () {
 	Route::model('holiday','\App\Holiday');
 	Route::post('/holiday/lists','HolidayController@lists');
 	Route::resource('/holiday', 'HolidayController');
-
+	// Gender Wise Report
 	Route::get('gender-wise-report', 'ReportController@GenderWiseRport');
 	Route::post('gender-wise-report', 'ReportController@GenderWiseRportPOST');
+
+	// Religion Wise Report
+	Route::get('religion-wise-report', 'ReportController@ReligionWiseRport');
+	Route::post('religion-wise-report', 'ReportController@ReligionWiseRportPOST');
 	// Spacial Holiday
 	Route::resource('/spacial-holiday', 'SpacialHolidayController');
 	Route::post('/spacial-holiday/lists', 'SpacialHolidayController@lists');
