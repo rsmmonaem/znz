@@ -79,4 +79,46 @@ class ReportController extends Controller
         ]);
     }
       
+    // AdvanceDeductionRport
+    public function ProbationaryPeriodRport()
+    {
+        return view('employee.report.ProbationaryPeriodRport', $this->getCommonData());
+    }
+
+    public function ProbationaryPeriodRportPOST(Request $request){
+        // return $request->all();
+        $branch = Branch::where('id', $request->branch)->first();
+        $data = User::LeftJoin('profile', 'users.id', '=', 'profile.user_id')
+        ->LeftJoin('designations', 'users.designation_id', '=', 'designations.id')
+        ->LeftJoin('sections', 'profile.section_id', '=', 'sections.id')
+        ->LeftJoin('branchs', 'profile.branch_id', '=', 'branchs.id')
+        ->LeftJoin('departments', 'designations.department_id', '=', 'departments.id')
+        ->select('profile.employee_code', 'users.first_name', 'departments.name as department', 'designations.name as designation', 'sections.name as section', 'branchs.name as branch', 'profile.date_of_joining', 'profile.confirm_date');
+        if ($request->branch) {
+            $data->where('profile.branch_id', '=', $request->branch);
+        }
+        if ($request->department) {
+            $data->where('designations.department_id', '=', $request->department);
+        }
+        if ($request->section) {
+            $data->where('profile.section_id', '=', $request->section);
+        }
+        if ($request->designation) {
+            $data->where('users.designation_id', '=', $request->designation);
+        }
+        if($request->employee_id){
+            $data->where('users.id', '=', $request->employee_id);
+        }
+        if ($request->financial_year) {
+            $data->whereRaw('YEAR(profile.date_of_joining) = ?', [$request->financial_year]);
+        }
+        if ($request->month) {
+            $data->whereRaw('MONTH(profile.date_of_joining) = ?', [$request->month]);
+        }
+        $data = $data->get();
+        return response()->json([
+            'data' => $data,
+            'branch' => $branch
+        ]);
+    }
 }
