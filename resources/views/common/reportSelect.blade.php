@@ -18,4 +18,5 @@
     <option value="{{ url('salary-summary') }}" {{ Request::is('salary-summary') ? 'selected' : '' }}>Salary Summary</option>
     <option value="{{ url('salary-bank-statement') }}" {{ Request::is('salary-bank-statement') ? 'selected' : '' }}>Salary Bank Statement</option>
     <option value="{{ url('salary-transfer-glance') }}" {{ Request::is('salary-transfer-glance') ? 'selected' : '' }}>Salary Transfer at a Glance</option>
+    <option value="{{ url('gender-wise-report') }}" {{ Request::is('gender-wise-report') ? 'selected' : '' }}>Gender Wise Report</option>
 </select>

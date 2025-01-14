@@ -67,7 +67,7 @@ Route::group(['middleware' => ['auth','license','account_valid']], function () {
 		Route::post('/email/lists','EmailController@lists');
 		Route::resource('/email', 'EmailController',['only' => ['index','show']]); 
 	});
-
+ 
 	Route::group(['middleware' => ['permission:manage_backup']], function () {
 		Route::model('backup','\App\Backup');
 		Route::post('/backup/lists','BackupController@lists');
@@ -247,6 +247,8 @@ Route::group(['middleware' => ['auth','license','account_valid']], function () {
 	Route::post('/holiday/lists','HolidayController@lists');
 	Route::resource('/holiday', 'HolidayController');
 
+	Route::get('gender-wise-report', 'ReportController@GenderWiseRport');
+	Route::post('gender-wise-report', 'ReportController@GenderWiseRportPOST');
 	// Spacial Holiday
 	Route::resource('/spacial-holiday', 'SpacialHolidayController');
 	Route::post('/spacial-holiday/lists', 'SpacialHolidayController@lists');
