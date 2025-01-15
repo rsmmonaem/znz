@@ -3,6 +3,7 @@ namespace App\Http\Controllers;
 
 use App\Branch;
 use App\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -86,7 +87,6 @@ class ReportController extends Controller
     }
 
     public function ProbationaryPeriodRportPOST(Request $request){
-        // return $request->all();
         $branch = Branch::where('id', $request->branch)->first();
         $data = User::LeftJoin('profile', 'users.id', '=', 'profile.user_id')
         ->LeftJoin('designations', 'users.designation_id', '=', 'designations.id')
@@ -118,6 +118,95 @@ class ReportController extends Controller
         $data = $data->get();
         return response()->json([
             'data' => $data,
+            'branch' => $branch
+        ]);
+    }
+
+    public function AdvanceDeductionRport()
+    {
+        return view('employee.report.AdvanceDeductionRport', $this->getCommonData());
+    }
+
+    public function AdvanceDeductionRportPOST(Request $request){
+        $branch = Branch::where('id', $request->branch)->first();
+        $data = User::leftJoin('profile', 'users.id', '=', 'profile.user_id')
+            ->leftJoin('designations', 'users.designation_id', '=', 'designations.id')
+            ->leftJoin('sections', 'profile.section_id', '=', 'sections.id')
+            ->leftJoin('branchs', 'profile.branch_id', '=', 'branchs.id')
+            ->leftJoin('departments', 'designations.department_id', '=', 'departments.id')
+            ->select('users.id', 'profile.employee_code', 'users.first_name', 'departments.name as department', 'designations.name as designation', 'sections.name as section', 'branchs.name as branch');
+        if ($request->branch) {
+            $data->where('profile.branch_id', '=', $request->branch);
+        }
+        if ($request->department) {
+            $data->where('designations.department_id', '=', $request->department);
+        }
+        if ($request->section) {
+            $data->where('profile.section_id', '=', $request->section);
+        }
+        if ($request->designation) {
+            $data->where('users.designation_id', '=', $request->designation);
+        }
+        if ($request->employee_id) {
+            $data->where('users.id', '=', $request->employee_id);
+        }
+
+        $employees = $data->get();
+
+        $currentYear = $request->financial_year;
+        $last12Months = [];
+        for ($i = 0; $i < 12; $i++) {
+            $month = Carbon::now()->subMonths($i);
+            $last12Months[] = [
+                'month' => $month->format('F'), 
+                'month_number' => $month->format('m') 
+            ];
+        }
+        $result = [];
+        foreach ($employees as $employee) {
+            $monthsWithAdvanceSalary = [];
+            $salaryAdvance = DB::table('salary_advance')
+                ->where('employeeId', $employee->id)
+                ->where('effectiveDate', '>=', Carbon::now()->subYear())
+                ->whereRaw('YEAR(created_at) = ?', [$currentYear])
+                ->latest('created_at')
+                ->first();
+            if ($salaryAdvance) {
+                $totalAmount = DB::table('salary_advance_months')
+                ->where('salary_advance_id', $salaryAdvance->id)
+                ->sum('amount');
+            } else {
+                $totalAmount = 0; // Default value if no record is found
+            }
+            foreach ($last12Months as $monthData) {
+                $monthName = $monthData['month'];
+                $monthNumber = $monthData['month_number'];
+                $salaryDetails = DB::table('employee_salary_details')
+                    ->where('employee_id', $employee->id)
+                    ->whereRaw('YEAR(to_date) = ?', [$currentYear])
+                    ->whereRaw('MONTH(to_date) = ?', [$monthNumber])
+                    ->latest('created_at')
+                    ->first();
+                $monthsWithAdvanceSalary[] = [
+                    'month' => $monthName,
+                    'advance_salary' => $salaryDetails ? $salaryDetails->advance_salary : null
+                ];
+            }
+            $result[] = [
+                'employee_name' => $employee->first_name,
+                'employee_code' => $employee->employee_code,
+                'department' => $employee->department,
+                'designation' => $employee->designation,
+                'section' => $employee->section,
+                'branch' => $employee->branch,
+                'months_with_advance_salary' => $monthsWithAdvanceSalary,
+                'totalDeduct' => array_sum(array_column($monthsWithAdvanceSalary, 'advance_salary')),
+                'total_amount' => $totalAmount
+            ];
+        }
+        // Return the result
+        return response()->json([
+            'data' => $result,
             'branch' => $branch
         ]);
     }
