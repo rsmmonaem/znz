@@ -266,6 +266,14 @@ Route::group(['middleware' => ['auth','license','account_valid']], function () {
 	Route::get('advance-deduction-report', 'ReportController@AdvanceDeductionRport');
 	Route::post('advance-deduction-report', 'ReportController@AdvanceDeductionRportPOST');
 	
+	// Bonus Process
+	Route::get('bonus-process', 'BonusProcess@index');
+	Route::post('bonus-process', 'BonusProcess@indexPost');
+	Route::get('bonus-process-summary', 'BonusProcess@summary');
+	Route::post('bonus-process-summary', 'BonusProcess@summaryPost');
+	Route::get('bonus-process-report', 'BonusProcess@report');
+	Route::post('bonus-process-report', 'BonusProcess@reportPost');
+
 	// Spacial Holiday
 	Route::resource('/spacial-holiday', 'SpacialHolidayController');
 	Route::post('/spacial-holiday/lists', 'SpacialHolidayController@lists');

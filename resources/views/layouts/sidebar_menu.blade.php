@@ -175,6 +175,21 @@
 							@if(Entrust::can('whd'))
 							 <li data-position="27" {!! (in_array('whd',$menu)) ? 'class="active"' : '' !!} {!! menuAttr($menus,'whd') !!}><a href="{!! URL::to('/whd') !!}"><i class="fa fa-fighter-jet icon"></i> WHD </a></li>
 							@endif
+
+							@if(Entrust::can('whd'))
+								<li data-position="27" {!! (in_array('bonus',$menu)) ? 'class="active"' : '' !!} {!! menuAttr($menus,'bonus') !!}><a href="#"><i class="fa fa-book icon"></i><i class="fa fa-angle-double-down i-right"></i>Bonus</a>
+									<ul {!! (in_array('bonus-process',$menu)) ? 'class="visible"' : '' !!}>
+										@if(Entrust::can('bonus-process')) 
+										<li {!! (in_array('bonus-process',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/bonus-process') !!}"><i class="fa fa-angle-right"></i> Bonus Process </a></li>
+										@endif
+										{{--  --}}
+										@if(Entrust::can('bonus-process-summary')) 
+										<li {!! (in_array('bonus-process-summary',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/bonus-process-summary') !!}"><i class="fa fa-angle-right"></i> Bonus Process Summary </a></li>
+										@endif
+										
+									</ul>
+								</li>
+							@endif
                           
 							<li {!! (in_array('leave',$menu)) ? 'class="active"' : '' !!} {!! menuAttr($menus,'leave') !!}><a href="#"><i class="fa fa-coffee icon"></i> <i class="fa fa-angle-double-down i-right"></i> {!! trans('messages.leave') !!}</a>
 							    <ul {!! (in_array('leave',$menu) ||
