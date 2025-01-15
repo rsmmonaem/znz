@@ -258,10 +258,14 @@ Route::group(['middleware' => ['auth','license','account_valid']], function () {
 	Route::get('designation-wise-report', 'ReportController@DesignationWiseRport');
 	Route::post('designation-wise-report', 'ReportController@DesignationWiseRportPOST');
 
-	// Advance Deduction Report
+	//Probationary Preiod Report
 	Route::get('probationary-period-report', 'ReportController@ProbationaryPeriodRport');
 	Route::post('probationary-period-report', 'ReportController@ProbationaryPeriodRportPOST');
 
+	// Advance Deduciton Report
+	Route::get('advance-deduction-report', 'ReportController@AdvanceDeductionRport');
+	Route::post('advance-deduction-report', 'ReportController@AdvanceDeductionRportPOST');
+	
 	// Spacial Holiday
 	Route::resource('/spacial-holiday', 'SpacialHolidayController');
 	Route::post('/spacial-holiday/lists', 'SpacialHolidayController@lists');
