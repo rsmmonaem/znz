@@ -7,7 +7,7 @@ class TaxbankController extends Controller
 {
     public function showPage()
     {
-        return view('Tax.TaxBank');
+        return view('Tax.Taxbank');
     }
     public function index()
     {
