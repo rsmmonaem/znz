@@ -190,6 +190,35 @@
 									</ul>
 								</li>
 							@endif
+
+							@if(Entrust::can('bonus-process'))
+								<li data-position="27" {!! (in_array('bonus',$menu)) ? 'class="active"' : '' !!} {!! menuAttr($menus,'bonus') !!}><a href="#"><i class="fa fa-money icon"></i><i class="fa fa-angle-double-down i-right"></i>Tax Process</a>
+									<ul {!! (in_array('bonus-process',$menu)) ? 'class="visible"' : '' !!}>
+										@if(Entrust::can('bonus-process')) 
+										   <li {!! (in_array('cost-unit-set-panel',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/cost-unit-set-panel') !!}"><i class="fa fa-angle-right"></i> Cost Unit Set Panel</a></li>
+										@endif
+										@if(Entrust::can('bonus-process')) 
+										   <li {!! (in_array('month-wise-challan-set-panel',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/month-wise-challan-set-panel') !!}"><i class="fa fa-angle-right"></i>Month Wise Challan Set Panel</a></li>
+										@endif
+									
+										@if(Entrust::can('bonus-process')) 
+										   <li {!! (in_array('month-wise-adjutment-panel',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/month-wise-adjutment-panel') !!}"><i class="fa fa-angle-right"></i>Month Wise Adjutment Panel</a></li>
+										@endif
+										@if(Entrust::can('bonus-process')) 
+										   <li {!! (in_array('cost-unit-wise-challan-list',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/cost-unit-wise-challan-list') !!}"><i class="fa fa-angle-right"></i>Cost Unit Wise Challan List</a></li>
+										@endif
+										
+										{{--  --}}
+										@if(Entrust::can('bonus-process-summary')) 
+										   <li {!! (in_array('tax-bank-show',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/tax-bank-show') !!}"><i class="fa fa-angle-right"></i> Tax Bank </a></li>
+										@endif
+										@if(Entrust::can('bonus-process-summary')) 
+										   <li {!! (in_array('tax-cost-unit-type-show',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/tax-cost-unit-type-show') !!}"><i class="fa fa-angle-right"></i> Tax Cost Unit </a></li>
+										@endif
+										
+									</ul>
+								</li>
+							@endif
                           
 							<li {!! (in_array('leave',$menu)) ? 'class="active"' : '' !!} {!! menuAttr($menus,'leave') !!}><a href="#"><i class="fa fa-coffee icon"></i> <i class="fa fa-angle-double-down i-right"></i> {!! trans('messages.leave') !!}</a>
 							    <ul {!! (in_array('leave',$menu) ||

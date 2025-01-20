@@ -244,6 +244,33 @@ class SalaryProcessController extends Controller
 
         $GrossSalaryAmountAfterProvidentFund = $GrossSalaryAmountAfterAdvance - $ProvidentFund;
 
+        $monthColumns = [
+            1 => 'january',
+            2 => 'february',
+            3 => 'march',
+            4 => 'april',
+            5 => 'may',
+            6 => 'june',
+            7 => 'july',
+            8 => 'august',
+            9 => 'september',
+            10 => 'october',
+            11 => 'november',
+            12 => 'december',
+        ];
+        $monthNumber = (int)date('m', strtotime($toDate));
+        // Get the column name for the provided month number
+        $monthColumn = isset($monthColumns[$monthNumber]) ? $monthColumns[$monthNumber] : null;
+
+        $taxAmount = DB::table('tax_month_adjustments')
+        ->where('user_id', $employeeId)
+        ->latest('created_at')
+            ->first();
+        $amount = 0;
+        if ($taxAmount) {
+            $amount = $taxAmount->$monthColumn;
+        }
+        // return $taxAmount;
         $netSalary = $GrossSalaryAmountAfterProvidentFund;
 
         $TableData = [
@@ -256,6 +283,7 @@ class SalaryProcessController extends Controller
             'gross_salary' => $salaryslab?$salaryslab->gross:0,
             'net_salary' => $netSalary,
             'employee_id' => $employeeId,
+            'tax_amount' => $amount,
             'arrear_amount' => '',
             'remarks' => $remarks,
             'form_date' => $formDate,
@@ -487,6 +515,33 @@ class SalaryProcessController extends Controller
 
         $overtimeSalery = $totalOvertimeHrs * $perdaysAmount;
 
+        $monthColumns = [
+            1 => 'january',
+            2 => 'february',
+            3 => 'march',
+            4 => 'april',
+            5 => 'may',
+            6 => 'june',
+            7 => 'july',
+            8 => 'august',
+            9 => 'september',
+            10 => 'october',
+            11 => 'november',
+            12 => 'december',
+        ];
+        $monthNumber = (int)date('m', strtotime($toDate));
+        // Get the column name for the provided month number
+        $monthColumn = isset($monthColumns[$monthNumber]) ? $monthColumns[$monthNumber] : null;
+
+        $taxAmount = DB::table('tax_month_adjustments')
+        ->where('user_id', $employeeId)
+        ->latest('created_at')  
+        ->first(); 
+        $amount = 0;
+        if ($taxAmount) {
+            $amount = $taxAmount->$monthColumn;
+        }
+
         $TableData = [
             'total_worked_days' => $totalWorkedDays,
             'total_absents' => $totalAbsents,
@@ -498,6 +553,7 @@ class SalaryProcessController extends Controller
             'net_salary' => $netSalary,
             'employee_id' => $employeeId,
             'arrear_amount' => '',
+            'tax_amount' => $amount,
             'remarks' => $remarks,
             'form_date' => $formDate,
             'to_date' => $toDate,

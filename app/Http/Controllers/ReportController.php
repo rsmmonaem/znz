@@ -210,4 +210,98 @@ class ReportController extends Controller
             'branch' => $branch
         ]);
     }
+
+    public function TaxDeductionRport() {
+        $taxFinacialYears = ['2020-2021','2021-2022','2022-2023','2023-2024','2024-2025','2025-2026','2026-2027','2027-2028','2028-2029','2029-2030'];
+        return view('Tax.TaxDeductionRport', $this->getCommonData())->with('taxFinacialYears', $taxFinacialYears); 
+    }
+
+    public function TaxDeductionRportPOST(Request $request) {
+        $branch = Branch::where('id', $request->branch)->first();
+        $data = User::leftJoin('profile', 'users.id', '=', 'profile.user_id')
+        ->leftJoin('designations', 'users.designation_id', '=', 'designations.id')
+        ->leftJoin('sections', 'profile.section_id', '=', 'sections.id')
+        ->leftJoin('branchs', 'profile.branch_id', '=', 'branchs.id')
+        ->leftJoin('departments', 'designations.department_id', '=', 'departments.id')
+        ->LeftJoin('tax_month_adjustments', 'users.id', '=', 'tax_month_adjustments.user_id')
+        ->select('users.id', 'profile.employee_code', 'users.first_name', 'departments.name as department', 'designations.name as designation', 'sections.name as section', 'branchs.name as branch')
+        ->where('tax_month_adjustments.financial_year', $request->financial_year);
+        if ($request->branch) {
+            $data->where('profile.branch_id', '=', $request->branch);
+        }
+        if ($request->department) {
+            $data->where('designations.department_id', '=', $request->department);
+        }
+        if ($request->section) {
+            $data->where('profile.section_id', '=', $request->section);
+        }
+        if ($request->designation) {
+            $data->where('users.designation_id', '=', $request->designation);
+        }
+        if ($request->employee_id) {
+            $data->where('users.id', '=', $request->employee_id);
+        }
+
+        $employees = $data->get();
+
+        $currentYear = $request->financial_year; // e.g., 2024
+        $last12Months = [];
+
+        // Set the start of the financial year
+        list($startYear, $endYear) = explode('-', $currentYear);
+
+        // Define the start and end dates
+        $startDate = Carbon::createFromDate($startYear, 7, 1); // July 1, 2024
+        $endDate = Carbon::createFromDate($endYear, 6, 30);
+
+        // Iterate through the months from July to June
+        // $months = [];
+        $currentDate = $startDate->copy();
+
+        while ($currentDate->lte($endDate)) {
+            $last12Months[] = [
+                'month' => $currentDate->format('F'),
+                'year' => $currentDate->year,
+                'month_number' => $currentDate->month
+            ];
+            $currentDate->addMonth();
+        }
+        // return $last12Months;
+        $result = [];
+        foreach ($employees as $employee) {
+            $monthsWithAdvanceSalary = [];
+            foreach ($last12Months as $monthData) {
+                $monthName = $monthData['month'];
+                $monthNumber = $monthData['month_number'];
+                $year = $monthData['year'];
+                $salaryDetails = DB::table('employee_salary_details')
+                ->where('employee_id', $employee->id)
+                    ->whereRaw('YEAR(to_date) = ?', [$year])
+                    ->whereRaw('MONTH(to_date) = ?', [$monthNumber])
+                    ->latest('created_at')
+                    ->first();
+                $monthsWithAdvanceSalary[] = [
+                    'month' => $monthName,
+                    'tax_amount' => $salaryDetails ? $salaryDetails->tax_amount : null
+                ];
+            }
+            $result[] = [
+                'employee_name' => $employee->first_name,
+                'employee_code' => $employee->employee_code,
+                'department' => $employee->department,
+                'designation' => $employee->designation,
+                'section' => $employee->section,
+                'branch' => $employee->branch,
+                'months_with_tax_amount' => $monthsWithAdvanceSalary,
+                'totalDeduct' => array_sum(array_column($monthsWithAdvanceSalary, 'tax_amount')),
+                // 'total_amount' => $totalAmount
+            ];
+        }
+        // Return the result
+        return response()->json([
+            'data' => $result,
+            'branch' => $branch,
+            'tax_year' => $currentYear
+        ]);
+    }
 }

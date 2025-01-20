@@ -274,6 +274,41 @@ Route::group(['middleware' => ['auth','license','account_valid']], function () {
 	Route::get('bonus-process-report', 'BonusProcess@report');
 	Route::post('bonus-process-report', 'BonusProcess@reportPost');
 
+	// Tax Bank Account
+	Route::get('tax-bank-show', 'TaxbankController@showPage');
+	Route::resource('tax-bank', 'TaxbankController');
+	// 
+	Route::resource('tax-cost-unit-type-show', 'CostUnitTypeController@showPage');
+	Route::resource('tax-cost-unit-type', 'CostUnitTypeController');
+	
+	// Route::get('tax-bank', 'TaxProcessController@TaxBank');
+	Route::get('cost-unit-set-panel', 'TaxProcessController@CostUnitSetPanel');
+	Route::post('cost-unit-set-panel', 'TaxProcessController@CostUnitSetPanelPost');
+
+	// Month Wise Challan Set Panel 
+	Route::get('month-wise-challan-set-panel', 'TaxProcessController@MonthWiseChallanSetPanel');
+	Route::post('month-wise-challan-set-panel','TaxProcessController@MonthWiseChallanSetPanelPOST');
+	Route::get('month-wise-challan-set-panel-get-data', 'TaxProcessController@MonthWiseChallanSetPanelGetData');
+	Route::post('month-wise-challan-delete', 'TaxProcessController@MonthWiseChallanDelete');
+
+	// Month Wise Adjutment Panel
+	Route::get('month-wise-adjutment-panel', 'TaxProcessController@MonthWiseAdjutmentPanel');
+	Route::post('month-wise-adjutment-panel-search','TaxProcessController@MonthWiseAdjutmentPanelPOSTSearch');
+	Route::post('month-wise-adjutment-panel','TaxProcessController@MonthWiseAdjutmentPanelPOST');
+
+	// Cost Unit Wise Challan List
+	Route::get('cost-unit-wise-challan-list', 'TaxProcessController@CostUnitWiseChallanList');
+	Route::post('cost-unit-wise-challan-list','TaxProcessController@CostUnitWiseChallanListPOST');
+
+	// Get Cost Unit
+	Route::get('GetCostUnitEmployee/{id}', 'TaxProcessController@GetCostUnitEmployee');
+	Route::get('GetBankBranch/{id}', 'TaxProcessController@GetBankBranch');
+	
+	// Tax Diduction Report
+	Route::get('tax-deduction-report', 'ReportController@TaxDeductionRport');
+	Route::post('tax-deduction-report', 'ReportController@TaxDeductionRportPOST');
+
+	// Tax Deduction Report
 	// Spacial Holiday
 	Route::resource('/spacial-holiday', 'SpacialHolidayController');
 	Route::post('/spacial-holiday/lists', 'SpacialHolidayController@lists');
