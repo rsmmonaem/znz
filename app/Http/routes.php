@@ -277,6 +277,10 @@ Route::group(['middleware' => ['auth','license','account_valid']], function () {
 	// Tax Bank Account
 	Route::get('tax-bank-show', 'TaxbankController@showPage');
 	Route::resource('tax-bank', 'TaxbankController');
+	
+	// Tax Bank Branch
+	Route::get('tax-bank-branch-show', 'TaxbankbranchController@showPage');
+	Route::resource('tax-bank-branch', 'TaxbankbranchController');
 	// 
 	Route::resource('tax-cost-unit-type-show', 'CostUnitTypeController@showPage');
 	Route::resource('tax-cost-unit-type', 'CostUnitTypeController');
