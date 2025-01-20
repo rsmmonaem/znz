@@ -24,4 +24,6 @@
     <option value="{{ url('probationary-period-report') }}" {{ Request::is('probationary-period-report') ? 'selected' : '' }}>Probationary Period Report</option>
     <option value="{{ url('bonus-process-report') }}" {{ Request::is('bonus-process-report') ? 'selected' : '' }}>Bonus Process Report</option>
     <option value="{{ url('bonus-process-summary') }}" {{ Request::is('bonus-process-summary') ? 'selected' : '' }}>Bonus Process Summary</option>
+    <option value="{{ url('cost-unit-wise-challan-list') }}" {{ Request::is('cost-unit-wise-challan-list') ? 'selected' : '' }}>Cost Unit Wise Challan List</option>
+    <option value="{{ url('tax-deduction-report') }}" {{ Request::is('tax-deduction-report') ? 'selected' : '' }}>Tax Deduction Report</option>
 </select>
