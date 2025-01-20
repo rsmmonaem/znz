@@ -24,7 +24,7 @@ class TaxProcessController extends Controller
 
     public function CostUnitSetPanel()
     {
-        return view('tax.cost_unit_set_panel', $this->GetCommonData());
+        return view('Tax.cost_unit_set_panel', $this->GetCommonData());
     }
 
     public function CostUnitSetPanelPost(Request $request){
@@ -60,7 +60,7 @@ class TaxProcessController extends Controller
         $taxFinacialyear = ['2024-2025', '2025-2026', '2026-2027', '2028-2029', '2029-2030', '2031-2032'];
         $finacialyear = ['2024','2025','2026','2027','2028','2029','2030'];
         $taxBank = DB::table('tax_bank')->get();
-        return view('tax.month-wise-challan-set-panel', compact('costUnitName', 'taxFinacialyear', 'finacialyear', 'taxBank'));
+        return view('Tax.month-wise-challan-set-panel', compact('costUnitName', 'taxFinacialyear', 'finacialyear', 'taxBank'));
     }
 
     public function GetCostUnitEmployee($id){
@@ -128,7 +128,7 @@ class TaxProcessController extends Controller
     public function MonthWiseAdjutmentPanel(){
         $taxFinacialyear = ['2024-2025', '2025-2026', '2026-2027', '2028-2029', '2029-2030', '2031-2032'];
         $branch = Branch::all();
-        return view('tax.month-wise-adjutment-panel', compact('taxFinacialyear', 'branch'));
+        return view('Tax.month-wise-adjutment-panel', compact('taxFinacialyear', 'branch'));
     }
 
     public function MonthWiseAdjutmentPanelPOSTSearch(Request $request){
@@ -173,7 +173,7 @@ class TaxProcessController extends Controller
 
     public function CostUnitWiseChallanList(){
         $tax_cost_unit_type = DB::table('tax_cost_unit_type')->get();
-        return view('tax.CostUnitWiseChallanList', compact('tax_cost_unit_type'));
+        return view('Tax.CostUnitWiseChallanList', compact('tax_cost_unit_type'));
     }
 
     public function CostUnitWiseChallanListPOST(Request $request){
