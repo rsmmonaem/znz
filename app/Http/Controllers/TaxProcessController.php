@@ -135,8 +135,18 @@ class TaxProcessController extends Controller
         // return $request->all();
         $data = User::where('users.id', $request->employee_id)
         ->leftJoin('profile', 'users.id', '=', 'profile.user_id')
-        ->select('profile.employee_code as employee_code', 'users.first_name as name')
+        ->LeftJoin('tax_month_adjustments', 'users.id', '=', 'tax_month_adjustments.user_id')
+        ->select('profile.employee_code as employee_code', 'users.first_name as username', 'tax_month_adjustments.*')
+        ->where('tax_month_adjustments.financial_year', $request->finacialyear)
+        ->latest('tax_month_adjustments.id' , 'desc')
         ->first();
+
+        if (empty($data)) {
+            $data = User::where('users.id', $request->employee_id)
+            ->leftJoin('profile', 'users.id', '=', 'profile.user_id')
+            ->select('profile.employee_code as employee_code', 'users.first_name as username')
+            ->first();
+        }
         return response()->json([
             'success' => true,
             'data' => $data,
