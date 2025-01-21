@@ -60,11 +60,16 @@
             getSeparationData();
             $('body').attr('aria-hidden', 'true'); // Hide background content
   		    $(this).removeAttr('aria-hidden');  
+        $('#branch').on('change', function() {
+            const id = $(this).val();
+            $('#multiple_id').val('').trigger('change');
+            HandleBranchWiseEmployees(id, '#multiple_id', true);
+        })
         // Handle form submission
 		$('.Spacial-Holiday-save').on('click', function(e){
 			  e.preventDefault(); 
-            const multiple_id = $('input[name="multiple_id"]').val();
-            const multiple_id_array = multiple_id.split(',').map(id => id.trim()).filter(id => id !== "");
+            const multiple_id = $('#multiple_id').val();
+            // const multiple_id_array = multiple_id.split(',').map(id => id.trim()).filter(id => id !== "");
             // Get data from form fields by name
             const formData = {
                 date: $('[name="date"]').val(),
@@ -74,7 +79,7 @@
                 department: $('[name="department"]').val(),
                 section: $('[name="section"]').val(),
                 status: $('[name="status"]').val(),
-                employee_id: multiple_id_array,
+                employee_id: multiple_id,
             };
 
            // Send AJAX request
@@ -134,7 +139,7 @@
                                     <a href="#" data-id="${separation.id}" class="btn btn-danger btn-xs" id="deleteHoliday"><i class="fa fa-trash"></i></a>
                                 </div>
                             </td>
-                            <td>${separation.id}</td>
+                            <td>${separation.employee_code}</td>
                             <td>${separation.bname || ' '}</td>
                             <td>${separation.date}</td> 
                             <td>${separation.description || ' '}</td> 

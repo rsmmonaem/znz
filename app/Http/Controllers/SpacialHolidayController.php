@@ -24,7 +24,8 @@ Class SpacialHolidayController extends Controller{
 	public function lists(){
 
         $holidays = SpacialHoliday::leftJoin('users', 'spacial_holidays.user_id','=', 'users.id')
-		->select('spacial_holidays.description as description', 'spacial_holidays.date', 'spacial_holidays.id', 'users.first_name as bname')
+		->leftJoin('profile', 'users.id', '=', 'profile.user_id')
+		->select('profile.employee_code as employee_code','spacial_holidays.description as description', 'spacial_holidays.date', 'spacial_holidays.id', 'users.first_name as bname')
 		->orderby('spacial_holidays.id','desc')
 		->get();
 		return $holidays;
