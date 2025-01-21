@@ -121,6 +121,7 @@
                 const formData = {
                     branch_id: branch_id,
                     employee_id: employee_id,
+                    finacialyear: $('#taxfinancialyear').val(),
                     _token: '{{ csrf_token() }}',
                 }
                 $.ajax({
@@ -131,7 +132,20 @@
                         if(response.data) {
                            $('#month-table').show();
                            $('#emp_id').text(response.data.employee_code);
-                           $('#emp_name').text(response.data.name);
+                           $('#emp_name').text(response.data.username);
+                           $('#july').val(response.data.july);
+                           $('#aug').val(response.data.august);
+                           $('#sep').val(response.data.september);
+                           $('#oct').val(response.data.october);
+                           $('#nov').val(response.data.november);
+                           $('#dec').val(response.data.december);
+                           $('#jan').val(response.data.january);
+                           $('#feb').val(response.data.february);
+                           $('#mar').val(response.data.march);
+                           $('#apr').val(response.data.april);
+                           $('#may').val(response.data.may);
+                           $('#jun').val(response.data.june);
+                           $('#total').val(response.data.total);
                         }
                     }
                 })

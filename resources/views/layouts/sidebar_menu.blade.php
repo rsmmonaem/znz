@@ -97,6 +97,9 @@
 										@if (Entrust::can('Salary_Sheet'))
 											<li {!! (in_array('/slary-shit',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/slary-shit') !!}"><i class="fa fa-angle-right"></i> Salary Sheet </a></li>
 										@endif
+										@if (Entrust::can('salary_paid_unpaid'))
+										   <li {!! (in_array('/salary-paid-unpaid',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/salary-paid-unpaid') !!}"><i class="fa fa-angle-right"></i> Salary Paid Unpaid Panel</a></li>
+										@endif
 									</ul>
 								</li> 
 							@endif

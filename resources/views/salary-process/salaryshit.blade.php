@@ -111,7 +111,9 @@
                                     <th rowspan="2">TAX</th>                                    <th rowspan="2">Arrear Amount</th>
                                     <th rowspan="2">OT Amount</th>
                                     <th rowspan="2">Net Payable</th>
-                                    <th rowspan="2">Bank Asia A/C No.</th>
+                                    <th rowspan="2">Bank Payable</th>
+                                    <th rowspan="2">Cash Payable</th>
+                                    <th rowspan="2">Bank A/C No.</th>
                                     <th rowspan="2">Remarks</th>
                                 </tr>
                                 <tr>
@@ -142,6 +144,8 @@
                                     <td id="total-arrear"></td>
                                     <td id="total-otamount"></td>
                                     <td id="total-net-payable"></td>
+                                    <td id="total-bank-payable"></td>
+                                    <td id="total-cash-payable"></td>
                                     <td colspan="2"></td>
                                 </tr>
                             </tfoot>
@@ -242,6 +246,8 @@
                                 <td class="arrear-amount" data-name="${item.first_name}" data-arrear-amount="${item.arrear_amount}" data-id="${item.id}" >${item.arrear_amount}</td>
                                 <td class="ot-amount" data-id="${item.id}" >${item.ot_amount ? item.ot_amount : '0.00'}</td>
                                 <td class="net-payable" data-id="${item.id}" data-netpayable="${item.net_salary}">${parseFloat(netPayable).toFixed(2)}</td>
+                                <td>${parseFloat(item.bankamount).toFixed(2)}</td>
+                                <td class="cash-amount" data-id="${item.id}" data-cashamount="${item.cashamount}">${parseFloat(item.cashamount).toFixed(2)}</td>
                                 <td>${item.account_number || ' '}</td>
                                 <td>${item.remarks || ' '}</td>
                             </tr>
@@ -249,7 +255,7 @@
                     });
 
                     const table = datatable.DataTable({
-                        lengthMenu: [10, 20, 50, 100],
+                        lengthMenu: [20, 50, 100],
                         paging: true,
                         // searching: true,
                         autoWidth: true,
@@ -337,6 +343,14 @@
                                 return parseFloat(a) + parseFloat(b);
                             }, 0);
 
+                            var TotalBank = api.column(19).data().reduce(function(a, b) {
+                                return parseFloat(a) + parseFloat(b);
+                            })
+
+                            var TotalCash = api.column(20).data().reduce(function(a, b) {
+                                return parseFloat(a) + parseFloat(b);
+                            })
+
                             // Update the footer with the calculated sums
                             // $('#total-attendance').html(totalAttendance);
                             $('#total-gross-salary').html(totalGrossSalary);
@@ -352,6 +366,8 @@
                             $('#total-arrear').html(totalArrear);
                             $('#total-otamount').html(totalArrear);
                             $('#total-net-payable').html(parseFloat(totalNetPayable).toFixed(2));
+                            $('#total-bank-payable').html(parseFloat(TotalBank).toFixed(2));
+                            $('#total-cash-payable').html(parseFloat(TotalCash).toFixed(2));
                         }
                         
                     });
@@ -368,6 +384,7 @@
                     const arrearAmount = parseFloat($(this).data('arrear-amount'));  // Get the current arrear amount
                     const id = $(this).data('id');  // Get the ID of the clicked element
                     const name = $(this).data('name');  // Get the name of the clicked employee
+                    const cashamount = $(this).data('cashamount');
                     // Create the modal
                     console.log(id);
 
@@ -423,9 +440,13 @@
                                     const netPayable = parseFloat($('.net-payable[data-id="' + id + '"]').data('netpayable'));
                                     const newNetPayable = isNaN(netPayable) ? parseFloat(arrearAmountInput) : (netPayable + parseFloat(arrearAmountInput));
 
+                                    const cashamount = parseFloat($('.cash-amount[data-id="' + id + '"]').data('cashamount'));
+                                    const newCashAmount = isNaN(cashamount) ? parseFloat(arrearAmountInput) : (cashamount + parseFloat(arrearAmountInput));
+
                                     $('.net-payable[data-id="' + id + '"]').text(newNetPayable);
                                     $('.net-payable[data-id="' + id + '"]').data('netpayable', newNetPayable);
 
+                                    $('.cash-amount[data-id="' + id + '"]').text(newCashAmount);
                                     // Hide the modal
                                     $('#arrearModal').modal('hide');  // Close the modal
                                     toastr.success('Arrear amount updated successfully.');

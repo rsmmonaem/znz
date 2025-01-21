@@ -167,19 +167,8 @@ class SalaryProcessController extends Controller
         $endDate = Carbon::parse($toDate); 
         $TotalDays = $startDate->diffInDays($endDate) + 1;
 
-        // Define an array of weekly holidays
-        // $weeklyHolidays = [Carbon::FRIDAY];
-
         // Initialize an array to store the Friday dates
         $fridays = WHD::where('user_id', $employeeId)->whereBetween('date', [$formDate, $toDate])->pluck('date')->toArray();
-        // Loop through the date range
-        // while ($startDate <= $endDate) {
-        //     if (in_array($startDate->dayOfWeek, $weeklyHolidays)) {
-        //         $fridays[] = $startDate->format('Y-m-d');  // Store the Friday date in the array
-        //     }
-        //     // Move to the next day
-        //     $startDate->addDay();
-        // }
         // Total Fridays
         $totalFridays = count($fridays);
         // Sarary Slab
@@ -234,6 +223,7 @@ class SalaryProcessController extends Controller
         $GrossAmountSalaryPerDays = $perdaysAmount * $totalWorkedDays;
         $TotalDiductionAmount = $perdaysAmount * $totalAbsents;
 
+        $TotalFridaysAmount = $perdaysAmount * $totalFridays;
         $GrossSalaryAmountAfterAdvance = $GrossAmountSalaryPerDays - $advanceAmount;
         // return $deductionsData->where('salary_type_id', 5);
         if(count($deductionsData->where('salary_type_id', 5)) === 0){
@@ -273,6 +263,19 @@ class SalaryProcessController extends Controller
         // return $taxAmount;
         $netSalary = $GrossSalaryAmountAfterProvidentFund;
 
+        $BankAmount = DB::table('salary_bank')
+        ->where('user_id', $employeeId)
+        ->where('effective_date', '<=', $formDate)
+        ->latest('created_at')
+        ->first();
+
+        $FinalBankAmount = 0;
+        $FinalcashAmount = 0;
+        if($BankAmount){
+           $FinalBankAmount = $BankAmount->bank_amount / $BankAmount->gross * 100;
+           $FinalcashAmount = $BankAmount->cash_amount / $BankAmount->gross * 100;
+        }
+
         $TableData = [
             'total_worked_days' => $totalWorkedDays,
             'total_absents' => $totalAbsents,
@@ -287,31 +290,34 @@ class SalaryProcessController extends Controller
             'arrear_amount' => '',
             'remarks' => $remarks,
             'form_date' => $formDate,
-            'to_date' => $toDate
-        ];
+            'to_date' => $toDate,
+            'bankamount' => max(0, $FinalBankAmount / 100 * $netSalary - $amount),
+            'cashamount' => $FinalBankAmount > 0
+                ? $FinalcashAmount / 100 * $netSalary
+                    : ($FinalcashAmount / 100 * $netSalary - $amount),
+            'weekendays_amount' => $TotalFridaysAmount ? $TotalFridaysAmount : 0
+            ];
 
+        DB::table('employee_salary_payment_details')->insert([
+            'PaidAmount' => 0,
+            'UnpaidAmount' => 0,
+            'NetPayable' => $netSalary,
+            'EmployeeID' => $employeeId,
+            'BankPay' => max(0, $FinalBankAmount / 100 * $netSalary - $amount),
+            'CashPay' => $FinalBankAmount > 0
+            ? $FinalcashAmount / 100 * $netSalary
+                : ($FinalcashAmount / 100 * $netSalary - $amount),
+            'Gross' => $salaryslab ? $salaryslab->gross : 0,
+            'TotalPayable' => max(0, $netSalary - $amount),
+            'TotalDeduction' => $TotalDiductionAmount + $amount + $advanceAmount + $ProvidentFund,
+            'FormDate' => $formDate,
+            'ToDate' => $toDate,
+            'Remarks' => $remarks
+        ]);
         // Check if record exists for the same employee and date range
-        $exists = DB::table('employee_salary_details')
-            ->where('employee_id', $employeeId)
-            ->where('form_date', $formDate)
-            ->where('to_date', $toDate)
-            ->exists();
         DB::table('employee_salary_details')->insert($TableData);
+
         return $User->employee_code;
-        // if (!$exists) {
-        //     // Insert the new record into the database
-        //     DB::table('employee_salary_details')->insert($TableData);
-        //     return $employeeId;  // Return the processed employee ID for successful insertion
-        // } else {
-        //     return null;  // Return null if the record already exists
-        // }
-        // if (!$exists) {
-        //     // Insert new record if not exists
-        //     DB::table('employee_salary_details')->insert($TableData);
-        //     return response()->json(['message' => 'Record inserted successfully.']);
-        // } else {
-        //     return response()->json(['message' => 'Record already exists for the same employee and date range.']);
-        // }
     }
 
     public function SalaryProcessByBranch($employeeId, $formDate, $toDate, $remarks)
@@ -366,19 +372,8 @@ class SalaryProcessController extends Controller
         $endDate = Carbon::parse($toDate);
         $TotalDays = $startDate->diffInDays($endDate);
 
-        // Define an array of weekly holidays
-        $weeklyHolidays = [Carbon::FRIDAY];
-
         // Initialize an array to store the Friday dates
-        $fridays = [];
-        // Loop through the date range
-        while ($startDate <= $endDate) {
-            if (in_array($startDate->dayOfWeek, $weeklyHolidays)) {
-                $fridays[] = $startDate->format('Y-m-d');  // Store the Friday date in the array
-            }
-            // Move to the next day
-            $startDate->addDay();
-        }
+        $fridays = WHD::where('user_id', $employeeId)->whereBetween('date', [$formDate, $toDate])->pluck('date')->toArray();
         // Total Fridays
         $totalFridays = count($fridays);
         // Sarary Slab
@@ -412,18 +407,20 @@ class SalaryProcessController extends Controller
         $deductionsData = $deductionsData->unique('salary_type_id');
 
         $advanceSalary = DB::table('salary_advance')
-        ->leftjoin('salary_advance_months', 'salary_advance.id', '=', 'salary_advance_months.salary_advance_id')
+        ->leftJoin('salary_advance_months', 'salary_advance.id', '=', 'salary_advance_months.salary_advance_id')
         ->where('employeeId', $employeeId)
-            ->whereBetween('salary_advance.session', [
-                date('Y', strtotime($formDate)),
-                date('Y', strtotime($toDate))
-            ])
-            ->whereBetween('salary_advance_months.month', [
-                date('m', strtotime($formDate)),
-                date('m', strtotime($toDate))
-            ])
-            ->select('salary_advance.grossValue', 'salary_advance.grossOption')
-            ->first();
+        ->where('salary_advance.effectiveDate', '<', $formDate)
+        ->select('salary_advance.grossValue', 'salary_advance.grossOption', 'salary_advance_months.month', 'salary_advance_months.amount')
+        ->get();
+        $monthNumber = (int)date('m', strtotime($toDate));
+        $advanceAmount = 0;
+        foreach ($advanceSalary as $record) {
+            if ($record->month === $monthNumber
+            ) {
+                $advanceAmount = $record->amount;
+                break;
+            }
+        }
 
         // Fetch shift data
         $shiftTime = UserShift::where('user_id', '=', $employeeId)
@@ -486,15 +483,6 @@ class SalaryProcessController extends Controller
         $GrossAmountSalaryPerDays = $perdaysAmount * $totalWorkedDays;
         $TotalDiductionAmount = $perdaysAmount * $totalAbsents;
 
-        $advanceAmount = '';
-        if ($advanceSalary) {
-            if ($advanceSalary->grossOption == 'percentage') {
-                $advanceAmount = $GrossAmountSalaryPerDays * ($advanceSalary->grossValue / 100);
-            } else {
-                $advanceAmount = $advanceSalary->grossValue;
-            }
-        }
-
         $GrossSalaryAmountAfterAdvance = $GrossAmountSalaryPerDays - $advanceAmount;
         // return $deductionsData->where('salary_type_id', 5);
         if (count($deductionsData->where('salary_type_id', 5)) === 0) {
@@ -505,7 +493,7 @@ class SalaryProcessController extends Controller
 
         $GrossSalaryAmountAfterProvidentFund = $GrossSalaryAmountAfterAdvance - $ProvidentFund;
 
-        $netSalary = $GrossSalaryAmountAfterProvidentFund;
+        
 
         $totalLateApprove = $attendances->count() * 15;
         // Convert totals to hours and minutes
@@ -514,7 +502,7 @@ class SalaryProcessController extends Controller
         // $totalLateTime = floor($totalLateMinutes - $totalLateApprove) / 60;
 
         $overtimeSalery = $totalOvertimeHrs * $perdaysAmount;
-
+        $netSalary = $GrossSalaryAmountAfterProvidentFund + $overtimeSalery;
         $monthColumns = [
             1 => 'january',
             2 => 'february',
@@ -542,6 +530,23 @@ class SalaryProcessController extends Controller
             $amount = $taxAmount->$monthColumn;
         }
 
+        $TotalFridaysAmount = $perdaysAmount * $totalFridays;
+        $BankAmount = DB::table('salary_bank')
+            ->where('user_id', $employeeId)
+            ->where('effective_date',
+                '<=',
+                $formDate
+            )
+            ->latest('created_at')
+            ->first();
+
+        $FinalBankAmount = 0;
+        $FinalcashAmount = 0;
+        if ($BankAmount) {
+            $FinalBankAmount = $BankAmount->bank_amount / $BankAmount->gross * 100;
+            $FinalcashAmount = $BankAmount->cash_amount / $BankAmount->gross * 100;
+        }
+
         $TableData = [
             'total_worked_days' => $totalWorkedDays,
             'total_absents' => $totalAbsents,
@@ -558,25 +563,32 @@ class SalaryProcessController extends Controller
             'form_date' => $formDate,
             'to_date' => $toDate,
             'ot_hrs' => $totalOvertimeHrs,
-            'ot_amount' => $overtimeSalery
-        ];
+            'ot_amount' => $overtimeSalery,
+            'bankamount' => max(0,$FinalBankAmount / 100 * $netSalary - $amount),
+            'cashamount' => $FinalBankAmount > 0
+                ? $FinalcashAmount / 100 * $netSalary
+                : ($FinalcashAmount / 100 * $netSalary - $amount),
+            'weekendays_amount' => $TotalFridaysAmount ? $TotalFridaysAmount : 0
+            ];
 
+        DB::table('employee_salary_payment_details')->insert([
+            'PaidAmount' => 0,
+            'UnpaidAmount' => 0,
+            'NetPayable' => $netSalary,
+            'EmployeeID' => $employeeId,
+            'BankPay' => max(0,$FinalBankAmount / 100 * $netSalary - $amount),
+            'CashPay' => $FinalBankAmount > 0
+                ? $FinalcashAmount / 100 * $netSalary
+                : ($FinalcashAmount / 100 * $netSalary - $amount),
+            'Gross' => $salaryslab ? $salaryslab->gross : 0,
+            'TotalPayable' => max(0, $netSalary - $amount),
+            'TotalDeduction' => $TotalDiductionAmount + $amount + $advanceAmount + $ProvidentFund,
+            'FormDate' => $formDate,
+            'ToDate' => $toDate,
+            'Remarks' => $remarks
+        ]);
         DB::table('employee_salary_details')->insert($TableData);
         return $employeeId;
-        // Check if record exists for the same employee and date range
-        // $exists = DB::table('employee_salary_details')
-        // ->where('employee_id', $employeeId)
-        //     ->where('form_date', $formDate)
-        //     ->where('to_date', $toDate)
-        //     ->exists();
-
-        // if (!$exists) {
-        //     // Insert the new record into the database
-        //     DB::table('employee_salary_details')->insert($TableData);
-        //     return $employeeId;  // Return the processed employee ID for successful insertion
-        // } else {
-        //     return null;  // Return null if the record already exists
-        // }
     }
 
     public function indexSalaryShit(){
@@ -631,90 +643,16 @@ class SalaryProcessController extends Controller
 
         return $this->SalaryData($user_ids, $request->branch);
         // // Get the latest bank account for each user using a subquery
-        // $latestBankAccounts = DB::table('bank_accounts')
-        // ->select('user_id', DB::raw('MAX(id) as latest_id'))
-        // ->groupBy('user_id')
-        // ->get();
-
-        // // Create a lookup array for the latest bank account IDs
-        // $latestBankAccountsLookup = [];
-        // foreach ($latestBankAccounts as $account) {
-        //     $latestBankAccountsLookup[$account->user_id] = $account->latest_id;
-        // }
-
-        // // Fetch employee salary details and related user data
-        // $data = DB::table('employee_salary_details')
-        // ->leftJoin('users', 'employee_salary_details.employee_id', '=', 'users.id')
-        // ->leftJoin('profile', 'users.id', '=', 'profile.user_id')
-        // ->leftJoin('designations', 'users.designation_id', '=', 'designations.id')
-        // ->leftJoin('bank_accounts', function ($join) use ($latestBankAccountsLookup) {
-        //     $join->on('employee_salary_details.employee_id', '=', 'bank_accounts.user_id')
-        //     ->whereIn('bank_accounts.id', $latestBankAccountsLookup);
-        // })
-        //     ->orderBy('employee_salary_details.id', 'desc')
-        //     ->select(
-        //         'employee_salary_details.id',
-        //         'users.id as user_id',
-        //         'users.first_name',
-        //         'designations.name as designation',
-        //         'profile.date_of_joining',
-        //         'profile.employee_code',
-        //         'employee_salary_details.total_worked_days',
-        //         'employee_salary_details.gross_salary',
-        //         'employee_salary_details.net_salary',
-        //         'employee_salary_details.advance_salary',
-        //         'employee_salary_details.provident_fund',
-        //         'employee_salary_details.tax_amount',
-        //         'employee_salary_details.arrear_amount',
-        //         'bank_accounts.account_number', // Only the latest bank account
-        //         'employee_salary_details.remarks'
-        //     )
-        //     ->get();
-
-        // // Prepare a collection to store the latest salary data for each user
-        // $latestSalaryData = [];
-
-        // foreach ($data as $record) {
-        //     // Get the latest bank account for the user (already joined in the query)
-        //     $record->account_number = $record->account_number ? $record->account_number : null;
-
-        //     // Fetch latest salary data for the specific user
-        //     $salaryData = DB::table('salary')
-        //     ->join('salary_types', 'salary.salary_type_id', '=', 'salary_types.id')
-        //     ->where('salary.user_id', $record->user_id)
-        //         ->where('salary_types.salary_type', 'earning')
-        //         ->select(
-        //             'salary.id',
-        //             'salary.salary_type_id',
-        //             'salary.amount',
-        //             'salary.created_at',
-        //             'salary_types.head',
-        //             'salary_types.salary_type'
-        //         )
-        //         ->orderBy('salary.salary_type_id')
-        //         ->orderBy('salary.created_at', 'desc')
-        //         ->get();
-
-        //     // Filter unique salary types
-        //     $salaryData = collect($salaryData)->unique('salary_type_id');
-
-        //     // Store the unique salary data in the collection
-        //     $latestSalaryData[$record->user_id] = $salaryData;
-        // }
-
-        // // Add the latest salary data to the main collection
-        // foreach ($data as $record) {
-        //     $record->salaryData = $latestSalaryData[$record->user_id];
-        // }
-
-        // return $data;
     }
 
     public function UpdateArrearAmount(Request $request){
         try {
             DB::table('employee_salary_details')
             ->where('id', $request->id)
-            ->update(['arrear_amount' => $request->arrear_amount]);
+            ->update([
+                'arrear_amount' => $request->arrear_amount,
+                'cashamount' => DB::raw("cashamount + {$request->arrear_amount}")
+            ]);
             return response()->json(['success' => 'Arrear Amount Updated Successfully.']);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Failed to update arrear amount.']);
@@ -882,7 +820,10 @@ class SalaryProcessController extends Controller
                  DB::raw('DATEDIFF(employee_salary_details.to_date, employee_salary_details.form_date) + 1 as date_difference'), // Calculate date difference
                 'employee_salary_details.total_absents_fee',
                 'employee_salary_details.created_at',
-                'employee_salary_details.ot_amount'
+                'employee_salary_details.ot_amount',
+                'employee_salary_details.bankamount',
+                'employee_salary_details.cashamount',
+                'employee_salary_details.weekendays_amount'
             )
             ->get();
 

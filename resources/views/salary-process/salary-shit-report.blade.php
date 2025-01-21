@@ -224,6 +224,8 @@ function populateSalaryTable(data) {
         totalArrearAmount = 0,
         totalNetPayable = 0;
         totalOT = 0;
+        totalBankAmount = 0;
+        totalCashAmount = 0;
 
     // Build the main table HTML
     let tableHTML = `
@@ -288,6 +290,8 @@ function populateSalaryTable(data) {
                         <th>Arrear Amount</th>
                         <th>OT Amount</th>
                         <th>Net Payable</th>
+                        <th>Bank Amount</th>
+                        <th>Cash Amount</th>
                         <th>Account Number</th>
                         <th>Remarks</th>
                     </tr>
@@ -307,11 +311,7 @@ function populateSalaryTable(data) {
 
          const netPayable = 
             parseFloat(item.net_salary || 0) +
-            parseFloat(item.arrear_amount || 0) +
-            parseFloat(item.ot_amount || 0) -
-            parseFloat(item.tax_amount || 0) -
-            parseFloat(item.provident_fund || 0) -
-            parseFloat(item.advance_salary || 0);
+            parseFloat(item.arrear_amount || 0);
         // Update totals
         totalWorkedDays += parseFloat(item.total_worked_days || 0);
         totalGrossSalary += parseFloat(item.gross_salary || 0);
@@ -327,6 +327,8 @@ function populateSalaryTable(data) {
         totalArrearAmount += parseFloat(item.arrear_amount || 0);
         totalOT += parseFloat(item.ot_amount || 0);
         totalNetPayable += netPayable;
+        totalBankAmount += parseFloat(item.bankamount || 0);
+        totalCashAmount += parseFloat(item.cashamount || 0);
 
         tableHTML += `
             <tr>
@@ -349,6 +351,8 @@ function populateSalaryTable(data) {
                 <td>${item.arrear_amount || '0.00'}</td>
                 <td>${item.ot_amount || '0.00'}</td>
                 <td>${netPayable}</td>
+                <td>${item.bankamount || '0.00'}</td>
+                <td>${item.cashamount || '0.00'}</td>
                 <td>${item.account_number || ''}</td>
                 <td>${item.remarks || ''}</td>
             </tr>
@@ -371,6 +375,8 @@ function populateSalaryTable(data) {
                         <td>${totalArrearAmount.toFixed(2)}</td>
                         <td>${totalOT.toFixed(2)}</td>
                         <td>${totalNetPayable.toFixed(2)}</td>
+                        <td>${totalBankAmount.toFixed(2)}</td>
+                        <td>${totalCashAmount.toFixed(2)}</td>
                         <td colspan="2"></td>
                     </tr>
                 </tbody>
@@ -418,6 +424,8 @@ function populateSalaryTable(data) {
                         <th>Total Arrear</th>
                         <th>Total OT</th>
                         <th>Total Net Payable</th>
+                        <th>Total Bank Amount</th>
+                        <th>Total Cash Amount</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -436,6 +444,8 @@ function populateSalaryTable(data) {
                         <td>${totalArrearAmount.toFixed(2)}</td>
                         <td>${totalOT.toFixed(2)}</td>
                         <td>${totalNetPayable.toFixed(2)}</td>
+                        <td>${totalBankAmount.toFixed(2)}</td>
+                        <td>${totalCashAmount.toFixed(2)}</td>
                     </tr>
                 </tbody>
             </table>
@@ -446,6 +456,7 @@ function populateSalaryTable(data) {
     // Write the table to the new window and close the document
     newWindow.document.write(tableHTML);
     newWindow.document.close();
+
 }
 
 

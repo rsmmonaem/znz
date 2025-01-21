@@ -48,13 +48,13 @@
     </div>
     <div class="form-group">
         <label>Employee IDs</label>
-        {{-- <select class="form-control" name="employee_id" id="employee_id" multiple>
-        <option value="">Select Employee</option>
-        @foreach ($employee as $d)
+        <select class="form-control" name="multiple_id" id="multiple_id" multiple>
+          {{-- <option value="">Select Employee</option> --}}
+        {{-- @foreach ($employee as $d)
             <option value="{{ $d->id }}">{{ $d->first_name }} - {{ $d->employee_code }}</option>
-        @endforeach
-    </select> --}}
-        <input type="text" name="multiple_id" class="form-control" placeholder="ID1, ID2, ID3">
+        @endforeach --}}
+       </select>
+        {{-- <input type="text" name="multiple_id" class="form-control" placeholder="ID1, ID2, ID3"> --}}
     </div>
 @endif
 <div class="form-group">
