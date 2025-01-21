@@ -311,8 +311,10 @@ Route::group(['middleware' => ['auth','license','account_valid']], function () {
 	// Tax Diduction Report
 	Route::get('tax-deduction-report', 'ReportController@TaxDeductionRport');
 	Route::post('tax-deduction-report', 'ReportController@TaxDeductionRportPOST');
-
 	// Tax Deduction Report
+	// Salary Paid Unpaid
+	Route::get('salary-paid-unpaid', 'SalaryPaidUnpaidController@index');
+	Route::post('salary-paid-unpaid', 'SalaryPaidUnpaidController@indexPost');
 	// Spacial Holiday
 	Route::resource('/spacial-holiday', 'SpacialHolidayController');
 	Route::post('/spacial-holiday/lists', 'SpacialHolidayController@lists');

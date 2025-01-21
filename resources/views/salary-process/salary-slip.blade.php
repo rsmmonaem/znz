@@ -574,13 +574,13 @@
                                 <tr>
                                     <td class="text-center">${employee.salaryData[2]?.head || '-'}(9%)</td>
                                     <td class="text-right">${formatCurrency(employee.salaryData[2]?.amount || 0)}</td>
-                                    <td class="text-center">Others</td>
-                                    <td class="text-right"></td>
+                                    <td class="text-center">Holiday</td>
+                                    <td class="text-right">${employee.weekendays_amount}</td>
                                 </tr>
                                 <tr>
                                     <td class="text-center">${employee.salaryData[3]?.head || '-'}(8%)</td>
                                     <td class="text-right">${formatCurrency(employee.salaryData[3]?.amount || 0)}</td>
-                                    <td class="text-center"></td>
+                                    <td class="text-center">Others</td>
                                     <td class="text-right"></td>
                                 </tr>
                                 <tr>
@@ -639,6 +639,26 @@
                                     <strong>
                                         ${ 
                                             formatCurrency(Math.round(netPayableAfeterTax || 0))
+                                        }
+                                    </strong>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="1"><strong>Bank Amount:</strong></td>
+                                    <td colspan="3" style="text-align: right; margin-right: 20px">
+                                    <strong>
+                                        ${ 
+                                            formatCurrency(Math.round(employee.bankamount || 0))
+                                        }
+                                    </strong>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="1"><strong>Cash Amount:</strong></td>
+                                    <td colspan="3" style="text-align: right; margin-right: 20px">
+                                    <strong>
+                                        ${ 
+                                            formatCurrency(Math.round(employee.cashamount || 0))
                                         }
                                     </strong>
                                     </td>
