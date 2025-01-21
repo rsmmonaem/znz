@@ -315,6 +315,8 @@ Route::group(['middleware' => ['auth','license','account_valid']], function () {
 	// Salary Paid Unpaid
 	Route::get('salary-paid-unpaid', 'SalaryPaidUnpaidController@index');
 	Route::post('salary-paid-unpaid', 'SalaryPaidUnpaidController@indexPost');
+	Route::post('salary-paid-unpaid-update', 'SalaryPaidUnpaidController@SalaryPaidUnpaidUpdate');
+	Route::post('salary-paid-unpaid-pertial-paid', 'SalaryPaidUnpaidController@SalaryPaidUnpaidPertialPaid');
 	// Spacial Holiday
 	Route::resource('/spacial-holiday', 'SpacialHolidayController');
 	Route::post('/spacial-holiday/lists', 'SpacialHolidayController@lists');

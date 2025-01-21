@@ -310,6 +310,8 @@ class SalaryProcessController extends Controller
             'Gross' => $salaryslab ? $salaryslab->gross : 0,
             'TotalPayable' => max(0, $netSalary - $amount),
             'TotalDeduction' => $TotalDiductionAmount + $amount + $advanceAmount + $ProvidentFund,
+            'FormDate' => $formDate,
+            'ToDate' => $toDate,
             'Remarks' => $remarks
         ]);
         // Check if record exists for the same employee and date range
@@ -581,6 +583,8 @@ class SalaryProcessController extends Controller
             'Gross' => $salaryslab ? $salaryslab->gross : 0,
             'TotalPayable' => max(0, $netSalary - $amount),
             'TotalDeduction' => $TotalDiductionAmount + $amount + $advanceAmount + $ProvidentFund,
+            'FormDate' => $formDate,
+            'ToDate' => $toDate,
             'Remarks' => $remarks
         ]);
         DB::table('employee_salary_details')->insert($TableData);
