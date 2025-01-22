@@ -185,6 +185,16 @@ Route::group(['middleware' => ['auth','license','account_valid']], function () {
 	// Emplyee Education Added
 	Route::post('/education/lists','EducationController@lists');
 	Route::resource('/education', 'EducationController');
+
+	Route::get('/education-lavel-create', 'EducationController@educationLavelCreate');
+	Route::get('/education-lavel-list', 'EducationController@educationLavelList');
+	Route::post('/education-lavel-create', 'EducationController@educationLavelStore');
+	Route::post('/education-lavel-delete/{id}', 'EducationController@EducationLavelDelete');
+
+	Route::get('/class-subject-list', 'EducationController@ClassSubjectList');
+	Route::post('/class-subject-delete/{id}', 'EducationController@ClassSubjectDelete');
+	Route::post('/class-subject-create', 'EducationController@ClassSubjectStore');
+
 	Route::post('/work_experience', 'EducationController@work_experience');
 
 	Route::post('/employee/email/{id}',array('as' => 'employee.email', 'uses' => 'EmployeeController@email'));

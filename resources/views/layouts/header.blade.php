@@ -43,6 +43,9 @@
 											<li><a href="/configuration">{!! trans('messages.configuration') !!}</a></li>
 									@endif
 									@if(defaultRole() || Entrust::can('manage_configuration'))
+											<li><a href="/education-lavel-create">Education Configuration</a></li>
+									@endif
+									@if(defaultRole() || Entrust::can('manage_configuration'))
 										<li><a href="/permission">{!! trans('messages.permission') !!}</a></li>
 									@endif
 									@if(Entrust::can('list_department'))

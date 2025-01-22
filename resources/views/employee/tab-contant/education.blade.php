@@ -15,21 +15,19 @@
             const saveBtn = document.getElementById('save-education');
 
             addBtn.addEventListener('click', function() {
-                // Clone the form container without copying its data (deep = false)
+                $(formContainer).find('select').select2('destroy');
                 const clonedFormContainer = formContainer.cloneNode(true);
-                
-                // Clear the values in the form fields of the cloned container
                 const inputs = clonedFormContainer.querySelectorAll('input, select');
                 inputs.forEach(input => {
-                    input.value = ''; // Reset the value of input fields and selects
-                    if (input.type === 'select-one') {
-                        input.selectedIndex = 0; // Reset the selected option in select dropdowns
+                    if (input.tagName === 'SELECT') {
+                        input.selectedIndex = 0; 
+                    } else {
+                        input.value = ''; 
                     }
                 });
-
-              // Append the cloned, empty form container to the parent container
-              document.querySelector('#educationForm').appendChild(clonedFormContainer);
-           });
+                document.querySelector('#educationForm').appendChild(clonedFormContainer);
+                $('#educationForm select').select2();
+            });
 
             // Function to remove the last added education form
             removeBtn.addEventListener('click', function() {
