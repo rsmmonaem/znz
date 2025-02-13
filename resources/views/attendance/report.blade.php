@@ -289,6 +289,9 @@
                                             <th>Punch In</th>
                                             <th>Punch Out</th>
                                             <th>Status</th>
+                                            <th>Late</th>
+                                            <th>OT</th>
+                                            <th>Extra Time</th>
                                             <th>Remarks</th>
                                         </tr>
                                     </thead>
@@ -298,20 +301,23 @@
                             content += `
                             <tr>
                                 <td>${index + 1}</td>
-                                <td>${attendance.date || 'N/A'}</td>
-                                <td>${attendance.employee_code || 'N/A'}</td>
-                                <td>${attendance.name || 'N/A'}</td>
-                                <td>${attendance.department || 'N/A'}</td>
-                                <td>${attendance.section || 'N/A'}</td>
-                                <td>${attendance.category || 'N/A'}</td>
-                                <td>${attendance.designation || 'N/A'}</td>
-                                <td>${attendance.shift_in || 'N/A'}</td>
-                                <td>${attendance.shift_out || 'N/A'}</td>
-                                <td>${attendance.shift_name || 'N/A'}</td>
-                                <td>${attendance.in_time || 'N/A'}</td>
-                                <td>${attendance.out_time || 'N/A'}</td>
-                                <td>${attendance.status || 'N/A'} </td>
-                                <td>${attendance.overTime || ''}</br> ${attendance.lateTime || ''}</td>
+                                <td>${attendance.date || ''}</td>
+                                <td>${attendance.employee_code || ''}</td>
+                                <td>${attendance.name || ''}</td>
+                                <td>${attendance.department || ''}</td>
+                                <td>${attendance.section || ''}</td>
+                                <td>${attendance.category || ''}</td>
+                                <td>${attendance.designation || ''}</td>
+                                <td>${attendance.shift_in || ''}</td>
+                                <td>${attendance.shift_out || ''}</td>
+                                <td>${attendance.shift_name || ''}</td>
+                                <td>${attendance.in_time || ''}</td>
+                                <td>${attendance.out_time || ''}</td>
+                                <td>${attendance.status || ''} </td>
+                                <td>${attendance.lateTime || ''}</td>
+                                <td>${attendance.status != 'P' ? attendance.overTime : ''}</td>
+                                <td>${attendance.status == 'P' ? attendance.overTime : ''}</td>
+                                <td>${attendance.remarks || ''}</td>
                             </tr>
                             `;
                         });

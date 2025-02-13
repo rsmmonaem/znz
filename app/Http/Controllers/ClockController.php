@@ -1843,9 +1843,9 @@ Class ClockController extends Controller{
 				$status = 'HLD';
 			} 
 			elseif (in_array($date, $weeklyHolidays)) {
-				$status = $attendance ? 'OT' : 'WHD';
+				$status = $attendance ? 'WHD' : 'WHD';
 			}elseif (in_array($date, $spacialHolidays)) {
-				$status = $attendance ? 'OT' : 'SPHD';
+				$status = $attendance ? 'SPHD' : 'SPHD';
 			} elseif ($attendance && $attendance->count() > 0) {
 				// Get earliest clock-in and latest clock-out
 				$earliestClockIn = Carbon::parse($attendance->min('clock_in'))->format('H:i:s');
@@ -1898,7 +1898,7 @@ Class ClockController extends Controller{
 				'shift_out' => $shiftTime ? $shiftTime->out_time : 'N/A',
 				'shift_name' => $shiftTime ? $shiftTime->name : 'N/A',
 				// 'shift_id' => $shiftTime ? $shiftTime->id : 'N/A',
-				'overTime' => $overtimeHours ? 'OT: ' . floor($overtimeHours / 60) . ' hr ' . ($overtimeHours % 60) . ' min' : '',
+				'overTime' => $overtimeHours ? floor($overtimeHours / 60) . ' hr ' . ($overtimeHours % 60) . ' min' : '',
 				'lateTime' => $lateMinutes ? 'Late: ' . floor($lateMinutes / 60) . ' hr ' . ($lateMinutes % 60) . ' min' : '',
 				'status' => $status == 'P' ? 'P' : ($status == 'OT' ? 'Overtime' : ($status == 'WHD' ? 'WHD' : ($status == 'A' ? 'Absent' : ($status == 'approved' ? 'Leave' : ($status == 'lwp' ? 'LWP' : $status))))),
 			];

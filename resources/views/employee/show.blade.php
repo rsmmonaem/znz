@@ -735,9 +735,11 @@
 			    				  	<div class="form-group flex-form-group">
 										<input type="file" name="photo" id="photo" class="btn btn-default" title="{!! trans('messages.select_profile_photo') !!}">
 										
+										<img src="{{ $employee->Profile->photo ? URL::to(config('constants.upload_path.profile_image').$employee->Profile->photo) : URL::to(config('constants.upload_path.profile_image').'blank_profile.webp') }}" alt="Profile Picture" class="imagePreview" style="width: 100px; height: 100px; object-fit: cover;" id="Up_preview">
+
 										@if($employee->Profile->photo != null)
 											@if(File::exists(config('constants.upload_path.profile_image').$employee->Profile->photo))
-											<img src="{{ URL::to(config('constants.upload_path.profile_image').$employee->Profile->photo) }}" width="50px" style="margin-left:20px;">
+											<img src="{{ URL::to(config('constants.upload_path.profile_image').$employee->Profile->photo) }}" width="100px" style="margin-left:20px;">
 											@endif
 											<div class="checkbox">
 												<label>

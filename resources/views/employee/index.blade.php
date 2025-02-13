@@ -213,6 +213,7 @@
                                 <tr>
 								    <th>Action</th>
                                     <th>SL No</th>
+                                    <th>Photo</th>
 									<th>ID</th>
 									<th>Name</th>
 									<th>Designation</th>
@@ -313,80 +314,93 @@
 			});
 
 
-			function populateEmployeeTable(data) {
-				const datatable = $('#employeeTable');
-				datatable.DataTable().destroy(); // Destroy existing table instance if exists
-				let tableBody = $('#employeeTable tbody');
-				tableBody.empty(); // Clear existing rows
+function populateEmployeeTable(data) {
+    const datatable = $('#employeeTable');
+    datatable.DataTable().destroy(); // Destroy existing table instance if exists
+    let tableBody = $('#employeeTable tbody');
+    tableBody.empty(); // Clear existing rows
 
-				// Append the data row
-				data.forEach((item, index) => {
-					const deleteAction = `
-						<form method="POST" onsubmit="return confirm('Are you sure?')" action="/employee/${item.id}" style="display:inline;">
-							<input type="hidden" name="_method" value="DELETE">
-							<input type="hidden" name="_token" value="${$('meta[name="csrf-token"]').attr('content')}">
-							<button type="submit" class="btn btn-danger btn-xs" title="Delete">
-								<i class="fa fa-trash"></i>
-							</button>
-						</form>`;
+    // Append the data row
+    data.forEach((item, index) => {
+        const deleteAction = `
+            <form method="POST" onsubmit="return confirm('Are you sure?')" action="/employee/${item.id}" style="display:inline;">
+                <input type="hidden" name="_method" value="DELETE">
+                <input type="hidden" name="_token" value="${$('meta[name="csrf-token"]').attr('content')}">
+                <button type="submit" class="btn btn-danger btn-xs" title="Delete">
+                    <i class="fa fa-trash"></i>
+                </button>
+            </form>`;
 
-					const actions = `
-						<div class="btn-group btn-group-xs">
-							<a href="/employee/${item.id}" class="btn btn-default btn-xs" data-toggle="tooltip" title="View">
-								<i class="fa fa-arrow-circle-right"></i>
-							</a>
-							${item.id == 1 ? '' : deleteAction}
-						</div>`;
+        const actions = `
+            <div class="btn-group btn-group-xs">
+                <a href="/employee/${item.id}" class="btn btn-default btn-xs" data-toggle="tooltip" title="View">
+                    <i class="fa fa-arrow-circle-right"></i>
+                </a>
+                ${item.id == 1 ? '' : deleteAction}
+            </div>`;
+        
+        const photoContent = item.photo
+            ? `<img src="/uploads/profile_image/${item.photo}" alt="${item.first_name}" style="width: 50px; height: 50px;">`
+            : ` `;
 
-					tableBody.append(`
-						<tr>
-							<td>${actions}</td>
-							<td>${index + 1}</td>
-							<td>${item.employee_code || 'N/A'}</td>
-							<td>${item.first_name || 'N/A'}</td>
-							<td>${item.designation_name || 'N/A'}</td>
-							<td>${item.department_name || 'N/A'}</td>
-							<td>${item.category || 'N/A'}</td>
-							<td>${item.date_of_joining || 'N/A'}</td>
-							<td>${item.date_of_birth || 'N/A'}</td>
-							<td>${item.blood_group || 'N/A'}</td>
-							<td>${item.job_nature || 'N/A'}</td>
-							<td>${item.contact_number || 'N/A'}</td>
-							<td>${item.gender || 'N/A'}</td>
-							<td>${item.branch_name || 'N/A'}</td>
-						</tr>
-					`);
-				});
+        tableBody.append(`
+            <tr>
+                <td>${actions}</td>
+                <td>${index + 1}</td>
+                <td>${photoContent}</td>
+                <td>${item.employee_code || 'N/A'}</td>
+                <td>${item.first_name || 'N/A'}</td>
+                <td>${item.designation_name || 'N/A'}</td>
+                <td>${item.department_name || 'N/A'}</td>
+                <td>${item.category || 'N/A'}</td>
+                <td>${item.date_of_joining || 'N/A'}</td>
+                <td>${item.date_of_birth || 'N/A'}</td>
+                <td>${item.blood_group || 'N/A'}</td>
+                <td>${item.job_nature || 'N/A'}</td>
+                <td>${item.contact_number || 'N/A'}</td>
+                <td>${item.gender || 'N/A'}</td>
+                <td>${item.branch_name || 'N/A'}</td>
+            </tr>
+        `);
+    });
 
-				const table = datatable.DataTable({
-					lengthMenu: [10, 20, 50, 100],
-					paging: true,
-					autoWidth: true,
-					dom: 'Bfrtip',
-					buttons: [
-						{
-							extend: 'excelHtml5',
-							text: 'Export to Excel',
-							title: 'Employee Details',
-						},
-						{
-							extend: 'print',
-							text: 'Print',
-							title: 'Employee Details',
-							customize: function (win) {
-								$(win.document.body)
-									.css('font-size', '10pt')
-									.find('table')
-									.addClass('compact')
-									.css('font-size', 'inherit');
-							},
-						},
-					],
-					columnDefs: [
-						{ targets: [0], orderable: true }, // SL No sortable
-					],
-				});
-			}
+    const table = datatable.DataTable({
+        lengthMenu: [10, 20, 50, 100],
+        paging: true,
+        autoWidth: true,
+        dom: 'Bfrtip',
+        buttons: [
+            {
+                extend: 'excelHtml5',
+                text: 'Export to Excel',
+                title: 'Employee Details',
+            },
+            {
+                extend: 'print',
+                text: 'Print',
+                title: 'Employee Details',
+                customize: function (win) {
+                    $(win.document.body)
+                        .css('font-size', '10pt')
+                        .find('table')
+                        .addClass('compact')
+                        .css('font-size', 'inherit');
+                },
+            },
+        ],
+        columnDefs: [
+            { 
+                targets: [0], // SL No sortable
+                orderable: true 
+            },
+            {
+                targets: [3], // Employee code column is the 4th column (index 3)
+                orderable: true // Make sure this column is sortable
+            },
+        ],
+        order: [[3, 'asc']] // Sort by employee code (index 3) in ascending order by default
+    });
+}
 
 
 			// $('#employee_code').attr("disabled", true) 

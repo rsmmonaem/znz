@@ -287,6 +287,9 @@
                                             <th>Punch In</th>
                                             <th>Punch Out</th>
                                             <th>Status</th>
+                                            <th>Late</th>
+                                            <th>OT</th>
+                                            <th>Extra Time</th>
                                             <th>Remarks</th>
                                         </tr>
                                     </thead>
@@ -308,8 +311,11 @@
                                 <td>${attendance.shift_name || 'N/A'}</td>
                                 <td>${attendance.in_time || 'N/A'}</td>
                                 <td>${attendance.out_time || 'N/A'}</td>
-                                <td>${attendance.status || 'N/A'} <br> ${attendance.overTime || ''} </br> ${attendance.lateTime || ''}</td>
-                                <td>${attendance.remarks || 'N/A'}</td>
+                                <td>${attendance.status || ''} </td>
+                                <td>${attendance.lateTime || ''}</td>
+                                <td>${attendance.status != 'P' ? attendance.overTime : ''}</td>
+                                <td>${attendance.status == 'P' ? attendance.overTime : ''}</td>
+                                <td>${attendance.remarks || ''}</td>
                             </tr>
                             `;
                         });

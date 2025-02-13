@@ -8,7 +8,7 @@
 	@stop
 	
 	@section('content')
-		<div class="row">
+		<div class="row"> ff
 			<div class="col-sm-4">
 				<div class="box-info">
 					<h2><strong>{!! trans('messages.set_date') !!}</strong></h2>

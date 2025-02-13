@@ -292,8 +292,8 @@ Class SalaryController extends Controller{
 
             $totalBasic = $gross * $basic / 100;
             $totalHouseRent = $gross * $house_rent / 100;
-            $totalMedical = $gross * $medical / 100;
-            $totalConveyance = $gross * $conveyance / 100;
+            $totalMedical = $gross * $conveyance / 100;
+            $totalConveyance = $gross * $medical / 100;
             $totalOthers = $gross * $others / 100;
 
             $salary_type_ids = ['1', '2', '12', '8', '13'];
@@ -544,7 +544,7 @@ Class SalaryController extends Controller{
                         'employee_code' => $user->profile->employee_code,
                         'entry_date' => isset($slab_data->entrydate) ? date('Y-m-d', strtotime($slab_data->entrydate)) : null,
                         'effective_date' => isset($slab_data->effactive_date) ? date('Y-m-d', strtotime($slab_data->effactive_date)) : null,
-                        'gross' => isset($salary_bank->gross) ? $salary_bank->gross : null,
+                        'gross' => isset($slab_data->gross) ? $slab_data->gross : null,
                         'bank_amount' => $salary_bank ? $salary_bank->bank_amount : null,
                         'cash_amount' => $salary_bank ? $salary_bank->cash_amount : null,
                         'remarks' => $salary_bank ? $salary_bank->remarks : null,

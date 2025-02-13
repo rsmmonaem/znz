@@ -118,9 +118,9 @@ class EmployeeController extends Controller{
     }
 
     public function lists(Request $request){
-        if (Entrust::can('manage_all_employee'))
-        // $employees = User::with('profile', 'designation', 'designation.department')->get();
-            $employees = DB::table('users')
+        if (Entrust::can('manage_all_employee')){
+            
+         $employees = DB::table('users')
             ->leftJoin('profile', 'users.id', '=', 'profile.user_id')
             ->leftjoin('branchs', 'profile.branch_id', '=', 'branchs.id')
             ->leftJoin('designations', 'users.designation_id', '=', 'designations.id')
@@ -159,10 +159,13 @@ class EmployeeController extends Controller{
                 'profile.job_nature',
                 'profile.contact_number',
                 'profile.gender',
-                'branchs.name as branch_name'
+                'branchs.name as branch_name',
+                'profile.photo'
             )
+            ->orderby('profile.employee_code','asc')
             ->get();
-        elseif (Entrust::can('manage_subordinate_employee')) {
+        
+        }elseif (Entrust::can('manage_subordinate_employee')) {
             $childs = Helper::childDesignation(Auth::user()->designation_id, 1);
             $employees = User::with('roles')->whereIn('designation_id', $childs)->get();
         } else
@@ -304,21 +307,31 @@ class EmployeeController extends Controller{
         $profile->fill($data);
 
         if ($request->hasFile('photo') && $request->input('remove_photo') != 1) {
-            $extension = $request->file('photo')->getClientOriginalExtension();
-            $filename = uniqid();
-            $file = $request->file('photo')->move(config('constants.upload_path.profile_image'), $filename.".".$extension);
-            $img = Image::make(config('constants.upload_path.profile_image').$filename.".".$extension);
-            $img->resize(200, null, function ($constraint) {
-                $constraint->aspectRatio();
-            });
-            $img->save(config('constants.upload_path.profile_image').$filename.".".$extension);
-            $profile->photo = $filename.".".$extension;
-        } elseif($request->input('remove_photo') == 1){
-            File::delete(config('constants.upload_path.profile_image').$profile->photo);
-            $profile->photo = null;
+            // Handle new photo upload
+            $photoFile = $request->file('photo'); // Get the uploaded file
+            $filename = uniqid() . "." . $photoFile->getClientOriginalExtension(); // Generate unique filename
+        
+            // Define upload path
+            $uploadPath = public_path('uploads/profile_image'); // Public directory for image uploads
+        
+            // Move the uploaded file to the upload path
+            $photoFile->move($uploadPath, $filename);
+        
+            // Save the file path to the database
+            $profile->photo = $filename;
+        
+        } elseif ($request->input('remove_photo') == 1) {
+            // Handle photo removal
+            $currentPhotoPath = public_path($profile->photo); // Get the full path of the current photo
+            if (File::exists($currentPhotoPath)) {
+                File::delete($currentPhotoPath); // Delete the file
+            }
+            $profile->photo = null; // Clear the photo field in the database
+        } else {
+            // Keep the existing photo if no new upload or removal request
+            $profile->photo = $photo;
         }
-        else
-        $profile->photo = $photo;
+
 
         if($request->input('type') == 'social_networking')
             Helper::updateCustomField('employee-social-form',$employee->id, $data);
