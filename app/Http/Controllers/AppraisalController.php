@@ -15,7 +15,7 @@ class AppraisalController extends Controller{
    {
     
     $base_dir='';
-    $db_data=include('../config/db.php');
+    $db_data=include config_path('db.php');
     $hostname=$db_data['hostname'];
     $database=$db_data['database'];
     $username=$db_data['username'];

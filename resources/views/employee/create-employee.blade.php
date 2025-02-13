@@ -101,8 +101,7 @@
                                 <!-- Category -->
                                 <div class="col-sm-6">
                                     <div class="form-group">
-                                        <label for="category" class="control-label">Category <span
-                                                class="text-danger">*</span></label>
+                                        <label for="category" class="control-label">Category </label>
                                         <select name="category" id="category" class="form-control">
                                             <option value="">Select One</option>
                                             @foreach ($category as $type)
@@ -194,8 +193,7 @@
                                 <!-- Grade -->
                                 <div class="col-sm-6">
                                     <div class="form-group">
-                                        <label for="grade_id" class="control-label">Grade <span
-                                                class="text-danger">*</span></label>
+                                        <label for="grade_id" class="control-label">Grade </label>
                                         <select class="form-control" id="grade_id" name="grade_id">
                                             <option value="">Select One</option>
                                             @foreach ($grades as $g)
@@ -629,9 +627,9 @@
                 if (FormDate.branch_id.length == 0) {
                     return validate('Please select a branch.');
                 }
-                if (FormDate.category.length == 0) {
-                    return validate('Please select a category.');
-                }
+                // if (FormDate.category.length == 0) {
+                //     return validate('Please select a category.');
+                // }
                 if (FormDate.designation_id.length == 0) {
                     return validate('Please select a designation.');
                 }
