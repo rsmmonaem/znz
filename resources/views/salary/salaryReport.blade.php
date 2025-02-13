@@ -327,6 +327,6 @@
     newWindow.document.write(content);
     newWindow.document.close(); // Close the document to apply the styles
 }
-   
+
     </script>
 @stop
