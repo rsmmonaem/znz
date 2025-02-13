@@ -303,15 +303,16 @@ function populateSalaryTable(data) {
     data.employee_salary_data.forEach((item, index) => {
         let salaryData = item.salaryData || {};
         let basic = parseFloat(salaryData[0]?.amount || 0);
-        let hra = parseFloat(salaryData[2]?.amount || 0);
-        let medical = parseFloat(salaryData[6]?.amount || 0);
-        let conveyance = parseFloat(salaryData[4]?.amount || 0);
-        let others = parseFloat(salaryData[8]?.amount || 0);
+        let hra = parseFloat(salaryData[1]?.amount || 0);
+        let medical = parseFloat(salaryData[2]?.amount || 0);
+        let conveyance = parseFloat(salaryData[3]?.amount || 0);
+        let others = parseFloat(salaryData[4]?.amount || 0);
         // let netPayable = parseFloat(item.net_salary || 0) + parseFloat(item.arrear_amount || 0);
 
-         const netPayable = 
+         const netPayable =
             parseFloat(item.net_salary || 0) +
-            parseFloat(item.arrear_amount || 0);
+            parseFloat(item.arrear_amount || 0) -
+            parseFloat(item.tax_amount);
         // Update totals
         totalWorkedDays += parseFloat(item.total_worked_days || 0);
         totalGrossSalary += parseFloat(item.gross_salary || 0);
@@ -381,7 +382,7 @@ function populateSalaryTable(data) {
                     </tr>
                 </tbody>
             </table>
-            <style> 
+            <style>
                  .footer {
                  text-align: center;
                  padding: 10px;
@@ -607,9 +608,9 @@ function populateSalaryTable(data) {
                 //             $('#total-arrear').html(totalArrear);
                 //             $('#total-net-payable').html(totalNetPayable);
                 //         }
-                        
+
                 //     });
-                
+
                 // }
             });
     </script>

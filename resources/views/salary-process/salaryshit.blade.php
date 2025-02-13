@@ -104,7 +104,7 @@
                                     <th rowspan="2">ID No</th>
                                     <th rowspan="2">Attendance</th>
                                     <th rowspan="2">Gross Salary</th>
-                                    <th colspan="5">Basic Breakdown</th>
+                                    <th colspan="5" style="text-align: center;">Basic Breakdown</th>
                                     <th rowspan="2">Net Salary</th>
                                     <th rowspan="2">Advance</th>
                                     <th rowspan="2">Provident Fund</th>
@@ -211,13 +211,13 @@
 
                         // Breakdown amounts
                         let basic = salaryData[0]?.amount || '0.00';
-                        let hra = salaryData[2]?.amount || '0.00';
-                        let medical = salaryData[6]?.amount || '0.00';
-                        let conveyance = salaryData[4]?.amount || '0.00';
-                        let others = salaryData[8]?.amount || '0.00';
+                        let hra = salaryData[1]?.amount || '0.00';
+                        let medical = salaryData[2]?.amount || '0.00';
+                        let conveyance = salaryData[3]?.amount || '0.00';
+                        let others = salaryData[4]?.amount || '0.00';
 
 
-                        const netPayable = 
+                        const netPayable =
                             parseFloat(item.net_salary || 0) +
                             parseFloat(item.arrear_amount || 0) +
                             parseFloat(item.ot_amount || 0) -
@@ -369,14 +369,14 @@
                             $('#total-bank-payable').html(parseFloat(TotalBank).toFixed(2));
                             $('#total-cash-payable').html(parseFloat(TotalCash).toFixed(2));
                         }
-                        
+
                     });
-                    
+
 
                     $('#salaryTable_filter input').attr('placeholder', 'Search by Employee ID');
                     // Override default search behavior
                     $('#salaryTable_filter input').on('keyup', function () {
-                        table.column(4).search(this.value).draw(); 
+                        table.column(4).search(this.value).draw();
                     });
                 }
                 // Arrear amount modal
@@ -422,7 +422,7 @@
                         const arrearAmountInput = $('#arrearAmountInput').val();  // Get the new arrear amount from the input field
                         const id = $(this).data('id');  // Get the ID
                         const arrearAmount = $(this).data('arrear-amount');  // Get the old arrear amount
-                        
+
                         // Make the AJAX request to update the arrear amount
                         $.ajax({
                             url: '/update-arrear-amount',  // Your endpoint for updating the arrear amount
@@ -436,7 +436,7 @@
                                     // Update the arrear amount in the table without reloading
                                     $('.arrear-amount[data-id="' + id + '"]').text(arrearAmountInput);  // Update the displayed arrear amount
                                     $('.arrear-amount[data-id="' + id + '"]').data('arrear-amount', arrearAmountInput);  // Update the data attribute for the arrear amount
-                        
+
                                     const netPayable = parseFloat($('.net-payable[data-id="' + id + '"]').data('netpayable'));
                                     const newNetPayable = isNaN(netPayable) ? parseFloat(arrearAmountInput) : (netPayable + parseFloat(arrearAmountInput));
 
@@ -471,7 +471,7 @@
                     const taxAmount = parseFloat($(this).data('tax-amount')); // Get the current tax amount
                     const id = $(this).data('id'); // Get the ID of the clicked element
                     const name = $(this).data('name'); // Get the name of the clicked employee
-                    
+
                     // Create the modal
                     const modal = $('<div class="modal fade" id="taxModal" tabindex="-1" role="dialog" aria-labelledby="taxModalLabel" aria-hidden="true">');
                     modal.html(`
@@ -522,8 +522,8 @@
                                     $('.tax-amount[data-id="' + id + '"]').data('tax-amount', taxAmountInput); // Update the data attribute for the tax amount
 
                                     const netPayable = parseFloat($('.net-payable[data-id="' + id + '"]').data('netpayable'));
-                                    const newNetPayable = isNaN(netPayable) 
-                                        ? parseFloat(taxAmountInput) 
+                                    const newNetPayable = isNaN(netPayable)
+                                        ? parseFloat(taxAmountInput)
                                         : (netPayable - parseFloat(taxAmountInput));
 
                                     $('.net-payable[data-id="' + id + '"]').text(newNetPayable.toFixed(2));
