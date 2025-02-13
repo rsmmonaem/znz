@@ -161,11 +161,11 @@
                                 const medical = document.getElementById('medical1');
                                 const conveyance = document.getElementById('conveyance1');
                                 const others = document.getElementById('others1');
-                                const grossInput = document.getElementById('gross'); 
+                                const grossInput = document.getElementById('gross');
 
                                 grossInput.addEventListener('input', () => {
-                                const gross = parseFloat(grossInput.value) || 0; 
-                                    basic.value = (gross * 0.50).toFixed();        
+                                const gross = parseFloat(grossInput.value) || 0;
+                                    basic.value = (gross * 0.50).toFixed();
                                     houseRent.value = (gross * 0.28).toFixed();
                                     medical.value = (gross * 0.09).toFixed();
                                     conveyance.value = (gross * 0.08).toFixed();
@@ -205,7 +205,7 @@
                                 </tr>
                             </thead>
                             <tbody id="tableData">
-                                
+
                             </tbody>
                         </table>
                     </div>
@@ -236,6 +236,7 @@
                         $('#date_of_joining').val(data.date_of_joining);
                         $('#category').val(data.category);
                         //$('#gross').val(Math.round(data.amount));
+                        getData(employeeId);
                     },
                     error: function() {
                         console.log('error');
@@ -263,7 +264,7 @@
                 if(!$('#gross').val()) {
                     return validate('Please enter a gross amount.');
                 }
-                
+
                 function validate(data) {
                     $('#saveData').attr('disabled', false);
                     $('#saveData').text('Save');
@@ -310,10 +311,10 @@
             $('#tableData').empty();
         })
 
-        
+
         function getData(id=null){
           $.ajax({
-                url: "/slary-slab-list?id=" + id, 
+                url: "/slary-slab-list?id=" + id,
                 method: "GET",
                 success: function (data) {
                     const salaryTable_wrapper = $('.table-container');
@@ -321,10 +322,10 @@
                     const datatable = $('#salaryTable');
                     // Destroy the existing DataTable to reinitialize with new data
                     datatable.DataTable().destroy();
-                     
+
                     var tableBody = $('#tableData');
                     tableBody.empty(); // Clear the existing table body
-                    
+
                     // Loop through each user in the data
                     data.forEach(function (item) {
                         var row = `<tr>
