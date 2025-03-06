@@ -40,7 +40,9 @@
 					  </div>
 					  <div class="form-group show-hide-approved-date">
 					    {!! Form::label('approved_date',trans('messages.date'),[])!!}
-						{!! Form::input('text','approved_date',isset($leave->approved_date) ? $leave->approved_date : '',['class'=>'form-control mdatepicker','placeholder'=>trans('messages.date'),'readonly' => 'true'])!!}
+						{{-- {!! Form::input('text','approved_date',isset($leave->approved_date) ? $leave->approved_date : '',['class'=>'form-control mdatepicker','placeholder'=>trans('messages.date'),'readonly' => 'true'])!!} --}}
+						{!! Form::input('text','approved_date',isset($leave->approved_date) ? $leave->approved_date : '',['class'=>'form-control mdatepicker','placeholder'=>trans('messages.date')])!!}
+
 					  </div>
 					  <div class="form-group">
 								{!! Form::label('admin_remarks', trans('messages.remarks'), []) !!}
