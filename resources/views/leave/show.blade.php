@@ -43,10 +43,18 @@
 						{!! Form::input('text','approved_date',isset($leave->approved_date) ? $leave->approved_date : '',['class'=>'form-control mdatepicker','placeholder'=>trans('messages.date'),'readonly' => 'true'])!!}
 					  </div>
 					  <div class="form-group">
-					    {!! Form::label('admin_remarks',trans('messages.remarks'),[])!!}
-					    {!! Form::textarea('admin_remarks',isset($leave->admin_remarks) ? $leave->admin_remarks : '',['size' => '30x3', 'class' => 'form-control', 'placeholder' => trans('messages.remarks'),"data-show-counter" => 1,"data-limit" => config('config.textarea_limit'),'data-autoresize' => 1])!!}
-					    <span class="countdown"></span>
-					  </div>
+								{!! Form::label('admin_remarks', trans('messages.remarks'), []) !!}
+								{!! Form::textarea('admin_remarks', isset($leave->admin_remarks) ? $leave->admin_remarks : '', [
+									'size' => '30x3', 
+									'class' => 'form-control', 
+									'placeholder' => trans('messages.remarks'), 
+									'data-show-counter' => 1, 
+									'data-limit' => config('config.textarea_limit'), 
+									'data-autoresize' => 1,
+									'optional' => true // This does not affect the HTML but is for clarity
+								]) !!}
+								<span class="countdown"></span>
+						</div>
 					  {!! Form::submit(trans('messages.save'),['class' => 'btn btn-primary']) !!}
 					{!! Form::close() !!}
 					@else
