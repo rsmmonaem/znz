@@ -234,11 +234,11 @@
                                 <td>${item.employee_code}</td>
                                 <td>${item.total_worked_days}</td>
                                 <td>${item.gross_salary}</td>
-                                <td>${item.gross_salary * 0.50}</td>
-                                <td>${item.gross_salary * 0.28}</td>
-                                <td>${item.gross_salary * 0.09}</td>
-                                <td>${item.gross_salary * 0.08}</td>
-                                <td>${item.gross_salary * 0.05}</td>
+                                <td>${Math.floor(item.gross_salary * 0.50).toFixed(2)}</td>
+                                <td>${Math.floor(item.gross_salary * 0.28).toFixed(2)}</td>
+                                <td>${Math.floor(item.gross_salary * 0.09).toFixed(2)}</td>
+                                <td>${Math.floor(item.gross_salary * 0.08).toFixed(2)}</td>
+                                <td>${Math.floor(item.gross_salary * 0.05).toFixed(2)}</td>
                                 <td>${item.net_salary}</td>
                                 <td>${item.advance_salary}</td>
                                 <td>${item.provident_fund}</td>
