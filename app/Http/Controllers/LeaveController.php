@@ -869,7 +869,7 @@ $mergedLeaveRecords = $data->map(function ($leave) use ($user) {
 	public function updateLeaveStatus(Request $request) {
 		$leave = Leave::where('id', $request->id)->first();
 		$leave->recomstatus = $request->status;
-		$leave->recomRemark = $request->remark;
+		$leave->recomRemark = $request->remark ? $request->remark : null;
 		$leave->recomdate = date('Y-m-d');
 		$leave->save();
 		return response()->json(['message' => trans('messages.leave') . ' ' . trans('messages.status_updated'), 'status' => 'success']);
