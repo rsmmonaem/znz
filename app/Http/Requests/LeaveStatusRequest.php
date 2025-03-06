@@ -26,7 +26,6 @@ class LeaveStatusRequest extends Request
         return [
             'status' => 'required',
             'approved_date' => 'required_if:status,approved',
-            'admin_remarks' => 'required'
         ];
     }
 }
