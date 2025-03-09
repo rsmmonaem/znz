@@ -341,10 +341,10 @@ function populateSalaryTable(data) {
                 <td>${item.total_worked_days || '0'}</td>
                 <td>${item.gross_salary || '0.00'}</td>
                 <td>${basic.toFixed(2)}</td>
-                <td>${hra.toFixed(2)}</td>
-                <td>${medical.toFixed(2)}</td>
-                <td>${conveyance.toFixed(2)}</td>
-                <td>${others.toFixed(2)}</td>
+                <td>${item.hra || '0'}</td>
+                <td>${item.medical.toFixed(2)}</td>
+                <td>${item.conveyance.toFixed(2)}</td>
+                <td>${item.others.toFixed(2)}</td>
                 <td>${item.net_salary || '0.00'}</td>
                 <td>${item.advance_salary || '0.00'}</td>
                 <td>${item.provident_fund || '0.00'}</td>
