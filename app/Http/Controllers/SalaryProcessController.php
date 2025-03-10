@@ -264,57 +264,67 @@ class SalaryProcessController extends Controller
         // return $taxAmount;
         $netSalary = $GrossSalaryAmountAfterProvidentFund;
 
-        $BankAmount = DB::table('salary_bank')
-        ->where('user_id', $employeeId)
-        ->where('effective_date', '<=', $formDate)
-        ->latest('created_at')
-        ->first();
+// Fetch the latest salary bank allocation
+$BankAmount = DB::table('salary_bank')
+    ->where('user_id', $employeeId)
+    ->where('effective_date', '<=', $formDate)
+    ->latest('created_at')
+    ->first();
 
-        $FinalBankAmount = 0;
-        $FinalcashAmount = 0;
-        if($BankAmount){
-           $FinalBankAmount = $BankAmount->bank_amount / $BankAmount->gross * 100;// return $BankAmount->bank_amount %
-           $FinalcashAmount = $BankAmount->cash_amount / $BankAmount->gross * 100;// return $BankAmount->cash_amount %
-        }
+$FinalBankPercentage = 0;
+$FinalCashPercentage = 0;
+if ($BankAmount) {
+    $FinalBankPercentage = $BankAmount->bank_amount / $BankAmount->gross * 100; // Bank percentage
+    $FinalCashPercentage = $BankAmount->cash_amount / $BankAmount->gross * 100; // Cash percentage
+}
 
-        $TableData = [
-            'total_worked_days' => $totalWorkedDays,
-            'total_absents' => $totalAbsents,
-            'total_absents_fee' => $TotalDiductionAmount,
-            'total_fridays' => $totalFridays,
-            'advance_salary' => $advanceAmount,
-            'provident_fund' => $ProvidentFund,
-            'gross_salary' => $salaryslab?$salaryslab->gross:0,
-            'net_salary' => $netSalary,
-            'employee_id' => $employeeId,
-            'tax_amount' => $amount,
-            'arrear_amount' => '',
-            'remarks' => $remarks,
-            'form_date' => $formDate,
-            'to_date' => $toDate,
-            'bankamount' => $FinalBankAmount / 100 * ($netSalary - $amount),
-            'cashamount' => $FinalcashAmount / 100 * ($netSalary - $amount),
-            'weekendays_amount' => $TotalFridaysAmount ? $TotalFridaysAmount : 0
-            ];
+// **Step 1: Divide net salary before tax**
+$BankAmountValue = ($FinalBankPercentage / 100) * $netSalary;  // Bank portion before tax
+$CashAmountValue = ($FinalCashPercentage / 100) * $netSalary;  // Cash portion before tax
 
-        DB::table('employee_salary_payment_details')->insert([
-            'PaidAmount' => 0,
-            'UnpaidAmount' => 0,
-            'NetPayable' => $netSalary,
-            'EmployeeID' => $employeeId,
-            'BankPay' => max(0, $FinalBankAmount / 100 * $netSalary - $amount),
-            'CashPay' => $FinalBankAmount > 0
-            ? $FinalcashAmount / 100 * $netSalary
-                : ($FinalcashAmount / 100 * $netSalary - $amount),
-            'Gross' => $salaryslab ? $salaryslab->gross : 0,
-            'TotalPayable' => max(0, $netSalary - $amount),
-            'TotalDeduction' => $TotalDiductionAmount + $amount + $advanceAmount + $ProvidentFund,
-            'FormDate' => $formDate,
-            'ToDate' => $toDate,
-            'Remarks' => $remarks
-        ]);
-        // Check if record exists for the same employee and date range
-        DB::table('employee_salary_details')->insert($TableData);
+// **Step 2: Deduct tax from bank portion**
+$BankAmountValue = max(0, $BankAmountValue - $amount);
+
+// **Ensure Cash Pay remains valid**
+$CashAmountValue = max(0, $netSalary - $BankAmountValue); // Remaining salary goes to cash
+
+$TableData = [
+    'total_worked_days' => $totalWorkedDays,
+    'total_absents' => $totalAbsents,
+    'total_absents_fee' => $TotalDiductionAmount,
+    'total_fridays' => $totalFridays,
+    'advance_salary' => $advanceAmount,
+    'provident_fund' => $ProvidentFund,
+    'gross_salary' => $salaryslab ? $salaryslab->gross : 0,
+    'net_salary' => $netSalary,
+    'employee_id' => $employeeId,
+    'tax_amount' => $amount,
+    'arrear_amount' => '',
+    'remarks' => $remarks,
+    'form_date' => $formDate,
+    'to_date' => $toDate,
+    'bankamount' => $BankAmountValue, // Fixed logic
+    'cashamount' => $CashAmountValue, // Fixed logic
+    'weekendays_amount' => $TotalFridaysAmount ? $TotalFridaysAmount : 0
+];
+
+DB::table('employee_salary_payment_details')->insert([
+    'PaidAmount' => 0,
+    'UnpaidAmount' => 0,
+    'NetPayable' => $netSalary,
+    'EmployeeID' => $employeeId,
+    'BankPay' => max(0, $BankAmountValue), // Corrected bank amount
+    'CashPay' => max(0, $CashAmountValue), // Corrected cash amount
+    'Gross' => $salaryslab ? $salaryslab->gross : 0,
+    'TotalPayable' => max(0, $netSalary - $amount),
+    'TotalDeduction' => $TotalDiductionAmount + $amount + $advanceAmount + $ProvidentFund,
+    'FormDate' => $formDate,
+    'ToDate' => $toDate,
+    'Remarks' => $remarks
+]);
+
+// Insert into employee_salary_details
+DB::table('employee_salary_details')->insert($TableData);
 
         return $User->employee_code;
     }
