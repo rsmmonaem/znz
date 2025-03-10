@@ -267,7 +267,7 @@ class SalaryProcessController extends Controller
 // Fetch the latest salary bank allocation
 $BankAmount = DB::table('salary_bank')
     ->where('user_id', $employeeId)
-    ->where('effective_date', '<=', $formDate)
+    // ->where('effective_date', '<=', $formDate)
     ->latest('created_at')
     ->first();
 
