@@ -292,8 +292,8 @@ class SalaryProcessController extends Controller
             'remarks' => $remarks,
             'form_date' => $formDate,
             'to_date' => $toDate,
-            'bankamount' => max(0, $FinalBankAmount / 100 * $netSalary - $amount),
-            'cashamount' => $FinalBankAmount > 0 ? $FinalcashAmount / 100 * $netSalary : ($FinalcashAmount / 100 * $netSalary - $amount),
+            'bankamount' => $FinalBankAmount / 100 * ($netSalary - $amount),
+            'cashamount' => $FinalcashAmount / 100 * ($netSalary - $amount),
             'weekendays_amount' => $TotalFridaysAmount ? $TotalFridaysAmount : 0
             ];
 
