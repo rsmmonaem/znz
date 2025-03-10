@@ -273,8 +273,8 @@ class SalaryProcessController extends Controller
         $FinalBankAmount = 0;
         $FinalcashAmount = 0;
         if($BankAmount){
-           $FinalBankAmount = $BankAmount->bank_amount / $BankAmount->gross * 100;// return $BankAmount->bank_amount %
-           $FinalcashAmount = $BankAmount->cash_amount / $BankAmount->gross * 100;// return $BankAmount->cash_amount %
+           $FinalBankAmount = $BankAmount->bank_amount / $BankAmount->gross * 100;
+           $FinalcashAmount = $BankAmount->cash_amount / $BankAmount->gross * 100;
         }
 
         $TableData = [
@@ -293,7 +293,9 @@ class SalaryProcessController extends Controller
             'form_date' => $formDate,
             'to_date' => $toDate,
             'bankamount' => max(0, $FinalBankAmount / 100 * $netSalary - $amount),
-            'cashamount' => $FinalBankAmount > 0 ? $FinalcashAmount / 100 * $netSalary : ($FinalcashAmount / 100 * $netSalary - $amount),
+            'cashamount' => $FinalBankAmount > 0
+                ? $FinalcashAmount / 100 * $netSalary
+                    : ($FinalcashAmount / 100 * $netSalary - $amount),
             'weekendays_amount' => $TotalFridaysAmount ? $TotalFridaysAmount : 0
             ];
 
