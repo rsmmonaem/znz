@@ -303,8 +303,8 @@ $TableData = [
     'remarks' => $remarks,
     'form_date' => $formDate,
     'to_date' => $toDate,
-    'bankamount' => $BankAmountValue, // Fixed logic
-    'cashamount' => $CashAmountValue, // Fixed logic
+    'bankamount' => $FinalBankPercentage, // Fixed logic
+    'cashamount' => $FinalCashPercentage, // Fixed logic
     'weekendays_amount' => $TotalFridaysAmount ? $TotalFridaysAmount : 0
 ];
 
