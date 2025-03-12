@@ -584,7 +584,7 @@ DB::table('employee_salary_details')->insert($TableData);
             'advance_salary' => $advanceAmount,
             'provident_fund' => $ProvidentFund,
             'gross_salary' => $salaryslab ? $salaryslab->gross : 0,
-            'net_salary' => $netSalary,
+            'net_salary' => $netSalary+$advanceAmount,
             'employee_id' => $employeeId,
             'arrear_amount' => '',
             'tax_amount' => $amount,
