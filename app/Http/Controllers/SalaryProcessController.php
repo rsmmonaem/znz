@@ -505,20 +505,13 @@ class SalaryProcessController extends Controller
         $GrossAmountSalaryPerDays = $perdaysAmount * $totalWorkedDays;
         $TotalDiductionAmount = $perdaysAmount * $totalAbsents;
 
-
-        $totalWorkedDays = $getTotalPresent + $holidays + $leave + $totalFridays + $spacial_holidays;
-        $totalAbsents = $TotalDays - $totalWorkedDays;
-        $perdaysAmount =  $salaryslab ? $salaryslab->gross / $TotalDays : 0;
-        $GrossAmountSalaryPerDays = $perdaysAmount * $totalWorkedDays;
-        $TotalDiductionAmount = $perdaysAmount * $totalAbsents;
-l
         $GrossSalaryAmountAfterAdvance = $GrossAmountSalaryPerDays - $advanceAmount;
         // return $deductionsData->where('salary_type_id', 5);
         if (count($deductionsData->where('salary_type_id', 5)) === 0) {
             $ProvidentFund = 0;
         } else {
             $ProvidentFund = $deductionsData->where('salary_type_id', 5)->first()->amount;
-        }
+        }l
 
         $GrossSalaryAmountAfterProvidentFund = $GrossSalaryAmountAfterAdvance - $ProvidentFund;
 
@@ -586,6 +579,13 @@ l
             'gross_salary' => $salaryslab ? $salaryslab->gross : 0,
             'net_salary' => $GrossAmountSalaryPerDays,
             'employee_id' => $employeeId,
+            'arrear_amount' => '',
+            'tax_amount' => $amount,
+            'remarks' => $remarks,
+            'form_date' => $formDate,
+            'to_date' => $toDate,
+            'ot_hrs' => $totalOvertimeHrs,
+            'ot_amount' => $overtimeSalery,
             'arrear_amount' => '',
             'tax_amount' => $amount,
             'remarks' => $remarks,
