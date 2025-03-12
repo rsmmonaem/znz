@@ -205,7 +205,7 @@ class SalaryProcessController extends Controller
         $advanceSalary = DB::table('salary_advance')
         ->leftJoin('salary_advance_months', 'salary_advance.id', '=', 'salary_advance_months.salary_advance_id')
         ->where('employeeId', $employeeId)
-        ->where('salary_advance.effectiveDate', '<', $formDate)
+        ->where('salary_advance.effectiveDate', '<', $toDate)
         ->select('salary_advance.grossValue', 'salary_advance.grossOption', 'salary_advance_months.month', 'salary_advance_months.amount')
         ->get();
         $monthNumber = (int)date('m', strtotime($toDate));
