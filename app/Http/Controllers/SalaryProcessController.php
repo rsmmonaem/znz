@@ -413,13 +413,7 @@ class SalaryProcessController extends Controller
             ->orderBy('salary.salary_type_id')
             ->orderBy('salary.created_at', 'desc')
             ->get();
-        ->join('salary_types', 'salary.salary_type_id', '=', 'salary_types.id')
-        ->where('salary.user_id', $employeeId)
-            ->where('salary_types.salary_type', 'earning')
-            ->select('salary.id', 'salary.contract_id', 'salary.salary_type_id', 'salary.amount', 'salary.created_at', 'salary.updated_at', 'salary_types.head', 'salary_types.salary_type')
-            ->orderBy('salary.salary_type_id')
-            ->orderBy('salary.created_at', 'desc')
-            ->get();
+
         $latestSalaryData = collect($latestSalaryData);
         $latestSalaryData = $latestSalaryData->unique('salary_type_id');
 
