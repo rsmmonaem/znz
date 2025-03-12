@@ -479,7 +479,7 @@ Route::group(['middleware' => ['auth','license','account_valid']], function () {
 	Route::get('/slary-shit', 'SalaryProcessController@SalaryShit');
 	Route::get('/slary-shit-report', 'SalaryProcessController@SalaryShitReport');
 	// Route::post('/salary-process-post', 'SalaryProcessController@SalaryProcess');
-	Route::post('/salary-process-post', 'SalaryProcessController@SalaryProcessView');
+	Route::get('/salary-process-post', 'SalaryProcessController@SalaryProcessView');
 	Route::post('/slary-shit-post', 'SalaryProcessController@SalaryShitPost');
 	Route::post('/update-arrear-amount', 'SalaryProcessController@UpdateArrearAmount');
 	Route::post('/update-tax-amount', 'SalaryProcessController@UpdateTaxAmount');

@@ -50,7 +50,7 @@ class SalaryProcessController extends Controller
             break;
         }
     }
-    return $advanceAmount;
+    return $advanceSalary;
     //   DB::beginTransaction();
     //   try{
     //         // Define the base query for user data
