@@ -47,10 +47,10 @@ class SalaryProcessController extends Controller
     foreach ($advanceSalary as $record) {
         if ($record->month == $monthNumber) {
             $advanceAmount = $record->month; 
-            
+
         }
     }
-    return $advanceSalary;
+    return $advanceAmount;
     //   DB::beginTransaction();
     //   try{
     //         // Define the base query for user data
