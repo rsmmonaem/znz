@@ -209,7 +209,7 @@ class SalaryProcessController extends Controller
         ->select('salary_advance.grossValue', 'salary_advance.grossOption', 'salary_advance_months.month', 'salary_advance_months.amount')
         ->get();
         $monthNumber = (int)date('m', strtotime($toDate));
-        $advanceAmount = $monthNumber;
+        $advanceAmount = json_decode($advanceSalary);
         foreach ($advanceSalary as $record) {
             if ($record->month === $monthNumber) {
                 $advanceAmount = $record->amount;
