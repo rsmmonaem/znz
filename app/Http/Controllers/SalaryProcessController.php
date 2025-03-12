@@ -245,7 +245,7 @@ class SalaryProcessController extends Controller
         $TotalDiductionAmount = $perdaysAmount * $totalAbsents;
 
         $TotalFridaysAmount = $perdaysAmount * $totalFridays;
-        $GrossSalaryAmountAfterAdvance = $GrossAmountSalaryPerDays - $advanceAmount;
+        $GrossSalaryAmountAfterAdvance = $GrossAmountSalaryPerDays;
         // return $deductionsData->where('salary_type_id', 5);
         if(count($deductionsData->where('salary_type_id', 5)) === 0){
             $ProvidentFund = 0;
@@ -282,7 +282,7 @@ class SalaryProcessController extends Controller
             $amount = $taxAmount->$monthColumn;
         }
         // return $taxAmount;
-        $netSalary = $GrossSalaryAmountAfterProvidentFund;
+        $netSalary = $GrossSalaryAmountAfterProvidentFund-$amount;
 
 // Fetch the latest salary bank allocation
 $BankAmount = DB::table('salary_bank')
@@ -331,7 +331,7 @@ $TableData = [
 DB::table('employee_salary_payment_details')->insert([
     'PaidAmount' => 0,
     'UnpaidAmount' => 0,
-    'NetPayable' => $netSalary,
+    'NetPayable' => $netSalary-$advanceAmount,
     'EmployeeID' => $employeeId,
     'BankPay' => max(0, $BankAmountValue), // Corrected bank amount
     'CashPay' => max(0, $CashAmountValue), // Corrected cash amount
