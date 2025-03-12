@@ -221,21 +221,21 @@ class SalaryProcessController extends Controller
         $deductionsData = collect($deductionsData);
         $deductionsData = $deductionsData->unique('salary_type_id');
 
-        $advanceSalary = DB::table('salary_advance')
-        ->leftJoin('salary_advance_months', 'salary_advance.id', '=', 'salary_advance_months.salary_advance_id')
-        ->where('employeeId', $employeeId)
-        ->where('salary_advance.effectiveDate', '<', $toDate)
-        ->select('salary_advance.grossValue', 'salary_advance.grossOption', 'salary_advance_months.month', 'salary_advance_months.amount')
-        ->get();
-    
-    $monthNumber = (int)date('m', strtotime($toDate));
-    $advanceAmount = 0;
-    
-    foreach ($advanceSalary as $record) {
-        if ($record->month === $monthNumber) {
-            $advanceAmount = $record->amount;
+            $advanceSalary = DB::table('salary_advance')
+            ->leftJoin('salary_advance_months', 'salary_advance.id', '=', 'salary_advance_months.salary_advance_id')
+            ->where('employeeId', $employeeId)
+            ->where('salary_advance.effectiveDate', '<', $toDate)
+            ->select('salary_advance.grossValue', 'salary_advance.grossOption', 'salary_advance_months.month', 'salary_advance_months.amount')
+            ->get();
+        
+        $monthNumber = (int)date('m', strtotime($toDate));
+        $advanceAmount = 0;
+        
+        foreach ($advanceSalary as $record) {
+            if ($record->month == $monthNumber) {
+                $advanceAmount = $record->month; 
+            }
         }
-    }
 
         //$totalWorkedDays = $getTotalPresent + $holidays + $leave + $totalFridays + $spacial_holidays;
         $totalWorkedDays = $getTotalPresent;
