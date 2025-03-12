@@ -511,7 +511,7 @@ class SalaryProcessController extends Controller
             $ProvidentFund = 0;
         } else {
             $ProvidentFund = $deductionsData->where('salary_type_id', 5)->first()->amount;
-        }l
+        }
 
         $GrossSalaryAmountAfterProvidentFund = $GrossSalaryAmountAfterAdvance - $ProvidentFund;
 
@@ -579,13 +579,6 @@ class SalaryProcessController extends Controller
             'gross_salary' => $salaryslab ? $salaryslab->gross : 0,
             'net_salary' => $GrossAmountSalaryPerDays,
             'employee_id' => $employeeId,
-            'arrear_amount' => '',
-            'tax_amount' => $amount,
-            'remarks' => $remarks,
-            'form_date' => $formDate,
-            'to_date' => $toDate,
-            'ot_hrs' => $totalOvertimeHrs,
-            'ot_amount' => $overtimeSalery,
             'arrear_amount' => '',
             'tax_amount' => $amount,
             'remarks' => $remarks,
