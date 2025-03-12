@@ -214,7 +214,7 @@ class SalaryProcessController extends Controller
     
     foreach ($advanceSalary as $record) {
         if ($record->month === $monthNumber) {
-            $advanceAmount = $record->amount; // ✅ Corrected
+            $advanceAmount = $record->month;
             break;
         }
     }
