@@ -208,8 +208,8 @@ class SalaryProcessController extends Controller
         ->where('salary_advance.effectiveDate', '<', $toDate)
         ->select('salary_advance.grossValue', 'salary_advance.grossOption', 'salary_advance_months.month', 'salary_advance_months.amount')
         ->get();
-        $monthNumber = 1;
-        $advanceAmount = 0;
+        $monthNumber = (int)date('m', strtotime($toDate));
+        $advanceAmount = $monthNumber;
         foreach ($advanceSalary as $record) {
             if ($record->month === $monthNumber) {
                 $advanceAmount = $record->amount;
