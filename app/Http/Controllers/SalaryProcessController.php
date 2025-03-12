@@ -509,6 +509,8 @@ DB::table('employee_salary_details')->insert($TableData);
         $totalWorkedDays = $getTotalPresent + $holidays + $leave + $totalFridays + $spacial_holidays;
         $totalAbsents = $TotalDays - $totalWorkedDays;
         $perdaysAmount =  $salaryslab ? $salaryslab->gross / $TotalDays : 0;
+        return $perdaysAmount;
+        die();
         $GrossAmountSalaryPerDays = $perdaysAmount * $totalWorkedDays;
         $TotalDiductionAmount = $perdaysAmount * $totalAbsents;
 
