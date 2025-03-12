@@ -144,7 +144,7 @@ class SalaryProcessController extends Controller
         ->where('users.id', '=', $employeeId)
         ->select('users.id', 'profile.employee_code', 'users.first_name', 'designations.name as designation', 'departments.name as department', 'sections.name as section', 'branchs.name as branch')
         ->first();
-        // return $User->employee_code;
+
         // Total Present
         $getTotalPresent = DB::table('clocks')
         ->whereBetween('date', [$formDate, $toDate])
@@ -155,12 +155,11 @@ class SalaryProcessController extends Controller
         // Holidays
         $holidays = DB::table('holidays')
         ->whereBetween('date', [$formDate, $toDate])
-        // ->where('user_id', $employeeId)
         ->distinct('date') 
         ->count('date');
 
-        //Spacial Holidays
-        $spacial_holidays = DB::table('spacial_holidays')
+        // Special Holidays
+        $special_holidays = DB::table('special_holidays')
         ->whereBetween('date', [$formDate, $toDate])
         ->where('user_id', $employeeId)
         ->distinct('date') 
@@ -181,6 +180,7 @@ class SalaryProcessController extends Controller
         ->where('status', 'lwp')
         ->distinct('from_date') 
         ->count('from_date');
+
         // Total Days Of Month
         $startDate = Carbon::parse($formDate);
         $endDate = Carbon::parse($toDate); 
@@ -190,13 +190,15 @@ class SalaryProcessController extends Controller
         $fridays = WHD::where('user_id', $employeeId)->whereBetween('date', [$formDate, $toDate])->pluck('date')->toArray();
         // Total Fridays
         $totalFridays = count($fridays);
-        // Sarary Slab
+
+        // Salary Slab
         $salaryslab = DB::table('salary_slab')
         ->where('user_id', $employeeId)
-        ->where('effactive_date', '<', $toDate)
+        ->where('effective_date', '<', $toDate)
         ->select('gross')
         ->latest('id')
         ->first();
+
         // Fetch earning salary types only once
         $latestSalaryData = DB::table('salary')
         ->join('salary_types', 'salary.salary_type_id', '=', 'salary_types.id')
@@ -221,12 +223,12 @@ class SalaryProcessController extends Controller
         $deductionsData = collect($deductionsData);
         $deductionsData = $deductionsData->unique('salary_type_id');
 
-            $advanceSalary = DB::table('salary_advance')
-            ->leftJoin('salary_advance_months', 'salary_advance.id', '=', 'salary_advance_months.salary_advance_id')
-            ->where('employeeId', $employeeId)
-            ->where('salary_advance.effectiveDate', '<', $toDate)
-            ->select('salary_advance.grossValue', 'salary_advance.grossOption', 'salary_advance_months.month', 'salary_advance_months.amount')
-            ->get();
+        $advanceSalary = DB::table('salary_advance')
+        ->leftJoin('salary_advance_months', 'salary_advance.id', '=', 'salary_advance_months.salary_advance_id')
+        ->where('employeeId', $employeeId)
+        ->where('salary_advance.effectiveDate', '<', $toDate)
+        ->select('salary_advance.grossValue', 'salary_advance.grossOption', 'salary_advance_months.month', 'salary_advance_months.amount')
+        ->get();
         
         $monthNumber = (int)date('m', strtotime($toDate));
         $advanceAmount = 0;
@@ -237,7 +239,6 @@ class SalaryProcessController extends Controller
             }
         }
 
-        //$totalWorkedDays = $getTotalPresent + $holidays + $leave + $totalFridays + $spacial_holidays;
         $totalWorkedDays = $getTotalPresent;
         $totalAbsents = $TotalDays - $totalWorkedDays;
         $perdaysAmount =  $salaryslab ? $salaryslab->gross / $TotalDays : 0;
@@ -246,7 +247,7 @@ class SalaryProcessController extends Controller
 
         $TotalFridaysAmount = $perdaysAmount * $totalFridays;
         $GrossSalaryAmountAfterAdvance = $GrossAmountSalaryPerDays;
-        // return $deductionsData->where('salary_type_id', 5);
+        
         if(count($deductionsData->where('salary_type_id', 5)) === 0){
             $ProvidentFund = 0;
         }else{
@@ -270,81 +271,73 @@ class SalaryProcessController extends Controller
             12 => 'december',
         ];
         $monthNumber = (int)date('m', strtotime($toDate));
-        // Get the column name for the provided month number
         $monthColumn = isset($monthColumns[$monthNumber]) ? $monthColumns[$monthNumber] : null;
 
         $taxAmount = DB::table('tax_month_adjustments')
         ->where('user_id', $employeeId)
         ->latest('created_at')
-            ->first();
+        ->first();
         $amount = 0;
         if ($taxAmount) {
             $amount = $taxAmount->$monthColumn;
         }
-        // return $taxAmount;
-        $netSalary = $GrossSalaryAmountAfterProvidentFund-$amount;
 
-// Fetch the latest salary bank allocation
-$BankAmount = DB::table('salary_bank')
-    ->where('user_id', $employeeId)
-    // ->where('effective_date', '<=', $formDate)
-    ->latest('created_at')
-    ->first();
+        $netSalary = $GrossSalaryAmountAfterProvidentFund - $amount;
 
-$FinalBankPercentage = 0;
-$FinalCashPercentage = 0;
-if ($BankAmount) {
-    $FinalBankPercentage = $BankAmount->bank_amount / $BankAmount->gross * 100; // Bank percentage
-    $FinalCashPercentage = $BankAmount->cash_amount / $BankAmount->gross * 100; // Cash percentage
-}
+        $BankAmount = DB::table('salary_bank')
+        ->where('user_id', $employeeId)
+        ->latest('created_at')
+        ->first();
 
-// **Step 1: Divide net salary before tax**
-$BankAmountValue = ($FinalBankPercentage / 100) * $netSalary;  // Bank portion before tax
-$CashAmountValue = ($FinalCashPercentage / 100) * $netSalary;  // Cash portion before tax
+        $FinalBankPercentage = 0;
+        $FinalCashPercentage = 0;
+        if ($BankAmount) {
+            $FinalBankPercentage = $BankAmount->bank_amount / $BankAmount->gross * 100;
+            $FinalCashPercentage = $BankAmount->cash_amount / $BankAmount->gross * 100;
+        }
 
-// **Step 2: Deduct tax from bank portion**
-$BankAmountValue = max(0, $BankAmountValue - $amount);
+        $BankAmountValue = ($FinalBankPercentage / 100) * $netSalary;
+        $CashAmountValue = ($FinalCashPercentage / 100) * $netSalary;
 
-// **Ensure Cash Pay remains valid**
-$CashAmountValue = max(0, $netSalary - $BankAmountValue); // Remaining salary goes to cash
+        $BankAmountValue = max(0, $BankAmountValue - $amount);
+        $CashAmountValue = max(0, $netSalary - $BankAmountValue);
 
-$TableData = [
-    'total_worked_days' => $totalWorkedDays,
-    'total_absents' => $totalAbsents,
-    'total_absents_fee' => $TotalDiductionAmount,
-    'total_fridays' => $totalFridays,
-    'advance_salary' => $advanceAmount,
-    'provident_fund' => $ProvidentFund,
-    'gross_salary' => $salaryslab ? $salaryslab->gross : 0,
-    'net_salary' => $netSalary,
-    'employee_id' => $employeeId,
-    'tax_amount' => $amount,
-    'arrear_amount' => '',
-    'remarks' => $remarks,
-    'form_date' => $formDate,
-    'to_date' => $toDate,
-    'bankamount' => $BankAmountValue, // Fixed logic
-    'cashamount' => $CashAmountValue, // Fixed logic
-    'weekendays_amount' => $TotalFridaysAmount ? $TotalFridaysAmount : 0
-];
+        $TableData = [
+            'total_worked_days' => $totalWorkedDays,
+            'total_absents' => $totalAbsents,
+            'total_absents_fee' => $TotalDiductionAmount,
+            'total_fridays' => $totalFridays,
+            'advance_salary' => $advanceAmount,
+            'provident_fund' => $ProvidentFund,
+            'gross_salary' => $salaryslab ? $salaryslab->gross : 0,
+            'net_salary' => $netSalary,
+            'employee_id' => $employeeId,
+            'tax_amount' => $amount,
+            'arrear_amount' => '',
+            'remarks' => $remarks,
+            'form_date' => $formDate,
+            'to_date' => $toDate,
+            'bankamount' => $BankAmountValue,
+            'cashamount' => $CashAmountValue,
+            'weekendays_amount' => $TotalFridaysAmount ? $TotalFridaysAmount : 0
+        ];
 
-DB::table('employee_salary_payment_details')->insert([
-    'PaidAmount' => 0,
-    'UnpaidAmount' => 0,
-    'NetPayable' => $netSalary-$advanceAmount,
-    'EmployeeID' => $employeeId,
-    'BankPay' => max(0, $BankAmountValue), // Corrected bank amount
-    'CashPay' => max(0, $CashAmountValue), // Corrected cash amount
-    'Gross' => $salaryslab ? $salaryslab->gross : 0,
-    'TotalPayable' => max(0, $netSalary - $amount),
-    'TotalDeduction' => $TotalDiductionAmount + $amount + $advanceAmount + $ProvidentFund,
-    'FormDate' => $formDate,
-    'ToDate' => $toDate,
-    'Remarks' => $remarks
-]);
+        DB::table('employee_salary_payment_details')->insert([
+            'PaidAmount' => 0,
+            'UnpaidAmount' => 0,
+            'NetPayable' => $netSalary - $advanceAmount,
+            'EmployeeID' => $employeeId,
+            'BankPay' => max(0, $BankAmountValue),
+            'CashPay' => max(0, $CashAmountValue),
+            'Gross' => $salaryslab ? $salaryslab->gross : 0,
+            'TotalPayable' => max(0, $netSalary - $amount),
+            'TotalDeduction' => $TotalDiductionAmount + $amount + $advanceAmount + $ProvidentFund,
+            'FormDate' => $formDate,
+            'ToDate' => $toDate,
+            'Remarks' => $remarks
+        ]);
 
-// Insert into employee_salary_details
-DB::table('employee_salary_details')->insert($TableData);
+        DB::table('employee_salary_details')->insert($TableData);
 
         return $User->employee_code;
     }
@@ -509,11 +502,16 @@ DB::table('employee_salary_details')->insert($TableData);
         $totalWorkedDays = $getTotalPresent + $holidays + $leave + $totalFridays + $spacial_holidays;
         $totalAbsents = $TotalDays - $totalWorkedDays;
         $perdaysAmount =  $salaryslab ? $salaryslab->gross / $TotalDays : 0;
-        return $perdaysAmount;
-        die();
         $GrossAmountSalaryPerDays = $perdaysAmount * $totalWorkedDays;
         $TotalDiductionAmount = $perdaysAmount * $totalAbsents;
 
+
+        $totalWorkedDays = $getTotalPresent + $holidays + $leave + $totalFridays + $spacial_holidays;
+        $totalAbsents = $TotalDays - $totalWorkedDays;
+        $perdaysAmount =  $salaryslab ? $salaryslab->gross / $TotalDays : 0;
+        $GrossAmountSalaryPerDays = $perdaysAmount * $totalWorkedDays;
+        $TotalDiductionAmount = $perdaysAmount * $totalAbsents;
+l
         $GrossSalaryAmountAfterAdvance = $GrossAmountSalaryPerDays - $advanceAmount;
         // return $deductionsData->where('salary_type_id', 5);
         if (count($deductionsData->where('salary_type_id', 5)) === 0) {
