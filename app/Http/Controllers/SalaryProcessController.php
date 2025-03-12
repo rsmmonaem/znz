@@ -331,7 +331,7 @@ $TableData = [
 DB::table('employee_salary_payment_details')->insert([
     'PaidAmount' => 0,
     'UnpaidAmount' => 0,
-    'NetPayable' => $netSalary,
+    'NetPayable' => $netSalary-$advanceAmount,
     'EmployeeID' => $employeeId,
     'BankPay' => max(0, $BankAmountValue), // Corrected bank amount
     'CashPay' => max(0, $CashAmountValue), // Corrected cash amount
@@ -603,7 +603,7 @@ DB::table('employee_salary_details')->insert($TableData);
         DB::table('employee_salary_payment_details')->insert([
             'PaidAmount' => 0,
             'UnpaidAmount' => 0,
-            'NetPayable' => $netSalary,
+            'NetPayable' => $netSalary-$advanceAmount,
             'EmployeeID' => $employeeId,
             'BankPay' => max(0,$FinalBankAmount / 100 * $netSalary - $amount),
             'CashPay' => $FinalBankAmount > 0
