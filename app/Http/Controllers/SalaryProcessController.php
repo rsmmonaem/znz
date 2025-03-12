@@ -254,7 +254,7 @@ class SalaryProcessController extends Controller
         }
 
         $GrossSalaryAmountAfterProvidentFund = $GrossSalaryAmountAfterAdvance - $ProvidentFund;
-
+        
         $monthColumns = [
             1 => 'january',
             2 => 'february',
@@ -316,7 +316,7 @@ $TableData = [
     'advance_salary' => $advanceAmount,
     'provident_fund' => $ProvidentFund,
     'gross_salary' => $salaryslab ? $salaryslab->gross : 0,
-    'net_salary' => $netSalary,
+    'net_salary' => $$ProvidentFund,
     'employee_id' => $employeeId,
     'tax_amount' => $amount,
     'arrear_amount' => '',
@@ -603,7 +603,7 @@ DB::table('employee_salary_details')->insert($TableData);
         DB::table('employee_salary_payment_details')->insert([
             'PaidAmount' => 0,
             'UnpaidAmount' => 0,
-            'NetPayable' => 0,
+            'NetPayable' => $netSalary,
             'EmployeeID' => $employeeId,
             'BankPay' => max(0,$FinalBankAmount / 100 * $netSalary - $amount),
             'CashPay' => $FinalBankAmount > 0
