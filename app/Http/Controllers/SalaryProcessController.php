@@ -237,7 +237,7 @@ class SalaryProcessController extends Controller
             }
         }
 
-        $totalWorkedDays = $getTotalPresent + $holidays + $leave + $totalFridays + $spacial_holidays;
+        $totalWorkedDays = $getTotalPresent.'-'.$holidays.'-'.$leave.'-'.$totalFridays.'-'.$spacial_holidays;
         // $totalWorkedDays = $getTotalPresent;
         $totalAbsents = $TotalDays - $totalWorkedDays;
         $perdaysAmount =  $salaryslab ? $salaryslab->gross / $TotalDays : 0;
@@ -328,25 +328,25 @@ $TableData = [
     'weekendays_amount' => $TotalFridaysAmount ? $TotalFridaysAmount : 0
 ];
 
-DB::table('employee_salary_payment_details')->insert([
-    'PaidAmount' => 0,
-    'UnpaidAmount' => 0,
-    'NetPayable' => $netSalary-$advanceAmount,
-    'EmployeeID' => $employeeId,
-    'BankPay' => max(0, $BankAmountValue), // Corrected bank amount
-    'CashPay' => max(0, $CashAmountValue), // Corrected cash amount
-    'Gross' => $salaryslab ? $salaryslab->gross : 0,
-    'TotalPayable' => max(0, $netSalary - $amount),
-    'TotalDeduction' => $TotalDiductionAmount + $amount + $advanceAmount + $ProvidentFund,
-    'FormDate' => $formDate,
-    'ToDate' => $toDate,
-    'Remarks' => $remarks
-]);
+// DB::table('employee_salary_payment_details')->insert([
+//     'PaidAmount' => 0,
+//     'UnpaidAmount' => 0,
+//     'NetPayable' => $netSalary-$advanceAmount,
+//     'EmployeeID' => $employeeId,
+//     'BankPay' => max(0, $BankAmountValue), // Corrected bank amount
+//     'CashPay' => max(0, $CashAmountValue), // Corrected cash amount
+//     'Gross' => $salaryslab ? $salaryslab->gross : 0,
+//     'TotalPayable' => max(0, $netSalary - $amount),
+//     'TotalDeduction' => $TotalDiductionAmount + $amount + $advanceAmount + $ProvidentFund,
+//     'FormDate' => $formDate,
+//     'ToDate' => $toDate,
+//     'Remarks' => $remarks
+// ]);
 
-// Insert into employee_salary_details
-DB::table('employee_salary_details')->insert($TableData);
+// // Insert into employee_salary_details
+// DB::table('employee_salary_details')->insert($TableData);
 
-        return $User->employee_code;
+        return $totalWorkedDays;
     }
 
     public function SalaryProcessByBranch($employeeId, $formDate, $toDate, $remarks)
