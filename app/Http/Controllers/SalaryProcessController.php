@@ -289,6 +289,7 @@ class SalaryProcessController extends Controller
         }
         // return $taxAmount;
         $netSalary = $GrossSalaryAmountAfterProvidentFund-$amount;
+        $netSalaryWIthoutTax = $GrossSalaryAmountAfterProvidentFund;
 
 // Fetch the latest salary bank allocation
 $BankAmount = DB::table('salary_bank')
@@ -322,7 +323,7 @@ $TableData = [
     'advance_salary' => $advanceAmount,
     'provident_fund' => $ProvidentFund,
     'gross_salary' => $salaryslab ? $salaryslab->gross : 0,
-    'net_salary' => $netSalary,
+    'net_salary' => $netSalaryWIthoutTax,
     'employee_id' => $employeeId,
     'tax_amount' => $amount,
     'arrear_amount' => '',
@@ -337,12 +338,12 @@ $TableData = [
 DB::table('employee_salary_payment_details')->insert([
     'PaidAmount' => 0,
     'UnpaidAmount' => 0,
-    'NetPayable' => $netSalary-$advanceAmount,
+    'NetPayable' => $netSalaryWIthoutTax - $amount-$advanceAmount,
     'EmployeeID' => $employeeId,
     'BankPay' => max(0, $BankAmountValue), // Corrected bank amount
     'CashPay' => max(0, $CashAmountValue), // Corrected cash amount
     'Gross' => $salaryslab ? $salaryslab->gross : 0,
-    'TotalPayable' => max(0, $netSalary - $amount),
+    'TotalPayable' => max(0, $netSalaryWIthoutTax - $amount),
     'TotalDeduction' => $TotalDiductionAmount + $amount + $advanceAmount + $ProvidentFund,
     'FormDate' => $formDate,
     'ToDate' => $toDate,
