@@ -613,7 +613,9 @@
                             <tbody>
                                 <tr>
                                     <td>Late</td>
-                                    <td class="text-right">${formatCurrency(employee.total_absents_fee)}</td>
+                                    <td class="text-right">
+                                        0
+                                        </td>
                                     <td>Advance</td>
                                     <td class="text-right">${formatCurrency(employee.advance_salary)}</td>
                                 </tr>
