@@ -356,7 +356,7 @@ function populateSalaryTable(data) {
             <td>${medical.toFixed(2)}</td>
             <td>${conveyance.toFixed(2)}</td>
             <td>${others.toFixed(2)}</td>
-            <td>${item.net_salary+item.tax_amount || '0.00'}</td>
+            <td>${item.net_salary && item.tax_amount ? (parseFloat(item.net_salary) + parseFloat(item.tax_amount)).toFixed(2) : '0.00'}</td>
             <td>${item.advance_salary || '0.00'}</td>
             <td>${item.provident_fund || '0.00'}</td>
             <td>${item.tax_amount || '0.00'}</td>
