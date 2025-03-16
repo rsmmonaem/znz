@@ -546,7 +546,7 @@
                                 <td>Days Of Month:</td>
                                 <td class="text-right">${employee.date_difference}</td>
                                 <td>Attendance:</td>
-                                <td class="text-right">${employee.total_worked_days}</td>
+                                <td class="text-right">${employee.total_worked_days-employee.total_fridays}</td>
                             </tr>
                         </table>
                     </div>

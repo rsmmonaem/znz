@@ -170,6 +170,7 @@ class SalaryProcessController extends Controller
         $leave = DB::table('leaves')
         ->whereBetween('from_date', [$formDate, $toDate])
         ->where('user_id', $employeeId)
+        ->where('leave_type_id', '!=', 9)
         ->where('status', 'approved')
         ->distinct('from_date') 
         ->count('from_date');
@@ -178,9 +179,11 @@ class SalaryProcessController extends Controller
         $lwp = DB::table('leaves')
         ->whereBetween('from_date', [$formDate, $toDate])
         ->where('user_id', $employeeId)
-        ->where('status', 'lwp')
+        ->where('leave_type_id', '==', 9)
+        ->where('status', 'approved')
         ->distinct('from_date') 
         ->count('from_date');
+
         // Total Days Of Month
         $startDate = Carbon::parse($formDate);
         $endDate = Carbon::parse($toDate); 
@@ -240,7 +243,7 @@ class SalaryProcessController extends Controller
         // $totalWorkedDays = $getTotalPresent + $holidays + $leave + $totalFridays + $spacial_holidays;
         // $totalWorkedDays = $getTotalPresent + $holidays + $leave + $totalFridays + $spacial_holidays;
         $totalWorkedDays = $getTotalPresent;
-        $totalAbsents = $TotalDays-$totalWorkedDays+$totalFridays;
+        $totalAbsents = $TotalDays-$totalWorkedDays+$totalFridays+$spacial_holidays+$holidays+$leave;
         $perdaysAmount =  $salaryslab ? $salaryslab->gross / $TotalDays : 0;
         // $GrossAmountSalaryPerDays = $perdaysAmount * $totalWorkedDays;
         $GrossAmountSalaryPerDays = $perdaysAmount * $TotalDays;
@@ -841,6 +844,7 @@ DB::table('employee_salary_details')->insert($TableData);
                 'profile.date_of_joining',
                 'profile.employee_code',
                 'employee_salary_details.total_worked_days',
+                'employee_salary_details.total_fridays',
                 'employee_salary_details.gross_salary',
                 'employee_salary_details.net_salary',
                 'employee_salary_details.advance_salary',
