@@ -319,8 +319,7 @@ function populateSalaryTable(data) {
     // Net Payable Calculation with proper float handling
     const netPayable = (
         parseFloat(item.net_salary || 0) +
-        parseFloat(item.arrear_amount || 0) -
-        parseFloat(item.advance_salary || 0)
+        parseFloat(item.arrear_amount || 0) - parseFloat(item.advance_salary || 0) - parseFloat(item.provident_fund || 0) - parseFloat(item.tax_amount || 0)
     ).toFixed(2);
 
     // Update totals with proper calculations
