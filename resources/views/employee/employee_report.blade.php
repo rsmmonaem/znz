@@ -253,26 +253,29 @@
 
             // Generate report table rows dynamically
             let tableRows = '';
-            response.forEach((item, index) => {
-                tableRows += `
-                    <tr>
-                        <td>${index + 1}</td>
-                        <td>${item.employee_code}</td>
-                        <td>${item.first_name || ''}</td>
-                        <td>${item.designation_name || ''}</td>
-                        <td>${item.department_name || ''}</td>
-                        <td>${item.section_name || ''}</td>
-                        <td>${item.date_of_joining || ''}</td>
-                        <td>${item.date_of_birth || ''}</td>
-                        <td>${item.blood_group || ''}</td>
-                        <td>${item.category || ''}</td>
-                        <td>${item.contact_number || ''}</td>
-                        <td>${item.gender || ''}</td>
-                        <td>${item.grade_name || ''}</td>
-                        <td>${item.job_nature || ''}</td>
-                    </tr>
-                `;
-            });
+            response.sort((a, b) => b.employee_code.localeCompare(a.employee_code, undefined, { numeric: true }));
+
+response.forEach((item, index) => {
+    tableRows += `
+        <tr>
+            <td>${index + 1}</td>
+            <td>${item.employee_code}</td>
+            <td>${item.first_name || ''}</td>
+            <td>${item.designation_name || ''}</td>
+            <td>${item.department_name || ''}</td>
+            <td>${item.section_name || ''}</td>
+            <td>${item.date_of_joining || ''}</td>
+            <td>${item.date_of_birth || ''}</td>
+            <td>${item.blood_group || ''}</td>
+            <td>${item.category || ''}</td>
+            <td>${item.contact_number || ''}</td>
+            <td>${item.gender || ''}</td>
+            <td>${item.grade_name || ''}</td>
+            <td>${item.job_nature || ''}</td>
+        </tr>
+    `;
+});
+
 
             // Open a new window and inject HTML content
             const newWindow = window.open('', '_blank', 'width=1000,height=800');
