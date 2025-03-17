@@ -106,7 +106,7 @@
                                 </div>
                                 <div class="form-group">
                                     <label for="approvalDate">Approval Date</label>
-                                    <input type="date" id="approvalDate" class="form-control">
+                                    <input type="date" value="{{ date('Y-m-d') }}" id="approvalDate" class="form-control">
                                 </div>
                                 <div class="btn-section">
                                     <button type="button" class="btn btn-primary" id="search">Search</button>
