@@ -30,6 +30,9 @@
 				</div>
 			</div>
 			<div class="col-sm-4">
+				@php
+    $todayDate = \Carbon\Carbon::today()->format('Y-m-d');
+@endphp
 				<div class="box-info">
 					@if(Entrust::can('update_leave_status') && ($leave->user_id != Auth::user()->id || defaultRole()))
 					 {!! Form::model($leave,['method' => 'POST','route' => ['leave.update-status',$leave->id] ,'class' => 'leave-status-form','id' => 'leave-status-form','data-no-form-clear'=>1,'data-leave-statistics' => 1]) !!}
@@ -41,7 +44,7 @@
 					  <div class="form-group show-hide-approved-date">
 					    {!! Form::label('approved_date',trans('messages.date'),[])!!}
 						{{-- {!! Form::input('text','approved_date',isset($leave->approved_date) ? $leave->approved_date : '',['class'=>'form-control mdatepicker','placeholder'=>trans('messages.date'),'readonly' => 'true'])!!} --}}
-						{!! Form::input('text','approved_date',isset($leave->approved_date) ? $leave->approved_date : '',['class'=>'form-control mdatepicker','placeholder'=>trans('messages.date')])!!}
+						{!! Form::input('date','approved_date',isset($leave->approved_date) ? $leave->approved_date : $todayDate,['class'=>'form-control','placeholder'=>trans('messages.date')])!!}
 
 					  </div>
 					  <div class="form-group">
