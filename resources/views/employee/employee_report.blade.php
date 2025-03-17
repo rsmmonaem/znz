@@ -253,7 +253,7 @@
 
             // Generate report table rows dynamically
             let tableRows = '';
-            response.sort((a, b) => b.employee_code.localeCompare(a.employee_code, undefined, { numeric: true }));
+            response.sort((a, b) => a.employee_code.localeCompare(b.employee_code, undefined, { numeric: true }));
 
 response.forEach((item, index) => {
     tableRows += `
