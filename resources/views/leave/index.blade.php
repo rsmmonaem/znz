@@ -111,7 +111,7 @@
 			  {!! $leaves->links() !!}
 		</div>
 
-    </div> --}}
+</div> --}}
 	
     <div class="row">
 			@if (Entrust::can('request_leave'))
