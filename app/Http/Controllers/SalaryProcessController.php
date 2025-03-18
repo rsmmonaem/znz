@@ -103,17 +103,18 @@ class SalaryProcessController extends Controller
 
                 // Handle special case for branch ID 7
                 if ($request->branch == env('BRANCH_ID')) {
+                    $processedEmployeeIds[] = $user_id;  
                     // Call the SalaryProcess method to process salary for each user
-                    $processedId = $this->SalaryProcessByBranch($user_id, $request->formDate, $request->toDate, $request->remarks);
-                    if ($processedId !== null) {
-                        $processedEmployeeIds[] = $processedId;  // Collect successfully processed employee IDs
-                    }
+                    // $processedId = $this->SalaryProcessByBranch($user_id, $request->formDate, $request->toDate, $request->remarks);
+                    // if ($processedId !== null) {
+                    //     $processedEmployeeIds[] = $processedId;  // Collect successfully processed employee IDs
+                    // }
                 } else {
-                    // Call appropriate salary process method
-                    $processedId = $this->SalaryProcess($user_id, $request->formDate, $request->toDate, $request->remarks, $request->branch);
-                    if ($processedId !== null) {
-                        $processedEmployeeIds[] = $processedId;  // Collect successfully processed employee IDs
-                    }
+                    // // Call appropriate salary process method
+                    // $processedId = $this->SalaryProcess($user_id, $request->formDate, $request->toDate, $request->remarks, $request->branch);
+                    // if ($processedId !== null) {
+                    //     $processedEmployeeIds[] = $processedId;  // Collect successfully processed employee IDs
+                    // }
                 }
             }
             DB::commit();
@@ -623,7 +624,8 @@ DB::table('employee_salary_details')->insert($TableData);
             'Remarks' => $remarks
         ]);
         DB::table('employee_salary_details')->insert($TableData);
-        return $TableData;
+        return $employeeId;
+
     }
 
     public function indexSalaryShit(){
