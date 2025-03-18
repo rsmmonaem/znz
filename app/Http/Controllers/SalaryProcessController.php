@@ -622,7 +622,7 @@ DB::table('employee_salary_details')->insert($TableData);
             'Remarks' => $remarks
         ]);
         DB::table('employee_salary_details')->insert($TableData);
-        return $employeeId;
+        return $TableData;
     }
 
     public function indexSalaryShit(){
