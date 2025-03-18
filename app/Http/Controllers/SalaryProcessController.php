@@ -194,13 +194,32 @@ class SalaryProcessController extends Controller
     $leave = collect(DB::select($leaveQuery, [$formDate, $toDate, $employeeId, $formDate, $toDate, $employeeId]))->count();
 
         // LWP
-        $lwp = DB::table('leaves')
-        ->whereBetween('from_date', [$formDate, $toDate])
-        ->where('user_id', $employeeId)
-        ->where('leave_type_id', '==', 9)
-        ->where('status', 'approved')
-        ->distinct('from_date') 
-        ->count('from_date');
+        // $lwp = DB::table('leaves')
+        // ->whereBetween('from_date', [$formDate, $toDate])
+        // ->where('user_id', $employeeId)
+        // ->where('leave_type_id', '==', 9)
+        // ->where('status', 'approved')
+        // ->distinct('from_date') 
+        // ->count('from_date');
+
+        $lwpQuery = "
+    SELECT DISTINCT from_date AS leave_date FROM leaves
+    WHERE from_date BETWEEN ? AND ? 
+    AND user_id = ? 
+    AND leave_type_id = 9 
+    AND status = 'approved'
+    
+    UNION
+
+    SELECT DISTINCT to_date AS leave_date FROM leaves
+    WHERE to_date BETWEEN ? AND ? 
+    AND user_id = ? 
+    AND leave_type_id = 9 
+    AND status = 'approved'
+";
+
+$lwp = collect(DB::select($lwpQuery, [$formDate, $toDate, $employeeId, $formDate, $toDate, $employeeId]))->count();
+
 
         // Total Days Of Month
         $startDate = Carbon::parse($formDate);
