@@ -202,24 +202,7 @@ class SalaryProcessController extends Controller
         // ->distinct('from_date') 
         // ->count('from_date');
 
-        $lwpQuery = "
-    SELECT DISTINCT from_date AS leave_date FROM leaves
-    WHERE from_date BETWEEN ? AND ? 
-    AND user_id = ? 
-    AND leave_type_id = 9 
-    AND status = 'approved'
-    
-    UNION
-
-    SELECT DISTINCT to_date AS leave_date FROM leaves
-    WHERE to_date BETWEEN ? AND ? 
-    AND user_id = ? 
-    AND leave_type_id = 9 
-    AND status = 'approved'
-";
-
-$lwp = collect(DB::select($lwpQuery, [$formDate, $toDate, $employeeId, $formDate, $toDate, $employeeId]))->count();
-
+        
 
         // Total Days Of Month
         $startDate = Carbon::parse($formDate);
@@ -347,10 +330,10 @@ $BankAmountValue = ($FinalBankPercentage / 100) * $netSalary;  // Bank portion b
 $CashAmountValue = ($FinalCashPercentage / 100) * $netSalary;  // Cash portion before tax
 
 // **Step 2: Deduct tax from bank portion**
-$BankAmountValue = max(0, $BankAmountValue - $amount-$advanceAmount); // Deduct Advance amount from bank amount
+// $BankAmountValue = max(0, $BankAmountValue - $amount-$advanceAmount); // Deduct Advance amount from bank amount
 
-// **Ensure Cash Pay remains valid**
-$CashAmountValue = max(0, $netSalaryWIthoutTax - $amount-$advanceAmount-$BankAmountValue); // Remaining salary goes to cash
+// // **Ensure Cash Pay remains valid**
+// $CashAmountValue = max(0, $netSalaryWIthoutTax - $amount-$advanceAmount-$BankAmountValue); // Remaining salary goes to cash
 
 $TableData = [
     'total_worked_days' => $totalWorkedDays,
