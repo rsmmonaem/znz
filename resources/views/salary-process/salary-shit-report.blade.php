@@ -276,7 +276,7 @@ function populateSalaryTable(data) {
                         <th>Designation</th>
                         <th>Date of Joining</th>
                         <th>Employee Code</th>
-                        <th>Total Worked Days</th>
+                        <th>Total Present Days</th>
                         <th>Gross Salary</th>
                         <th>Basic</th>
                         <th>Home Rent</th>

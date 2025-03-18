@@ -1804,6 +1804,9 @@ Class ClockController extends Controller{
 			})
 			->select('leaves.from_date', 'leaves.to_date', 'leaves.status')
 			->get();
+
+
+			
         // Holydays
 		 $holidays = Holiday::whereBetween('date', [$startDate, $endDate])
 			->pluck('date') // Extract only the date column
