@@ -323,12 +323,17 @@ $FinalCashPercentage = 0;
 if ($BankAmount) {
     $FinalBankPercentage = $BankAmount->bank_amount / $BankAmount->gross * 100; // Bank percentage
     $FinalCashPercentage = $BankAmount->cash_amount / $BankAmount->gross * 100; // Cash percentage
+    $RsmBankAmount = $BankAmount->bank_amount-$advanceAmount-$amount;
+    $RsmCashAmount = $BankAmount->cash_amount;
 }
 
 // **Step 1: Divide net salary before tax**
 $BankApply = $netSalaryWIthoutTax - $amount-$advanceAmount; // Bank portion after tax & advance
 $BankAmountValue = ($FinalBankPercentage / 100) * $BankApply;  // Bank portion before tax
-$CashAmountValue = ($FinalCashPercentage / 100) * $BankApply;  // Cash portion before tax
+$CashAmountValue = ($FinalCashPercentage / 100) * $BankApply;  // Cash portion before 
+
+
+
 
 // **Step 2: Deduct tax from bank portion**
 // $BankAmountValue = max(0, $BankAmountValue - $amount-$advanceAmount); // Deduct Advance amount from bank amount
@@ -351,8 +356,8 @@ $TableData = [
     'remarks' => $remarks,
     'form_date' => $formDate,
     'to_date' => $toDate,
-    'bankamount' => $BankAmountValue, // Fixed logic
-    'cashamount' => $CashAmountValue, // Fixed logic
+    'bankamount' => $RsmBankAmount, // Fixed logic
+    'cashamount' => $RsmCashAmount, // Fixed logic
     'weekendays_amount' => $TotalFridaysAmount ? $TotalFridaysAmount : 0
 ];
 
@@ -361,8 +366,8 @@ DB::table('employee_salary_payment_details')->insert([
     'UnpaidAmount' => 0,
     'NetPayable' => $netSalaryWIthoutTax - $amount-$advanceAmount,
     'EmployeeID' => $employeeId,
-    'BankPay' => max(0, $BankAmountValue), // Corrected bank amount
-    'CashPay' => max(0, $CashAmountValue), // Corrected cash amount
+    'BankPay' => max(0, $RsmBankAmount), // Corrected bank amount
+    'CashPay' => max(0, $RsmCashAmount), // Corrected cash amount
     'Gross' => $salaryslab ? $salaryslab->gross : 0,
     'TotalPayable' => max(0, $netSalaryWIthoutTax - $amount),
     'TotalDeduction' => $TotalDiductionAmount + $amount + $advanceAmount + $ProvidentFund,
