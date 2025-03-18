@@ -328,7 +328,7 @@ if ($BankAmount) {
 // **Step 1: Divide net salary before tax**
 $BankApply = $netSalaryWIthoutTax - $amount-$advanceAmount; // Bank portion after tax & advance
 $BankAmountValue = ($FinalBankPercentage / 100) * $BankApply;  // Bank portion before tax
-$CashAmountValue = $FinalCashPercentage;  // Cash portion before tax
+$CashAmountValue = ($FinalCashPercentage / 100) * $BankApply;  // Cash portion before tax
 
 // **Step 2: Deduct tax from bank portion**
 // $BankAmountValue = max(0, $BankAmountValue - $amount-$advanceAmount); // Deduct Advance amount from bank amount
