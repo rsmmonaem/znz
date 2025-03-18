@@ -313,7 +313,7 @@ $CashAmountValue = ($FinalCashPercentage / 100) * $netSalary;  // Cash portion b
 $BankAmountValue = max(0, $BankAmountValue - $amount-$advanceAmount); // Deduct Advance amount from bank amount
 
 // **Ensure Cash Pay remains valid**
-$CashAmountValue = max(0, $netSalaryWIthoutTax - $amount - $BankAmountValue); // Remaining salary goes to cash
+$CashAmountValue = 0; // Remaining salary goes to cash
 
 $TableData = [
     'total_worked_days' => $totalWorkedDays,
