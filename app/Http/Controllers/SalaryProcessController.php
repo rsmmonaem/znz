@@ -175,24 +175,23 @@ class SalaryProcessController extends Controller
         // ->distinct('from_date') 
         // ->count('from_date');
 
-        $leave = DB::table(function ($query) use ($formDate, $toDate, $employeeId) {
-            $query->select('from_date as leave_date')
-                ->from('leaves')
-                ->whereBetween('from_date', [$formDate, $toDate])
-                ->where('user_id', $employeeId)
-                ->where('leave_type_id', '!=', 9)
-                ->where('status', 'approved')
-            ->union(
-                DB::table('leaves')
-                    ->select('to_date as leave_date')
-                    ->whereBetween('to_date', [$formDate, $toDate])
-                    ->where('user_id', $employeeId)
-                    ->where('leave_type_id', '!=', 9)
-                    ->where('status', 'approved')
-            );
-        }, 'leave_dates')
-        ->distinct()
-        ->count('leave_date');
+        $leaveQuery = "
+        SELECT DISTINCT from_date AS leave_date FROM leaves
+        WHERE from_date BETWEEN ? AND ? 
+        AND user_id = ? 
+        AND leave_type_id != 9 
+        AND status = 'approved'
+        
+        UNION
+    
+        SELECT DISTINCT to_date AS leave_date FROM leaves
+        WHERE to_date BETWEEN ? AND ? 
+        AND user_id = ? 
+        AND leave_type_id != 9 
+        AND status = 'approved'
+    ";
+    
+    $leave = collect(DB::select($leaveQuery, [$formDate, $toDate, $employeeId, $formDate, $toDate, $employeeId]))->count();
 
         // LWP
         $lwp = DB::table('leaves')
