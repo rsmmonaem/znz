@@ -103,32 +103,26 @@ class SalaryProcessController extends Controller
 
                 // Handle special case for branch ID 7
                 if ($request->branch == env('BRANCH_ID')) {
-                    return response()->json([
-                        'status' => 'success',
-                        'processed_employee_ids' => $processedEmployeeIds,
-                        'message' => 'Salary processed successfully.'.$request->branch,
-                    ]);
                     // Call the SalaryProcess method to process salary for each user
-                    // $processedId = $this->SalaryProcessByBranch($user_id, $request->formDate, $request->toDate, $request->remarks);
-                    // if ($processedId !== null) {
-                    //     $processedEmployeeIds[] = $processedId;  // Collect successfully processed employee IDs
-                    // }
+                    $processedId = $this->SalaryProcessByBranch($user_id, $request->formDate, $request->toDate, $request->remarks);
+                    if ($processedId !== null) {
+                        $processedEmployeeIds[] = $processedId;  // Collect successfully processed employee IDs
+                    }
                 } else {
-                    // // Call appropriate salary process method
-                    // $processedId = $this->SalaryProcess($user_id, $request->formDate, $request->toDate, $request->remarks, $request->branch);
-                    // if ($processedId !== null) {
-                    //     $processedEmployeeIds[] = $processedId;  // Collect successfully processed employee IDs
-                    // }
-                    return response()->json([
-                        'status' => 'success',
-                        'processed_employee_ids' => $processedEmployeeIds,
-                        'message' => 'Salary sfsd processed successfully.'.$request->branch,
-                    ]);
+                    // Call appropriate salary process method
+                    $processedId = $this->SalaryProcess($user_id, $request->formDate, $request->toDate, $request->remarks, $request->branch);
+                    if ($processedId !== null) {
+                        $processedEmployeeIds[] = $processedId;  // Collect successfully processed employee IDs
+                    }
                 }
             }
             DB::commit();
             // Return response with processed employee IDs
-
+            return response()->json([
+                'status' => 'success',
+                'processed_employee_ids' => $processedEmployeeIds,
+                'message' => 'Salary processed successfully.',
+            ]);
       }catch(Exception $e){
         DB::rollBack();
         return response()->json([
@@ -316,7 +310,7 @@ $BankAmountValue = ($FinalBankPercentage / 100) * $netSalary;  // Bank portion b
 $CashAmountValue = ($FinalCashPercentage / 100) * $netSalary;  // Cash portion before tax
 
 // **Step 2: Deduct tax from bank portion**
-$BankAmountValue = max(0, $BankAmountValue - $amount);
+$BankAmountValue = max(0, $BankAmountValue - $amount-$advanceAmount); // Deduct Advance amount from bank amount
 
 // **Ensure Cash Pay remains valid**
 $CashAmountValue = max(0, $netSalary - $BankAmountValue); // Remaining salary goes to cash
