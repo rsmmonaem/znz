@@ -610,7 +610,7 @@ DB::table('employee_salary_details')->insert($TableData);
             'UnpaidAmount' => 0,
             'NetPayable' => $netSalary-$advanceAmount,
             'EmployeeID' => $employeeId,
-            'BankPay' => max(0,$FinalBankAmount / 100 * $netSalary - $amount),
+            'BankPay' => max(0,$FinalBankAmount / 100 * $netSalary - $amount-$advanceAmount),
             'CashPay' => $FinalBankAmount > 0
                 ? $FinalcashAmount / 100 * $netSalary
                 : ($FinalcashAmount / 100 * $netSalary - $amount),
