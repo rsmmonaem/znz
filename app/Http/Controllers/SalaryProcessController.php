@@ -103,7 +103,11 @@ class SalaryProcessController extends Controller
 
                 // Handle special case for branch ID 7
                 if ($request->branch == env('BRANCH_ID')) {
-                    $processedEmployeeIds[] = $user_id;  
+                    return response()->json([
+                        'status' => 'success',
+                        'processed_employee_ids' => $processedEmployeeIds,
+                        'message' => 'Salary processed successfully.'.$request->branch,
+                    ]);
                     // Call the SalaryProcess method to process salary for each user
                     // $processedId = $this->SalaryProcessByBranch($user_id, $request->formDate, $request->toDate, $request->remarks);
                     // if ($processedId !== null) {
@@ -115,15 +119,16 @@ class SalaryProcessController extends Controller
                     // if ($processedId !== null) {
                     //     $processedEmployeeIds[] = $processedId;  // Collect successfully processed employee IDs
                     // }
+                    return response()->json([
+                        'status' => 'success',
+                        'processed_employee_ids' => $processedEmployeeIds,
+                        'message' => 'Salary sfsd processed successfully.'.$request->branch,
+                    ]);
                 }
             }
             DB::commit();
             // Return response with processed employee IDs
-            return response()->json([
-                'status' => 'success',
-                'processed_employee_ids' => $processedEmployeeIds,
-                'message' => 'Salary processed successfully.',
-            ]);
+
       }catch(Exception $e){
         DB::rollBack();
         return response()->json([
