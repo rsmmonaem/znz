@@ -167,22 +167,61 @@ class SalaryProcessController extends Controller
         ->count('date');
 
         // Leave
-        $leave = DB::table('leaves')
-        ->whereBetween('from_date', [$formDate, $toDate])
-        ->where('user_id', $employeeId)
-        ->where('leave_type_id', '!=', 9)
-        ->where('status', 'approved')
-        ->distinct('from_date') 
-        ->count('from_date');
+        // $leave = DB::table('leaves')
+        // ->whereBetween('from_date', [$formDate, $toDate])
+        // ->where('user_id', $employeeId)
+        // ->where('leave_type_id', '!=', 9)
+        // ->where('status', 'approved')
+        // ->distinct('from_date') 
+        // ->count('from_date');
+
+        $leave = DB::table(function ($query) use ($formDate, $toDate, $employeeId) {
+            $query->select('from_date as leave_date')
+                ->from('leaves')
+                ->whereBetween('from_date', [$formDate, $toDate])
+                ->where('user_id', $employeeId)
+                ->where('leave_type_id', '!=', 9)
+                ->where('status', 'approved')
+            ->union(
+                DB::table('leaves')
+                    ->select('to_date as leave_date')
+                    ->whereBetween('to_date', [$formDate, $toDate])
+                    ->where('user_id', $employeeId)
+                    ->where('leave_type_id', '!=', 9)
+                    ->where('status', 'approved')
+            );
+        }, 'leave_dates')
+        ->distinct()
+        ->count('leave_date');
 
         // LWP
-        $lwp = DB::table('leaves')
-        ->whereBetween('from_date', [$formDate, $toDate])
-        ->where('user_id', $employeeId)
-        ->where('leave_type_id', '==', 9)
-        ->where('status', 'approved')
-        ->distinct('from_date') 
-        ->count('from_date');
+        // $lwp = DB::table('leaves')
+        // ->whereBetween('from_date', [$formDate, $toDate])
+        // ->where('user_id', $employeeId)
+        // ->where('leave_type_id', '==', 9)
+        // ->where('status', 'approved')
+        // ->distinct('from_date') 
+        // ->count('from_date');
+
+        $lwp = DB::table(function ($query) use ($formDate, $toDate, $employeeId) {
+            $query->select('from_date as leave_date')
+                ->from('leaves')
+                ->whereBetween('from_date', [$formDate, $toDate])
+                ->where('user_id', $employeeId)
+                ->where('leave_type_id', 9)
+                ->where('status', 'approved')
+            ->union(
+                DB::table('leaves')
+                    ->select('to_date as leave_date')
+                    ->whereBetween('to_date', [$formDate, $toDate])
+                    ->where('user_id', $employeeId)
+                    ->where('leave_type_id', 9)
+                    ->where('status', 'approved')
+            );
+        }, 'leave_dates')
+        ->distinct()
+        ->count('leave_date');
+        
 
         // Total Days Of Month
         $startDate = Carbon::parse($formDate);
