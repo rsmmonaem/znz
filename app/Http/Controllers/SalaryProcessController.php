@@ -600,7 +600,7 @@ DB::table('employee_salary_details')->insert($TableData);
             'to_date' => $toDate,
             'ot_hrs' => $totalOvertimeHrs,
             'ot_amount' => $overtimeSalery,
-            'bankamount' => max(0,$FinalBankAmount / 100 * $netSalary - $amount),
+            'bankamount' => max(0,$FinalBankAmount / 100 * $netSalary - $amount-$advanceAmount),
             'cashamount' => $FinalBankAmount > 0 ? $FinalcashAmount / 100 * $netSalary - $amount : ($FinalcashAmount / 100 * $netSalary - $amount),
             'weekendays_amount' => $TotalFridaysAmount ? $TotalFridaysAmount : 0
             ];
@@ -610,10 +610,10 @@ DB::table('employee_salary_details')->insert($TableData);
             'UnpaidAmount' => 0,
             'NetPayable' => $netSalary-$advanceAmount,
             'EmployeeID' => $employeeId,
-            'BankPay' => max(0,$FinalBankAmount / 100 * $netSalary - $amount-$advanceAmount),
+            'BankPay' => max(0,$FinalBankAmount / 100 * $netSalary - $amount),
             'CashPay' => $FinalBankAmount > 0
-                ? $FinalcashAmount / 100 * $netSalary-$amount-$advanceAmount
-                : ($FinalcashAmount / 100 * $netSalary - $amount-$advanceAmount),
+                ? $FinalcashAmount / 100 * $netSalary
+                : ($FinalcashAmount / 100 * $netSalary - $amount),
             'Gross' => $salaryslab ? $salaryslab->gross : 0,
             'TotalPayable' => max(0, $netSalary - $amount),
             'TotalDeduction' => $TotalDiductionAmount + $amount + $advanceAmount + $ProvidentFund,
