@@ -601,9 +601,7 @@ DB::table('employee_salary_details')->insert($TableData);
             'ot_hrs' => $totalOvertimeHrs,
             'ot_amount' => $overtimeSalery,
             'bankamount' => max(0,$FinalBankAmount / 100 * $netSalary - $amount),
-            'cashamount' => $FinalBankAmount > 0
-                ? $FinalcashAmount / 100 * $netSalary
-                : ($FinalcashAmount / 100 * $netSalary - $amount),
+            'cashamount' => $FinalBankAmount > 0 ? $FinalcashAmount / 100 * $netSalary - $amount : ($FinalcashAmount / 100 * $netSalary - $amount),
             'weekendays_amount' => $TotalFridaysAmount ? $TotalFridaysAmount : 0
             ];
 

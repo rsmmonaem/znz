@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Leave Application Form - J&Z GROUP</title>
+  <!-- Adding Google Fonts with Bengali support -->
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Hind Siliguri', Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f5f5f5;
+    }
+    .container {
+      max-width: 800px;
+      margin: 20px auto;
+      background-color: white;
+      padding: 24px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #e5e5e5;
+      padding-bottom: 16px;
+    }
+    .logo {
+      width: 96px;
+      height: 96px;
+      object-fit: contain;
+    }
+    .company-info {
+      text-align: right;
+    }
+    .company-name {
+      color: #6366f1;
+      font-weight: 600;
+      font-size: 18px;
+      margin: 0;
+    }
+    .company-address {
+      color: #6b7280;
+      font-size: 14px;
+      margin: 4px 0 0 0;
+    }
+    .form-title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 16px 0;
+    }
+    .form-title {
+      border: 1px solid black;
+      padding: 0px 32px;
+      text-align: center;
+      font-weight: bold;
+    }
+    .form-content {
+      margin-top: 32px;
+    }
+    .form-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .form-field {
+      display: flex;
+      align-items: center;
+    }
+    .form-label {
+      font-weight: bold;
+    }
+    .required {
+      color: red;
+      margin-left: 8px;
+    }
+    .form-input {
+      margin-left: 8px;
+    }
+    .leave-status {
+      margin: 16px 0;
+    }
+    .leave-status-header {
+      border: 1px solid black;
+      padding: 8px;
+      text-align: center;
+      font-weight: bold;
+    }
+    .leave-status-table {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      border: 1px solid black;
+      border-top: none;
+    }
+    .leave-status-cell {
+      padding: 8px;
+      text-align: center;
+      border-right: 1px solid black;
+    }
+    .leave-status-cell:last-child {
+      border-right: none;
+    }
+    .leave-status-header-row {
+      font-weight: bold;
+      border-bottom: 1px solid black;
+    }
+    .text-area-container {
+      display: flex;
+      align-items: flex-start;
+      margin-bottom: 16px;
+    }
+    .text-area {
+      margin-left: 8px;
+      border: 1px solid black;
+      width: 100%;
+      height: 40px;
+    }
+    .signature-section {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 16px;
+      margin-top: 64px;
+      padding-top: 32px;
+    }
+    .signature-field {
+      text-align: center;
+      border-top: 1px solid black;
+      padding-top: 4px;
+    }
+    .signature-label {
+      font-weight: bold;
+    }
+    .footer {
+      margin-top: 32px;
+      border-top: 1px solid #e5e5e5;
+      padding-top: 16px;
+    }
+    .partner-logos {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 8px;
+    }
+    .contact-info {
+      background-color: #475569;
+      color: white;
+      padding: 8px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 14px;
+    }
+    .contact-item {
+      display: flex;
+      align-items: center;
+    }
+    .contact-icon {
+      margin-right: 8px;
+    }
+    /* Ensure proper rendering of Bengali text */
+    .bengali {
+      font-family: 'Hind Siliguri', Arial, sans-serif;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <div>
+        <img src="http://zandz.betikromfashion.com/uploads/profile_image/6790962a059a5.jpg" alt="J&Z GROUP Logo" class="logo">
+      </div>
+      <div class="company-info">
+        <h2 class="company-name">J&Z GROUP</h2>
+        <p class="company-address bengali">
+          House # 15, Road # 15, Sector # 04, Uttara<br>
+          ঢাকা, বাংলাদেশ-১২৩০
+        </p>
+      </div>
+    </div>
+
+    <!-- Form Title and Info -->
+    <div class="form-title-row">
+      <div>
+        <p class="form-label">SL NO: J&Z- 2025</p>
+      </div>
+      <div class="form-title">
+        <h4>LEAVE APPLICATION FORM</h4>
+      </div>
+      <div>
+        <p class="form-label">Application Date: 05.03.2025</p>
+      </div>
+    </div>
+
+    <!-- Form Content -->
+    <div class="form-content">
+      <!-- Row 1 -->
+      <div class="form-row">
+        <div class="form-field">
+          <p class="form-label">BRANCH NAME:</p>
+          <p class="form-input">HEAD OFFICE</p>
+        </div>
+        <div class="form-field">
+          <p class="form-label">APPLICANT'S ID</p>
+          <p class="required">(আবেদনকারীর আইডি)</p>
+          <p>...........</p>
+        </div>
+      </div>
+
+      <!-- Row 2 -->
+      <div class="form-row">
+        <div class="form-field">
+          <p class="form-label">NAME</p>
+          <p class="required">(নাম)</p>
+          <p class="form-input">...................................</p>
+        </div>
+        <div class="form-field">
+          <p class="form-label">DESIGNATION</p>
+          <p class="required">(পদবী)</p>
+          <p class="form-input">.........................</p>
+        </div>
+      </div>
+
+      <!-- Row 3 -->
+      <div class="form-row">
+        <div class="form-field">
+          <p class="form-label">DEPARTMENT</p>
+          <p class="required">(বিভাগ)</p>
+          <p class="form-input">.................................</p>
+        </div>
+        <div class="form-field">
+          <p class="form-label">SECTION</p>
+          <p class="required">(শাখা)</p>
+          <p class="form-input">.............</p>
+          <p class="form-label" style="margin-left: 8px;">DOJ</p>
+          <p class="required">(যোগদান)</p>
+          <p class="form-input">...........</p>
+        </div>
+      </div>
+
+      <!-- Row 4 -->
+      <div class="form-field" style="margin-bottom: 16px;">
+        <p class="form-label">LEAVE REQUIRED</p>
+        <p class="required">(ছুটির প্রয়োজন)</p>
+        <p class="form-input">: FROM</p>
+        <p class="required">(হতে)</p>
+        <p class="form-input">.............</p>
+        <p class="form-input">TO</p>
+        <p class="required">(পর্যন্ত)</p>
+        <p class="form-input">.............</p>
+        <p class="form-input">TOTAL</p>
+        <p class="required">(মোট)</p>
+        <p class="form-input">........DAYS</p>
+        <p class="required">(দিন)</p>
+      </div>
+
+      <!-- Row 5 -->
+      <div class="form-field" style="margin-bottom: 16px;">
+        <p class="form-label">LEAVE FROM</p>
+        <p class="required">(হতে)</p>
+        <p class="form-input">.........................</p>
+        <p class="form-input">TO</p>
+        <p class="required">(পর্যন্ত)</p>
+        <p class="form-input">.................................</p>
+      </div>
+
+      <!-- Row 6 - Leave Type -->
+      <div class="form-field" style="margin-bottom: 16px;">
+        <p class="form-label">LEAVE TYPE</p>
+        <p class="required">(ছুটির ধরন)</p>
+        <p class="form-input">:</p>
+        <div style="display: flex; align-items: center; margin-left: 8px;">
+          <input type="checkbox" style="margin-right: 4px;">
+          <p>CASUAL</p>
+          <p class="bengali" style="margin-left: 4px;">(নৈমিত্তিক)</p>
+          <p class="required" style="margin-left: 4px;">(req/opt)</p>
+        </div>
+        <div style="display: flex; align-items: center; margin-left: 8px;">
+          <input type="checkbox" style="margin-right: 4px;">
+          <p>MEDICAL</p>
+          <p class="bengali" style="margin-left: 4px;">(অসুস্থতা)</p>
+          <p class="required" style="margin-left: 4px;">(req/opt)</p>
+        </div>
+        <div style="display: flex; align-items: center; margin-left: 8px;">
+          <input type="checkbox" style="margin-right: 4px;">
+          <p>EL</p>
+          <p class="bengali" style="margin-left: 4px;">(অর্জিত)</p>
+          <p class="required" style="margin-left: 4px;">(req)</p>
+        </div>
+        <div style="display: flex; align-items: center; margin-left: 8px;">
+          <input type="checkbox" style="margin-right: 4px;">
+          <p>LWP</p>
+          <p class="bengali" style="margin-left: 4px;">(বেতন ছাড়া)</p>
+          <p class="required" style="margin-left: 4px;">(not count with)</p>
+        </div>
+      </div>
+
+      <!-- Approved Leave Status -->
+      <div class="leave-status">
+        <div class="leave-status-header">APPROVED LEAVE STATUS</div>
+        <div class="leave-status-table">
+          <div class="leave-status-cell leave-status-header-row">TOTAL ENTITLE</div>
+          <div class="leave-status-cell leave-status-header-row">ALREADY ENJOYED</div>
+          <div class="leave-status-cell leave-status-header-row">BALANCE</div>
+        </div>
+        <div class="leave-status-table" style="border-top: none;">
+          <div class="leave-status-cell">14</div>
+          <div class="leave-status-cell">3</div>
+          <div class="leave-status-cell">11</div>
+        </div>
+      </div>
+
+      <!-- Leave Reason -->
+      <div class="text-area-container">
+        <p class="form-label">LEAVE REASON</p>
+        <p class="bengali" style="margin-left: 4px;">(ছুটির কারণ)</p>
+        <p class="required">(write down)</p>
+        <p>:</p>
+        <div class="text-area"></div>
+      </div>
+
+      <!-- Address During Leave -->
+      <div class="text-area-container">
+        <p class="form-label">ADDRESS DURING LEAVE</p>
+        <p class="bengali" style="margin-left: 4px;">(ছুটিকালীন ঠিকানা)</p>
+        <p class="required">(write complete form)</p>
+        <p>:</p>
+        <div class="text-area"></div>
+      </div>
+
+      <!-- Joining After Leave -->
+      <div class="text-area-container">
+        <p class="form-label">JOINING AFTER LEAVE</p>
+        <p class="bengali" style="margin-left: 4px;">(ছুটি শেষে যোগদানের তারিখ)</p>
+        <p class="required">(write complete date)</p>
+        <p>:</p>
+        <div class="text-area"></div>
+      </div>
+
+      <!-- Signature Section -->
+      <div class="signature-section">
+        <div class="signature-field">
+          <p class="signature-label">APPLICANT</p>
+          <p class="bengali">আবেদনকারী</p>
+        </div>
+        <div class="signature-field">
+          <p class="signature-label">CONCERN HEAD</p>
+          <p class="bengali">বিভাগীয় প্রধান</p>
+        </div>
+        <div class="signature-field">
+          <p class="signature-label">HR DEPARTMENT</p>
+          <p class="bengali">এইচআর বিভাগ</p>
+        </div>
+        <div class="signature-field">
+          <p class="signature-label">AUTHORIZED BY</p>
+          <p class="bengali">অনুমোদনকারী</p>
+        </div>
+        <div class="signature-field">
+          <p class="signature-label">APPROVED BY</p>
+          <p class="bengali">অনুমোদিত</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <div class="partner-logos">
+        <div style="color: #a3a3a3; font-size: 12px;">Partner logos</div>
+      </div>
+      <div class="contact-info">
+        <div class="contact-item">
+          <span class="contact-icon">📞</span> 8951022, 58951987, 58957642
+        </div>
+        <div class="contact-item">
+          <span class="contact-icon">🌐</span> www.jandzgroup.com
+        </div>
+        <div class="contact-item">
+          <span class="contact-icon">✉️</span> info@jandzgroup.com
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
