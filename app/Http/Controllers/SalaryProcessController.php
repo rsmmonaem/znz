@@ -338,9 +338,7 @@ $TableData = [
 DB::table('employee_salary_payment_details')->insert([
     'PaidAmount' => 0,
     'UnpaidAmount' => 0,
-    // 'NetPayable' => $netSalaryWIthoutTax - $amount-$advanceAmount,
-    'NetPayable' => $netSalaryWIthoutTax - $amount,
-    
+    'NetPayable' => $netSalaryWIthoutTax - $amount-$advanceAmount,
     'EmployeeID' => $employeeId,
     'BankPay' => max(0, $BankAmountValue), // Corrected bank amount
     'CashPay' => max(0, $CashAmountValue), // Corrected cash amount
@@ -610,14 +608,12 @@ DB::table('employee_salary_details')->insert($TableData);
         DB::table('employee_salary_payment_details')->insert([
             'PaidAmount' => 0,
             'UnpaidAmount' => 0,
-            // 'NetPayable' => $netSalary-$advanceAmount,
-            'NetPayable' => $netSalary,
-
+            'NetPayable' => $netSalary-$advanceAmount,
             'EmployeeID' => $employeeId,
-            'BankPay' => max(0,$FinalBankAmount / 100 * $netSalary - $amount),
+            'BankPay' => max(0,$FinalBankAmount / 100 * $netSalary - $amount-$advanceAmount),
             'CashPay' => $FinalBankAmount > 0
-                ? $FinalcashAmount / 100 * $netSalary
-                : ($FinalcashAmount / 100 * $netSalary - $amount),
+                ? $FinalcashAmount / 100 * $netSalary-$amount-$advanceAmount
+                : ($FinalcashAmount / 100 * $netSalary - $amount-$advanceAmount),
             'Gross' => $salaryslab ? $salaryslab->gross : 0,
             'TotalPayable' => max(0, $netSalary - $amount),
             'TotalDeduction' => $TotalDiductionAmount + $amount + $advanceAmount + $ProvidentFund,
