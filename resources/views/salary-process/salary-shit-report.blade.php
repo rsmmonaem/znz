@@ -348,7 +348,8 @@ function populateSalaryTable(data) {
             <td>${item.designation || ''}</td>
             <td>${item.date_of_joining || ''}</td>
             <td>${item.employee_code || ''}</td>
-            <td>${item.date_difference || '0'}</td>
+                <td>${totalWorkedDays}</td>
+            
             <td>${item.gross_salary || '0.00'}</td>
             <td>${basic.toFixed(2)}</td>
             <td>${hra.toFixed(2)}</td>

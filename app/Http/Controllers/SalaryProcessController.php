@@ -262,8 +262,10 @@ class SalaryProcessController extends Controller
 
         // $totalWorkedDays = $getTotalPresent + $holidays + $leave + $totalFridays + $spacial_holidays;
         // $totalWorkedDays = $getTotalPresent + $holidays + $leave + $totalFridays + $spacial_holidays;
+
         $totalWorkedDays = $getTotalPresent;
         $totalAbsents = $TotalDays-$totalWorkedDays-$totalFridays-$spacial_holidays-$holidays-$leave;
+       //$totalPresentDays = $getTotalPresent + $holidays + $leave + $totalFridays + $spacial_holidays;
         $perdaysAmount =  $salaryslab ? $salaryslab->gross / $TotalDays : 0;
         // $GrossAmountSalaryPerDays = $perdaysAmount * $totalWorkedDays;
         $GrossAmountSalaryPerDays = $perdaysAmount * $TotalDays;
