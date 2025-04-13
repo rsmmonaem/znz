@@ -219,7 +219,7 @@
                                 <td>${item.department}</td>
                                 <td>${item.section}</td>
                                 <td>${item.grossValue}</td>
-                                <td>${item.effectiveDate}</td>
+                                <td>${new Date(item.effectiveDate).getFullYear()}</td>
                                 <td>${item.months}</td> 
                                 <td>
                                     <div class="btn-group btn-group-xs">
