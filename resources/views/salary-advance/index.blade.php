@@ -232,18 +232,19 @@
                                 <td>${item.department}</td>
                                 <td>${item.section}</td>
                                 <td>${item.grossValue}</td>
-                                <td>${item.january_advance_amount}</td>
-                                <td>${item.february_advance_amount}</td>
-                                <td>${item.march_advance_amount}<td>
-                                <td>${item.april_advance_amount}</td>
-                                <td>${item.may_advance_amount}</td>
-                                <td>${item.june_advance_amount}</td>
-                                <td>${item.july_advance_amount}</td>
-                                <td>${item.august_advance_amount}</td>
-                                <td>${item.september_advance_amount}</td>
-                                <td>${item.october_advance_amount}</td>
-                                <td>${item.november_advance_amount}</td>
-                                <td>${item.december_advance_amount}</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+
                                 <td>${item.effectiveDate}</td>
                                 <td>${item.months}</td>
                                 <td>${new Date(item.effectiveDate).getFullYear()}</td>
