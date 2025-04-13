@@ -119,6 +119,7 @@
                                     <th>Advance Due</th>
                                     <th>Effective Date</th>
                                     <th>Month</th>
+                                    <th>Year</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -219,8 +220,9 @@
                                 <td>${item.department}</td>
                                 <td>${item.section}</td>
                                 <td>${item.grossValue}</td>
+                                <td>${item.effectiveDate}</td>
+                                <td>${item.months}</td>
                                 <td>${new Date(item.effectiveDate).getFullYear()}</td>
-                                <td>${item.months}</td> 
                                 <td>
                                     <div class="btn-group btn-group-xs">
                                         <a href="/salary-advance-edit/${item.id}" class="btn btn-primary btn-sm"><i class="fa fa-edit"></i></a>
