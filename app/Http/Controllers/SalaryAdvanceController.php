@@ -36,22 +36,38 @@ class SalaryAdvanceController extends Controller
 
     public function GetAllDate(){
         $result = DB::table('salary_advance')
-        ->select(
-            'salary_advance.*',
-            'users.first_name',
-            'profile.employee_code',
-            'designations.name as designation',
-            'departments.name as department',
-            'sections.name as section',
-            DB::raw('GROUP_CONCAT(month_names.month_name ORDER BY salary_advance_months.month ASC) as months')
-        )
-        ->join('users', 'salary_advance.employeeId', '=', 'users.id')
-        ->join('profile', 'users.id', '=', 'profile.user_id')
-        ->leftJoin('designations', 'users.designation_id', '=', 'designations.id')
-        ->leftJoin('departments', 'designations.department_id', '=', 'departments.id')
-        ->leftJoin('sections', 'profile.section_id', '=', 'sections.id')
-        ->leftJoin('salary_advance_months', 'salary_advance.id', '=', 'salary_advance_months.salary_advance_id') // join salary_advance_months first
-        ->leftJoin(DB::raw('(
+    ->select(
+        'salary_advance.*',
+        'users.first_name',
+        'profile.employee_code',
+        'designations.name AS designation',
+        'departments.name AS department',
+        'sections.name AS section',
+        
+        // Concatenate all month names ordered
+        DB::raw('GROUP_CONCAT(month_names.month_name ORDER BY salary_advance_months.month ASC) AS months'),
+
+        // Advance amounts for each month
+        DB::raw('MAX(CASE WHEN salary_advance_months.month = 1 THEN salary_advance_months.amount END) AS january_advance_amount'),
+        DB::raw('MAX(CASE WHEN salary_advance_months.month = 2 THEN salary_advance_months.amount END) AS february_advance_amount'),
+        DB::raw('MAX(CASE WHEN salary_advance_months.month = 3 THEN salary_advance_months.amount END) AS march_advance_amount'),
+        DB::raw('MAX(CASE WHEN salary_advance_months.month = 4 THEN salary_advance_months.amount END) AS april_advance_amount'),
+        DB::raw('MAX(CASE WHEN salary_advance_months.month = 5 THEN salary_advance_months.amount END) AS may_advance_amount'),
+        DB::raw('MAX(CASE WHEN salary_advance_months.month = 6 THEN salary_advance_months.amount END) AS june_advance_amount'),
+        DB::raw('MAX(CASE WHEN salary_advance_months.month = 7 THEN salary_advance_months.amount END) AS july_advance_amount'),
+        DB::raw('MAX(CASE WHEN salary_advance_months.month = 8 THEN salary_advance_months.amount END) AS august_advance_amount'),
+        DB::raw('MAX(CASE WHEN salary_advance_months.month = 9 THEN salary_advance_months.amount END) AS september_advance_amount'),
+        DB::raw('MAX(CASE WHEN salary_advance_months.month = 10 THEN salary_advance_months.amount END) AS october_advance_amount'),
+        DB::raw('MAX(CASE WHEN salary_advance_months.month = 11 THEN salary_advance_months.amount END) AS november_advance_amount'),
+        DB::raw('MAX(CASE WHEN salary_advance_months.month = 12 THEN salary_advance_months.amount END) AS december_advance_amount')
+    )
+    ->join('users', 'salary_advance.employeeId', '=', 'users.id')
+    ->join('profile', 'users.id', '=', 'profile.user_id')
+    ->leftJoin('designations', 'users.designation_id', '=', 'designations.id')
+    ->leftJoin('departments', 'designations.department_id', '=', 'departments.id')
+    ->leftJoin('sections', 'profile.section_id', '=', 'sections.id')
+    ->leftJoin('salary_advance_months', 'salary_advance.id', '=', 'salary_advance_months.salary_advance_id')
+    ->leftJoin(DB::raw('(
         SELECT 1 AS month_number, "January" AS month_name
         UNION SELECT 2, "February"
         UNION SELECT 3, "March"
@@ -64,9 +80,9 @@ class SalaryAdvanceController extends Controller
         UNION SELECT 10, "October"
         UNION SELECT 11, "November"
         UNION SELECT 12, "December"
-     ) AS month_names'), 'salary_advance_months.month', '=', 'month_names.month_number') // now this join comes after salary_advance_months
-        ->groupBy('salary_advance.id')
-        ->get();
+    ) AS month_names'), 'salary_advance_months.month', '=', 'month_names.month_number')
+    ->groupBy('salary_advance.id')
+    ->get();
 
         return $result;
     }
