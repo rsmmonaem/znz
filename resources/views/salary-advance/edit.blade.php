@@ -71,7 +71,6 @@
                                     <label for="category">Category</label>
                                     <input type="text" class="form-control" id="category" value="" disabled />
                                 </div>
-
                                 @php
                                 $monthNames = [
                                     1 => 'January', 2 => 'February', 3 => 'March', 4 => 'April',
@@ -137,13 +136,8 @@
                             </script>
                             
 
-                                <div class="form-group">
-                                    <label for="month">Month</label>
-                                    @for ($month = 1; $month <= 12; $month++)
-                                    <input type="text" class="form-control" id="month{{ $month }}"
-                                        value="{{ in_array($month, explode(',', $entry->months)) ? 'selected' : '' }}" />
-                                    @endfor
-                                </div>
+
+                            </div>
                         </div>
 
                         <!-- Right Side -->
