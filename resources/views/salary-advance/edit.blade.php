@@ -74,7 +74,7 @@
 
                                 <div class="form-group">
                                     <label for="month">Month</label>
-                                    <select class="form-control select2me" id="month" multiple>
+                                    <select class="form-control select2me" id="month" multiple name="selected_months[]">
                                         @for ($month = 1; $month <= 12; $month++)
                                             <option value="{{ $month }}"
                                                 {{ in_array($month, explode(',', $entry->months)) ? 'selected' : '' }}>
@@ -83,21 +83,40 @@
                                         @endfor
                                     </select>
                                 </div>
-
+                                
                                 <div class="form-group">
-                                    <label for="month">Month <span class="text-danger">*</span></label>
-                                    <div class="form-group">
-                                        <label for="months">Select Months and Amounts:</label>
-                                        <div class="row">
-                                            @for ($month = 1; $month <= 12; $month++)
-                                                <div class="col-md-4">
-                                                    <label>{{ date('F', mktime(0, 0, 0, $month, 1)) }}</label>
-                                                    <input type="number" name="months[{{ $month }}]" class="form-control" placeholder="Enter amount" min="0">
-                                                </div>
-                                            @endfor
-                                        </div>
+                                    <label>Selected Months and Amounts:</label>
+                                    <div class="row" id="month-amounts">
+                                        @for ($month = 1; $month <= 12; $month++)
+                                            <div class="col-md-4 month-amount" data-month="{{ $month }}" style="display: none;">
+                                                <label>{{ date('F', mktime(0, 0, 0, $month, 1)) }}</label>
+                                                <input type="number" name="months[{{ $month }}]" class="form-control" placeholder="Enter amount" min="0" value="{{ old('months.' . $month, $entry->amounts[$month] ?? '') }}">
+                                            </div>
+                                        @endfor
                                     </div>
                                 </div>
+                                <script>
+                                    $(document).ready(function () {
+                                        function updateMonthAmounts() {
+                                            const selectedMonths = $('#month').val(); // array of selected month values
+                                            $('.month-amount').hide(); // hide all first
+                                            if (selectedMonths && selectedMonths.length) {
+                                                selectedMonths.forEach(function (month) {
+                                                    $('.month-amount[data-month="' + month + '"]').show();
+                                                });
+                                            }
+                                        }
+                                
+                                        // Initial state (on page load)
+                                        updateMonthAmounts();
+                                
+                                        // On change
+                                        $('#month').on('change', function () {
+                                            updateMonthAmounts();
+                                        });
+                                    });
+                                </script>
+                                                                
                             </div>
                         </div>
 
