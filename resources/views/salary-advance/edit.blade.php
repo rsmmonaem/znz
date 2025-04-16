@@ -95,15 +95,25 @@
                                             print_r($salary_advance_data);
                                         @endphp
                                         
-                                        @for ($month = 1; $month <= 12; $month++)
-                                            @if(in_array($month, $selectedMonths))
-                                            
-                                                <div class="col-md-4">
-                                                    <label>{{ date('F', mktime(0, 0, 0, $month, 1)) }}</label>
-                                                    <input type="number" name="months[{{ $month }}]" class="form-control" placeholder="Enter amount" min="0">
-                                                </div>
-                                            @endif
-                                        @endfor
+@for ($month = 1; $month <= 12; $month++)
+    @if(in_array($month, $selectedMonths))
+        @php
+            // Find matching object for the current month
+            $advance = collect($salary_advance_data)->firstWhere('month', $month);
+            $amount = $advance ? $advance->amount : 0;
+        @endphp
+
+        <div class="col-md-4">
+            <label>{{ date('F', mktime(0, 0, 0, $month, 1)) }}</label>
+            <input type="number" 
+                   value="{{ $amount }}" 
+                   name="months[{{ $month }}]" 
+                   class="form-control" 
+                   placeholder="Enter amount" 
+                   min="0">
+        </div>
+    @endif
+@endfor
                                         </div>
                                     </div>
                                 </div>
