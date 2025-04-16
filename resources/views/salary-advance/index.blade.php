@@ -108,6 +108,7 @@
 
                     <!-- Data Table -->
                     <div class="table-container">
+                        <div class="table-responsive"> 
                         <table class="table table-bordered table-striped" id="data-table" style="width: 100%">
                             <thead>
                                 <tr>
@@ -139,6 +140,7 @@
 
                             </tbody>
                         </table>
+                        </div>
                     </div>
                 </div>
             </div>
