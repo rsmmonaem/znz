@@ -109,7 +109,7 @@
 
         <div class="col-md-4">
             <label>{{ date('F', mktime(0, 0, 0, $month, 1)) }}</label>
-            <input type="number"
+            <input id="months[{{ $month }}]" type="number"
                    value="{{ $amount }}"
                    name="months[{{ $month }}]"
                    class="form-control"
@@ -198,6 +198,8 @@
                         'date': $('#date').val(),
                         'effectiveDate': $('#effectiveDate').val(),
                         'month': $('#month').val(),
+                        
+                        
                         'grossOption': $('input[name="grossOption"]:checked').val(),
                         'grossValue': $('input[name="grossValue"]').val(),
                         'remarks': $('#remarks').val(),
