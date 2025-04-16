@@ -74,54 +74,36 @@
 
                                 <div class="form-group">
                                     <label for="month">Month</label>
-                                    <select class="form-control select2me" id="month" multiple name="selected_months[]">
+                                    <select class="form-control select2me" id="month" multiple>
                                         @for ($month = 1; $month <= 12; $month++)
                                             <option value="{{ $month }}"
-                                                {{ in_array($month, $selectedMonths) ? 'selected' : '' }}>
+                                                {{ in_array($month, explode(',', $entry->months)) ? 'selected' : '' }}>
                                                 {{ date('F', mktime(0, 0, 0, $month, 1)) }}
                                             </option>
                                         @endfor
                                     </select>
                                 </div>
-                                
+
                                 <div class="form-group">
-                                    <label>Selected Months and Amounts:</label>
-                                    <div class="row" id="month-amounts">
+                                    <label for="month">Month <span class="text-danger">*</span></label>
+                                    <div class="form-group">
+                                        <label for="months">Select Months and Amounts:</label>
+                                        <div class="row">
+                                            @php
+                                            $selectedMonths = explode(',', $entry->months);
+                                        @endphp
+                                        
                                         @for ($month = 1; $month <= 12; $month++)
-                                            <div class="col-md-4 month-amount" data-month="{{ $month }}" style="display: none;">
-                                                <label>{{ date('F', mktime(0, 0, 0, $month, 1)) }}</label>
-                                                <input type="number"
-                                                       name="months[{{ $month }}]"
-                                                       class="form-control"
-                                                       placeholder="Enter amount"
-                                                       min="0"
-                                                       value="{{ old('months.' . $month, isset($amounts[$month]) ? $amounts[$month] : '') }}">
-                                            </div>
+                                            @if(in_array($month, $selectedMonths))
+                                                <div class="col-md-4">
+                                                    <label>{{ date('F', mktime(0, 0, 0, $month, 1)) }}</label>
+                                                    <input type="number" name="months[{{ $month }}]" class="form-control" placeholder="Enter amount" min="0">
+                                                </div>
+                                            @endif
                                         @endfor
+                                        </div>
                                     </div>
                                 </div>
-                                <script>
-                                    $(document).ready(function () {
-                                        function updateMonthAmounts() {
-                                            var selectedMonths = $('#month').val(); // array of selected month values
-                                            $('.month-amount').hide(); // hide all
-                                            if (selectedMonths && selectedMonths.length > 0) {
-                                                selectedMonths.forEach(function (month) {
-                                                    $('.month-amount[data-month="' + month + '"]').show();
-                                                });
-                                            }
-                                        }
-                                
-                                        // Initialize on page load
-                                        updateMonthAmounts();
-                                
-                                        // Trigger on selection change
-                                        $('#month').on('change', function () {
-                                            updateMonthAmounts();
-                                        });
-                                    });
-                                </script>
-                                
                             </div>
                         </div>
 
