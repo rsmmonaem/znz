@@ -193,17 +193,23 @@
                 // Update Data
                 $('#updateData').click(function() {
                     $('#updateData').attr('disabled', true).text('Saving...');
-                    var formData = {
-                        'employeeId': $('#employeeId').val(),
-                        'date': $('#date').val(),
-                        'effectiveDate': $('#effectiveDate').val(),
-                        'month': $('#month').val(),
-                        'amount': $('#amount').val(),
-                        
-                        'grossOption': $('input[name="grossOption"]:checked').val(),
-                        'grossValue': $('input[name="grossValue"]').val(),
-                        'remarks': $('#remarks').val(),
-                    };
+                    
+var monthAmounts = {};
+$('input[name^="months["]').each(function () {
+    var monthKey = $(this).attr('name').match(/\d+/)[0]; // Extract the number inside brackets
+    monthAmounts[monthKey] = $(this).val();
+});
+
+var formData = {
+    'employeeId': $('#employeeId').val(),
+    'date': $('#date').val(),
+    'effectiveDate': $('#effectiveDate').val(),
+    'month': $('#month').val(),
+    'amounts': monthAmounts, // 👈 Add this object to your formData
+    'grossOption': $('input[name="grossOption"]:checked').val(),
+    'grossValue': $('input[name="grossValue"]').val(),
+    'remarks': $('#remarks').val(),
+};
                     $.ajax({
                         url: '/salary-advance-edit/' + {{ $entry->id }},
                         type: 'POST',
