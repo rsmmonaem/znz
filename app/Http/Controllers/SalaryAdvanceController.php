@@ -209,7 +209,7 @@ class SalaryAdvanceController extends Controller
                 DB::table('salary_advance_months')->insert([
                     'salary_advance_id' => $id,
                     'month' => $month,
-                    'amount' => $request->amounts[$month] ?? 0.00
+                    'amount' => isset($request->amounts[$month]) ? $request->amounts[$month] : 0.00,
                 ]);
             }
             DB::commit();
