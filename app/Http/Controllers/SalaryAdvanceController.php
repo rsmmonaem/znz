@@ -195,7 +195,7 @@ class SalaryAdvanceController extends Controller
     }
 
     public function UpdateSalaryAdvance(Request $request, $id){
-        return $request->amount{1};
+        return $request->amount;
         DB::beginTransaction();
         try {
             DB::table('salary_advance')->where('id', $id)->update(['employeeId' => $request->employeeId,
