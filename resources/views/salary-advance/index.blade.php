@@ -130,7 +130,7 @@
                                     <th>November</th>
                                     <th>December</th>
                                     <th>Effective Date</th>
-                                    <th>Month</th>
+                                    <th style="display: none">Month</th>
                                     <th>Year</th>
                                     <th>Action</th>
                                 </tr>
@@ -246,7 +246,7 @@
 <td>${item.december_advance_amount}</td>
 
                                 <td>${item.effectiveDate}</td>
-                                <td>${item.months}</td>
+                                <td style="display:none">${item.months}</td>
                                 <td>${new Date(item.effectiveDate).getFullYear()}</td>
                                 <td>
                                     <div class="btn-group btn-group-xs">
