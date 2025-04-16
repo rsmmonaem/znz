@@ -197,23 +197,25 @@ class SalaryAdvanceController extends Controller
     public function UpdateSalaryAdvance(Request $request, $id){
         DB::beginTransaction();
         try {
-            DB::table('salary_advance')->where('id', $id)->update(['employeeId' => $request->employeeId,
-                'date' => $request->date,
-                'effectiveDate' => $request->effectiveDate,
-                'grossOption' => $request->grossOption,
-                'grossValue' => $request->grossValue,
-            ]);
-            DB::table('salary_advance_months')->where('salary_advance_id', $id)->delete();
+            // DB::table('salary_advance')->where('id', $id)->update(['employeeId' => $request->employeeId,
+            //     'date' => $request->date,
+            //     'effectiveDate' => $request->effectiveDate,
+            //     'grossOption' => $request->grossOption,
+            //     'grossValue' => $request->grossValue,
+            // ]);
+            // DB::table('salary_advance_months')->where('salary_advance_id', $id)->delete();
             $months =  $request->month;
-            foreach ($months as $month) {
-                DB::table('salary_advance_months')->insert([
-                    'salary_advance_id' => $id,
-                    'month' => $month,
-                    // name="months[{{ $month }}]"
-                    'amount' => $request->months[$month]
-                ]);
-            }
-            DB::commit();
+            print_r($months);
+            die();
+            // foreach ($months as $month) {
+            //     DB::table('salary_advance_months')->insert([
+            //         'salary_advance_id' => $id,
+            //         'month' => $month,
+            //         // name="months[{{ $month }}]"
+            //         'amount' => $request->months[$month]
+            //     ]);
+            // }
+            // DB::commit();
             return response()->json(['success', 'Salary Advance updated successfully.']);
         }catch(Exception $e) {
             DB::rollBack();
