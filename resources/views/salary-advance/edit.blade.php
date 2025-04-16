@@ -91,8 +91,7 @@
                                         <div class="row">
                                         @php
                                             $selectedMonths = explode(',', $entry->months);
-                                            $salary_advance_data = json_decode($entry->salary_advance_data, true);
-                                            print_r($salary_advance_data);
+                                            
                                         @endphp
                                         
                                         @for ($month = 1; $month <= 12; $month++)
