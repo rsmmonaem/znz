@@ -208,7 +208,9 @@ class SalaryAdvanceController extends Controller
             foreach ($months as $month) {
                 DB::table('salary_advance_months')->insert([
                     'salary_advance_id' => $id,
-                    'month' => $month
+                    'month' => $month,
+                    // name="months[{{ $month }}]"
+                    'amount' => $request->months[$month]
                 ]);
             }
             DB::commit();
