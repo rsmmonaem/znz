@@ -72,18 +72,78 @@
                                     <input type="text" class="form-control" id="category" value="" disabled />
                                 </div>
 
+                                @php
+                                $monthNames = [
+                                    1 => 'January', 2 => 'February', 3 => 'March', 4 => 'April',
+                                    5 => 'May', 6 => 'June', 7 => 'July', 8 => 'August',
+                                    9 => 'September', 10 => 'October', 11 => 'November', 12 => 'December'
+                                ];
+                            
+                                $selectedMonths = explode(',', $entry->months ?? '');
+                                $amounts = json_decode($entry->month_amounts ?? '{}', true); // Stored as {"1": 100, "5": 250, ...}
+                            @endphp
+                            
+                            <!-- Month Selection -->
+                            <div class="form-group">
+                                <label for="month">Select Months</label>
+                                <select class="form-control select2me" id="month-select" name="months[]" multiple>
+                                    @for ($month = 1; $month <= 12; $month++)
+                                        <option value="{{ $month }}"
+                                            {{ in_array($month, $selectedMonths) ? 'selected' : '' }}>
+                                            {{ $monthNames[$month] }}
+                                        </option>
+                                    @endfor
+                                </select>
+                            </div>
+                            
+                            <!-- Dynamic Amount Inputs -->
+                            <div id="month-amounts-container">
+                                @foreach ($selectedMonths as $month)
+                                    <div class="form-group month-amount-input" data-month="{{ $month }}">
+                                        <label>{{ $monthNames[$month] }} Amount</label>
+                                        <input type="number" step="0.01" class="form-control"
+                                               name="month_amounts[{{ $month }}]"
+                                               value="{{ $amounts[$month] ?? '' }}" />
+                                    </div>
+                                @endforeach
+                            </div>
+                            
+                            <!-- Script to show/hide inputs dynamically -->
+                            <script>
+                                document.addEventListener('DOMContentLoaded', function () {
+                                    const select = document.getElementById('month-select');
+                                    const container = document.getElementById('month-amounts-container');
+                            
+                                    const monthNames = @json($monthNames);
+                            
+                                    function updateAmountInputs() {
+                                        const selected = Array.from(select.selectedOptions).map(opt => opt.value);
+                                        container.innerHTML = '';
+                            
+                                        selected.forEach(month => {
+                                            const monthName = monthNames[month];
+                                            const inputHTML = `
+                                                <div class="form-group month-amount-input" data-month="${month}">
+                                                    <label>${monthName} Amount</label>
+                                                    <input type="number" step="0.01" class="form-control" name="month_amounts[${month}]" />
+                                                </div>
+                                            `;
+                                            container.insertAdjacentHTML('beforeend', inputHTML);
+                                        });
+                                    }
+                            
+                                    select.addEventListener('change', updateAmountInputs);
+                                });
+                            </script>
+                            
+
                                 <div class="form-group">
                                     <label for="month">Month</label>
-                                    <select class="form-control select2me" id="month" multiple>
-                                        @for ($month = 1; $month <= 12; $month++)
-                                            <option value="{{ $month }}"
-                                                {{ in_array($month, explode(',', $entry->months)) ? 'selected' : '' }}>
-                                                {{ date('F', mktime(0, 0, 0, $month, 1)) }}
-                                            </option>
-                                        @endfor
-                                    </select>
+                                    @for ($month = 1; $month <= 12; $month++)
+                                    <input type="text" class="form-control" id="month{{ $month }}"
+                                        value="{{ in_array($month, explode(',', $entry->months)) ? 'selected' : '' }}" />
+                                    @endfor
                                 </div>
-                            </div>
                         </div>
 
                         <!-- Right Side -->
