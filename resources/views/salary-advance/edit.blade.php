@@ -84,18 +84,19 @@
                                     </select>
                                 </div>
 
-
                                 <div class="form-group">
-                                    <label for="month">Month</label>
-                                   
-                                        @for ($month = 1; $month <= 12; $month++)
-                                            <label for="month">Month</label>
-                                            <input type="text" value="{{ $month }}"
-                                                {{ in_array($month, explode(',', $entry->months)) ? 'selected' : '' }}>
-                                                {{ date('F', mktime(0, 0, 0, $month, 1)) }}
-                                            </input>
-                                        @endfor
-                                    
+                                    <label for="month">Month <span class="text-danger">*</span></label>
+                                    <div class="form-group">
+                                        <label for="months">Select Months and Amounts:</label>
+                                        <div class="row">
+                                            @for ($month = 1; $month <= 12; $month++)
+                                                <div class="col-md-4">
+                                                    <label>{{ date('F', mktime(0, 0, 0, $month, 1)) }}</label>
+                                                    <input type="number" name="months[{{ $month }}]" class="form-control" placeholder="Enter amount" min="0">
+                                                </div>
+                                            @endfor
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
