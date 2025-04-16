@@ -60,11 +60,11 @@
                                     <label for="employeeId">Employee ID</label>
                                     <select class="form-control select2me" id="employeeId">
                                         <option value="">Select Employee ID</option>
-                                        @foreach ($employee as $e)
+                                        @for ($employee as $e)
                                             <option value="{{ $e->id }}"
                                                 {{ $entry->employeeId == $e->id ? 'selected' : '' }}>{{ $e->first_name }} -
                                                 {{ $e->employee_code }}</option>
-                                        @endforeach
+                                        @endfor
                                     </select>
                                 </div>
                                 <div class="form-group">
