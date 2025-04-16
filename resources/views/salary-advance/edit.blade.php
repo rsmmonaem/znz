@@ -60,11 +60,11 @@
                                     <label for="employeeId">Employee ID</label>
                                     <select class="form-control select2me" id="employeeId">
                                         <option value="">Select Employee ID</option>
-                                        @for ($employee as $e)
+                                        @foreach ($employee as $e)
                                             <option value="{{ $e->id }}"
                                                 {{ $entry->employeeId == $e->id ? 'selected' : '' }}>{{ $e->first_name }} -
                                                 {{ $e->employee_code }}</option>
-                                        @endfor
+                                        @endforeach
                                     </select>
                                 </div>
                                 <div class="form-group">
@@ -77,7 +77,7 @@
                                     <select class="form-control select2me" id="month" multiple name="selected_months[]">
                                         @for ($month = 1; $month <= 12; $month++)
                                             <option value="{{ $month }}"
-                                                {{ in_array($month, explode(',', $entry->months)) ? 'selected' : '' }}>
+                                                {{ in_array($month, $selectedMonths) ? 'selected' : '' }}>
                                                 {{ date('F', mktime(0, 0, 0, $month, 1)) }}
                                             </option>
                                         @endfor
@@ -90,7 +90,12 @@
                                         @for ($month = 1; $month <= 12; $month++)
                                             <div class="col-md-4 month-amount" data-month="{{ $month }}" style="display: none;">
                                                 <label>{{ date('F', mktime(0, 0, 0, $month, 1)) }}</label>
-                                                <input type="number" name="months[{{ $month }}]" class="form-control" placeholder="Enter amount" min="0" value="{{ old('months.' . $month, $entry->amounts[$month] ?? '') }}">
+                                                <input type="number"
+                                                       name="months[{{ $month }}]"
+                                                       class="form-control"
+                                                       placeholder="Enter amount"
+                                                       min="0"
+                                                       value="{{ old('months.' . $month, isset($amounts[$month]) ? $amounts[$month] : '') }}">
                                             </div>
                                         @endfor
                                     </div>
@@ -98,25 +103,25 @@
                                 <script>
                                     $(document).ready(function () {
                                         function updateMonthAmounts() {
-                                            const selectedMonths = $('#month').val(); // array of selected month values
-                                            $('.month-amount').hide(); // hide all first
-                                            if (selectedMonths && selectedMonths.length) {
+                                            var selectedMonths = $('#month').val(); // array of selected month values
+                                            $('.month-amount').hide(); // hide all
+                                            if (selectedMonths && selectedMonths.length > 0) {
                                                 selectedMonths.forEach(function (month) {
                                                     $('.month-amount[data-month="' + month + '"]').show();
                                                 });
                                             }
                                         }
                                 
-                                        // Initial state (on page load)
+                                        // Initialize on page load
                                         updateMonthAmounts();
                                 
-                                        // On change
+                                        // Trigger on selection change
                                         $('#month').on('change', function () {
                                             updateMonthAmounts();
                                         });
                                     });
                                 </script>
-                                                                
+                                
                             </div>
                         </div>
 
