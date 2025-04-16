@@ -89,12 +89,15 @@
                                     <div class="form-group">
                                         <label for="months">Select Months and Amounts:</label>
                                         <div class="row">
-                                            @php
+                                        @php
                                             $selectedMonths = explode(',', $entry->months);
+                                            $salary_advance_data = json_decode($entry->salary_advance_data, true);
+                                            print_r($salary_advance_data);
                                         @endphp
                                         
                                         @for ($month = 1; $month <= 12; $month++)
                                             @if(in_array($month, $selectedMonths))
+                                            
                                                 <div class="col-md-4">
                                                     <label>{{ date('F', mktime(0, 0, 0, $month, 1)) }}</label>
                                                     <input type="number" name="months[{{ $month }}]" class="form-control" placeholder="Enter amount" min="0">

@@ -187,9 +187,11 @@ class SalaryAdvanceController extends Controller
         $employee = User::leftJoin('profile', 'users.id', '=', 'profile.user_id')
         ->select('users.first_name', 'users.id', 'profile.employee_code')
         ->get();
+        // Fetch the salary advance months data allocated to the entry
+        $salary_advance_data = DB::table('salary_advance')->where('id', $id )->get();
 
         // Return the view with all the necessary data
-        return view('salary-advance.edit', compact('entry', 'group', 'branch', 'department', 'section', 'employee', 'designation', 'category'));
+        return view('salary-advance.edit', compact('entry', 'group', 'branch', 'department', 'section', 'employee', 'designation', 'category', 'salary_advance_data'));
     }
 
     public function UpdateSalaryAdvance(Request $request, $id){
