@@ -92,6 +92,7 @@
                                         @php
                                             $selectedMonths = explode(',', $entry->months);
                                             
+                                            print_r($salary_advance_data);
                                         @endphp
                                         
                                         @for ($month = 1; $month <= 12; $month++)
