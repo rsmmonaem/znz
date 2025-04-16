@@ -195,7 +195,6 @@ class SalaryAdvanceController extends Controller
     }
 
     public function UpdateSalaryAdvance(Request $request, $id){
-        return $request->all();
         DB::beginTransaction();
         try {
             DB::table('salary_advance')->where('id', $id)->update(['employeeId' => $request->employeeId,
@@ -210,8 +209,7 @@ class SalaryAdvanceController extends Controller
                 DB::table('salary_advance_months')->insert([
                     'salary_advance_id' => $id,
                     'month' => $month,
-                    'amount' => $request->amount[$month]
-
+                    'amount' => $request->amounts[$month] ?? 0.00
                 ]);
             }
             DB::commit();
