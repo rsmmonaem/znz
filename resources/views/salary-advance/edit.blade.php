@@ -92,7 +92,7 @@
                                         @php
                                             $selectedMonths = explode(',', $entry->months);
                                             
-                                            print_r($salary_advance_data);
+                                            //print_r($salary_advance_data);
                                         @endphp
                                         
 @for ($month = 1; $month <= 12; $month++)
@@ -193,7 +193,7 @@
                 // Update Data
                 $('#updateData').click(function() {
                     $('#updateData').attr('disabled', true).text('Saving...');
-                    
+
 var monthAmounts = {};
 $('input[name^="months["]').each(function () {
     var monthKey = $(this).attr('name').match(/\d+/)[0]; // Extract the number inside brackets
