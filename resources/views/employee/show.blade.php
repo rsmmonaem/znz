@@ -219,17 +219,17 @@
 								{{-- Department --}}
 								<div class="col-sm-6">
 									<div class="form-group flex-form-group">
-										<select name="department_id" id="">
+										{{-- <select name="department_id" id="">
 											<option value="">Select One</option>
 											@foreach ($departments as $department)
 											<option value="{{ $department->id }}">
 												{{ $department->name }}
 											</option>
 										@endforeach
-										</select>
+										</select> --}}
 
-										{{-- {!! Form::label('department_id',trans('messages.department'),['class' => 'control-label'])!!} --}}
-										{{-- {!! From::select('department_id',[null=>trans('messages.select_one')] + $department ,($employee->Profile->department_id) ? $employee->Profile->department_id : '',['class'=>'form-control input-xlarge select2me','placeholder'=>trans('messages.select_one')]) !!} --}}
+										{!! Form::label('department_id',trans('messages.department'),['class' => 'control-label'])!!}
+										{!! From::select('department_id',[null=>trans('messages.select_one')] + $departments ,($employee->Profile->department_id) ? $employee->Profile->department_id : '',['class'=>'form-control input-xlarge select2me','placeholder'=>trans('messages.select_one')]) !!}
 									</div>
 								</div>
 								{{-- Section --}}
