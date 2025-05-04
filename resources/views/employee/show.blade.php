@@ -219,7 +219,8 @@
 								{{-- Department --}}
 								<div class="col-sm-6">
 									<div class="form-group flex-form-group">
-										<select name="department_id" id="">
+										<label for="department_id" class="control-label">Email</label>
+										<select class="form-control input-xlarge select2me" name="department_id" id="">
 											<option value="">Select One</option>
 											@foreach ($departments as $department)
 											<option value="{{ $department->id }}">
