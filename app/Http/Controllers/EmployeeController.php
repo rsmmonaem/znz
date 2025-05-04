@@ -240,7 +240,7 @@ class EmployeeController extends Controller{
         $education = EmployeeEducation::where('user_id', '=', $employee->id)->get();
         $experience = WorkExperience::where('user_id','=', $employee->id)->get();
         //    return $depertment;
-        return view('employee.show',compact('experience','education','section','grade','brach','type', 'riligion','employee','designations','department_id','depertment_id','assets','menu','role','roles','gender','marital_status','custom_field_values','employee_relation','social_custom_field_values','contract_types','earning_salary_types','deduction_salary_types','leave_types','contract_lists','office_shifts','document_types','templates'));
+        return view('employee.show',compact('experience','education','section','grade','brach','type', 'riligion','employee','designations','department_id','departments','assets','menu','role','roles','gender','marital_status','custom_field_values','employee_relation','social_custom_field_values','contract_types','earning_salary_types','deduction_salary_types','leave_types','contract_lists','office_shifts','document_types','templates'));
     }
 
     public function edit(User $employee){
