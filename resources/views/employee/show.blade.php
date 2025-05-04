@@ -221,13 +221,12 @@
 									<div class="form-group flex-form-group">
 										<select name="department_id" id="">
 											<option value="">Select One</option>
-											@foreach ($departments as $department)
-											<option value="{{ $department->id }}"
-												{{ optional($employee->Profile)->department_id == $department->id ? 'selected' : '' }}>
-												{{ $department->name }}
+											@foreach ($departments as $id => $name)
+											<option value="{{ $id }}"
+												{{ optional($employee->Profile)->department_id == $id ? 'selected' : '' }}>
+												{{ $name }}
 											</option>
-
-											@endforeach
+						@endforeach
 										</select>
 
 										{{-- {!! Form::label('department_id',trans('messages.department'),['class' => 'control-label'])!!} --}}
