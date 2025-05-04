@@ -222,8 +222,7 @@
 										<select name="department_id" id="">
 											<option value="">Select One</option>
 											@foreach ($departments as $department)
-											<option value="{{ $department->id }}"
-												{{ optional($employee->Profile)->department_id == $department->id ? 'selected' : '' }}>
+											<option value="{{ $department->id }}">
 												{{ $department->name }}
 											</option>
 										@endforeach
