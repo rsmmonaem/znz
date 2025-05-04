@@ -65,7 +65,6 @@
 								<div class="form-group">
 								    {!! Form::label('date_of_joining',trans('messages.date_of_joining'))!!}
 									{!! Form::input('date','date_of_joining','',['class'=>'form-control datepicker','placeholder'=>trans('messages.date_of_joining'),'readonly' => 'true'])!!}
-						            <input type="text" name="date_of_joining" id="formDate" class="form-control datepicker" placeholder="From Date">
 								</div>
 							</div>
 							<div class="col-md-6">
