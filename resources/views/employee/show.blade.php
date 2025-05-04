@@ -169,6 +169,12 @@
 										{!! Form::select('branch_id', [null=>trans('messages.select_one')] + $brach ,($employee->Profile->branch_id) ? $employee->Profile->branch_id : '',['class'=>'form-control input-xlarge select2me','placeholder'=>trans('messages.select_one')])!!}
 									  </div>
 								  	</div>
+
+									{{-- Department --}}
+									<div class="col-sm-6">
+										<div class="form-group flex-form-group">
+											{!! Form::label('department_id',trans('messages.department'),['class' => 'control-label'])!!}
+											{!! From::select('department_id',[null=>trans('messages.select_one')] + $department ,($employee->Profile->department_id) ? $employee->Profile->department_id : '',['class'=>'form-control input-xlarge select2me','placeholder'=>trans('messages.select_one')]) !!}
 									{{-- Section --}}
 									<div class="col-sm-6">
 									  <div class="form-group flex-form-group">

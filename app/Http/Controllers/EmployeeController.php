@@ -227,7 +227,7 @@ class EmployeeController extends Controller{
         $document_types = DocumentType::pluck('name','id')->all();
 
         $templates = \App\Template::whereIsDefault(0)->pluck('name','id')->all();
-
+        $department = Department::all()->pluck('name','id')->all();
         $assets = ['rte'];
         $menu = ['employee'];
         $type = DB::table('category')->get();
@@ -239,7 +239,7 @@ class EmployeeController extends Controller{
         $education = EmployeeEducation::where('user_id', '=', $employee->id)->get();
         $experience = WorkExperience::where('user_id','=', $employee->id)->get();
         // return $education;
-        return view('employee.show',compact('experience','education','section','grade','brach','type', 'riligion','employee','designations','assets','menu','role','roles','gender','marital_status','custom_field_values','employee_relation','social_custom_field_values','contract_types','earning_salary_types','deduction_salary_types','leave_types','contract_lists','office_shifts','document_types','templates'));
+        return view('employee.show',compact('experience','education','section','grade','brach','type', 'riligion','employee','designations','department','assets','menu','role','roles','gender','marital_status','custom_field_values','employee_relation','social_custom_field_values','contract_types','earning_salary_types','deduction_salary_types','leave_types','contract_lists','office_shifts','document_types','templates'));
     }
 
     public function edit(User $employee){
