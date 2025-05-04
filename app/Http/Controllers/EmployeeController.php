@@ -307,11 +307,8 @@ class EmployeeController extends Controller{
         $profile->fill($data);
 
         if ($request->hasFile('photo') && $request->input('remove_photo') != 1) {
-            // Handle new photo upload
             $photoFile = $request->file('photo'); // Get the uploaded file
             $filename = uniqid() . "." . $photoFile->getClientOriginalExtension(); // Generate unique filename
-        
-            // Define upload path
             $uploadPath = public_path('uploads/profile_image'); // Public directory for image uploads
         
             // Move the uploaded file to the upload path
@@ -373,6 +370,8 @@ class EmployeeController extends Controller{
         $employee->email = $request->input('email');
         if($request->has('designation_id'))
         $employee->designation_id = $request->input('designation_id');
+        if($request->has('department_id'))
+        $employee->department_id = $request->input('department_id');
 
         if(defaultRole() && $request->has('role_id')){
           $roles[] = $request->input('role_id');
