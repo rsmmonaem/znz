@@ -218,9 +218,9 @@
 
 								{{-- Department --}}
 								<div class="col-sm-6">
-									@php
+									{{-- @php
 									print_r($departments);
-									@endphp
+									@endphp --}}
 									{{-- <div class="form-group flex-form-group">
 										<select name="department_id" id="">
 											<option value="">Select One</option>
