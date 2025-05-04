@@ -343,25 +343,38 @@ function populateEmployeeTable(data) {
             ? `<img src="/uploads/profile_image/${item.photo}" alt="${item.first_name}" style="width: 50px; height: 50px;">`
             : ` `;
 
-        tableBody.append(`
-            <tr>
-                <td>${actions}</td>
-                <td>${index + 1}</td>
-                <td>${photoContent}</td>
-                <td>${item.employee_code || 'N/A'}</td>
-                <td>${item.first_name || 'N/A'}</td>
-                <td>${item.designation_name || 'N/A'}</td>
-                <td>${item.department_name || 'N/A'}</td>
-                <td>${item.category || 'N/A'}</td>
-                <td>${item.date_of_joining || 'N/A'}</td>
-                <td>${item.date_of_birth || 'N/A'}</td>
-                <td>${item.blood_group || 'N/A'}</td>
-                <td>${item.job_nature || 'N/A'}</td>
-                <td>${item.contact_number || 'N/A'}</td>
-                <td>${item.gender || 'N/A'}</td>
-                <td>${item.branch_name || 'N/A'}</td>
-            </tr>
-        `);
+			function formatDate(dateStr) {
+    if (!dateStr) return 'N/A';
+    const date = new Date(dateStr);
+    if (isNaN(date)) return 'Invalid Date';
+    
+    const mm = String(date.getMonth() + 1).padStart(2, '0');
+    const dd = String(date.getDate()).padStart(2, '0');
+    const yy = String(date.getFullYear()).slice(-2);
+
+    return `${mm}-${dd}-${yy}`;
+}
+
+tableBody.append(`
+    <tr>
+        <td>${actions}</td>
+        <td>${index + 1}</td>
+        <td>${photoContent}</td>
+        <td>${item.employee_code || 'N/A'}</td>
+        <td>${item.first_name || 'N/A'}</td>
+        <td>${item.designation_name || 'N/A'}</td>
+        <td>${item.department_name || 'N/A'}</td>
+        <td>${item.category || 'N/A'}</td>
+        <td>${formatDate(item.date_of_joining)}</td>
+        <td>${formatDate(item.date_of_birth)}</td>
+        <td>${item.blood_group || 'N/A'}</td>
+        <td>${item.job_nature || 'N/A'}</td>
+        <td>${item.contact_number || 'N/A'}</td>
+        <td>${item.gender || 'N/A'}</td>
+        <td>${item.branch_name || 'N/A'}</td>
+    </tr>
+`);
+
     });
 
     const table = datatable.DataTable({
