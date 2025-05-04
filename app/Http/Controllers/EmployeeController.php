@@ -227,7 +227,7 @@ class EmployeeController extends Controller{
         $document_types = DocumentType::pluck('name','id')->all();
 
         $templates = \App\Template::whereIsDefault(0)->pluck('name','id')->all();
-        $departments = Department::all()->pluck('name','id')->all();
+        $departments = Department::all();
         $assets = ['rte'];
         $menu = ['employee'];
         $type = DB::table('category')->get();
