@@ -223,7 +223,7 @@
 										<select class="form-control input-xlarge select2me" name="department_id" id="">
 											<option value="">Select One</option>
 											@foreach ($departments as $department)
-											<option value="{{ $department->id }}" {{ $employee->Profile->department_id == $department->id ? 'selected' : '' }}>
+											<option value="{{ $department->id }}" {{ $employee->department_id == $department->id ? 'selected' : '' }}>
 												{{ $department->name }}
 											</option>
 										@endforeach
