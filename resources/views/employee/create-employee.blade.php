@@ -409,6 +409,14 @@
                                 </div>
                                 <div class="col-sm-6">
                                     <div class="form-group flex-form-group">
+                                        <label for="date_of_birth">Date of Birth</label>
+                                        <input class="form-control" placeholder="Date of Birth"
+                                            readonly="true" name="date_of_birth" type="date" value=""
+                                            id="date_of_birth">
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group flex-form-group">
                                         <label for="nid">NID</label>
                                         <input class="form-control" placeholder="NID" name="nid" type="text"
                                             value="" id="nid">
