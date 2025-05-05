@@ -177,40 +177,6 @@
 
                             <!-- Row 6 -->
                             <div class="row">
-
-
-                                <div class="col-md-6">
-                                    <div class="form-group flex-form-group">
-                                        <label for="date_of_brith">Department <span
-                                                class="text-danger">*</span></label>
-                                        <select class="form-control input-xlarge select2me select2-offscreen"
-                                            placeholder="Select One" id="department_id" name="department_id"
-                                            title="Department" tabindex="-1" onchange="getDesignations()">
-                                            <option value="">Select One</option>
-                                            @foreach ($departments as $d)
-                                                <option value="{{ $d->id }}">{{ $d->name }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                </div>
-                                                                <!-- Grade -->
-                                                                <div class="col-sm-6">
-                                                                    <div class="form-group">
-                                                                        <label for="grade_id" class="control-label">Grade </label>
-                                                                        <select class="form-control" id="grade_id" name="grade_id">
-                                                                            <option value="">Select One</option>
-                                                                            @foreach ($grades as $g)
-                                                                                <option value="{{ $g->id }}">{{ $g->name }}</option>
-                                                                            @endforeach
-                                                                        </select>
-                                                                    </div>
-                                                                </div>
-                            </div>
-                            <!-- End Row 6 -->
-                            <div class="row">
-
-                
-                              <div class="row">
                                 <div class="col-sm-6">
                                     <div class="form-group">
                                         <label for="section_id" class="control-label">Section <span
@@ -236,9 +202,49 @@
                                             @endforeach --}}
                                         </select>
                                     </div>
-                                </div>       
-                             </div>
+                                </div>  
+                                <div class="col-md-6">
+                                    <div class="form-group flex-form-group">
+                                        <label for="date_of_brith">Department <span
+                                                class="text-danger">*</span></label>
+                                        <select class="form-control input-xlarge select2me select2-offscreen"
+                                            placeholder="Select One" id="department_id" name="department_id"
+                                            title="Department" tabindex="-1" onchange="getDesignations()">
+                                            <option value="">Select One</option>
+                                            @foreach ($departments as $d)
+                                                <option value="{{ $d->id }}">{{ $d->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                                                                <!-- Grade -->
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label for="grade_id" class="control-label">Grade </label>
+                                        <select class="form-control" id="grade_id" name="grade_id">
+                                            <option value="">Select One</option>
+                                            @foreach ($grades as $g)
+                                                <option value="{{ $g->id }}">{{ $g->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
                             </div>
+                            <!-- End Row 6 -->
+                            <div class="row">
+                                <!-- Designation -->
+                                <div class="col-sm-6">
+
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group flex-form-group">
+                                        <label for="date_of_brith">Date of Birth <span
+                                                class="text-danger">*</span></label>
+                                        <input class="form-control datepicker" placeholder="Date of Birth"
+                                            readonly="true" name="date_of_birth" type="text" value=""
+                                            id="date_of_birth">
+                                    </div>
+                                </div>
                             </div>
                             <!-- Row 7 -->
                             <div class="row">
