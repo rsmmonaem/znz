@@ -246,7 +246,7 @@
 							</div>
 							<div class="row">
 								{{-- Section --}}
-								<div class="col-sm-3">
+								<div class="col-sm-6">
 									<div class="form-group flex-form-group">
 										{!! Form::label('section_id',trans('messages.section'),['class' =>
 										'control-label'])!!}
@@ -258,7 +258,7 @@
 								</div>
 								{{-- Section --}}
 								@if(!$employee->Designation->is_hidden)
-								<div class="col-sm-3">
+								<div class="col-sm-6">
 									<div class="form-group flex-form-group">
 										{!! Form::label('designation_id',trans('messages.designation'),['class' =>
 										'control-label'])!!}
