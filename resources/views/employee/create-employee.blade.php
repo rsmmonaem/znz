@@ -260,6 +260,13 @@
                                             <option value="divorced_separated">Divorced or Separated</option>
                                         </select>
                                     </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group flex-form-group d-flex justify-content-between">
+                                        <label for="date_of_joining">Date of Joining</label>
+                                        <input class="form-control" placeholder="Date of Joining"
+                                            name="date_of_joining" type="date" value="" id="date_of_joining">
+                                    </div>
                                     <div class="form-group flex-form-group d-flex justify-content-between">
 										<label for="joining_period">Joining Period</label>
 										<div>
