@@ -303,7 +303,6 @@
 							</div>
 							<div class="row">
 								{{-- Date of Joining --}}
-								{{-- Date of Joining --}}
 								<div class="col-sm-6">
 									<div class="form-group flex-form-group">
 										{!! Form::label('date_of_joining', trans('messages.date_of_joining')) !!}

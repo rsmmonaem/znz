@@ -281,23 +281,36 @@
                                 </div>
                                 <!-- Date of Joining -->
                                 <div class="col-sm-6">
-                                    <div class="form-group flex-form-group d-flex justify-content-between">
+									<div class="form-group flex-form-group d-flex justify-content-between">
+										<label for="joining_period">Joining Period</label>
+										<div>
+											<label>
+												<input type="radio" name="joining_period" value="3_month" id="3_month">
+												3 Months
+											</label>
+											<label>
+												<input type="radio" name="joining_period" value="6_month" id="6_month">
+												6 Months
+											</label>
+										</div>
                                         <div>
-                                            <label>
-                                                <input type="radio" name="joining_period" value="3_month" id="3_month"> 3 Months
-                                            </label>
-                                            <label>
-                                                <input type="radio" name="joining_period" value="6_month" id="6_month"> 6 Months
-                                            </label>
+                                            <label>Employee Confirm Date</label>
+                                            <input class="form-control datepicker" placeholder="Employee Confirm Date"
+                                                 name="confirm_date" type="text" value=""
+                                                id="confirm_date">
                                         </div>
-                                    </div>
-                                    <div class="form-group flex-form-group">
-                                        <label for="date_of_joining">Date of Joining <span class="text-danger">*</span></label>
-                                        <input class="form-control" name="date_of_joining" type="date" value="" id="date_of_joining">
-                                    </div>
-                                    <div class="form-group flex-form-group">
-                                        <label for="confirm_date">Confirm Date</label>
-                                        <input class="form-control" placeholder="Confirm Date" readonly="true" name="confirm_date" type="text" value="" id="confirm_date">
+                                     
+									</div>
+                                </div>
+                                <div class="form-group flex-form-group d-flex justify-content-between">
+                                    <div>
+                                        <label for="joining_period">Joining Period</label>
+                                        <label>
+                                            <input type="radio" name="joining_period" value="3_month" id="3_month"> 3 Months
+                                        </label>
+                                        <label>
+                                            <input type="radio" name="joining_period" value="6_month" id="6_month"> 6 Months
+                                        </label>
                                     </div>
                                 </div>
                                <script>
