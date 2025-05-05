@@ -278,10 +278,7 @@
                                             <option value="divorced_separated">Divorced or Separated</option>
                                         </select>
                                     </div>
-                                </div>
-                                <!-- Date of Joining -->
-                                <div class="col-sm-6">
-									<div class="form-group flex-form-group d-flex justify-content-between">
+                                    <div class="form-group flex-form-group d-flex justify-content-between">
 										<label for="joining_period">Joining Period</label>
 										<div>
 											<label>
@@ -295,24 +292,11 @@
 										</div>
                                         <div>
                                             <label>Employee Confirm Date</label>
-                                            <input class="form-control datepicker" placeholder="Employee Confirm Date"
-                                                 name="confirm_date" type="text" value=""
-                                                id="confirm_date">
+                                            <input class="form-control" placeholder="Employee Confirm Date" name="confirm_date" type="date" value="" id="confirm_date">
                                         </div>
-                                     
 									</div>
                                 </div>
-                                <div class="form-group flex-form-group d-flex justify-content-between">
-                                    <div>
-                                        <label for="joining_period">Joining Period</label>
-                                        <label>
-                                            <input type="radio" name="joining_period" value="3_month" id="3_month"> 3 Months
-                                        </label>
-                                        <label>
-                                            <input type="radio" name="joining_period" value="6_month" id="6_month"> 6 Months
-                                        </label>
-                                    </div>
-                                </div>
+
                                <script>
                                     function setConfirmDate() {
                                         const joiningDateInput = document.getElementById('date_of_joining');
