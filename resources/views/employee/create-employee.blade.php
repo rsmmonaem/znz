@@ -265,7 +265,7 @@
                                     <div class="from-group">
                                         <label for="date_of_joining">Date of Joining</label>
                                         <input class="form-control" placeholder="Date of Joining"
-                                            readonly="true" name="date_of_joining" type="date" value=""
+                                             name="date_of_joining" type="date" value=""
                                             id="date_of_joining">
                                     </div>
                                 </div>
