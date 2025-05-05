@@ -328,7 +328,7 @@
 											</label>
 										</div>
 									</div>
-									<div class="form-group flex-form-group">
+									<div style="margin-bottom: 25px;margin-top: -12px;" class="form-group flex-form-group">
 										{!! Form::label('empoloyee_confirm', trans('messages.empoloyee_confirm')) !!}
 										{!! Form::input('text', 'empoloyee_confirm',
 										isset($employee->Profile->confirm_date) ? $employee->Profile->confirm_date : '',
