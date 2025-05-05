@@ -1943,6 +1943,25 @@ Class ClockController extends Controller{
 				'lateTime' => $lateMinutes ? 'Late: ' . floor($lateMinutes / 60) . ' hr ' . ($lateMinutes % 60) . ' min' : '',
 				'status' => $status == 'P' ? 'P' : ($status == 'OT' ? 'Overtime' : ($status == 'WHD' ? 'WHD' : ($status == 'A' ? 'Absent' : ($status == 'approved' ? 'Leave' : ($status == 'lwp' ? 'LWP' : $status))))),
 			];
+			if($attendance && $attendance->count() > 0){
+				$earliestClockIn = Carbon::parse($attendance->min('clock_in'))->format('H:i:s');
+				$latestClockOut = Carbon::parse($attendance->max('clock_out'))->format('H:i:s');
+				if ($shiftTime) {
+					$inTime = Carbon::parse($shiftTime->in_time);
+					$outTime = Carbon::parse($shiftTime->out_time);
+					$clockIn = Carbon::parse($earliestClockIn);
+					$clockOut = Carbon::parse($latestClockOut);
+					if ($clockIn->eq($inTime) && $clockOut->eq($outTime)) {
+					} elseif ($clockIn->gt($inTime)) { // Late entry
+						$lateMinutes = $inTime->diffInMinutes($clockIn);
+					} 
+					elseif ($clockOut->gt($outTime)) {
+						$overtimeHours = $clockOut->diffInMinutes($outTime);
+					} else {
+						$overtimeHours = $clockOut->diffInMinutes($outTime);
+					}
+				}
+			}
 		});
 		
 		// Return the result as a JSON response
