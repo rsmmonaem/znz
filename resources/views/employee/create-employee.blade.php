@@ -230,22 +230,6 @@
                                     </div>
                                 </div>  
                             </div>
-                            <!-- End Row 6 -->
-                            <div class="row">
-                                <!-- Designation -->
-                                <div class="col-sm-6">
-
-                                </div>
-                                <div class="col-sm-6">
-                                    <div class="form-group flex-form-group">
-                                        <label for="date_of_brith">Date of Birth <span
-                                                class="text-danger">*</span></label>
-                                        <input class="form-control datepicker" placeholder="Date of Birth"
-                                            readonly="true" name="date_of_birth" type="text" value=""
-                                            id="date_of_birth">
-                                    </div>
-                                </div>
-                            </div>
                             <!-- Row 7 -->
                             <div class="row">
                                 <!-- Gender -->
