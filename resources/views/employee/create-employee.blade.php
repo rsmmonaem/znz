@@ -208,10 +208,9 @@
                             </div>
                             <!-- End Row 6 -->
                             <div class="row">
-                                <!-- Designation -->
-                                <div class="col-sm-6">
-                                    <div class="row">
-                                <!-- Section -->
+
+                
+                              <div class="row">
                                 <div class="col-sm-6">
                                     <div class="form-group">
                                         <label for="section_id" class="control-label">Section <span
@@ -224,22 +223,22 @@
                                         </select>
                                     </div>
                                 </div>
-                                        <div class="col-md-6">
-                                            <div class="form-group flex-form-group">
-                                                <label for="designation_id" class="control-label">Designation <span
-                                                        class="text-danger">*</span></label>
-                                                <select class="form-control input-xlarge select2me select2-offscreen"
-                                                    placeholder="Designation" id="designation_id" name="designation_id"
-                                                    title="Designation" tabindex="-1">
-                                                    <option value="">Select One</option>
-                                                    {{-- @foreach ($designations as $d)
-                                                        <option value="{{ $d->id }}">{{ $d->name }} ({{ $d->department_name }})</option>
-                                                    @endforeach --}}
-                                                </select>
-                                            </div>
-                                        </div>
+                                <div class="col-md-6">
+                                    <div class="form-group flex-form-group">
+                                        <label for="designation_id" class="control-label">Designation <span
+                                                class="text-danger">*</span></label>
+                                        <select class="form-control input-xlarge select2me select2-offscreen"
+                                            placeholder="Designation" id="designation_id" name="designation_id"
+                                            title="Designation" tabindex="-1">
+                                            <option value="">Select One</option>
+                                            {{-- @foreach ($designations as $d)
+                                                <option value="{{ $d->id }}">{{ $d->name }} ({{ $d->department_name }})</option>
+                                            @endforeach --}}
+                                        </select>
                                     </div>
-                                </div>
+                                </div>       
+                             </div>
+                            </div>
                             </div>
                             <!-- Row 7 -->
                             <div class="row">
