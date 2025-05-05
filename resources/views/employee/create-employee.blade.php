@@ -177,7 +177,7 @@
 
                             <!-- Row 6 -->
                             <div class="row">
-                                <div class="col-md-6">
+                                <div class="col-sm-6">
                                     <div class="form-group flex-form-group">
                                         <label for="date_of_brith">Department <span
                                                 class="text-danger">*</span></label>
@@ -215,7 +215,7 @@
                                         </select>
                                     </div>
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-sm-6">
                                     <div class="form-group flex-form-group">
                                         <label for="designation_id" class="control-label">Designation <span
                                                 class="text-danger">*</span></label>
