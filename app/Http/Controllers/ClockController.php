@@ -1844,37 +1844,25 @@ Class ClockController extends Controller{
 				$status = $leaveDays->get($date);
 			}elseif (in_array($date, $holidays)) {
 				$status = 'HLD';
-				// Get earliest clock-in and latest clock-out
-				$earliestClockIn = Carbon::parse($attendance->min('clock_in'))->format('H:i:s');
-				$latestClockOut = Carbon::parse($attendance->max('clock_out'))->format('H:i:s');
-				
-				// return $earliestClockIn;
-				if ($shiftTime) {
-					$inTime = Carbon::parse($shiftTime->in_time);
-					$outTime = Carbon::parse($shiftTime->out_time);
-					$clockIn = Carbon::parse($earliestClockIn);
-					$clockOut = Carbon::parse($latestClockOut);
-
-					if ($clockIn->eq($inTime) && $clockOut->eq($outTime)) {
-						$status = 'P'; // Present
-					} elseif ($clockIn->gt($inTime)) { // Late entry
-						$lateMinutes = $inTime->diffInMinutes($clockIn);
-					    // $lateTime = "(Late: {$lateMinutes} mins)";
-						$status = "L"; // Late
-					} 
-					elseif ($clockOut->gt($outTime)) {
-						$overtimeHours = $clockOut->diffInMinutes($outTime);
-						// return $overtimeHours;
-						$status = "P";
-						// $overTime = '(OT: {$overtimeHours} hrs)';
-					} else {
-						$overtimeHours = $clockOut->diffInMinutes($outTime);
-						$status = "P"; // Regular overtime
+				if($attendance && $attendance->count() > 0){
+					$earliestClockIn = Carbon::parse($attendance->min('clock_in'))->format('H:i:s');
+					$latestClockOut = Carbon::parse($attendance->max('clock_out'))->format('H:i:s');
+					if ($shiftTime) {
+						$inTime = Carbon::parse($shiftTime->in_time);
+						$outTime = Carbon::parse($shiftTime->out_time);
+						$clockIn = Carbon::parse($earliestClockIn);
+						$clockOut = Carbon::parse($latestClockOut);
+						if ($clockIn->eq($inTime) && $clockOut->eq($outTime)) {
+						} elseif ($clockIn->gt($inTime)) { // Late entry
+							$lateMinutes = $inTime->diffInMinutes($clockIn);
+						} 
+						elseif ($clockOut->gt($outTime)) {
+							$overtimeHours = $clockOut->diffInMinutes($outTime);
+						} else {
+							$overtimeHours = $clockOut->diffInMinutes($outTime);
+						}
 					}
-				} else {
-					$status = 'P'; // Mark present if no shift defined
 				}
-				
 			} 
 			elseif (in_array($date, $weeklyHolidays)) {
 				if($attendance && $attendance->count() > 0){
