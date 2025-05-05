@@ -1846,6 +1846,12 @@ Class ClockController extends Controller{
 				$status = 'HLD';
 			} 
 			elseif (in_array($date, $weeklyHolidays)) {
+				if($attendance && $attendance->count() > 0){
+					$earliestClockIn = Carbon::parse($attendance->min('clock_in'))->format('H:i:s');
+					$latestClockOut = Carbon::parse($attendance->max('clock_out'))->format('H:i:s');
+				}else{
+					
+				}
 				$status = $attendance ? 'WHD' : 'WHD';
 			}elseif (in_array($date, $spacialHolidays)) {
 				$status = $attendance ? 'SPHD' : 'SPHD';
