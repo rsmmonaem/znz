@@ -233,18 +233,6 @@
 										{{-- {!! From::select('department_id',[null=>trans('messages.select_one')] + $department ,($employee->Profile->department_id) ? $employee->Profile->department_id : '',['class'=>'form-control input-xlarge select2me','placeholder'=>trans('messages.select_one')]) !!} --}}
 									</div>
 								</div>
-								{{-- Section --}}
-								<div class="col-sm-6">
-									<div class="form-group flex-form-group">
-										{!! Form::label('section_id',trans('messages.section'),['class' =>
-										'control-label'])!!}
-										{!! Form::select('section_id', [null=>trans('messages.select_one')] + $section
-										,($employee->Profile->section_id) ? $employee->Profile->section_id :
-										'',['class'=>'form-control input-xlarge
-										select2me','placeholder'=>trans('messages.select_one')])!!}
-									</div>
-								</div>
-								{{-- Section --}}
 								<div class="col-sm-6">
 									<div class="form-group flex-form-group">
 										{!! Form::label('grade_id',trans('messages.grade'),['class' =>
@@ -255,11 +243,22 @@
 										select2me','placeholder'=>trans('messages.select_one')])!!}
 									</div>
 								</div>
-								{{-- Grade --}}
 							</div>
 							<div class="row">
+								{{-- Section --}}
+								<div class="col-sm-3">
+									<div class="form-group flex-form-group">
+										{!! Form::label('section_id',trans('messages.section'),['class' =>
+										'control-label'])!!}
+										{!! Form::select('section_id', [null=>trans('messages.select_one')] + $section
+										,($employee->Profile->section_id) ? $employee->Profile->section_id :
+										'',['class'=>'form-control input-xlarge
+										select2me','placeholder'=>trans('messages.select_one')])!!}
+									</div>
+								</div>
+								{{-- Section --}}
 								@if(!$employee->Designation->is_hidden)
-								<div class="col-sm-6">
+								<div class="col-sm-3">
 									<div class="form-group flex-form-group">
 										{!! Form::label('designation_id',trans('messages.designation'),['class' =>
 										'control-label'])!!}
