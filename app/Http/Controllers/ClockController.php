@@ -1844,6 +1844,7 @@ Class ClockController extends Controller{
 				$status = $leaveDays->get($date);
 			}elseif (in_array($date, $holidays)) {
 				$status = 'HLD';
+				
 			} 
 			elseif (in_array($date, $weeklyHolidays)) {
 				if($attendance && $attendance->count() > 0){
@@ -1864,8 +1865,6 @@ Class ClockController extends Controller{
 							$overtimeHours = $clockOut->diffInMinutes($outTime);
 						}
 					}
-				}else{
-					
 				}
 				$status = $attendance ? 'WHD' : 'WHD';
 			}elseif (in_array($date, $spacialHolidays)) {

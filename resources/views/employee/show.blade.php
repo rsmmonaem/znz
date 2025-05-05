@@ -306,10 +306,10 @@
 								<div class="col-sm-6">
 									<div class="form-group flex-form-group">
 										{!! Form::label('date_of_joining', trans('messages.date_of_joining')) !!}
-										{!! Form::text('date_of_joining', isset($employee->Profile->date_of_joining) ?
-										\Carbon\Carbon::parse($employee->Profile->date_of_joining)->format('m-d-y') :
-										'', ['class' => 'form-control', 'placeholder' =>
-										trans('messages.date_of_joining'), 'id' => 'date_of_joining']) !!}
+										{!! Form::input('text', 'date_of_joining',
+										isset($employee->Profile->date_of_joining) ? $employee->Profile->date_of_joining :
+										'', ['class' => 'form-control datepicker', 'placeholder' => 'Select Date']) !!}
+										
 									</div>
 								</div>
 
