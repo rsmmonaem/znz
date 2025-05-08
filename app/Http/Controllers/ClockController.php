@@ -1921,25 +1921,25 @@ Class ClockController extends Controller{
 			} else {
 				$status = 'A'; // Absent
 			}
-			if($attendance && $attendance->count() > 0){
-				$earliestClockIn = Carbon::parse($attendance->min('clock_in'))->format('H:i:s');
-				$latestClockOut = Carbon::parse($attendance->max('clock_out'))->format('H:i:s');
-				if ($shiftTime) {
-					$inTime = Carbon::parse($shiftTime->in_time);
-					$outTime = Carbon::parse($shiftTime->out_time);
-					$clockIn = Carbon::parse($earliestClockIn);
-					$clockOut = Carbon::parse($latestClockOut);
-					if ($clockIn->eq($inTime) && $clockOut->eq($outTime)) {
-					} elseif ($clockIn->gt($inTime)) { // Late entry
-						$lateMinutes = $inTime->diffInMinutes($clockIn);
-					} 
-					elseif ($clockOut->gt($outTime)) {
-						$overtimeHours = $clockOut->diffInMinutes($outTime);
-					} else {
-						$overtimeHours = $clockOut->diffInMinutes($outTime);
-					}
-				}
-			}
+			// if($attendance && $attendance->count() > 0){
+			// 	$earliestClockIn = Carbon::parse($attendance->min('clock_in'))->format('H:i:s');
+			// 	$latestClockOut = Carbon::parse($attendance->max('clock_out'))->format('H:i:s');
+			// 	if ($shiftTime) {
+			// 		$inTime = Carbon::parse($shiftTime->in_time);
+			// 		$outTime = Carbon::parse($shiftTime->out_time);
+			// 		$clockIn = Carbon::parse($earliestClockIn);
+			// 		$clockOut = Carbon::parse($latestClockOut);
+			// 		if ($clockIn->eq($inTime) && $clockOut->eq($outTime)) {
+			// 		} elseif ($clockIn->gt($inTime)) { // Late entry
+			// 			$lateMinutes = $inTime->diffInMinutes($clockIn);
+			// 		} 
+			// 		elseif ($clockOut->gt($outTime)) {
+			// 			$overtimeHours = $clockOut->diffInMinutes($outTime);
+			// 		} else {
+			// 			$overtimeHours = $clockOut->diffInMinutes($outTime);
+			// 		}
+			// 	}
+			// }
 			return [
 				'date' => $date,
 				'employee_code' => $Profiles ? $Profiles->employee_code : 'N/A',
