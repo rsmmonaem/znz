@@ -152,6 +152,8 @@ class SalaryProcessController extends Controller
         ->distinct('date') 
         ->count('date');
 
+
+
         // Holidays
         $holidays = DB::table('holidays')
         ->whereBetween('date', [$formDate, $toDate])
@@ -262,8 +264,14 @@ class SalaryProcessController extends Controller
 
         // $totalWorkedDays = $getTotalPresent + $holidays + $leave + $totalFridays + $spacial_holidays;
         // $totalWorkedDays = $getTotalPresent + $holidays + $leave + $totalFridays + $spacial_holidays;
+        $actual_present = $getTotalPresent
+                - count($fridays)
+                - $lwp
+                - $leave
+                - $spacial_holidays
+                - $holidays;
 
-        $totalWorkedDays = $getTotalPresent;
+        $totalWorkedDays = $actual_present;
         $totalAbsents = $TotalDays-$totalWorkedDays-$totalFridays-$spacial_holidays-$holidays-$leave;
        //$totalPresentDays = $getTotalPresent + $holidays + $leave + $totalFridays + $spacial_holidays;
         $perdaysAmount =  $salaryslab ? $salaryslab->gross / $TotalDays : 0;
@@ -344,7 +352,7 @@ $CashAmountValue = ($FinalCashPercentage / 100) * $BankApply;  // Cash portion b
 // $CashAmountValue = max(0, $netSalaryWIthoutTax - $amount-$advanceAmount-$BankAmountValue); // Remaining salary goes to cash
 
 $TableData = [
-    'total_worked_days' => $totalWorkedDays-$totalAbsents,
+    'total_worked_days' => $actual_present,
     'total_absents' => $totalAbsents,
     'total_absents_fee' => $TotalDiductionAmount,
     'total_fridays' => $totalFridays,
