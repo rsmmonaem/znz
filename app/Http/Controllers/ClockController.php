@@ -1741,7 +1741,19 @@ Class ClockController extends Controller{
 		return $dates;
 	}
 
-
+	function getDatesBetweentwoDateRefine($startDate, $endDate)
+	{
+		$start = Carbon::parse($startDate);
+		$end = Carbon::parse($endDate);
+		$dates = [];
+	
+		while ($start->lte($end)) { // ✅ Include end date
+			$dates[] = $start->format('Y-m-d');
+			$start->addDay();
+		}
+	
+		return $dates;
+	}
 	// Attendance report generation for a single user
 	public function getAttendanceReport1($userId, $startDat, $endDat)
 	{
@@ -1817,7 +1829,7 @@ Class ClockController extends Controller{
 		foreach ($leaves as $leave) {
 			$fromDate = Carbon::parse($leave->from_date);
 			$toDate = Carbon::parse($leave->to_date);
-			$datesBetween = $this->getDatesBetweentwo($fromDate, $toDate);
+			$datesBetween = $this->getDatesBetweentwoDateRefine($fromDate, $toDate);
 		
 			foreach ($datesBetween as $date) {
 				// Properly label based on leave status
