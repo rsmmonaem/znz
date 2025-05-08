@@ -194,13 +194,13 @@ class SalaryProcessController extends Controller
     $leave = collect(DB::select($leaveQuery, [$formDate, $toDate, $employeeId, $formDate, $toDate, $employeeId]))->count();
 
         // LWP
-        // $lwp = DB::table('leaves')
-        // ->whereBetween('from_date', [$formDate, $toDate])
-        // ->where('user_id', $employeeId)
-        // ->where('leave_type_id', '==', 9)
-        // ->where('status', 'approved')
-        // ->distinct('from_date') 
-        // ->count('from_date');
+        $lwp = DB::table('leaves')
+        ->whereBetween('from_date', [$formDate, $toDate])
+        ->where('user_id', $employeeId)
+        ->where('leave_type_id', '==', 9)
+        ->where('status', 'approved')
+        ->distinct('from_date') 
+        ->count('from_date');
 
         
 
@@ -268,7 +268,7 @@ class SalaryProcessController extends Controller
        //$totalPresentDays = $getTotalPresent + $holidays + $leave + $totalFridays + $spacial_holidays;
         $perdaysAmount =  $salaryslab ? $salaryslab->gross / $TotalDays : 0;
         // $GrossAmountSalaryPerDays = $perdaysAmount * $totalWorkedDays;
-        $GrossAmountSalaryPerDays = $perdaysAmount * $TotalDays;
+        $GrossAmountSalaryPerDays = $perdaysAmount * ($TotalDays-$totalAbsents);
 
         $TotalDiductionAmount = $perdaysAmount * $totalAbsents;
 
