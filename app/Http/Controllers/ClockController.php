@@ -1818,11 +1818,17 @@ Class ClockController extends Controller{
 			$fromDate = Carbon::parse($leave->from_date);
 			$toDate = Carbon::parse($leave->to_date);
 			$datesBetween = $this->getDatesBetweentwo($fromDate, $toDate);
-			$leaveDays = $leaveDays->merge($datesBetween);
+		
 			foreach ($datesBetween as $date) {
-				$leaveDays->put($date, $leave->status);
+				// Properly label based on leave status
+				if ($leave->status === 'lwp') {
+					$leaveDays->put($date, 'LWP');
+				} elseif ($leave->status === 'approved') {
+					$leaveDays->put($date, 'Leave');
+				}
 			}
 		}
+		
 
 		$spacialHolidays = SpacialHoliday::whereBetween('date', [$startDate, $endDate])
 		->where('user_id', $userId)
@@ -1921,6 +1927,7 @@ Class ClockController extends Controller{
 			} else {
 				$status = 'A'; // Absent
 			}
+			// Leave Punch Show
 			// if($attendance && $attendance->count() > 0){
 			// 	$earliestClockIn = Carbon::parse($attendance->min('clock_in'))->format('H:i:s');
 			// 	$latestClockOut = Carbon::parse($attendance->max('clock_out'))->format('H:i:s');
