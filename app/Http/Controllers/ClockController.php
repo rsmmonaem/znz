@@ -1932,6 +1932,7 @@ Class ClockController extends Controller{
 				'overTime' => $overtimeHours ? floor($overtimeHours / 60) . ' hr ' . ($overtimeHours % 60) . ' min' : '',
 				'lateTime' => $lateMinutes ? 'Late: ' . floor($lateMinutes / 60) . ' hr ' . ($lateMinutes % 60) . ' min' : '',
 				'status' => $status == 'P' ? 'P' : ($status == 'OT' ? 'Overtime' : ($status == 'WHD' ? 'WHD' : ($status == 'A' ? 'Absent' : ($status == 'approved' ? 'Leave' : ($status == 'lwp' ? 'LWP' : $status))))),
+
 			];
 		});
 		
