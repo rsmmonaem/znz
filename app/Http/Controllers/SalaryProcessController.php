@@ -237,7 +237,7 @@ $lwpResult = DB::selectOne($lwpQuery, [
     $formDate, $toDate, $employeeId, $employeeId, $formDate, $toDate
 ]);
 
-$lwp = $lwpResult->total_lwp ?? 0;
+$lwp = isset($lwpResult->total_lwp) ? $lwpResult->total_lwp : 0;
 
         
 
