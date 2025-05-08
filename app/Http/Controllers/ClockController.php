@@ -1846,50 +1846,53 @@ Class ClockController extends Controller{
 			$overtimeHours = '';
 			$lateMinutes = '';
 
-			if ($leaveDays->has($date)) {
-				$status = $leaveDays->get($date);
-			}elseif (in_array($date, $holidays)) {
-				$status = 'HLD';
-			} 
-			elseif (in_array($date, $weeklyHolidays)) {
-				$status = $attendance ? 'WHD' : 'WHD';
-			}elseif (in_array($date, $spacialHolidays)) {
-				$status = $attendance ? 'SPHD' : 'SPHD';
+			if (in_array($date, $weeklyHolidays)) {
+				$status = 'WHD'; // Weekly holiday takes top priority
+			
+			} elseif ($leaveDays->has($date)) {
+				$leaveStatus = $leaveDays->get($date);
+			
+				if ($leaveStatus === 'LWP') {
+					$status = 'LWP'; // Leave Without Pay
+				} else {
+					$status = $leaveStatus; // Could be CL, SL, EL, etc.
+				}
+			
+			} elseif (in_array($date, $holidays)) {
+				$status = 'HLD'; // Regular holiday
+			
+			} elseif (in_array($date, $spacialHolidays)) {
+				$status = 'SPHD'; // Special holiday
+			
 			} elseif ($attendance && $attendance->count() > 0) {
-				// Get earliest clock-in and latest clock-out
 				$earliestClockIn = Carbon::parse($attendance->min('clock_in'))->format('H:i:s');
 				$latestClockOut = Carbon::parse($attendance->max('clock_out'))->format('H:i:s');
-				
-				// return $earliestClockIn;
+			
 				if ($shiftTime) {
 					$inTime = Carbon::parse($shiftTime->in_time);
 					$outTime = Carbon::parse($shiftTime->out_time);
 					$clockIn = Carbon::parse($earliestClockIn);
 					$clockOut = Carbon::parse($latestClockOut);
-
+			
 					if ($clockIn->eq($inTime) && $clockOut->eq($outTime)) {
-						$status = 'P'; // Present
-					} elseif ($clockIn->gt($inTime)) { // Late entry
-						$lateMinutes = $inTime->diffInMinutes($clockIn);
-					    // $lateTime = "(Late: {$lateMinutes} mins)";
-						$status = "L"; // Late
-					} 
-					elseif ($clockOut->gt($outTime)) {
-						$overtimeHours = $clockOut->diffInMinutes($outTime);
-						// return $overtimeHours;
-						$status = "P";
-						// $overTime = '(OT: {$overtimeHours} hrs)';
+						$status = 'P'; // Present (Perfect)
+					} elseif ($clockIn->gt($inTime)) {
+						$status = 'L'; // Late
+					} elseif ($clockOut->gt($outTime)) {
+						$status = 'P'; // Present with overtime
 					} else {
-						$overtimeHours = $clockOut->diffInMinutes($outTime);
-						$status = "P"; // Regular overtime
+						$status = 'P'; // Present
 					}
 				} else {
-					$status = 'P'; // Mark present if no shift defined
+					$status = 'P'; // Present with no shift defined
 				}
+			
 			} else {
 				$status = 'A'; // Absent
 			}
-			//Leave Punch Show
+			
+
+
 			if($attendance && $attendance->count() > 0){
 				$earliestClockIn = Carbon::parse($attendance->min('clock_in'))->format('H:i:s');
 				$latestClockOut = Carbon::parse($attendance->max('clock_out'))->format('H:i:s');
