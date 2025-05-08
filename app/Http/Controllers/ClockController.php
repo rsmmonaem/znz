@@ -1836,6 +1836,9 @@ Class ClockController extends Controller{
 		->toArray();
 		// Map the data to the calendar range
 		$result = $dateRange->map(function ($date) use ($attendances, $leaveDays, $holidays, $weeklyHolidays, $shiftTime, $Profiles, $spacialHolidays) {
+
+			return $leaveDays;
+			die();
 			$attendance = $attendances->get($date);
 			$dayOfWeek = Carbon::parse($date)->dayOfWeek;
 			// return $dayOfWeek;
