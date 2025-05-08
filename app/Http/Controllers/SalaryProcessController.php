@@ -157,16 +157,15 @@ class SalaryProcessController extends Controller
         // Holidays
         $holidays = DB::table('holidays')
         ->whereBetween('date', [$formDate, $toDate])
-        // ->where('user_id', $employeeId)
-        ->distinct('date') 
-        ->count('date');
+        ->count(DB::raw('DISTINCT date'));
+
+
 
         //Spacial Holidays
-        $spacial_holidays = DB::table('spacial_holidays')
-        ->whereBetween('date', [$formDate, $toDate])
+        $spacial_holidays =  DB::table('spacial_holidays')
         ->where('user_id', $employeeId)
-        ->distinct('date') 
-        ->count('date');
+        ->whereBetween('date', [$formDate, $toDate])
+        ->count(DB::raw('DISTINCT date'));
 
         // Leave
         // $leave = DB::table('leaves')
@@ -190,19 +189,55 @@ class SalaryProcessController extends Controller
         WHERE to_date BETWEEN ? AND ? 
         AND user_id = ? 
         AND leave_type_id != 9 
-        AND status = 'approved'
-    ";
+        AND status = 'approved'";
     
-    $leave = collect(DB::select($leaveQuery, [$formDate, $toDate, $employeeId, $formDate, $toDate, $employeeId]))->count();
-
-        // LWP
-        $lwp = DB::table('leaves')
-        ->whereBetween('from_date', [$formDate, $toDate])
+    // $leave = collect(DB::select($leaveQuery, [$formDate, $toDate, $employeeId, $formDate, $toDate, $employeeId]))->count();
+        $leave = DB::table('leaves')
         ->where('user_id', $employeeId)
-        ->where('leave_type_id', '==', 9)
+        ->whereBetween('from_date', [$formDate, $toDate])
         ->where('status', 'approved')
-        ->distinct('from_date') 
+        ->where('leave_type_id', '!=', 9)
+        ->distinct()
         ->count('from_date');
+        // LWP
+        // $lwp = DB::table('leaves')
+        // ->whereBetween('from_date', [$formDate, $toDate])
+        // ->where('user_id', $employeeId)
+        // ->where('leave_type_id', '==', 9)
+        // ->where('status', 'lwp')
+        // ->distinct('from_date') 
+        // ->count('from_date');
+
+        $lwpQuery = "
+    SELECT COUNT(DISTINCT leave_dates.leave_date) AS total_lwp
+    FROM (
+        SELECT DATE_ADD(l.from_date, INTERVAL seq DAY) AS leave_date
+        FROM (
+            SELECT a.N + b.N * 10 AS seq
+            FROM 
+                (SELECT 0 AS N UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 
+                 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) a,
+                (SELECT 0 AS N UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 
+                 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) b
+        ) AS seq_gen
+        JOIN leaves l ON seq_gen.seq <= DATEDIFF(l.to_date, l.from_date)
+        WHERE l.from_date BETWEEN ? AND ?
+          AND l.user_id = ?
+          AND l.leave_type_id = 9
+          AND l.status = 'lwp'
+    ) AS leave_dates
+    LEFT JOIN holidays h ON leave_dates.leave_date = h.date
+    LEFT JOIN whd w ON leave_dates.leave_date = w.date AND w.user_id = ?
+    WHERE leave_dates.leave_date BETWEEN ? AND ?
+      AND h.date IS NULL
+      AND w.date IS NULL
+";
+
+$lwpResult = DB::selectOne($lwpQuery, [
+    $formDate, $toDate, $employeeId, $employeeId, $formDate, $toDate
+]);
+
+$lwp = $lwpResult->total_lwp ?? 0;
 
         
 
@@ -215,7 +250,8 @@ class SalaryProcessController extends Controller
         $fridays = WHD::where('user_id', $employeeId)->whereBetween('date', [$formDate, $toDate])->pluck('date')->toArray();
         // Total Fridays
         $totalFridays = count($fridays);
-        // Sarary Slab
+
+       // Sarary Slab
         $salaryslab = DB::table('salary_slab')
         ->where('user_id', $employeeId)
         ->where('effactive_date', '<', $toDate)
@@ -265,11 +301,12 @@ class SalaryProcessController extends Controller
         // $totalWorkedDays = $getTotalPresent + $holidays + $leave + $totalFridays + $spacial_holidays;
         // $totalWorkedDays = $getTotalPresent + $holidays + $leave + $totalFridays + $spacial_holidays;
         $actual_present = $getTotalPresent
-                - count($fridays)
+                - $totalFridays
                 - $lwp
                 - $leave
                 - $spacial_holidays
                 - $holidays;
+
 
         $totalWorkedDays = $actual_present;
         $totalAbsents = $TotalDays-$totalWorkedDays-$totalFridays-$spacial_holidays-$holidays-$leave;
