@@ -463,18 +463,18 @@ DB::table('employee_salary_details')->insert($TableData);
 
         // Leave
         $leave = DB::table('leaves')
-            ->where('user_id', $employeeId)
-            ->where('status', 'approved')
-            ->where(function ($query) use ($formDate, $toDate) {
-                $query->whereBetween('from_date', [$formDate, $toDate])
-                      ->orWhereBetween('to_date', [$formDate, $toDate])
-                      ->orWhere(function ($query1) use ($formDate, $toDate) {
-                          $query1->where('from_date', '<', $formDate)
-                                 ->where('to_date', '>', $toDate);
-                      });
-            })
-            ->distinct('from_date')
-            ->count('from_date');
+        ->where('user_id', 55)
+        ->where('status', 'approved')
+        ->where(function ($query) {
+            $query->whereBetween('from_date', ['2025-04-01', '2025-04-30'])
+                  ->orWhereBetween('to_date', ['2025-04-01', '2025-04-30'])
+                  ->orWhere(function ($query1) {
+                      $query1->where('from_date', '<', '2025-04-01')
+                             ->where('to_date', '>', '2025-04-30');
+                  });
+        })
+        ->selectRaw('COUNT(DISTINCT from_date) as total')
+        ->value('total');
 
         // LWP
         $lwp = DB::table('leaves')
