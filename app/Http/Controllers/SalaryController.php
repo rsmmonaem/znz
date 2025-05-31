@@ -345,18 +345,20 @@ Class SalaryController extends Controller{
     // }
 
     public function Salary_BankPart() {
-        $group = DB::table('com_group')->get();
-        $branch = Branch::all();
-        $department = Department::all();
-        $section = Section::all();
-        $employee = User::LeftJoin('profile', 'users.id', '=', 'profile.user_id')
-        ->select(
-            'users.id', 
-            'profile.employee_code', 
-            'users.first_name'
-        )
-        ->get();
-        return view('salary.salary', compact('group', 'branch', 'department', 'section', 'employee'));
+        $leave = DB::table('leaves')
+        ->where('user_id', 55)
+        ->where('status', 'approved')
+        ->where(function ($query) {
+            $query->whereBetween('from_date', ['2025-04-01', '2025-04-30'])
+                  ->orWhereBetween('to_date', ['2025-04-01', '2025-04-30'])
+                  ->orWhere(function ($query1) {
+                      $query1->where('from_date', '<', '2025-04-01')
+                             ->where('to_date', '>', '2025-04-30');
+                  });
+        })
+        ->selectRaw('COUNT(DISTINCT from_date) as total')
+        ->value('total');
+        return $leave;
     }
 
     public function  Salary_BankPartPost(Request $request) {
