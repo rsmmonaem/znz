@@ -462,12 +462,22 @@ DB::table('employee_salary_details')->insert($TableData);
         ->count('date');
 
         // Leave
-        $leave = DB::table('leaves')
-        ->select(DB::raw('COUNT(DISTINCT from_date) as leave_count'))
-        ->whereBetween('from_date', [$formDate, $toDate])
-        ->where('user_id', $employeeId)
-        ->where('status', 'approved')
-        ->value('leave_count');
+        // $leave = DB::table('leaves')
+        // ->select(DB::raw('COUNT(DISTINCT from_date) as leave_count'))
+        // ->whereBetween('from_date', [$formDate, $toDate])
+        // ->where('user_id', $employeeId)
+        // ->where('status', 'approved')
+        // ->value('leave_count');
+
+        $leavesql = DB::select("
+    SELECT COUNT(DISTINCT from_date) AS leave_count
+    FROM leaves
+    WHERE from_date BETWEEN ? AND ?
+      AND user_id = ?
+      AND status = 'approved'
+", [$formDate, $toDate, $employeeId]);
+
+$leave = $leavesql[0]->leave_count;
 
         // LWP
         $lwp = DB::table('leaves')
