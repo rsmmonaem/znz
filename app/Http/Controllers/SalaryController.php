@@ -345,19 +345,15 @@ Class SalaryController extends Controller{
     // }
 
     public function Salary_BankPart() {
+        $employeeId = 55;
+        $formDate = "2025-04-26";
+        $toDate = "2025-05-25";
         $leave = DB::table('leaves')
-        ->where('user_id', 55)
-        ->where('status', 'approved')
-        ->where(function ($query) {
-            $query->whereBetween('from_date', ['2025-04-01', '2025-04-30'])
-                  ->orWhereBetween('to_date', ['2025-04-01', '2025-04-30'])
-                  ->orWhere(function ($query1) {
-                      $query1->where('from_date', '<', '2025-04-01')
-                             ->where('to_date', '>', '2025-04-30');
-                  });
-        })
-        ->selectRaw('COUNT(DISTINCT from_date) as total')
-        ->value('total');
+        ->whereBetween('from_date', [$formDate, $toDate])
+            ->where('user_id', $employeeId)
+            ->where('status', 'approved')
+            ->distinct('from_date')
+            ->count('from_date');
         return $leave;
     }
 

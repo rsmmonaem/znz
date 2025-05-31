@@ -400,7 +400,7 @@ $TableData = [
     'employee_id' => $employeeId,
     'tax_amount' => $amount,
     'arrear_amount' => '',
-    'remarks' => $remarks.'-'.$leave,
+    'remarks' => $remarks.'-'.$totalWorkedDays.'-'.$totalFridays.'-'.$spacial_holidays.'-'.$holidays.'-'.$leave,
     'form_date' => $formDate,
     'to_date' => $toDate,
     'bankamount' => $RsmBankAmount, // Fixed logic
@@ -463,18 +463,11 @@ DB::table('employee_salary_details')->insert($TableData);
 
         // Leave
         $leave = DB::table('leaves')
-        ->where('user_id', 55)
-        ->where('status', 'approved')
-        ->where(function ($query) {
-            $query->whereBetween('from_date', ['2025-04-01', '2025-04-30'])
-                  ->orWhereBetween('to_date', ['2025-04-01', '2025-04-30'])
-                  ->orWhere(function ($query1) {
-                      $query1->where('from_date', '<', '2025-04-01')
-                             ->where('to_date', '>', '2025-04-30');
-                  });
-        })
-        ->selectRaw('COUNT(DISTINCT from_date) as total')
-        ->value('total');
+        ->whereBetween('from_date', [$formDate, $toDate])
+            ->where('user_id', $employeeId)
+            ->where('status', 'approved')
+            ->distinct('from_date')
+            ->count('from_date');
 
         // LWP
         $lwp = DB::table('leaves')
