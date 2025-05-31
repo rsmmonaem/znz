@@ -470,14 +470,14 @@ DB::table('employee_salary_details')->insert($TableData);
         // ->value('leave_count');
 
         $leavesql = DB::select("
-    SELECT COUNT(DISTINCT from_date) AS leave_count
-    FROM leaves
-    WHERE from_date BETWEEN ? AND ?
-      AND user_id = ?
-      AND status = 'approved'
-", [$formDate, $toDate, $employeeId]);
-
-$leave = $leavesql[0]->leave_count;
+        SELECT COUNT(DISTINCT from_date) AS leave_count 
+        FROM leaves 
+        WHERE from_date BETWEEN ? AND ? 
+          AND user_id = ? 
+          AND status = 'approved'
+    ", ['2025-04-01', '2025-04-30', 55]);
+    
+    $leave = $leavesql[0]->leave_count;
 
         // LWP
         $lwp = DB::table('leaves')
