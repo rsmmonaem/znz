@@ -201,39 +201,50 @@ class SalaryProcessController extends Controller
         ->count('from_date');
 
         $host = 'localhost';
-$db   = 'betikrom_znz';
-$user = 'betikrom_znz';
-$pass = 'betikrom_znz';
-$charset = 'utf8';
+        $db   = 'betikrom_znz';
+        $user = 'betikrom_znz';
+        $pass = 'betikrom_znz';
+        
+        
+        // Declare leaveCount outside to make it accessible later
+        $leaveCount = 0;
+        
+        // Create MySQLi connection
+        $conn = new mysqli($host, $user, $pass, $db);
+        
+        // Check connection
+        if ($conn->connect_error) {
+            die("Connection failed: " . $conn->connect_error);
+        }
+        
+        // Escape variables
+        $employeeId = (int)$employeeId;
+        $formDate = $conn->real_escape_string($formDate);
+        $toDate = $conn->real_escape_string($toDate);
+        
+        // Prepare the query
+        $sql = "
+            SELECT COUNT(DISTINCT from_date) AS leave_count
+            FROM leaves
+            WHERE from_date BETWEEN '$formDate' AND '$toDate'
+              AND user_id = $employeeId
+              AND status = 'approved'
+        ";
+        
+        // Execute the query
+        $result = $conn->query($sql);
+        
+        if ($result) {
+            $row = $result->fetch_assoc();
+            $leaveCount = $row['leave_count'];
+        } else {
+            echo "Query error: " . $conn->error;
+        }
+        
+        // Close the connection
+        $conn->close();
 
-$dsn = "mysql:host=$host;dbname=$db;charset=$charset";
-$options = array(
-    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
-);
 
-$pdo = new PDO($dsn, $user, $pass, $options);
-
-    // Prepare SQL
-    $sql = "
-        SELECT COUNT(DISTINCT from_date) AS leave_count
-        FROM leaves
-        WHERE from_date BETWEEN :fromDate AND :toDate
-          AND user_id = :userId
-          AND status = 'approved'
-    ";
-
-    $stmt = $pdo->prepare($sql);
-
-    // Execute with parameters
-    $stmt->execute(array(
-        ':fromDate' => $formDate,
-        ':toDate' => $toDate,
-        ':userId' => $employeeId
-    ));
-
-    $row = $stmt->fetch();
-    $leaveCount = $row['leave_count'];
         // LWP
         // $lwp = DB::table('leaves')
         // ->whereBetween('from_date', [$formDate, $toDate])
