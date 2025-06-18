@@ -210,7 +210,7 @@ class SalaryProcessController extends Controller
         $leaveCount = 0;
         
         // Create MySQLi connection
-        $conn = new mysqli($host, $user, $pass, $db);
+        $conn = new \mysqli($host, $user, $pass, $db);
         
         // Check connection
         if ($conn->connect_error) {
