@@ -446,7 +446,18 @@ $TableData = [
     'employee_id' => $employeeId,
     'tax_amount' => $amount,
     'arrear_amount' => '',
-    'remarks' => $remarks.'-'.$totalWorkedDays.'-'.$totalFridays.'-'.$spacial_holidays.'-'.$holidays.'-'.$leaveCount,
+'remarks' => $remarks
+    . '-WorkDays' . $totalWorkedDays
+    . '-Fridays' . $totalFridays
+    . '-SpacialHD' . $spacial_holidays
+    . '-HD' . $holidays
+    . '-LeaveCount' . $leaveCount
+    . '-Present' . $getTotalPresent
+    . '-FridaysAgain' . $totalFridays
+    . '-LWP' . $lwp
+    . '-Leave' . $leave
+    . '-SpacialHD2' . $spacial_holidays
+    . '-HD2' . $holidays,
     'form_date' => $formDate,
     'to_date' => $toDate,
     'bankamount' => $RsmBankAmount, // Fixed logic
