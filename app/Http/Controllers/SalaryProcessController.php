@@ -243,7 +243,7 @@ class SalaryProcessController extends Controller
         
         // Close the connection
         $conn->close();
-
+        $leaveCount = $leave;
 
         // LWP
         // $lwp = DB::table('leaves')
@@ -508,12 +508,12 @@ DB::table('employee_salary_details')->insert($TableData);
         ->count('date');
 
         // Leave
-        $leave = DB::table('leaves')
-        ->whereBetween('from_date', [$formDate, $toDate])
-            ->where('user_id', $employeeId)
-            ->where('status', 'approved')
-            ->distinct('from_date')
-            ->count('from_date');
+        // $leave = DB::table('leaves')
+        // ->whereBetween('from_date', [$formDate, $toDate])
+        //     ->where('user_id', $employeeId)
+        //     ->where('status', 'approved')
+        //     ->distinct('from_date')
+        //     ->count('from_date');
 
 
 
