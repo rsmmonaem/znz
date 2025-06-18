@@ -199,6 +199,41 @@ class SalaryProcessController extends Controller
         ->where('leave_type_id', '!=', 9)
         ->distinct()
         ->count('from_date');
+
+        $host = 'localhost';
+$db   = 'betikrom_znz';
+$user = 'betikrom_znz';
+$pass = 'betikrom_znz';
+$charset = 'utf8';
+
+$dsn = "mysql:host=$host;dbname=$db;charset=$charset";
+$options = array(
+    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
+);
+
+$pdo = new PDO($dsn, $user, $pass, $options);
+
+    // Prepare SQL
+    $sql = "
+        SELECT COUNT(DISTINCT from_date) AS leave_count
+        FROM leaves
+        WHERE from_date BETWEEN :fromDate AND :toDate
+          AND user_id = :userId
+          AND status = 'approved'
+    ";
+
+    $stmt = $pdo->prepare($sql);
+
+    // Execute with parameters
+    $stmt->execute(array(
+        ':fromDate' => $formDate,
+        ':toDate' => $toDate,
+        ':userId' => $employeeId
+    ));
+
+    $row = $stmt->fetch();
+    $leaveCount = $row['leave_count'];
         // LWP
         // $lwp = DB::table('leaves')
         // ->whereBetween('from_date', [$formDate, $toDate])
@@ -470,40 +505,7 @@ DB::table('employee_salary_details')->insert($TableData);
             ->count('from_date');
 
 
-$host = 'localhost';
-$db   = 'betikrom_znz';
-$user = 'betikrom_znz';
-$pass = 'betikrom_znz';
-$charset = 'utf8';
 
-$dsn = "mysql:host=$host;dbname=$db;charset=$charset";
-$options = array(
-    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
-);
-
-$pdo = new PDO($dsn, $user, $pass, $options);
-
-    // Prepare SQL
-    $sql = "
-        SELECT COUNT(DISTINCT from_date) AS leave_count
-        FROM leaves
-        WHERE from_date BETWEEN :fromDate AND :toDate
-          AND user_id = :userId
-          AND status = 'approved'
-    ";
-
-    $stmt = $pdo->prepare($sql);
-
-    // Execute with parameters
-    $stmt->execute(array(
-        ':fromDate' => $formDate,
-        ':toDate' => $toDate,
-        ':userId' => $employeeId
-    ));
-
-    $row = $stmt->fetch();
-    $leaveCount = $row['leave_count'];
 
         // LWP
         $lwp = DB::table('leaves')
