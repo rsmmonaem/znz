@@ -313,7 +313,7 @@
                                 <td>${attendance.shift_name || ''}</td>
                                 <td>${attendance.in_time || ''}</td>
                                 <td>${attendance.out_time || ''}</td>
-                                <td>${attendance.status || ''} </td>
+                                <td>${attendance.status==Leave ? 'LWP' || attendance.status || ''} </td>
                                 <td>${attendance.lateTime || ''}</td>
                                 <td>${attendance.status != 'P' ? attendance.overTime : ''}</td>
                                 <td>${attendance.status == 'P' ? attendance.overTime : ''}</td>
