@@ -194,7 +194,7 @@ $toDates = DB::table('leaves')
     ->whereBetween('to_date', [$formDate, $toDate])
     ->pluck(DB::raw('DISTINCT DATE(to_date) as date'));
 
-$leaveDates = array_unique(array_merge($fromDates->toArray(), $toDates->toArray()));
+$leaveDates = array_unique(array_merge($fromDates, $toDates));
 
 
 
