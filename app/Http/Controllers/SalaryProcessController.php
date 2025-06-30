@@ -165,7 +165,9 @@ class SalaryProcessController extends Controller
         WHERE date BETWEEN ? AND ?
     ", [$formDate, $toDate]);
     
-    $holidayDates = array_map(fn($row) => $row->date, $holidayDates);
+    $holidayDates = array_map(function($row) {
+        return $row->date;
+    }, $holidayDates);
 
     $spacialHolidayDates = DB::select("
     SELECT date 
@@ -174,7 +176,9 @@ class SalaryProcessController extends Controller
       AND date BETWEEN ? AND ?
 ", [$employeeId, $formDate, $toDate]);
 
-$spacialHolidayDates = array_map(fn($row) => $row->date, $spacialHolidayDates);
+$spacialHolidayDates = array_map(function($row) {
+    return $row->date;
+}, $spacialHolidayDates);
 
 $leaveDateSQL = "
     SELECT DISTINCT from_date AS date 
@@ -199,7 +203,9 @@ $leaveDates = DB::select($leaveDateSQL, [
     $employeeId, $formDate, $toDate
 ]);
 
-$leaveDates = array_map(fn($row) => $row->date, $leaveDates);
+$leaveDates = array_map(function($row) {
+    return $row->date;
+}, $leaveDates);
 
 
         //Spacial Holidays
