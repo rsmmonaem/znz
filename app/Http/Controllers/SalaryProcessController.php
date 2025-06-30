@@ -375,7 +375,7 @@ $lwp = isset($lwpResult->total_lwp) ? $lwpResult->total_lwp : 0;
        //$totalPresentDays = $getTotalPresent + $holidays + $leave + $totalFridays + $spacial_holidays;
         $perdaysAmount =  $salaryslab ? $salaryslab->gross / $TotalDays : 0;
         // $GrossAmountSalaryPerDays = $perdaysAmount * $totalWorkedDays;
-        $GrossAmountSalaryPerDays = $perdaysAmount * ($TotalDays-$totalAbsents);
+        $GrossAmountSalaryPerDays = $perdaysAmount * ($TotalDays-$leave-$totalAbsents);
 
         $TotalDiductionAmount = $perdaysAmount * $totalAbsents;
 
