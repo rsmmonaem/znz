@@ -462,7 +462,7 @@ $TableData = [
     'employee_id' => $employeeId,
     'tax_amount' => $amount,
     'arrear_amount' => '',
-    'remarks' => $remarks.'WorkDays'.$totalWorkedDays.'-Fridays'.$totalFridays.'-SpacialHD'.$spacial_holidays.'-HD'.$holidays.'-'.$leaveCount.'-Present'.$getTotalPresent,
+    'remarks' => $remarks,
 
     'form_date' => $formDate,
     'to_date' => $toDate,

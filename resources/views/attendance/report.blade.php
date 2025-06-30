@@ -345,7 +345,7 @@
         Total Late = ${response.filtered_totals.find(status => status.status === "L")?.count || 0}
     </td>
     <td colspan="2" style="text-align:center;">
-        Total LWP = ${response.filtered_totals.find(status => status.status === "LWP")?.count || 0}
+        Total LWP = ${response.filtered_totals.find(status => status.status === "Leave")?.count || 0}
     </td>
     <td colspan="2" style="text-align:center;">
         Total HLD = ${response.filtered_totals.find(status => status.status === "HLD")?.count || 0}
