@@ -319,6 +319,22 @@ $leave=$leaveCount; // Assign the leave count to the variable
 $lwpResult = DB::selectOne($lwpQuery, [
     $formDate, $toDate, $employeeId, $employeeId, $formDate, $toDate
 ]);
+$lwpDateQuery = "
+    SELECT DISTINCT DATE_ADD(l.from_date, INTERVAL seq DAY) AS leave_date
+    FROM (
+        SELECT a.N + b.N * 10 AS seq
+        FROM 
+            (SELECT 0 AS N UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 
+             UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) a,
+            (SELECT 0 AS N UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 
+             UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) b
+    ) AS seq_gen
+    JOIN leaves l ON seq_gen.seq <= DATEDIFF(l.to_date, l.from_date)
+    WHERE l.user_id = ? 
+      AND l.leave_type_id = 9 
+      AND l.status = 'lwp' 
+      AND l.from_date BETWEEN ? AND ?
+";
 
 $lwpDatesResult = DB::select($lwpDateQuery, [$employeeId, $formDate, $toDate]);
 
