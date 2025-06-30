@@ -146,30 +146,37 @@ class SalaryProcessController extends Controller
         ->first();
         // return $User->employee_code;
         // Total Present
-        $getTotalPresent = DB::table('clocks')
-        ->whereBetween('date', [$formDate, $toDate])
-        ->where('user_id', $employeeId)
-        ->distinct('date') 
-        ->count('date');
+        $excludeDates = [];
+
+        // $getTotalPresent = DB::table('clocks')
+        // ->whereBetween('date', [$formDate, $toDate])
+        // ->where('user_id', $employeeId)
+        // ->distinct('date') 
+        // ->count('date');
 
         // Holidays
         $holidays = DB::table('holidays')
         ->whereBetween('date', [$formDate, $toDate])
         ->count(DB::raw('DISTINCT date'));
 
+        $holidayDates = DB::table('holidays')
+    ->whereBetween('date', [$formDate, $toDate])
+    ->pluck('date')
+    ->toArray();
 
-        // $totalAbsents = DB::table('clocks')
-        // ->whereBetween('date', [$formDate, $toDate])
-        // ->where('user_id', $employeeId)
-        // ->whereNull('clock_in')
-        // ->whereNull('clock_out')
-        // ->distinct('date')
-        // ->count('date');
+    $spacialHolidayDates = DB::table('spacial_holidays')
+    ->where('user_id', $employeeId)
+    ->whereBetween('date', [$formDate, $toDate])
+    ->pluck('date')
+    ->toArray();
 
-
-
-
-
+    $leaveDates = DB::table('leaves')
+    ->where('user_id', $employeeId)
+    ->where('status', 'approved')
+    ->where('leave_type_id', '!=', 9)
+    ->whereBetween('from_date', [$formDate, $toDate])
+    ->pluck('from_date')
+    ->toArray();
 
 
         //Spacial Holidays
@@ -201,8 +208,6 @@ class SalaryProcessController extends Controller
         AND user_id = ? 
         AND leave_type_id != 9 
         AND status = 'approved'";
-    
-    // $leave = collect(DB::select($leaveQuery, [$formDate, $toDate, $employeeId, $formDate, $toDate, $employeeId]))->count();
         $leave = DB::table('leaves')
         ->where('user_id', $employeeId)
         ->whereBetween('from_date', [$formDate, $toDate])
@@ -256,14 +261,6 @@ class SalaryProcessController extends Controller
         $conn->close();
 $leave=$leaveCount; // Assign the leave count to the variable
 
-        // LWP
-        // $lwp = DB::table('leaves')
-        // ->whereBetween('from_date', [$formDate, $toDate])
-        // ->where('user_id', $employeeId)
-        // ->where('leave_type_id', '==', 9)
-        // ->where('status', 'lwp')
-        // ->distinct('from_date') 
-        // ->count('from_date');
 
         $lwpQuery = "
     SELECT COUNT(DISTINCT leave_dates.leave_date) AS total_lwp
@@ -294,9 +291,39 @@ $lwpResult = DB::selectOne($lwpQuery, [
     $formDate, $toDate, $employeeId, $employeeId, $formDate, $toDate
 ]);
 
+$lwpDatesResult = DB::select($lwpDateQuery, [$employeeId, $formDate, $toDate]);
+
+$lwpDates = array_map(function ($row) {
+    return $row->leave_date;
+}, $lwpDatesResult);
+
 $lwp = isset($lwpResult->total_lwp) ? $lwpResult->total_lwp : 0;
 
-        
+$getTotalPresent = DB::table('clocks')
+->whereBetween('date', [$formDate, $toDate])
+->where('user_id', $employeeId)
+->distinct('date') 
+->count('date');
+$lwp,$spacial_holidays, $holidays, $leave
+
+
+// Merge all exclusion dates
+$excludeDates = array_unique(array_merge(
+    $leaveDates,
+    $spacialHolidayDates,
+    $holidayDates,
+    $lwpDates
+));
+
+// Step 2: Final Query to Count Total Present Days excluding these dates
+$getTotalPresent = DB::table('clocks')
+    ->whereBetween('date', [$formDate, $toDate])
+    ->where('user_id', $employeeId)
+    ->whereNotIn('date', $excludeDates)
+    ->distinct('date')
+    ->count('date');
+
+
 
         // Total Days Of Month
         $startDate = Carbon::parse($formDate);
@@ -726,7 +753,7 @@ DB::table('employee_salary_details')->insert($TableData);
         $ActualCashAmount = $FinalBankAmount > 0 ? $FinalcashAmount / 100 * $netSalary - $amount : ($FinalcashAmount / 100 * $netSalary - $amount);
 
         $TableData = [
-            'total_worked_days' => $TotalDays-$leave-$totalAbsents,
+            'total_worked_days' => $getTotalPresent,
             'total_absents' => $totalAbsents,
             'total_absents_fee' => $TotalDiductionAmount,
             'total_fridays' => $totalFridays,
