@@ -180,32 +180,22 @@ $spacialHolidayDates = array_map(function($row) {
     return $row->date;
 }, $spacialHolidayDates);
 
-$leaveDateSQL = "
-    SELECT DISTINCT from_date AS date 
-    FROM leaves 
-    WHERE user_id = ? 
-      AND status = 'approved' 
-      AND leave_type_id != 9 
-      AND from_date BETWEEN ? AND ?
-    
-    UNION
+$fromDates = DB::table('leaves')
+    ->where('user_id', $employeeId)
+    ->where('status', 'approved')
+    ->where('leave_type_id', '!=', 9)
+    ->whereBetween('from_date', [$formDate, $toDate])
+    ->pluck(DB::raw('DISTINCT DATE(from_date) as date'));
 
-    SELECT DISTINCT to_date AS date 
-    FROM leaves 
-    WHERE user_id = ? 
-      AND status = 'approved' 
-      AND leave_type_id != 9 
-      AND to_date BETWEEN ? AND ?
-";
+$toDates = DB::table('leaves')
+    ->where('user_id', $employeeId)
+    ->where('status', 'approved')
+    ->where('leave_type_id', '!=', 9)
+    ->whereBetween('to_date', [$formDate, $toDate])
+    ->pluck(DB::raw('DISTINCT DATE(to_date) as date'));
 
-$leaveDates = DB::select($leaveDateSQL, [
-    $employeeId, $formDate, $toDate,
-    $employeeId, $formDate, $toDate
-]);
+$leaveDates = array_unique(array_merge($fromDates->toArray(), $toDates->toArray()));
 
-$leaveDates = array_map(function($row) {
-    return $row->date;
-}, $leaveDates);
 
 
         //Spacial Holidays
