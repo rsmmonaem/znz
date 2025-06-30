@@ -159,24 +159,47 @@ class SalaryProcessController extends Controller
         ->whereBetween('date', [$formDate, $toDate])
         ->count(DB::raw('DISTINCT date'));
 
-        $holidayDates = DB::table('holidays')
-    ->whereBetween('date', [$formDate, $toDate])
-    ->pluck('date')
-    ->toArray();
+        $holidayDates = DB::select("
+        SELECT date 
+        FROM holidays 
+        WHERE date BETWEEN ? AND ?
+    ", [$formDate, $toDate]);
+    
+    $holidayDates = array_map(fn($row) => $row->date, $holidayDates);
 
-    $spacialHolidayDates = DB::table('spacial_holidays')
-    ->where('user_id', $employeeId)
-    ->whereBetween('date', [$formDate, $toDate])
-    ->pluck('date')
-    ->toArray();
+    $spacialHolidayDates = DB::select("
+    SELECT date 
+    FROM spacial_holidays 
+    WHERE user_id = ? 
+      AND date BETWEEN ? AND ?
+", [$employeeId, $formDate, $toDate]);
 
-    $leaveDates = DB::table('leaves')
-    ->where('user_id', $employeeId)
-    ->where('status', 'approved')
-    ->where('leave_type_id', '!=', 9)
-    ->whereBetween('from_date', [$formDate, $toDate])
-    ->pluck('from_date')
-    ->toArray();
+$spacialHolidayDates = array_map(fn($row) => $row->date, $spacialHolidayDates);
+
+$leaveDateSQL = "
+    SELECT DISTINCT from_date AS date 
+    FROM leaves 
+    WHERE user_id = ? 
+      AND status = 'approved' 
+      AND leave_type_id != 9 
+      AND from_date BETWEEN ? AND ?
+    
+    UNION
+
+    SELECT DISTINCT to_date AS date 
+    FROM leaves 
+    WHERE user_id = ? 
+      AND status = 'approved' 
+      AND leave_type_id != 9 
+      AND to_date BETWEEN ? AND ?
+";
+
+$leaveDates = DB::select($leaveDateSQL, [
+    $employeeId, $formDate, $toDate,
+    $employeeId, $formDate, $toDate
+]);
+
+$leaveDates = array_map(fn($row) => $row->date, $leaveDates);
 
 
         //Spacial Holidays
@@ -302,12 +325,11 @@ $lwp = isset($lwpResult->total_lwp) ? $lwpResult->total_lwp : 0;
 
 // Merge all exclusion dates
 $excludeDates = array_unique(array_merge(
-    $leaveDates,
-    $spacialHolidayDates,
     $holidayDates,
+    $spacialHolidayDates,
+    $leaveDates,
     $lwpDates
 ));
-
 // Step 2: Final Query to Count Total Present Days excluding these dates
 $getTotalPresent = DB::table('clocks')
     ->whereBetween('date', [$formDate, $toDate])
