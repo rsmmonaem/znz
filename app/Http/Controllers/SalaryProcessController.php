@@ -451,7 +451,7 @@ $CashAmountValue = ($FinalCashPercentage / 100) * $BankApply;  // Cash portion b
 // $CashAmountValue = max(0, $netSalaryWIthoutTax - $amount-$advanceAmount-$BankAmountValue); // Remaining salary goes to cash
 
 $TableData = [
-    'total_worked_days' => $actual_present,
+    'total_worked_days' => $TotalDays-$leave-$totalAbsents,
     'total_absents' => $totalAbsents,
     'total_absents_fee' => $TotalDiductionAmount,
     'total_fridays' => $totalFridays,
