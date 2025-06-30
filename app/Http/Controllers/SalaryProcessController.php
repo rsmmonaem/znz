@@ -299,13 +299,6 @@ $lwpDates = array_map(function ($row) {
 
 $lwp = isset($lwpResult->total_lwp) ? $lwpResult->total_lwp : 0;
 
-$getTotalPresent = DB::table('clocks')
-->whereBetween('date', [$formDate, $toDate])
-->where('user_id', $employeeId)
-->distinct('date') 
-->count('date');
-$lwp,$spacial_holidays, $holidays, $leave
-
 
 // Merge all exclusion dates
 $excludeDates = array_unique(array_merge(
