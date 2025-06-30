@@ -801,7 +801,7 @@ DB::table('employee_salary_details')->insert($TableData);
             'employee_id' => $employeeId,
             'arrear_amount' => '',
             'tax_amount' => $amount,
-            'remarks' => $remarks,
+            'remarks' => $remarks.$excludeDates,
             'form_date' => $formDate,
             'to_date' => $toDate,
             'ot_hrs' => $totalOvertimeHrs,
