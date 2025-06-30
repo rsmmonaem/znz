@@ -152,12 +152,23 @@ class SalaryProcessController extends Controller
         ->distinct('date') 
         ->count('date');
 
-
-
         // Holidays
         $holidays = DB::table('holidays')
         ->whereBetween('date', [$formDate, $toDate])
         ->count(DB::raw('DISTINCT date'));
+
+
+        // $totalAbsents = DB::table('clocks')
+        // ->whereBetween('date', [$formDate, $toDate])
+        // ->where('user_id', $employeeId)
+        // ->whereNull('clock_in')
+        // ->whereNull('clock_out')
+        // ->distinct('date')
+        // ->count('date');
+
+
+
+
 
 
 
@@ -346,13 +357,18 @@ $lwp = isset($lwpResult->total_lwp) ? $lwpResult->total_lwp : 0;
 
         // $totalWorkedDays = $getTotalPresent + $holidays + $leave + $totalFridays + $spacial_holidays;
         // $totalWorkedDays = $getTotalPresent + $holidays + $leave + $totalFridays + $spacial_holidays;
-        $actual_present = $getTotalPresent
+        // $actual_present = $getTotalPresent
+        //         - $totalFridays
+        //         - $lwp
+        //         - $leave
+        //         - $spacial_holidays
+        //         - $holidays;
+        $actual_present = $TotalDays
                 - $totalFridays
                 - $lwp
                 - $leave
                 - $spacial_holidays
                 - $holidays;
-
 
         $totalWorkedDays = $actual_present;
         $totalAbsents = $TotalDays-$totalWorkedDays-$totalFridays-$spacial_holidays-$holidays-$leave;
@@ -446,18 +462,8 @@ $TableData = [
     'employee_id' => $employeeId,
     'tax_amount' => $amount,
     'arrear_amount' => '',
-'remarks' => $remarks
-    . '-WorkDays' . $totalWorkedDays
-    . '-Fridays' . $totalFridays
-    . '-SpacialHD' . $spacial_holidays
-    . '-HD' . $holidays
-    . '-LeaveCount' . $leaveCount
-    . '-Present' . $getTotalPresent
-    . '-FridaysAgain' . $totalFridays
-    . '-LWP' . $lwp
-    . '-Leave' . $leave
-    . '-SpacialHD2' . $spacial_holidays
-    . '-HD2' . $holidays,
+    'remarks' => $remarks.'WorkDays'.$totalWorkedDays.'-Fridays'.$totalFridays.'-SpacialHD'.$spacial_holidays.'-HD'.$holidays.'-'.$leaveCount.'-Present'.$getTotalPresent,
+
     'form_date' => $formDate,
     'to_date' => $toDate,
     'bankamount' => $RsmBankAmount, // Fixed logic
@@ -720,7 +726,7 @@ DB::table('employee_salary_details')->insert($TableData);
         $ActualCashAmount = $FinalBankAmount > 0 ? $FinalcashAmount / 100 * $netSalary - $amount : ($FinalcashAmount / 100 * $netSalary - $amount);
 
         $TableData = [
-            'total_worked_days' => $totalWorkedDays,
+            'total_worked_days' => $TotalDays-$leave-$totalAbsents,
             'total_absents' => $totalAbsents,
             'total_absents_fee' => $TotalDiductionAmount,
             'total_fridays' => $totalFridays,
