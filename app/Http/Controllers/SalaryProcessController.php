@@ -424,8 +424,8 @@ $getTotalPresent = DB::table('clocks')
                 - $spacial_holidays
                 - $holidays;
 
-        $totalWorkedDays = $actual_present;
-        $totalAbsents = $TotalDays-$totalWorkedDays-$totalFridays-$spacial_holidays-$holidays-$leave;
+        $totalWorkedDays = $getTotalPresent + $spacial_holidays + $leave + $holidays;
+        $totalAbsents = $TotalDays-$totalWorkedDays;
        //$totalPresentDays = $getTotalPresent + $holidays + $leave + $totalFridays + $spacial_holidays;
         $perdaysAmount =  $salaryslab ? $salaryslab->gross / $TotalDays : 0;
         // $GrossAmountSalaryPerDays = $perdaysAmount * $totalWorkedDays;
@@ -505,7 +505,8 @@ $CashAmountValue = ($FinalCashPercentage / 100) * $BankApply;  // Cash portion b
 // $CashAmountValue = max(0, $netSalaryWIthoutTax - $amount-$advanceAmount-$BankAmountValue); // Remaining salary goes to cash
 
 $TableData = [
-    'total_worked_days' => $TotalDays-$lwp-$totalAbsents,
+    'total_worked_days' => $totalWorkedDays,
+    // 'total_worked_days' => $TotalDays-$lwp-$totalAbsents,
     'total_absents' => $totalAbsents,
     'total_absents_fee' => $TotalDiductionAmount,
     'total_fridays' => $totalFridays,
@@ -780,8 +781,7 @@ DB::table('employee_salary_details')->insert($TableData);
         $ActualCashAmount = $FinalBankAmount > 0 ? $FinalcashAmount / 100 * $netSalary - $amount : ($FinalcashAmount / 100 * $netSalary - $amount);
 
         $TableData = [
-            'total_worked_days' => $totalWorkedDays,
-            // 'total_worked_days' => $getTotalPresent,
+            'total_worked_days' => $getTotalPresent,
             'total_absents' => $totalAbsents,
             'total_absents_fee' => $TotalDiductionAmount,
             'total_fridays' => $totalFridays,
