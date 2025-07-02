@@ -780,7 +780,8 @@ DB::table('employee_salary_details')->insert($TableData);
         $ActualCashAmount = $FinalBankAmount > 0 ? $FinalcashAmount / 100 * $netSalary - $amount : ($FinalcashAmount / 100 * $netSalary - $amount);
 
         $TableData = [
-            'total_worked_days' => $getTotalPresent,
+            'total_worked_days' => $totalWorkedDays,
+            // 'total_worked_days' => $getTotalPresent,
             'total_absents' => $totalAbsents,
             'total_absents_fee' => $TotalDiductionAmount,
             'total_fridays' => $totalFridays,
