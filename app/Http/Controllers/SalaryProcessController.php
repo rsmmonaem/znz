@@ -424,8 +424,8 @@ $getTotalPresent = DB::table('clocks')
                 - $spacial_holidays
                 - $holidays;
 
-        $totalWorkedDays = $getTotalPresent + $spacial_holidays + $leave + $holidays;
-        $totalAbsents = $TotalDays-$totalWorkedDays;
+        $totalWorkedDays = $getTotalPresent + $leave ;
+        $totalAbsents = $TotalDays - $totalWorkedDays;
        //$totalPresentDays = $getTotalPresent + $holidays + $leave + $totalFridays + $spacial_holidays;
         $perdaysAmount =  $salaryslab ? $salaryslab->gross / $TotalDays : 0;
         // $GrossAmountSalaryPerDays = $perdaysAmount * $totalWorkedDays;
