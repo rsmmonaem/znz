@@ -325,7 +325,7 @@ $lwpDateQuery = "
       AND l.status = 'lwp' 
       AND l.from_date BETWEEN ? AND ?
 ";
-
+$fridays = WHD::where('user_id', $employeeId)->whereBetween('date', [$formDate, $toDate])->pluck('date')->toArray();
 $lwpDatesResult = DB::select($lwpDateQuery, [$employeeId, $formDate, $toDate]);
 
 $lwpDates = array_map(function ($row) {
@@ -342,15 +342,25 @@ $excludeDates = array_unique(array_merge(
     $leaveDates,
     $lwpDates
 ));
-// Step 2: Final Query to Count Total Present Days excluding these dates
-$getTotalPresent = DB::table('clocks')
+
+    // Step 2: Final Query to Count Total Present Days excluding these dates
+    $getTotalPresentwithLWP = DB::table('clocks')
     ->whereBetween('date', [$formDate, $toDate])
     ->where('user_id', $employeeId)
     ->whereNotIn('date', $excludeDates)
     ->distinct('date')
     ->count('date');
+    
+    // Step 1: Remove common dates between $lwpDates and $fridays
+    $filteredLwpDates = array_diff($lwpDates, $fridays);
 
+    // Step 2: Count the remaining LWP dates after excluding Fridays
+    $totalFilteredLwp = count($filteredLwpDates);
 
+    $getTotalPresent = ($getTotalPresentwithLWP - $totalFilteredLwp) + count($fridays) + count($leaveDates);
+
+    // dd($getTotalPresent , $leaveDates);
+    // die();
 
         // Total Days Of Month
         $startDate = Carbon::parse($formDate);
@@ -434,12 +444,12 @@ $getTotalPresent = DB::table('clocks')
                 - $spacial_holidays
                 - $holidays;
 
-        $totalWorkedDays = $getTotalPresent + $leave ;
+        $totalWorkedDays = $getTotalPresent  ;
         $totalAbsents = $TotalDays - $totalWorkedDays;
        //$totalPresentDays = $getTotalPresent + $holidays + $leave + $totalFridays + $spacial_holidays;
         $perdaysAmount =  $salaryslab ? $salaryslab->gross / $TotalDays : 0;
         // $GrossAmountSalaryPerDays = $perdaysAmount * $totalWorkedDays;
-        $GrossAmountSalaryPerDays = $perdaysAmount * ($TotalDays-$lwp-$totalAbsents);
+        $GrossAmountSalaryPerDays = $perdaysAmount * $totalWorkedDays;
 
         $TotalDiductionAmount = $perdaysAmount * $totalAbsents;
 
