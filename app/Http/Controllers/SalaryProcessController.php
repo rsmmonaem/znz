@@ -339,8 +339,9 @@ $lwp = isset($lwpResult->total_lwp) ? $lwpResult->total_lwp : 0;
 $excludeDates = array_unique(array_merge(
     $holidayDates,
     $spacialHolidayDates,
-    $leaveDates,
-    $lwpDates
+    $leaveDates
+    // ,
+    // $lwpDates
 ));
 // Step 2: Final Query to Count Total Present Days excluding these dates
 $getTotalPresent = DB::table('clocks')
