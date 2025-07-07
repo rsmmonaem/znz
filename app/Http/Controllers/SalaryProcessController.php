@@ -516,9 +516,26 @@ class SalaryProcessController extends Controller
         $BankAmountValue = ($FinalBankPercentage / 100) * $BankApply;  // Bank portion before tax
         $CashAmountValue = ($FinalCashPercentage / 100) * $BankApply;  // Cash portion before 
 
+        $taxAdvance = $amount + $advanceAmount; 
+        $bankResult = $netSalaryWIthoutTax * ($FinalBankPercentage / 100);
+        $cashResult = $netSalaryWIthoutTax * ($FinalCashPercentage / 100);
+
+        // 70% bank
+        $bankTaxAdv = $taxAdvance * (70 / 100);
+
+        // 30% cash
+        $cashTaxAdv = $taxAdvance * (30 / 100);
+
+        $newBank = $bankResult - $bankTaxAdv; // Bank amount after tax and advance
+        $cashamount = $cashResult - $cashTaxAdv; // Cash amount after tax and advance
+
+
+
+        // $bankPercentage = ; 
+
         $NetPayable = $netSalaryWIthoutTax - $amount-$advanceAmount;
-        $newBank = ($NetPayable * 70) / 100;
-        $cashamount = $NetPayable - $newBank;
+        // $newBank = ($NetPayable * 70) / 100;
+        // $cashamount = $NetPayable - $newBank;
 
 
 
