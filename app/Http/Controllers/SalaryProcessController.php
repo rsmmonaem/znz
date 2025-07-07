@@ -132,7 +132,7 @@ class SalaryProcessController extends Controller
       }
     }
 
-// start from here MH
+    // start from here MH
     public function SalaryProcess($employeeId, $formDate, $toDate, $remarks, $branch_id = null)
     {
         // Get Employee
@@ -516,6 +516,10 @@ class SalaryProcessController extends Controller
         $BankAmountValue = ($FinalBankPercentage / 100) * $BankApply;  // Bank portion before tax
         $CashAmountValue = ($FinalCashPercentage / 100) * $BankApply;  // Cash portion before 
 
+        $NetPayable = $netSalaryWIthoutTax - $amount-$advanceAmount;
+        $newBank = ($NetPayable * 70) / 100;
+        $cashamount = $NetPayable - $newBank;
+
 
 
 
@@ -542,18 +546,18 @@ class SalaryProcessController extends Controller
 
             'form_date' => $formDate,
             'to_date' => $toDate,
-            'bankamount' => $RsmBankAmount, // Fixed logic
-            'cashamount' => $RsmCashAmount, // Fixed logic
+            'bankamount' => $newBank, // Fixed logic
+            'cashamount' => $cashamount, // Fixed logic
             'weekendays_amount' => $TotalFridaysAmount ? $TotalFridaysAmount : 0
         ];
 
         DB::table('employee_salary_payment_details')->insert([
             'PaidAmount' => 0,
             'UnpaidAmount' => 0,
-            'NetPayable' => $netSalaryWIthoutTax - $amount-$advanceAmount,
+            'NetPayable' => $NetPayable,
             'EmployeeID' => $employeeId,
-            'BankPay' => max(0, $RsmBankAmount), // Corrected bank amount
-            'CashPay' => max(0, $RsmCashAmount), // Corrected cash amount
+            'BankPay' => max(0, $newBank), // Corrected bank amount
+            'CashPay' => max(0, $cashamount), // Corrected cash amount
             'Gross' => $salaryslab ? $salaryslab->gross : 0,
             'TotalPayable' => max(0, $netSalaryWIthoutTax - $amount),
             'TotalDeduction' => $TotalDiductionAmount + $amount + $advanceAmount + $ProvidentFund,
