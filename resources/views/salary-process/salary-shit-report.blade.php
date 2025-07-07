@@ -326,17 +326,17 @@
                         basic = (parseFloat(item.gross_salary || 0) * 50) / 100;
                     }
                     
-                    // if hra == 0 it will 50% of gross salary
+                    // if hra == 0 it will 28% of gross salary
                     if (hra === 0) {
                         hra = (parseFloat(item.gross_salary || 0) * 28) / 100;
                     }
                     
-                    // if conveyance == 0 it will 50% of gross salary
+                    // if conveyance == 0 it will 8% of gross salary
                     if (conveyance === 0) {
                         conveyance = (parseFloat(item.gross_salary || 0) * 8) / 100;
                     }
                     
-                    // if others == 0 it will 50% of gross salary
+                    // if others == 0 it will 5% of gross salary
                     if (others === 0) {
                         others = (parseFloat(item.gross_salary || 0) * 5) / 100;
                     }
