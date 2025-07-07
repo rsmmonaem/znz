@@ -31,25 +31,25 @@ class SalaryProcessController extends Controller
 
     public function SalaryProcessView(Request $request)
     {
-    //     $employeeId= 55;
-    //     $toDate = date('Y-m-d');
+        //     $employeeId= 55;
+        //     $toDate = date('Y-m-d');
 
-    //     $advanceSalary = DB::table('salary_advance')
-    //     ->leftJoin('salary_advance_months', 'salary_advance.id', '=', 'salary_advance_months.salary_advance_id')
-    //     ->where('employeeId', $employeeId)
-    //     ->where('salary_advance.effectiveDate', '<', $toDate)
-    //     ->select('salary_advance.grossValue', 'salary_advance.grossOption', 'salary_advance_months.month', 'salary_advance_months.amount')
-    //     ->get();
-    
-    // $monthNumber = (int)date('m', strtotime($toDate));
-    // $advanceAmount = 0;
-    
-    // foreach ($advanceSalary as $record) {
-    //     if ($record->month == $monthNumber) {
-    //         $advanceAmount = $record->month; 
-    //     }
-    // }
-    // return $advanceAmount;
+        //     $advanceSalary = DB::table('salary_advance')
+        //     ->leftJoin('salary_advance_months', 'salary_advance.id', '=', 'salary_advance_months.salary_advance_id')
+        //     ->where('employeeId', $employeeId)
+        //     ->where('salary_advance.effectiveDate', '<', $toDate)
+        //     ->select('salary_advance.grossValue', 'salary_advance.grossOption', 'salary_advance_months.month', 'salary_advance_months.amount')
+        //     ->get();
+        
+        // $monthNumber = (int)date('m', strtotime($toDate));
+        // $advanceAmount = 0;
+        
+        // foreach ($advanceSalary as $record) {
+        //     if ($record->month == $monthNumber) {
+        //         $advanceAmount = $record->month; 
+        //     }
+        // }
+        // return $advanceAmount;
       DB::beginTransaction();
       try{
             // Define the base query for user data
@@ -163,38 +163,38 @@ class SalaryProcessController extends Controller
         SELECT date 
         FROM holidays 
         WHERE date BETWEEN ? AND ?
-    ", [$formDate, $toDate]);
+        ", [$formDate, $toDate]);
     
-    $holidayDates = array_map(function($row) {
-        return $row->date;
-    }, $holidayDates);
+        $holidayDates = array_map(function($row) {
+            return $row->date;
+        }, $holidayDates);
 
-    $spacialHolidayDates = DB::select("
-    SELECT date 
-    FROM spacial_holidays 
-    WHERE user_id = ? 
-      AND date BETWEEN ? AND ?
-", [$employeeId, $formDate, $toDate]);
+        $spacialHolidayDates = DB::select("
+            SELECT date 
+            FROM spacial_holidays 
+            WHERE user_id = ? 
+            AND date BETWEEN ? AND ?
+        ", [$employeeId, $formDate, $toDate]);
 
-$spacialHolidayDates = array_map(function($row) {
-    return $row->date;
-}, $spacialHolidayDates);
+        $spacialHolidayDates = array_map(function($row) {
+            return $row->date;
+        }, $spacialHolidayDates);
 
-$fromDates = DB::table('leaves')
-    ->where('user_id', $employeeId)
-    ->where('status', 'approved')
-    ->where('leave_type_id', '!=', 9)
-    ->whereBetween('from_date', [$formDate, $toDate])
-    ->pluck(DB::raw('DISTINCT DATE(from_date) as date'));
+        $fromDates = DB::table('leaves')
+            ->where('user_id', $employeeId)
+            ->where('status', 'approved')
+            ->where('leave_type_id', '!=', 9)
+            ->whereBetween('from_date', [$formDate, $toDate])
+            ->pluck(DB::raw('DISTINCT DATE(from_date) as date'));
 
-$toDates = DB::table('leaves')
-    ->where('user_id', $employeeId)
-    ->where('status', 'approved')
-    ->where('leave_type_id', '!=', 9)
-    ->whereBetween('to_date', [$formDate, $toDate])
-    ->pluck(DB::raw('DISTINCT DATE(to_date) as date'));
+        $toDates = DB::table('leaves')
+            ->where('user_id', $employeeId)
+            ->where('status', 'approved')
+            ->where('leave_type_id', '!=', 9)
+            ->whereBetween('to_date', [$formDate, $toDate])
+            ->pluck(DB::raw('DISTINCT DATE(to_date) as date'));
 
-$leaveDates = array_unique(array_merge($fromDates, $toDates));
+        $leaveDates = array_unique(array_merge($fromDates, $toDates));
 
 
 
@@ -278,89 +278,90 @@ $leaveDates = array_unique(array_merge($fromDates, $toDates));
         
         // Close the connection
         $conn->close();
-$leave=$leaveCount; // Assign the leave count to the variable
+        $leave=$leaveCount; // Assign the leave count to the variable
 
 
         $lwpQuery = "
-    SELECT COUNT(DISTINCT leave_dates.leave_date) AS total_lwp
-    FROM (
-        SELECT DATE_ADD(l.from_date, INTERVAL seq DAY) AS leave_date
-        FROM (
-            SELECT a.N + b.N * 10 AS seq
-            FROM 
-                (SELECT 0 AS N UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 
-                 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) a,
-                (SELECT 0 AS N UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 
-                 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) b
-        ) AS seq_gen
-        JOIN leaves l ON seq_gen.seq <= DATEDIFF(l.to_date, l.from_date)
-        WHERE l.from_date BETWEEN ? AND ?
-          AND l.user_id = ?
-          AND l.leave_type_id = 9
-          AND l.status = 'lwp'
-    ) AS leave_dates
-    LEFT JOIN holidays h ON leave_dates.leave_date = h.date
-    LEFT JOIN whd w ON leave_dates.leave_date = w.date AND w.user_id = ?
-    WHERE leave_dates.leave_date BETWEEN ? AND ?
-      AND h.date IS NULL
-      AND w.date IS NULL
-";
+            SELECT COUNT(DISTINCT leave_dates.leave_date) AS total_lwp
+            FROM (
+                SELECT DATE_ADD(l.from_date, INTERVAL seq DAY) AS leave_date
+                FROM (
+                    SELECT a.N + b.N * 10 AS seq
+                    FROM 
+                        (SELECT 0 AS N UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 
+                        UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) a,
+                        (SELECT 0 AS N UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 
+                        UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) b
+                ) AS seq_gen
+                JOIN leaves l ON seq_gen.seq <= DATEDIFF(l.to_date, l.from_date)
+                WHERE l.from_date BETWEEN ? AND ?
+                AND l.user_id = ?
+                AND l.leave_type_id = 9
+                AND l.status = 'lwp'
+            ) AS leave_dates
+            LEFT JOIN holidays h ON leave_dates.leave_date = h.date
+            LEFT JOIN whd w ON leave_dates.leave_date = w.date AND w.user_id = ?
+            WHERE leave_dates.leave_date BETWEEN ? AND ?
+            AND h.date IS NULL
+            AND w.date IS NULL
+        ";
 
-$lwpResult = DB::selectOne($lwpQuery, [
-    $formDate, $toDate, $employeeId, $employeeId, $formDate, $toDate
-]);
-$lwpDateQuery = "
-    SELECT DISTINCT DATE_ADD(l.from_date, INTERVAL seq DAY) AS leave_date
-    FROM (
-        SELECT a.N + b.N * 10 AS seq
-        FROM 
-            (SELECT 0 AS N UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 
-             UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) a,
-            (SELECT 0 AS N UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 
-             UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) b
-    ) AS seq_gen
-    JOIN leaves l ON seq_gen.seq <= DATEDIFF(l.to_date, l.from_date)
-    WHERE l.user_id = ? 
-      AND l.leave_type_id = 9 
-      AND l.status = 'lwp' 
-      AND l.from_date BETWEEN ? AND ?
-";
-$fridays = WHD::where('user_id', $employeeId)->whereBetween('date', [$formDate, $toDate])->pluck('date')->toArray();
-$lwpDatesResult = DB::select($lwpDateQuery, [$employeeId, $formDate, $toDate]);
+        // Execute the query
 
-$lwpDates = array_map(function ($row) {
-    return $row->leave_date;
-}, $lwpDatesResult);
+        $lwpResult = DB::selectOne($lwpQuery, [
+            $formDate, $toDate, $employeeId, $employeeId, $formDate, $toDate
+        ]);
+        $lwpDateQuery = "
+            SELECT DISTINCT DATE_ADD(l.from_date, INTERVAL seq DAY) AS leave_date
+            FROM (
+                SELECT a.N + b.N * 10 AS seq
+                FROM 
+                    (SELECT 0 AS N UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 
+                    UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) a,
+                    (SELECT 0 AS N UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 
+                    UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) b
+            ) AS seq_gen
+            JOIN leaves l ON seq_gen.seq <= DATEDIFF(l.to_date, l.from_date)
+            WHERE l.user_id = ? 
+            AND l.leave_type_id = 9 
+            AND l.status = 'lwp' 
+            AND l.from_date BETWEEN ? AND ?
+        ";
+        $fridays = WHD::where('user_id', $employeeId)->whereBetween('date', [$formDate, $toDate])->pluck('date')->toArray();
+        $lwpDatesResult = DB::select($lwpDateQuery, [$employeeId, $formDate, $toDate]);
 
-$lwp = isset($lwpResult->total_lwp) ? $lwpResult->total_lwp : 0;
+        $lwpDates = array_map(function ($row) {
+            return $row->leave_date;
+        }, $lwpDatesResult);
+
+        $lwp = isset($lwpResult->total_lwp) ? $lwpResult->total_lwp : 0;
 
 
-// Merge all exclusion dates
-$excludeDates = array_unique(array_merge(
-    $holidayDates,
-    $spacialHolidayDates,
-    $leaveDates,
-    $lwpDates
-));
+        // Merge all exclusion dates
+        $excludeDates = array_unique(array_merge(
+            $holidayDates,
+            $spacialHolidayDates,
+            $leaveDates,
+            $lwpDates
+        ));
 
-    // Step 2: Final Query to Count Total Present Days excluding these dates
-    $getTotalPresentwithLWP = DB::table('clocks')
-    ->whereBetween('date', [$formDate, $toDate])
-    ->where('user_id', $employeeId)
-    ->whereNotIn('date', $excludeDates)
-    ->distinct('date')
-    ->count('date');
+        // Step 2: Final Query to Count Total Present Days excluding these dates
+        $getTotalPresentwithLWP = DB::table('clocks')
+        ->whereBetween('date', [$formDate, $toDate])
+        ->where('user_id', $employeeId)
+        ->whereNotIn('date', $excludeDates)
+        ->distinct('date')
+        ->count('date');
+        
+        // Step 1: Remove common dates between $lwpDates and $fridays
+        $filteredLwpDates = array_diff($lwpDates, $fridays);
+
+        // Step 2: Count the remaining LWP dates after excluding Fridays
+        $totalFilteredLwp = count($filteredLwpDates);
+
+        $getTotalPresent = ($getTotalPresentwithLWP - $totalFilteredLwp) + count($fridays) + count($leaveDates);
+
     
-    // Step 1: Remove common dates between $lwpDates and $fridays
-    $filteredLwpDates = array_diff($lwpDates, $fridays);
-
-    // Step 2: Count the remaining LWP dates after excluding Fridays
-    $totalFilteredLwp = count($filteredLwpDates);
-
-    $getTotalPresent = ($getTotalPresentwithLWP - $totalFilteredLwp) + count($fridays) + count($leaveDates);
-
-    // dd($getTotalPresent , $leaveDates);
-    // die();
 
         // Total Days Of Month
         $startDate = Carbon::parse($formDate);
@@ -494,75 +495,75 @@ $excludeDates = array_unique(array_merge(
         $netSalary = $GrossSalaryAmountAfterProvidentFund-$amount;
         $netSalaryWIthoutTax = $GrossSalaryAmountAfterProvidentFund;
 
-// Fetch the latest salary bank allocation
-$BankAmount = DB::table('salary_bank')
-    ->where('user_id', $employeeId)
-    // ->where('effective_date', '<=', $formDate)
-    ->latest('created_at')
-    ->first();
+        // Fetch the latest salary bank allocation
+        $BankAmount = DB::table('salary_bank')
+            ->where('user_id', $employeeId)
+            // ->where('effective_date', '<=', $formDate)
+            ->latest('created_at')
+            ->first();
 
-$FinalBankPercentage = 0;
-$FinalCashPercentage = 0;
-if ($BankAmount) {
-    $FinalBankPercentage = $BankAmount->bank_amount / $BankAmount->gross * 100; // Bank percentage
-    $FinalCashPercentage = $BankAmount->cash_amount / $BankAmount->gross * 100; // Cash percentage
-    $RsmBankAmount = $BankAmount->bank_amount-$advanceAmount-$amount;
-    $RsmCashAmount = $BankAmount->cash_amount;
-}
+        $FinalBankPercentage = 0;
+        $FinalCashPercentage = 0;
+        if ($BankAmount) {
+            $FinalBankPercentage = $BankAmount->bank_amount / $BankAmount->gross * 100; // Bank percentage
+            $FinalCashPercentage = $BankAmount->cash_amount / $BankAmount->gross * 100; // Cash percentage
+            $RsmBankAmount = $BankAmount->bank_amount-$advanceAmount-$amount;
+            $RsmCashAmount = $BankAmount->cash_amount;
+        }
 
-// **Step 1: Divide net salary before tax**
-$BankApply = $netSalaryWIthoutTax - $amount-$advanceAmount; // Bank portion after tax & advance
-$BankAmountValue = ($FinalBankPercentage / 100) * $BankApply;  // Bank portion before tax
-$CashAmountValue = ($FinalCashPercentage / 100) * $BankApply;  // Cash portion before 
-
-
+        // **Step 1: Divide net salary before tax**
+        $BankApply = $netSalaryWIthoutTax - $amount-$advanceAmount; // Bank portion after tax & advance
+        $BankAmountValue = ($FinalBankPercentage / 100) * $BankApply;  // Bank portion before tax
+        $CashAmountValue = ($FinalCashPercentage / 100) * $BankApply;  // Cash portion before 
 
 
-// **Step 2: Deduct tax from bank portion**
-// $BankAmountValue = max(0, $BankAmountValue - $amount-$advanceAmount); // Deduct Advance amount from bank amount
 
-// // **Ensure Cash Pay remains valid**
-// $CashAmountValue = max(0, $netSalaryWIthoutTax - $amount-$advanceAmount-$BankAmountValue); // Remaining salary goes to cash
 
-$TableData = [
-    'total_worked_days' => $totalWorkedDays,
-    // 'total_worked_days' => $TotalDays-$lwp-$totalAbsents,
-    'total_absents' => $totalAbsents,
-    'total_absents_fee' => $TotalDiductionAmount,
-    'total_fridays' => $totalFridays,
-    'advance_salary' => $advanceAmount,
-    'provident_fund' => $ProvidentFund,
-    'gross_salary' => $salaryslab ? $salaryslab->gross : 0,
-    'net_salary' => $netSalaryWIthoutTax,
-    'employee_id' => $employeeId,
-    'tax_amount' => $amount,
-    'arrear_amount' => '',
-    'remarks' => $remarks,
+        // **Step 2: Deduct tax from bank portion**
+        // $BankAmountValue = max(0, $BankAmountValue - $amount-$advanceAmount); // Deduct Advance amount from bank amount
 
-    'form_date' => $formDate,
-    'to_date' => $toDate,
-    'bankamount' => $RsmBankAmount, // Fixed logic
-    'cashamount' => $RsmCashAmount, // Fixed logic
-    'weekendays_amount' => $TotalFridaysAmount ? $TotalFridaysAmount : 0
-];
+        // // **Ensure Cash Pay remains valid**
+        // $CashAmountValue = max(0, $netSalaryWIthoutTax - $amount-$advanceAmount-$BankAmountValue); // Remaining salary goes to cash
 
-DB::table('employee_salary_payment_details')->insert([
-    'PaidAmount' => 0,
-    'UnpaidAmount' => 0,
-    'NetPayable' => $netSalaryWIthoutTax - $amount-$advanceAmount,
-    'EmployeeID' => $employeeId,
-    'BankPay' => max(0, $RsmBankAmount), // Corrected bank amount
-    'CashPay' => max(0, $RsmCashAmount), // Corrected cash amount
-    'Gross' => $salaryslab ? $salaryslab->gross : 0,
-    'TotalPayable' => max(0, $netSalaryWIthoutTax - $amount),
-    'TotalDeduction' => $TotalDiductionAmount + $amount + $advanceAmount + $ProvidentFund,
-    'FormDate' => $formDate,
-    'ToDate' => $toDate,
-    'Remarks' => $remarks
-]);
+        $TableData = [
+            'total_worked_days' => $totalWorkedDays,
+            // 'total_worked_days' => $TotalDays-$lwp-$totalAbsents,
+            'total_absents' => $totalAbsents,
+            'total_absents_fee' => $TotalDiductionAmount,
+            'total_fridays' => $totalFridays,
+            'advance_salary' => $advanceAmount,
+            'provident_fund' => $ProvidentFund,
+            'gross_salary' => $salaryslab ? $salaryslab->gross : 0,
+            'net_salary' => $netSalaryWIthoutTax,
+            'employee_id' => $employeeId,
+            'tax_amount' => $amount,
+            'arrear_amount' => '',
+            'remarks' => $remarks,
 
-// Insert into employee_salary_details
-DB::table('employee_salary_details')->insert($TableData);
+            'form_date' => $formDate,
+            'to_date' => $toDate,
+            'bankamount' => $RsmBankAmount, // Fixed logic
+            'cashamount' => $RsmCashAmount, // Fixed logic
+            'weekendays_amount' => $TotalFridaysAmount ? $TotalFridaysAmount : 0
+        ];
+
+        DB::table('employee_salary_payment_details')->insert([
+            'PaidAmount' => 0,
+            'UnpaidAmount' => 0,
+            'NetPayable' => $netSalaryWIthoutTax - $amount-$advanceAmount,
+            'EmployeeID' => $employeeId,
+            'BankPay' => max(0, $RsmBankAmount), // Corrected bank amount
+            'CashPay' => max(0, $RsmCashAmount), // Corrected cash amount
+            'Gross' => $salaryslab ? $salaryslab->gross : 0,
+            'TotalPayable' => max(0, $netSalaryWIthoutTax - $amount),
+            'TotalDeduction' => $TotalDiductionAmount + $amount + $advanceAmount + $ProvidentFund,
+            'FormDate' => $formDate,
+            'ToDate' => $toDate,
+            'Remarks' => $remarks
+        ]);
+
+        // Insert into employee_salary_details
+        DB::table('employee_salary_details')->insert($TableData);
 
         return $User->employee_code;
     }
@@ -975,6 +976,7 @@ DB::table('employee_salary_details')->insert($TableData);
         ->LeftJoin('sections', 'profile.section_id', '=', 'sections.id')
         ->LeftJoin('branchs', 'profile.branch_id', '=', 'branchs.id')
         ->LeftJoin('departments', 'designations.department_id', '=', 'departments.id');
+
         if ($request->branch) {
             $data->where('profile.branch_id', '=', $request->branch);
         }

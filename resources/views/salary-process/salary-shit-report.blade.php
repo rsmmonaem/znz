@@ -201,274 +201,279 @@
                 })
 
 
-function populateSalaryTable(data) {
-    // Create a new window for the salary table
-    const newWindow = window.open('', '_blank', 'width=1200,height=800');
-    if (!newWindow) {
-        alert('Popup blocked! Please allow popups for this website.');
-        return;
-    }
+                function populateSalaryTable(data) {
+                    // Create a new window for the salary table
+                    const newWindow = window.open('', '_blank', 'width=1200,height=800');
+                    if (!newWindow) {
+                        alert('Popup blocked! Please allow popups for this website.');
+                        return;
+                    }
 
-    // Initialize totals for each column
-    let totalWorkedDays = 0,
-        totalGrossSalary = 0,
-        totalBasic = 0,
-        totalHRA = 0,
-        totalMedical = 0,
-        totalConveyance = 0,
-        totalOthers = 0,
-        totalNetSalary = 0,
-        totalAdvanceSalary = 0,
-        totalProvidentFund = 0,
-        totalTaxAmount = 0,
-        totalArrearAmount = 0,
-        totalNetPayable = 0;
-        totalOT = 0;
-        totalBankAmount = 0;
-        totalCashAmount = 0;
+                    // Initialize totals for each column
+                    let totalWorkedDays = 0,
+                        totalGrossSalary = 0,
+                        totalBasic = 0,
+                        totalHRA = 0,
+                        totalMedical = 0,
+                        totalConveyance = 0,
+                        totalOthers = 0,
+                        totalNetSalary = 0,
+                        totalAdvanceSalary = 0,
+                        totalProvidentFund = 0,
+                        totalTaxAmount = 0,
+                        totalArrearAmount = 0,
+                        totalNetPayable = 0;
+                        totalOT = 0;
+                        totalBankAmount = 0;
+                        totalCashAmount = 0;
 
-    // Build the main table HTML
-    let tableHTML = `
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <title>Salary Table</title>
-            <style>
-                table {
-                    width: 100%;
-                    border-collapse: collapse;
-                    margin-bottom: 20px;
-                }
-                th, td {
-                    border: 1px solid #ddd;
-                    padding: 8px;
-                    text-align: left;
-                }
-                th {
-                    background-color: #fff;
-                }
-                tr:nth-child(even) {
-                    background-color: #fff;
-                }
-                tr:hover {
-                    background-color: #fff;
-                }
-                .totals-row {
-                    font-weight: bold;
-                    background-color: #fff;
-                }
-                .page-break {
-                  page-break-before: always;
-                }
-            </style>
-        </head>
-        <body>
-             <div class="company-details">
-                <h1 style="text-align: center; font-size: 26px; font-weight: bold; text-transform: uppercase;">${data.branch.name ?? ' '} .
-                 (${data.branch.description ?? ' '})</h1>
-            </div>
-             <h2 style="text-align: center; font-size: 24px; font-weight: bold; text-transform: uppercase;">SALARY SHEET FOR THE MONTH OF ${data.month} (${data.form_date} to ${data.to_date})</h2>
-            <table>
-                <thead>
+                    // Build the main table HTML
+                    let tableHTML = `
+                        <!DOCTYPE html>
+                        <html>
+                        <head>
+                            <title>Salary Table</title>
+                            <style>
+                                table {
+                                    width: 100%;
+                                    border-collapse: collapse;
+                                    margin-bottom: 20px;
+                                }
+                                th, td {
+                                    border: 1px solid #ddd;
+                                    padding: 8px;
+                                    text-align: left;
+                                }
+                                th {
+                                    background-color: #fff;
+                                }
+                                tr:nth-child(even) {
+                                    background-color: #fff;
+                                }
+                                tr:hover {
+                                    background-color: #fff;
+                                }
+                                .totals-row {
+                                    font-weight: bold;
+                                    background-color: #fff;
+                                }
+                                .page-break {
+                                page-break-before: always;
+                                }
+                            </style>
+                        </head>
+                        <body>
+                            <div class="company-details">
+                                <h1 style="text-align: center; font-size: 26px; font-weight: bold; text-transform: uppercase;">${data.branch.name ?? ' '} .
+                                (${data.branch.description ?? ' '})</h1>
+                            </div>
+                            <h2 style="text-align: center; font-size: 24px; font-weight: bold; text-transform: uppercase;">SALARY SHEET FOR THE MONTH OF ${data.month} (${data.form_date} to ${data.to_date})</h2>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>SL No</th>
+                                        <th>Name</th>
+                                        <th>Designation</th>
+                                        <th>Date of Joining</th>
+                                        <th>Employee Code</th>
+                                        <th>Attendance</th>
+                                        <th>Gross Salary</th>
+                                        <th>Basic</th>
+                                        <th>Home Rent</th>
+                                        <th>Medical</th>
+                                        <th>Conveyance</th>
+                                        <th>Others</th>
+                                        <th>Net Salary</th>
+                                        <th>Advance Salary</th>
+                                        <th>Provident Fund</th>
+                                        <th>Tax Amount</th>
+                                        <th>Arrear Amount</th>
+                                        <th>OT Amount</th>
+                                        <th>Net Payable</th>
+                                        <th>Bank Amount</th>
+                                        <th>Cash Amount</th>
+                                        <th>Account Number</th>
+                                        <th>Remarks</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                    `;
+
+                    data.employee_salary_data.forEach((item, index) => {
+                    let basic = 0, hra = 0, medical = 0, conveyance = 0, others = 0;
+                    // Loop through salary data to assign amounts based on head type
+                    Object.values(item.salaryData).forEach(salary => {
+                        if (salary.head.includes("Basic Salary")) {
+                            basic = parseFloat(salary.amount) || 0;
+                        } else if (salary.head.includes("House Rent")) {
+                            hra = parseFloat(salary.amount) || 0;
+                        } else if (salary.head.includes("Medical")) {
+                            medical = parseFloat(salary.amount) || 0;
+                        } else if (salary.head.includes("Conveyance")) {
+                            conveyance = parseFloat(salary.amount) || 0;
+                        } else if (salary.head.includes("Others")) {
+                            others = parseFloat(salary.amount) || 0;
+                        }
+                    });
+                    
+                    // if medical == 0 it will 9% of gross salary
+                    if (medical === 0) {
+                        medical = (parseFloat(item.gross_salary || 0) * 9) / 100;
+                    }
+
+                    // Net Payable Calculation with proper float handling
+                    const netPayable = (
+                        parseFloat(item.net_salary || 0) +
+                        parseFloat(item.arrear_amount || 0) - parseFloat(item.advance_salary || 0) - parseFloat(item.provident_fund || 0) - parseFloat(item.tax_amount || 0)
+                    ).toFixed(2);
+
+                    // Update totals with proper calculations
+                    totalWorkedDays += parseFloat(item.total_worked_days || 0);
+                    totalGrossSalary += parseFloat(item.gross_salary || 0);
+                    totalBasic += basic;
+                    totalHRA += hra;
+                    totalMedical += medical;
+                    totalConveyance += conveyance;
+                    totalOthers += others;
+                    totalNetSalary += parseFloat(item.net_salary || 0);
+                    totalAdvanceSalary += parseFloat(item.advance_salary || 0);
+                    totalProvidentFund += parseFloat(item.provident_fund || 0);
+                    totalTaxAmount += parseFloat(item.tax_amount || 0);
+                    totalArrearAmount += parseFloat(item.arrear_amount || 0);
+                    totalOT += parseFloat(item.ot_amount || 0);
+                    totalNetPayable += parseFloat(netPayable);
+                    totalBankAmount += parseFloat(item.bankamount || 0);
+                    totalCashAmount += parseFloat(item.cashamount || 0);
+
+                    // Construct the table row
+                    let tableRow = `
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td>${item.first_name || ''}</td>
+                            <td>${item.designation || ''}</td>
+                            <td>${item.date_of_joining || ''}</td>
+                            <td>${item.employee_code || ''}</td>
+                                <td>${totalWorkedDays}</td>
+                            
+                            <td>${item.gross_salary || '0.00'}</td>
+                            <td>${basic.toFixed(2)}</td>
+                            <td>${hra.toFixed(2)}</td>
+                            <td>${medical.toFixed(2)}</td>
+                            <td>${conveyance.toFixed(2)}</td>
+                            <td>${others.toFixed(2)}</td>
+                            <td>${item.net_salary || '0.00'}</td>
+                            <td>${item.advance_salary || '0.00'}</td>
+                            <td>${item.provident_fund || '0.00'}</td>
+                            <td>${item.tax_amount || '0.00'}</td>
+                            <td>${item.arrear_amount || '0.00'}</td>
+                            <td>${item.ot_amount || '0.00'}</td>
+                            <td>${netPayable}</td>
+                            <td>${item.bankamount || '0.00'}</td>
+                            <td>${item.cashamount || '0.00'}</td>
+                            <td>${item.account_number || ''}</td>
+                            <td>${item.remarks || ''}</td>
+                        </tr>
+                    `;
+
+                    // Add row to tableHTML
+                    tableHTML += tableRow;
+                });
+
+                // Add totals row
+                tableHTML += `
                     <tr>
-                        <th>SL No</th>
-                        <th>Name</th>
-                        <th>Designation</th>
-                        <th>Date of Joining</th>
-                        <th>Employee Code</th>
-                        <th>Attendance</th>
-                        <th>Gross Salary</th>
-                        <th>Basic</th>
-                        <th>Home Rent</th>
-                        <th>Medical</th>
-                        <th>Conveyance</th>
-                        <th>Others</th>
-                        <th>Net Salary</th>
-                        <th>Advance Salary</th>
-                        <th>Provident Fund</th>
-                        <th>Tax Amount</th>
-                        <th>Arrear Amount</th>
-                        <th>OT Amount</th>
-                        <th>Net Payable</th>
-                        <th>Bank Amount</th>
-                        <th>Cash Amount</th>
-                        <th>Account Number</th>
-                        <th>Remarks</th>
+                        <td colspan="6">Total</td>
+                        <td>${totalGrossSalary.toFixed(2)}</td>
+                        <td>${totalBasic.toFixed(2)}</td>
+                        <td>${totalHRA.toFixed(2)}</td>
+                        <td>${totalMedical.toFixed(2)}</td>
+                        <td>${totalConveyance.toFixed(2)}</td>
+                        <td>${totalOthers.toFixed(2)}</td>
+                        <td>${totalNetSalary.toFixed(2)}</td>
+                        <td>${totalAdvanceSalary.toFixed(2)}</td>
+                        <td>${totalProvidentFund.toFixed(2)}</td>
+                        <td>${totalTaxAmount.toFixed(2)}</td>
+                        <td>${totalArrearAmount.toFixed(2)}</td>
+                        <td>${totalOT.toFixed(2)}</td>
+                        <td>${totalNetPayable.toFixed(2)}</td>
+                        <td>${totalBankAmount.toFixed(2)}</td>
+                        <td>${totalCashAmount.toFixed(2)}</td>
+                        <td colspan="2"></td>
                     </tr>
-                </thead>
-                <tbody>
-    `;
+                `;
 
-    data.employee_salary_data.forEach((item, index) => {
-    let basic = 0, hra = 0, medical = 0, conveyance = 0, others = 0;
-    // Loop through salary data to assign amounts based on head type
-    Object.values(item.salaryData).forEach(salary => {
-        if (salary.head.includes("Basic Salary")) {
-            basic = parseFloat(salary.amount) || 0;
-        } else if (salary.head.includes("House Rent")) {
-            hra = parseFloat(salary.amount) || 0;
-        } else if (salary.head.includes("Medical")) {
-            medical = parseFloat(salary.amount) || 0;
-        } else if (salary.head.includes("Conveyance")) {
-            conveyance = parseFloat(salary.amount) || 0;
-        } else if (salary.head.includes("Others")) {
-            others = parseFloat(salary.amount) || 0;
-        }
-    });
+                // Footer and summary section (no changes needed)
+                tableHTML += `
+                    <style>
+                        .footer {
+                            text-align: center;
+                            padding: 10px;
+                            margin-top: 20px;
+                            background: #f0f0f0;
+                        }
+                        .footer-section {
+                            display: inline-block;
+                            width: 22%;
+                            text-align: center;
+                        }
+                    </style>
+                    <table class="footer" style="width: 100%; background-color: #fff; margin-top: 50px; margin-bottom: 50px;">
+                        <tr>
+                            <td class="footer-section" style="border: 1px solid #ffffff;">PREPARED & CHECKED BY HR</td>
+                            <td class="footer-section" style="border: 1px solid #ffffff;">VERIFIED BY FINANCE/ACCOUNTS</td>
+                            <td class="footer-section" style="border: 1px solid #ffffff;">RECOMMENDED BY ADMIN BD</td>
+                            <td class="footer-section" style="border: 1px solid #ffffff;">APPROVED BY EDM/MD/CHAIRMAN</td>
+                        </tr>
+                    </table>
+                    <div class="page-break"></div>
+                    <h2>SUMMARY</h2>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Total Worked Days</th>
+                                <th>Total Gross Salary</th>
+                                <th>Total Basic</th>
+                                <th>Total Home Rent</th>
+                                <th>Total Medical</th>
+                                <th>Total Conveyance</th>
+                                <th>Total Others</th>
+                                <th>Total Net Salary</th>
+                                <th>Total Advance</th>
+                                <th>Total Provident Fund</th>
+                                <th>Total Tax Amount</th>
+                                <th>Total Arrear</th>
+                                <th>Total OT</th>
+                                <th>Total Net Payable</th>
+                                <th>Total Bank Amount</th>
+                                <th>Total Cash Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="totals-row">
+                                <td>${totalWorkedDays}</td>
+                                <td>${totalGrossSalary.toFixed(2)}</td>
+                                <td>${totalBasic.toFixed(2)}</td>
+                                <td>${totalHRA.toFixed(2)}</td>
+                                <td>${totalMedical.toFixed(2)}</td>
+                                <td>${totalConveyance.toFixed(2)}</td>
+                                <td>${totalOthers.toFixed(2)}</td>
+                                <td>${totalNetSalary.toFixed(2)}</td>
+                                <td>${totalAdvanceSalary.toFixed(2)}</td>
+                                <td>${totalProvidentFund.toFixed(2)}</td>
+                                <td>${totalTaxAmount.toFixed(2)}</td>
+                                <td>${totalArrearAmount.toFixed(2)}</td>
+                                <td>${totalOT.toFixed(2)}</td>
+                                <td>${totalNetPayable.toFixed(2)}</td>
+                                <td>${totalBankAmount.toFixed(2)}</td>
+                                <td>${totalCashAmount.toFixed(2)}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                `;
 
-    // Net Payable Calculation with proper float handling
-    const netPayable = (
-        parseFloat(item.net_salary || 0) +
-        parseFloat(item.arrear_amount || 0) - parseFloat(item.advance_salary || 0) - parseFloat(item.provident_fund || 0) - parseFloat(item.tax_amount || 0)
-    ).toFixed(2);
-
-    // Update totals with proper calculations
-    totalWorkedDays += parseFloat(item.total_worked_days || 0);
-    totalGrossSalary += parseFloat(item.gross_salary || 0);
-    totalBasic += basic;
-    totalHRA += hra;
-    totalMedical += medical;
-    totalConveyance += conveyance;
-    totalOthers += others;
-    totalNetSalary += parseFloat(item.net_salary || 0);
-    totalAdvanceSalary += parseFloat(item.advance_salary || 0);
-    totalProvidentFund += parseFloat(item.provident_fund || 0);
-    totalTaxAmount += parseFloat(item.tax_amount || 0);
-    totalArrearAmount += parseFloat(item.arrear_amount || 0);
-    totalOT += parseFloat(item.ot_amount || 0);
-    totalNetPayable += parseFloat(netPayable);
-    totalBankAmount += parseFloat(item.bankamount || 0);
-    totalCashAmount += parseFloat(item.cashamount || 0);
-
-    // Construct the table row
-    let tableRow = `
-        <tr>
-            <td>${index + 1}</td>
-            <td>${item.first_name || ''}</td>
-            <td>${item.designation || ''}</td>
-            <td>${item.date_of_joining || ''}</td>
-            <td>${item.employee_code || ''}</td>
-                <td>${totalWorkedDays}</td>
-            
-            <td>${item.gross_salary || '0.00'}</td>
-            <td>${basic.toFixed(2)}</td>
-            <td>${hra.toFixed(2)}</td>
-            <td>${medical.toFixed(2)}</td>
-            <td>${conveyance.toFixed(2)}</td>
-            <td>${others.toFixed(2)}</td>
-            <td>${item.net_salary || '0.00'}</td>
-            <td>${item.advance_salary || '0.00'}</td>
-            <td>${item.provident_fund || '0.00'}</td>
-            <td>${item.tax_amount || '0.00'}</td>
-            <td>${item.arrear_amount || '0.00'}</td>
-            <td>${item.ot_amount || '0.00'}</td>
-            <td>${netPayable}</td>
-            <td>${item.bankamount || '0.00'}</td>
-            <td>${item.cashamount || '0.00'}</td>
-            <td>${item.account_number || ''}</td>
-            <td>${item.remarks || ''}</td>
-        </tr>
-    `;
-
-    // Add row to tableHTML
-    tableHTML += tableRow;
-});
-
-// Add totals row
-tableHTML += `
-    <tr>
-        <td colspan="6">Total</td>
-        <td>${totalGrossSalary.toFixed(2)}</td>
-        <td>${totalBasic.toFixed(2)}</td>
-        <td>${totalHRA.toFixed(2)}</td>
-        <td>${totalMedical.toFixed(2)}</td>
-        <td>${totalConveyance.toFixed(2)}</td>
-        <td>${totalOthers.toFixed(2)}</td>
-        <td>${totalNetSalary.toFixed(2)}</td>
-        <td>${totalAdvanceSalary.toFixed(2)}</td>
-        <td>${totalProvidentFund.toFixed(2)}</td>
-        <td>${totalTaxAmount.toFixed(2)}</td>
-        <td>${totalArrearAmount.toFixed(2)}</td>
-        <td>${totalOT.toFixed(2)}</td>
-        <td>${totalNetPayable.toFixed(2)}</td>
-        <td>${totalBankAmount.toFixed(2)}</td>
-        <td>${totalCashAmount.toFixed(2)}</td>
-        <td colspan="2"></td>
-    </tr>
-`;
-
-// Footer and summary section (no changes needed)
-tableHTML += `
-    <style>
-        .footer {
-            text-align: center;
-            padding: 10px;
-            margin-top: 20px;
-            background: #f0f0f0;
-        }
-        .footer-section {
-            display: inline-block;
-            width: 22%;
-            text-align: center;
-        }
-    </style>
-    <table class="footer" style="width: 100%; background-color: #fff; margin-top: 50px; margin-bottom: 50px;">
-        <tr>
-            <td class="footer-section" style="border: 1px solid #ffffff;">PREPARED & CHECKED BY HR</td>
-            <td class="footer-section" style="border: 1px solid #ffffff;">VERIFIED BY FINANCE/ACCOUNTS</td>
-            <td class="footer-section" style="border: 1px solid #ffffff;">RECOMMENDED BY ADMIN BD</td>
-            <td class="footer-section" style="border: 1px solid #ffffff;">APPROVED BY EDM/MD/CHAIRMAN</td>
-        </tr>
-    </table>
-    <div class="page-break"></div>
-    <h2>SUMMARY</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>Total Worked Days</th>
-                <th>Total Gross Salary</th>
-                <th>Total Basic</th>
-                <th>Total Home Rent</th>
-                <th>Total Medical</th>
-                <th>Total Conveyance</th>
-                <th>Total Others</th>
-                <th>Total Net Salary</th>
-                <th>Total Advance</th>
-                <th>Total Provident Fund</th>
-                <th>Total Tax Amount</th>
-                <th>Total Arrear</th>
-                <th>Total OT</th>
-                <th>Total Net Payable</th>
-                <th>Total Bank Amount</th>
-                <th>Total Cash Amount</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr class="totals-row">
-                <td>${totalWorkedDays}</td>
-                <td>${totalGrossSalary.toFixed(2)}</td>
-                <td>${totalBasic.toFixed(2)}</td>
-                <td>${totalHRA.toFixed(2)}</td>
-                <td>${totalMedical.toFixed(2)}</td>
-                <td>${totalConveyance.toFixed(2)}</td>
-                <td>${totalOthers.toFixed(2)}</td>
-                <td>${totalNetSalary.toFixed(2)}</td>
-                <td>${totalAdvanceSalary.toFixed(2)}</td>
-                <td>${totalProvidentFund.toFixed(2)}</td>
-                <td>${totalTaxAmount.toFixed(2)}</td>
-                <td>${totalArrearAmount.toFixed(2)}</td>
-                <td>${totalOT.toFixed(2)}</td>
-                <td>${totalNetPayable.toFixed(2)}</td>
-                <td>${totalBankAmount.toFixed(2)}</td>
-                <td>${totalCashAmount.toFixed(2)}</td>
-            </tr>
-        </tbody>
-    </table>
-`;
-
-newWindow.document.write(tableHTML);
-newWindow.document.close();
-}
+                newWindow.document.write(tableHTML);
+                newWindow.document.close();
+            }
 
 
                 // Function to populate the table
