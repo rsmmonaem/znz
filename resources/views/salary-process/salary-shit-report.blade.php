@@ -278,11 +278,11 @@
                                         <th>Employee Code</th>
                                         <th>Attendance</th>
                                         <th>Gross Salary</th>
-                                        <th>Basic</th>
-                                        <th>Home Rent</th>
-                                        <th>Medical</th>
-                                        <th>Conveyance</th>
-                                        <th>Others</th>
+                                        <th>Basic (50% of gross)</th>
+                                        <th>Home Rent (28% of gross)</th>
+                                        <th>Medical (9% of gross)</th>
+                                        <th>Conveyance (8% of gross)</th>
+                                        <th>Others (5% of gross)</th>
                                         <th>Net Salary</th>
                                         <th>Advance Salary</th>
                                         <th>Provident Fund</th>
