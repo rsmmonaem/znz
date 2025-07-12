@@ -426,14 +426,7 @@
                                 holiday_amount: newHoliday
                             },
                             success: function (response) {
-                                if (response.success) {
-                                    $('.holiday-amount[data-id="' + id + '"]').text(newHoliday);
-                                    $('.holiday-amount[data-id="' + id + '"]').data('holiday-amount', newHoliday);
-                                    $('#holidayModal').modal('hide');
-                                    toastr.success('Holiday updated successfully.');
-                                } else {
-                                    toastr.error('Update failed.');
-                                }
+                                toastr.success('Holiday updated successfully.');
                             },
                             error: function () {
                                 toastr.error('Server error.');
