@@ -426,7 +426,23 @@
                                 holiday_amount: newHoliday
                             },
                             success: function (response) {
-                                toastr.success('Holiday updated successfully.');
+                                if (response.success) {
+                                    $('.holiday-amount[data-id="' + id + '"]').text(newHoliday);
+                                    $('.holiday-amount[data-id="' + id + '"]').data('holiday-amount', newHoliday);
+
+                                    // Update cashamount cell from response (dhore nei response e ase)
+                                    if (response.updated_cashamount !== undefined) {
+                                        $('.cash-amount[data-id="' + id + '"]').text(parseFloat(response.updated_cashamount).toFixed(2));
+                                        $('.cash-amount[data-id="' + id + '"]').data('cashamount', response.updated_cashamount);
+                                    }
+
+                                    $('#holidayModal').modal('hide');
+
+                                    // Reload the page to reflect changes
+                                    location.reload();
+                                } else {
+                                    toastr.error('Update failed.');
+                                }
                             },
                             error: function () {
                                 toastr.error('Server error.');
