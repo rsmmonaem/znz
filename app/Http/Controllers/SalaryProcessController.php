@@ -1164,6 +1164,7 @@ public function updateHolidayAmount(Request $request)
                 'employee_salary_details.ot_amount',
                 'employee_salary_details.bankamount',
                 'employee_salary_details.cashamount',
+                'employee_salary_details.holiday_amount',
                 'employee_salary_details.weekendays_amount'
             )
             ->get();

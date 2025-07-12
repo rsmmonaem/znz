@@ -390,65 +390,65 @@
                     });
                 }
                 // Holiday amount modal
-$(document).on('click', '.holiday-amount', function() {
-    const holidayAmount = parseFloat($(this).data('holiday-amount'));
-    const id = $(this).data('id');
-    const name = $(this).data('name');
+                $(document).on('click', '.holiday-amount', function() {
+                    const holidayAmount = parseFloat($(this).data('holiday-amount'));
+                    const id = $(this).data('id');
+                    const name = $(this).data('name');
 
-    const modal = $('<div class="modal fade" id="holidayModal" tabindex="-1" role="dialog" aria-labelledby="holidayModalLabel" aria-hidden="true">');
-    modal.html(`
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="holidayModalLabel">Edit Holiday Amount</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <p>Edit holiday for <strong>${name}</strong>:</p>
-                    <input type="number" id="holidayAmountInput" class="form-control" value="${holidayAmount}">
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" id="saveHolidayAmount" data-id="${id}">Save</button>
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                </div>
-            </div>
-        </div>
-    `);
-    $('body').append(modal);
-    $('#holidayModal').modal('show');
+                    const modal = $('<div class="modal fade" id="holidayModal" tabindex="-1" role="dialog" aria-labelledby="holidayModalLabel" aria-hidden="true">');
+                    modal.html(`
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="holidayModalLabel">Edit Holiday Amount</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <p>Edit holiday for <strong>${name}</strong>:</p>
+                                    <input type="number" id="holidayAmountInput" class="form-control" value="${holidayAmount}">
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-primary" id="saveHolidayAmount" data-id="${id}">Save</button>
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                </div>
+                            </div>
+                        </div>
+                    `);
+                    $('body').append(modal);
+                    $('#holidayModal').modal('show');
 
-    $('#saveHolidayAmount').on('click', function () {
-        const newHoliday = $('#holidayAmountInput').val();
-        const id = $(this).data('id');
-        $.ajax({
-            url: '/update-holiday-amount',
-            method: 'POST',
-            data: {
-                id: id,
-                holiday_amount: newHoliday
-            },
-            success: function (response) {
-                if (response.success) {
-                    $('.holiday-amount[data-id="' + id + '"]').text(newHoliday);
-                    $('.holiday-amount[data-id="' + id + '"]').data('holiday-amount', newHoliday);
-                    $('#holidayModal').modal('hide');
-                    toastr.success('Holiday updated successfully.');
-                } else {
-                    toastr.error('Update failed.');
-                }
-            },
-            error: function () {
-                toastr.error('Server error.');
-            }
-        });
-    });
+                    $('#saveHolidayAmount').on('click', function () {
+                        const newHoliday = $('#holidayAmountInput').val();
+                        const id = $(this).data('id');
+                        $.ajax({
+                            url: '/update-holiday-amount',
+                            method: 'POST',
+                            data: {
+                                id: id,
+                                holiday_amount: newHoliday
+                            },
+                            success: function (response) {
+                                if (response.success) {
+                                    $('.holiday-amount[data-id="' + id + '"]').text(newHoliday);
+                                    $('.holiday-amount[data-id="' + id + '"]').data('holiday-amount', newHoliday);
+                                    $('#holidayModal').modal('hide');
+                                    toastr.success('Holiday updated successfully.');
+                                } else {
+                                    toastr.error('Update failed.');
+                                }
+                            },
+                            error: function () {
+                                toastr.error('Server error.');
+                            }
+                        });
+                    });
 
-    $('#holidayModal').on('hidden.bs.modal', function () {
-        $(this).remove();
-    });
-});
+                    $('#holidayModal').on('hidden.bs.modal', function () {
+                        $(this).remove();
+                    });
+                });
 
 
 
