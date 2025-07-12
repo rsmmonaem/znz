@@ -483,7 +483,10 @@ Route::group(['middleware' => ['auth','license','account_valid']], function () {
 	Route::post('/slary-shit-post', 'SalaryProcessController@SalaryShitPost');
 	Route::post('/update-arrear-amount', 'SalaryProcessController@UpdateArrearAmount');
 	Route::post('/update-tax-amount', 'SalaryProcessController@UpdateTaxAmount');
-	Route::post('/update-holiday-amount', 'SalaryProcessController@updateHolidayAmount');
+	Route::post('/update-holiday-amount','SalaryProcessController@updateHolidayAmount');
+	Route::post('/update-ot-amount','SalaryProcessController@updateOtAmount');
+
+
 	// Salary Slip
 	Route::get('/salary-slip', 'SalaryProcessController@SalarySlip');
 	Route::post('/salary-slip-post', 'SalaryProcessController@salarySlipPost');

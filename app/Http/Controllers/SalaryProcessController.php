@@ -935,146 +935,120 @@ class SalaryProcessController extends Controller
             return response()->json(['error' => 'Failed to update arrear amount.']);
         }
     }  
-    
-    // public function UpdateHolidayAmount(Request $request)
-    // {
-    //     try {
-    //         $holidayAmount = floatval($request->holiday_amount);
-    //         DB::table('employee_salary_details')
-    //             ->where('id', $request->id)
-    //             ->update([
-    //                 'holiday_amount' => $holidayAmount,
-    //                 'cashamount' => DB::raw("cashamount + {$request->holiday_amount}")
-    //             ]);
 
-    //         return response()->json(['success' => 'Holiday Amount Updated Successfully.']);
-    //     } catch (\Exception $e) {
-    //         return response()->json(['error' => 'Failed to update holiday amount.']);
-    //     }
-    // }
-
-// app/Http/Controllers/SalaryController.php
-
-public function updateHolidayAmount(Request $request)
-{
-    $id = $request->input('id');
-    $amount = $request->input('holiday_amount');
-
-    try {
-        // Step 1: Find employee_id from employee_salary_details
-        $employee = DB::table('employee_salary_details')->where('id', $id)->first();
-
-        if (!$employee) {
-            return response()->json(['success' => false, 'message' => 'Employee not found.']);
-        }
-
-        $employee_id = $employee->employee_id;
-        
-
-        // Step 2: Update holiday_amount and cashamount
-        DB::table('employee_salary_details')
-            ->where('id', $id)
-            ->update([
-                'holiday_amount' => $amount,
-                'cashamount' => DB::raw("cashamount + $amount")
-            ]);
-
-        // Step 3: Update NetPayable in the latest employee_salary_payment_details row
-        DB::table('employee_salary_payment_details')
-            ->where('EmployeeID', $employee_id)
-            ->orderBy('id', 'desc')
-            ->limit(1)
-            ->update([
-                'NetPayable' => DB::raw("NetPayable + $amount")
-            ]);
-
-        return response()->json(['success' => true]);
-
-    } catch (\Exception $e) {
-        return response()->json(['success' => false, 'message' => $e->getMessage()]);
-    }
-}
-
-
-// public function updateTaxAmount(Request $request)
-// {
-//     try {
-//         $id = $request->id;
-//         $newTax = floatval($request->tax_amount);
-
-//         // Get previous tax and bank amounts
-//         $record = DB::table('employee_salary_details')->where('id', $id)->first();
-
-//         if (!$record) {
-//             return response()->json(['error' => 'Record not found.']);
-//         }
-
-//         $oldTax = floatval($record->tax_amount);
-//         $oldBank = floatval($record->bank_amount);
-
-//         // Calculate updated bank amount
-//         $updatedBank = $oldBank + $oldTax - $newTax;
-
-//         // Update DB
-//         DB::table('employee_salary_details')->where('id', $id)->update([
-//             'tax_amount' => $newTax,
-//             'bank_amount' => $updatedBank,
-//         ]);
-
-//         return response()->json([
-//             'success' => true,
-//             'updated_bank_amount' => $updatedBank,
-//         ]);
-//     } catch (\Exception $e) {
-//         return response()->json(['error' => 'Failed to update tax amount.']);
-//     }
-// }
-
-public function UpdateTaxAmount(Request $request)
+    public function updateOtAmount(Request $request)
 {
     try {
-        // Retrieve old tax and bank amounts
         $row = DB::table('employee_salary_details')->where('id', $request->id)->first();
 
         if (!$row) {
             return response()->json(['error' => 'Data not found.']);
         }
 
-        $oldTax = (float) $row->tax_amount;
-        $oldBank = (float) $row->bankamount;
-        $newTax = (float) $request->tax_amount;
+        $oldOt = (float) $row->ot_amount;
+        $oldCash = (float) $row->cashamount;
+        $newOt = (float) $request->ot_amount;
 
-        // Calculate new bank amount
-        $newBank = $oldBank + $oldTax - $newTax;
+        $newCash = $oldCash - $oldOt + $newOt;
 
-        // Update values
         DB::table('employee_salary_details')
             ->where('id', $request->id)
             ->update([
-                'tax_amount' => $newTax,
-                'bankamount' => $newBank,
+                'ot_amount' => $newOt,
+                'cashamount' => $newCash,
             ]);
 
         return response()->json([
             'success' => true,
-            'updated_bankamount' => $newBank
+            'updated_cashamount' => $newCash
         ]);
     } catch (\Exception $e) {
-        return response()->json(['error' => 'Failed to update tax amount.', 'message' => $e->getMessage()]);
+        return response()->json(['error' => 'Failed to update OT amount.', 'message' => $e->getMessage()]);
     }
 }
 
+    
 
-    // public function UpdateTaxAmount(Request $request){
-    //     try {
-    //         DB::table('employee_salary_details')
-    //         ->where('id', $request->id)
-    //         ->update(['tax_amount' => $request->tax_amount]);
-    //         return response()->json(['success' => 'Tax Amount Updated Successfully.']);
-    //     } catch (\Exception $e) {
-    //         return response()->json(['error' => 'Failed to update tax amount.']);
-    //     }
-    // }
+
+    public function updateHolidayAmount(Request $request)
+    {
+        $id = $request->input('id');
+        $amount = $request->input('holiday_amount');
+
+        try {
+            // Step 1: Find employee_id from employee_salary_details
+            $employee = DB::table('employee_salary_details')->where('id', $id)->first();
+
+            if (!$employee) {
+                return response()->json(['success' => false, 'message' => 'Employee not found.']);
+            }
+
+            $employee_id = $employee->employee_id;
+            
+
+            // Step 2: Update holiday_amount and cashamount
+            DB::table('employee_salary_details')
+                ->where('id', $id)
+                ->update([
+                    'holiday_amount' => $amount,
+                    'cashamount' => DB::raw("cashamount + $amount")
+                ]);
+
+            // Step 3: Update NetPayable in the latest employee_salary_payment_details row
+            DB::table('employee_salary_payment_details')
+                ->where('EmployeeID', $employee_id)
+                ->orderBy('id', 'desc')
+                ->limit(1)
+                ->update([
+                    'NetPayable' => DB::raw("NetPayable + $amount")
+                ]);
+
+            return response()->json(['success' => true]);
+
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()]);
+        }
+    }
+
+
+
+
+    public function UpdateTaxAmount(Request $request)
+    {
+        try {
+            // Retrieve old tax and bank amounts
+            $row = DB::table('employee_salary_details')->where('id', $request->id)->first();
+
+            if (!$row) {
+                return response()->json(['error' => 'Data not found.']);
+            }
+
+            $oldTax = (float) $row->tax_amount;
+            $oldBank = (float) $row->bankamount;
+            $newTax = (float) $request->tax_amount;
+
+            // Calculate new bank amount
+            $newBank = $oldBank + $oldTax - $newTax;
+
+            // Update values
+            DB::table('employee_salary_details')
+                ->where('id', $request->id)
+                ->update([
+                    'tax_amount' => $newTax,
+                    'bankamount' => $newBank,
+                ]);
+
+            return response()->json([
+                'success' => true,
+                'updated_bankamount' => $newBank
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to update tax amount.', 'message' => $e->getMessage()]);
+        }
+    }
+
+
+
 
     public function  SalarySlip() {
         $group = DB::table('com_group')->get();
