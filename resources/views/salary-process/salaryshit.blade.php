@@ -222,10 +222,7 @@
 
                         const netPayable =
                             parseFloat(item.bankamount || 0) +
-                            parseFloat(item.cashamount || 0) +
-                            parseFloat(item.arrear_amount || 0) +
-                            parseFloat(item.holiday_amount || 0) +
-                            parseFloat(item.ot_amount || 0) ;
+                            parseFloat(item.cashamount || 0) ;
                         // Append row to the table
                         tableBody.append(`
                             <tr>
