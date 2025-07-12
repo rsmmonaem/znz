@@ -448,243 +448,86 @@
                         $(this).remove();
                     });
                 });
-                    // Holiday amount modal
-                // $(document).on('click', '.holiday-amount', function() {
-                //     const holidayAmount = parseFloat($(this).data('holiday-amount'));
-                //     const id = $(this).data('id');
-                //     const name = $(this).data('name');
-
-                //     const modal = $('<div class="modal fade" id="holidayModal" tabindex="-1" role="dialog" aria-labelledby="holidayModalLabel" aria-hidden="true">');
-                //     modal.html(
-                //         '<div class="modal-dialog" role="document">' +
-                //             '<div class="modal-content">' +
-                //                 '<div class="modal-header">' +
-                //                     '<h5 class="modal-title" id="holidayModalLabel">Edit Holiday Amount</h5>' +
-                //                     '<button type="button" class="close" data-dismiss="modal" aria-label="Close">' +
-                //                         '<span aria-hidden="true">&times;</span>' +
-                //                     '</button>' +
-                //                 '</div>' +
-                //                 '<div class="modal-body">' +
-                //                     `<p>Edit holiday for <strong>${name}</strong>:</p>` +
-                //                     `<input type="number" id="holidayAmountInput" class="form-control" value="${holidayAmount}">` +
-                //                 '</div>' +
-                //                 '<div class="modal-footer">' +
-                //                     `<button type="button" class="btn btn-primary" id="saveHolidayAmount" data-id="${id}">Save</button>` +
-                //                     '<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>' +
-                //                 '</div>' +
-                //             '</div>' +
-                //         '</div>'
-                //     );
-                //     $('body').append(modal);
-                //     $('#holidayModal').modal('show');
-
-                //     $('#saveHolidayAmount').on('click', function () {
-                //         const newHoliday = $('#holidayAmountInput').val();
-                //         const id = $(this).data('id');
-
-                //         // Get the old holiday amount from the table cell's data attribute before updating it
-                //         const oldHoliday = parseFloat($('.holiday-amount[data-id="' + id + '"]').data('holiday-amount')) || 0;
-                //         const netPayable = parseFloat($('.net-payable[data-id="' + id + '"]').data('netpayable')) || 0;
-
-                //         $.ajax({
-                //             url: '/update-holiday-amount',
-                //             method: 'POST',
-                //             data: {
-                //                 id: id,
-                //                 holiday_amount: newHoliday
-                //             },
-                //             success: function (response) {
-                //                 if (response.success) {
-                //                     // Update holiday amount cell text and data attribute
-                //                     $('.holiday-amount[data-id="' + id + '"]').text(newHoliday);
-                //                     $('.holiday-amount[data-id="' + id + '"]').data('holiday-amount', newHoliday);
-
-                //                     // Calculate new net payable
-                //                     const newNetPayable = netPayable - oldHoliday + parseFloat(newHoliday);
-
-                //                     // Update net payable cell text and data attribute
-                //                     $('.net-payable[data-id="' + id + '"]').text(newNetPayable.toFixed(2));
-                //                     $('.net-payable[data-id="' + id + '"]').data('netpayable', newNetPayable);
-
-                //                     $('#holidayModal').modal('hide');
-                //                     toastr.success('Holiday updated successfully.');
-                //                 } else {
-                //                     toastr.error('Update failed.');
-                //                 }
-                //             },
-                //             error: function () {
-                //                 toastr.error('Server error.');
-                //             }
-                //         });
-                //     });
-
-                //     $('#holidayModal').on('hidden.bs.modal', function () {
-                //         $(this).remove();
-                //     });
-                // });
-
+               
 
 
                 // Arrear amount modal
-                // $(document).on('click', '.arrear-amount', function() {
-                //     const arrearAmount = parseFloat($(this).data('arrear-amount'));  // Get the current arrear amount
-                //     const id = $(this).data('id');  // Get the ID of the clicked element
-                //     const name = $(this).data('name');  // Get the name of the clicked employee
-                //     const cashamount = $(this).data('cashamount');
-                //     // Create the modal
-                //     console.log(id);
+                
+                $(document).on('click', '.arrear-amount', function () {
+                    const arrearAmount = parseFloat($(this).data('arrear-amount'));
+                    const id = $(this).data('id');
+                    const name = $(this).data('name');
+                    const oldCash = parseFloat($('.cash-amount[data-id="' + id + '"]').data('cashamount')) || 0;
 
-                //     const modal = $('<div class="modal fade" id="arrearModal" tabindex="-1" role="dialog" aria-labelledby="arrearModalLabel" aria-hidden="true">');
-                //     modal.html(`
-                //         <div class="modal-dialog" role="document">
-                //             <div class="modal-content">
-                //                 <div class="modal-header">
-                //                     <h5 class="modal-title" id="arrearModalLabel">Edit Arrear Amount</h5>
-                //                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                //                         <span aria-hidden="true">&times;</span>
-                //                     </button>
-                //                 </div>
-                //                 <div class="modal-body">
-                //                     <p>Are you sure you want to edit the arrear amount for <strong>${name}</strong>?</p>
-                //                     <label for="arrearAmountInput">Arrear Amount</label>
-                //                     <input type="number" id="arrearAmountInput" class="form-control" value="${arrearAmount}">
-                //                 </div>
-                //                 <div class="modal-footer">
-                //                     <button type="button" class="btn btn-primary" id="saveArrearAmount" data-id="${id}" data-arrear-amount="${arrearAmount}">Save</button>
-                //                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                //                 </div>
-                //             </div>
-                //         </div>
-                //     `);
+                    const modal = $(`
+                        <div class="modal fade" id="arrearModal" tabindex="-1" role="dialog" aria-labelledby="arrearModalLabel" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="arrearModalLabel">Edit Arrear Amount</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p>Edit arrear for <strong>${name}</strong>:</p>
+                                        <input type="number" id="arrearAmountInput" class="form-control" value="${arrearAmount}">
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-primary" id="saveArrearAmount" data-id="${id}" data-old="${arrearAmount}" data-cash="${oldCash}">Save</button>
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `);
 
-                //     // Append the modal to the body
-                //     $('body').append(modal);
+                    $('body').append(modal);
+                    $('#arrearModal').modal('show');
 
-                //     // Show the modal
-                //     $('#arrearModal').modal('show');
+                    $(document).off('click', '#saveArrearAmount').on('click', '#saveArrearAmount', function () {
+                        const newArrear = parseFloat($('#arrearAmountInput').val()) || 0;
+                        const id = $(this).data('id');
+                        const oldArrear = parseFloat($(this).data('old'));
+                        const oldCash = parseFloat($(this).data('cash'));
 
-                //     // Handle save button click
-                //     $('#saveArrearAmount').on('click', function() {
-                //         const arrearAmountInput = $('#arrearAmountInput').val();  // Get the new arrear amount from the input field
-                //         const id = $(this).data('id');  // Get the ID
-                //         const arrearAmount = $(this).data('arrear-amount');  // Get the old arrear amount
+                        $.ajax({
+                            url: '/update-arrear-amount',
+                            method: 'POST',
+                            data: {
+                                id: id,
+                                arrear_amount: newArrear
+                            },
+                            success: function (response) {
+                                if (response.success) {
+                                    // Update the table cell
+                                    $('.arrear-amount[data-id="' + id + '"]').text(newArrear.toFixed(2));
+                                    $('.arrear-amount[data-id="' + id + '"]').data('arrear-amount', newArrear);
 
-                //         // Make the AJAX request to update the arrear amount
-                //         $.ajax({
-                //             url: '/update-arrear-amount',  // Your endpoint for updating the arrear amount
-                //             method: 'POST',
-                //             data: {
-                //                 id: id,
-                //                 arrear_amount: arrearAmountInput
-                //             },
-                //             success: function(response) {
-                //                 if (response.success) {
-                //                     // Update the arrear amount in the table without reloading
-                //                     $('.arrear-amount[data-id="' + id + '"]').text(arrearAmountInput);  // Update the displayed arrear amount
-                //                     $('.arrear-amount[data-id="' + id + '"]').data('arrear-amount', arrearAmountInput);  // Update the data attribute for the arrear amount
+                                    // Update cash amount
+                                    const updatedCash = (oldCash - oldArrear + newArrear).toFixed(2);
+                                    $('.cash-amount[data-id="' + id + '"]').text(updatedCash);
+                                    $('.cash-amount[data-id="' + id + '"]').data('cashamount', updatedCash);
 
-                //                     const netPayable = parseFloat($('.net-payable[data-id="' + id + '"]').data('netpayable'));
-                //                     const newNetPayable = isNaN(netPayable) ? parseFloat(arrearAmountInput) : (netPayable + parseFloat(arrearAmountInput));
+                                    // Remove modal and then reload
+                                    $('#arrearModal').modal('hide').on('hidden.bs.modal', function () {
+                                        $(this).remove();
+                                        location.reload();
+                                    });
+                                } else {
+                                    toastr.error('Update failed.');
+                                }
+                            },
+                            error: function () {
+                                toastr.error('Server error.');
+                            }
+                        });
+                    });
 
-                //                     const cashamount = parseFloat($('.cash-amount[data-id="' + id + '"]').data('cashamount'));
-                //                     const newCashAmount = isNaN(cashamount) ? parseFloat(arrearAmountInput) : (cashamount + parseFloat(arrearAmountInput));
-
-                //                     $('.net-payable[data-id="' + id + '"]').text(newNetPayable);
-                //                     $('.net-payable[data-id="' + id + '"]').data('netpayable', newNetPayable);
-
-                //                     $('.cash-amount[data-id="' + id + '"]').text(newCashAmount);
-                //                     // Hide the modal
-                //                     $('#arrearModal').modal('hide');  // Close the modal
-                //                     toastr.success('Arrear amount updated successfully.');
-                //                 } else {
-                //                     toastr.error('Failed to update arrear amount.');
-                //                 }
-                //             },
-                //             error: function(xhr, status, error) {
-                //                 console.error('Error:', error);  // Log any errors
-                //                 toastr.error('An error occurred while updating the arrear amount.');
-                //             }
-                //         });
-                //     });
-
-                //     // Close modal on clicking outside or pressing the escape key
-                //     $('#arrearModal').on('hidden.bs.modal', function() {
-                //         $(this).remove();  // Remove modal from the DOM after it is closed
-                //     });
-                // });
-// Ensure the jQuery code runs after the DOM is ready
-$(document).on('click', '.arrear-amount', function () {
-    const arrearAmount = parseFloat($(this).data('arrear-amount'));
-    const id = $(this).data('id');
-    const name = $(this).data('name');
-    const oldCash = parseFloat($('.cash-amount[data-id="' + id + '"]').data('cashamount')) || 0;
-
-    const modal = $(`
-        <div class="modal fade" id="arrearModal" tabindex="-1" role="dialog" aria-labelledby="arrearModalLabel" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="arrearModalLabel">Edit Arrear Amount</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <p>Edit arrear for <strong>${name}</strong>:</p>
-                        <input type="number" id="arrearAmountInput" class="form-control" value="${arrearAmount}">
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-primary" id="saveArrearAmount" data-id="${id}" data-old="${arrearAmount}" data-cash="${oldCash}">Save</button>
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    `);
-
-    $('body').append(modal);
-    $('#arrearModal').modal('show');
-
-    $(document).off('click', '#saveArrearAmount').on('click', '#saveArrearAmount', function () {
-        const newArrear = parseFloat($('#arrearAmountInput').val()) || 0;
-        const id = $(this).data('id');
-        const oldArrear = parseFloat($(this).data('old'));
-        const oldCash = parseFloat($(this).data('cash'));
-
-        $.ajax({
-            url: '/update-arrear-amount',
-            method: 'POST',
-            data: {
-                id: id,
-                arrear_amount: newArrear
-            },
-            success: function (response) {
-                if (response.success) {
-                    // update table cell
-                    $('.arrear-amount[data-id="' + id + '"]').text(newArrear.toFixed(2));
-                    $('.arrear-amount[data-id="' + id + '"]').data('arrear-amount', newArrear);
-
-                    // update cash amount
-                    const updatedCash = (oldCash - oldArrear + newArrear).toFixed(2);
-                    $('.cash-amount[data-id="' + id + '"]').text(updatedCash);
-                    $('.cash-amount[data-id="' + id + '"]').data('cashamount', updatedCash);
-                    location.reload();
-                    $('#arrearModal').modal('hide');
-                    toastr.success('Arrear Amount Updated Successfully.');
-                } else {
-                    toastr.error('Update failed.');
-                }
-            },
-            error: function () {
-                toastr.error('Server error.');
-            }
-        });
-    });
-
-    $('#arrearModal').on('hidden.bs.modal', function () {
-        $(this).remove();
-    });
-});
+                    $('#arrearModal').on('hidden.bs.modal', function () {
+                        $(this).remove();
+                    });
+                });
 
 
                 
