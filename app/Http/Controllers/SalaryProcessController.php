@@ -934,7 +934,24 @@ class SalaryProcessController extends Controller
         } catch (\Exception $e) {
             return response()->json(['error' => 'Failed to update arrear amount.']);
         }
-    }   
+    }  
+    
+    public function UpdateHolidayAmount(Request $request)
+    {
+        try {
+            DB::table('employee_salary_details')
+                ->where('id', $request->id)
+                ->update([
+                    'holiday_amount' => $request->holiday_amount,
+                    'cashamount' => DB::raw("cashamount + {$request->holiday_amount}")
+                ]);
+
+            return response()->json(['success' => 'Holiday Amount Updated Successfully.']);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to update holiday amount.']);
+        }
+    }
+
     
     public function UpdateTaxAmount(Request $request){
         try {
