@@ -1041,7 +1041,7 @@ public function UpdateTaxAmount(Request $request)
         }
 
         $oldTax = (float) $row->tax_amount;
-        $oldBank = (float) $row->bank_amount;
+        $oldBank = (float) $row->bankamount;
         $newTax = (float) $request->tax_amount;
 
         // Calculate new bank amount
