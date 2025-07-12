@@ -668,7 +668,7 @@ $(document).on('click', '.arrear-amount', function () {
                     const updatedCash = (oldCash - oldArrear + newArrear).toFixed(2);
                     $('.cash-amount[data-id="' + id + '"]').text(updatedCash);
                     $('.cash-amount[data-id="' + id + '"]').data('cashamount', updatedCash);
-
+                    location.reload();
                     $('#arrearModal').modal('hide');
                     toastr.success('Arrear Amount Updated Successfully.');
                 } else {
