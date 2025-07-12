@@ -936,22 +936,55 @@ class SalaryProcessController extends Controller
         }
     }  
     
+    // public function UpdateHolidayAmount(Request $request)
+    // {
+    //     try {
+    //         $holidayAmount = floatval($request->holiday_amount);
+    //         DB::table('employee_salary_details')
+    //             ->where('id', $request->id)
+    //             ->update([
+    //                 'holiday_amount' => $holidayAmount,
+    //                 'cashamount' => DB::raw("cashamount + {$request->holiday_amount}")
+    //             ]);
+
+    //         return response()->json(['success' => 'Holiday Amount Updated Successfully.']);
+    //     } catch (\Exception $e) {
+    //         return response()->json(['error' => 'Failed to update holiday amount.']);
+    //     }
+    // }
+
     public function UpdateHolidayAmount(Request $request)
     {
         try {
             $holidayAmount = floatval($request->holiday_amount);
+
+            // আগে cashamount এর বর্তমান মান আনো
+            $current = DB::table('employee_salary_details')
+                        ->where('id', $request->id)
+                        ->value('cashamount');
+
+            // null হলে 0 ধরে নিও
+            $current = is_null($current) ? 0 : $current;
+
+            // নতুন ক্যাশ অ্যামাউন্ট
+            $newCashAmount = $current + $holidayAmount;
+
+            // Update query
             DB::table('employee_salary_details')
                 ->where('id', $request->id)
                 ->update([
                     'holiday_amount' => $holidayAmount,
-                    'cashamount' => DB::raw("cashamount + {$request->holiday_amount}")
+                    'cashamount'     => $newCashAmount
                 ]);
 
             return response()->json(['success' => 'Holiday Amount Updated Successfully.']);
+
         } catch (\Exception $e) {
+            \Log::error('Holiday Amount Update Error: '.$e->getMessage());
             return response()->json(['error' => 'Failed to update holiday amount.']);
         }
     }
+
 
     
     public function UpdateTaxAmount(Request $request){
