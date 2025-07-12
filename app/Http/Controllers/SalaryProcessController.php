@@ -996,18 +996,50 @@ public function updateHolidayAmount(Request $request)
 }
 
 
+public function updateTaxAmount(Request $request)
+{
+    try {
+        $id = $request->id;
+        $newTax = floatval($request->tax_amount);
 
-    
-    public function UpdateTaxAmount(Request $request){
-        try {
-            DB::table('employee_salary_details')
-            ->where('id', $request->id)
-            ->update(['tax_amount' => $request->tax_amount]);
-            return response()->json(['success' => 'Tax Amount Updated Successfully.']);
-        } catch (\Exception $e) {
-            return response()->json(['error' => 'Failed to update tax amount.']);
+        // Get previous tax and bank amounts
+        $record = DB::table('employee_salary_details')->where('id', $id)->first();
+
+        if (!$record) {
+            return response()->json(['error' => 'Record not found.']);
         }
+
+        $oldTax = floatval($record->tax_amount);
+        $oldBank = floatval($record->bank_amount);
+
+        // Calculate updated bank amount
+        $updatedBank = $oldBank + $oldTax - $newTax;
+
+        // Update DB
+        DB::table('employee_salary_details')->where('id', $id)->update([
+            'tax_amount' => $newTax,
+            'bank_amount' => $updatedBank,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'updated_bank_amount' => $updatedBank,
+        ]);
+    } catch (\Exception $e) {
+        return response()->json(['error' => 'Failed to update tax amount.']);
     }
+}
+    
+    // public function UpdateTaxAmount(Request $request){
+    //     try {
+    //         DB::table('employee_salary_details')
+    //         ->where('id', $request->id)
+    //         ->update(['tax_amount' => $request->tax_amount]);
+    //         return response()->json(['success' => 'Tax Amount Updated Successfully.']);
+    //     } catch (\Exception $e) {
+    //         return response()->json(['error' => 'Failed to update tax amount.']);
+    //     }
+    // }
 
     public function  SalarySlip() {
         $group = DB::table('com_group')->get();

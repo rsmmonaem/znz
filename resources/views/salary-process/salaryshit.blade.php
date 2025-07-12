@@ -532,87 +532,166 @@
 
                 
                 // Tax Amount Edit
-                $(document).on('click', '.tax-amount', function() {
-                    const taxAmount = parseFloat($(this).data('tax-amount')); // Get the current tax amount
-                    const id = $(this).data('id'); // Get the ID of the clicked element
-                    const name = $(this).data('name'); // Get the name of the clicked employee
+                // $(document).on('click', '.tax-amount', function() {
+                //     const taxAmount = parseFloat($(this).data('tax-amount')); // Get the current tax amount
+                //     const id = $(this).data('id'); // Get the ID of the clicked element
+                //     const name = $(this).data('name'); // Get the name of the clicked employee
 
-                    // Create the modal
-                    const modal = $('<div class="modal fade" id="taxModal" tabindex="-1" role="dialog" aria-labelledby="taxModalLabel" aria-hidden="true">');
-                    modal.html(`
-                        <div class="modal-dialog" role="document">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="taxModalLabel">Edit Tax Amount</h5>
-                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                </div>
-                                <div class="modal-body">
-                                    <p>Are you sure you want to edit the tax amount for <strong>${name}</strong>?</p>
-                                    <label for="taxAmountInput">Tax Amount</label>
-                                    <input type="number" id="taxAmountInput" class="form-control" value="${taxAmount}">
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-primary" id="saveTaxAmount" data-id="${id}" data-tax-amount="${taxAmount}">Save</button>
-                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                                </div>
-                            </div>
-                        </div>
-                    `);
+                //     // Create the modal
+                //     const modal = $('<div class="modal fade" id="taxModal" tabindex="-1" role="dialog" aria-labelledby="taxModalLabel" aria-hidden="true">');
+                //     modal.html(`
+                //         <div class="modal-dialog" role="document">
+                //             <div class="modal-content">
+                //                 <div class="modal-header">
+                //                     <h5 class="modal-title" id="taxModalLabel">Edit Tax Amount</h5>
+                //                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                //                         <span aria-hidden="true">&times;</span>
+                //                     </button>
+                //                 </div>
+                //                 <div class="modal-body">
+                //                     <p>Are you sure you want to edit the tax amount for <strong>${name}</strong>?</p>
+                //                     <label for="taxAmountInput">Tax Amount</label>
+                //                     <input type="number" id="taxAmountInput" class="form-control" value="${taxAmount}">
+                //                 </div>
+                //                 <div class="modal-footer">
+                //                     <button type="button" class="btn btn-primary" id="saveTaxAmount" data-id="${id}" data-tax-amount="${taxAmount}">Save</button>
+                //                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                //                 </div>
+                //             </div>
+                //         </div>
+                //     `);
 
-                    // Append the modal to the body
-                    $('body').append(modal);
+                //     // Append the modal to the body
+                //     $('body').append(modal);
 
-                    // Show the modal
-                    $('#taxModal').modal('show');
+                //     // Show the modal
+                //     $('#taxModal').modal('show');
 
-                    // Handle save button click
-                    $('#saveTaxAmount').on('click', function() {
-                        const taxAmountInput = $('#taxAmountInput').val(); // Get the new tax amount from the input field
-                        const id = $(this).data('id'); // Get the ID
+                //     // Handle save button click
+                //     $('#saveTaxAmount').on('click', function() {
+                //         const taxAmountInput = $('#taxAmountInput').val(); // Get the new tax amount from the input field
+                //         const id = $(this).data('id'); // Get the ID
 
-                        // Make the AJAX request to update the tax amount
-                        $.ajax({
-                            url: '/update-tax-amount', // Your endpoint for updating the tax amount
-                            method: 'POST',
-                            data: {
-                                id: id,
-                                tax_amount: taxAmountInput
-                            },
-                            success: function(response) {
-                                if (response.success) {
-                                    // Update the tax amount in the table without reloading
-                                    $('.tax-amount[data-id="' + id + '"]').text(taxAmountInput); // Update the displayed tax amount
-                                    $('.tax-amount[data-id="' + id + '"]').data('tax-amount', taxAmountInput); // Update the data attribute for the tax amount
+                //         // Make the AJAX request to update the tax amount
+                //         $.ajax({
+                //             url: '/update-tax-amount', // Your endpoint for updating the tax amount
+                //             method: 'POST',
+                //             data: {
+                //                 id: id,
+                //                 tax_amount: taxAmountInput
+                //             },
+                //             success: function(response) {
+                //                 if (response.success) {
+                //                     // Update the tax amount in the table without reloading
+                //                     $('.tax-amount[data-id="' + id + '"]').text(taxAmountInput); // Update the displayed tax amount
+                //                     $('.tax-amount[data-id="' + id + '"]').data('tax-amount', taxAmountInput); // Update the data attribute for the tax amount
 
-                                    const netPayable = parseFloat($('.net-payable[data-id="' + id + '"]').data('netpayable'));
-                                    const newNetPayable = isNaN(netPayable)
-                                        ? parseFloat(taxAmountInput)
-                                        : (netPayable - parseFloat(taxAmountInput));
+                //                     const netPayable = parseFloat($('.net-payable[data-id="' + id + '"]').data('netpayable'));
+                //                     const newNetPayable = isNaN(netPayable)
+                //                         ? parseFloat(taxAmountInput)
+                //                         : (netPayable - parseFloat(taxAmountInput));
 
-                                    $('.net-payable[data-id="' + id + '"]').text(newNetPayable.toFixed(2));
-                                    $('.net-payable[data-id="' + id + '"]').data('netpayable', newNetPayable);
+                //                     $('.net-payable[data-id="' + id + '"]').text(newNetPayable.toFixed(2));
+                //                     $('.net-payable[data-id="' + id + '"]').data('netpayable', newNetPayable);
 
-                                    // Hide the modal
-                                    $('#taxModal').modal('hide'); // Close the modal
-                                    toastr.success('Tax amount updated successfully.');
-                                } else {
-                                    toastr.error('Failed to update tax amount.');
-                                }
-                            },
-                            error: function(xhr, status, error) {
-                                console.error('Error:', error); // Log any errors
-                                toastr.error('An error occurred while updating the tax amount.');
-                            }
-                        });
+                //                     // Hide the modal
+                //                     $('#taxModal').modal('hide'); // Close the modal
+                //                     toastr.success('Tax amount updated successfully.');
+                //                 } else {
+                //                     toastr.error('Failed to update tax amount.');
+                //                 }
+                //             },
+                //             error: function(xhr, status, error) {
+                //                 console.error('Error:', error); // Log any errors
+                //                 toastr.error('An error occurred while updating the tax amount.');
+                //             }
+                //         });
+                //     });
+
+                //     // Close modal on clicking outside or pressing the escape key
+                //     $('#taxModal').on('hidden.bs.modal', function() {
+                //         $(this).remove(); // Remove modal from the DOM after it is closed
+                //     });
+                // });
+// Tax Amount Edit (Updated to follow arrear logic)
+$(document).on('click', '.tax-amount', function () {
+    const taxAmount = parseFloat($(this).data('tax-amount')) || 0;
+    const id = $(this).data('id');
+    const name = $(this).data('name');
+    const oldBankAmount = parseFloat($('.bank-amount[data-id="' + id + '"]').data('bankamount')) || 0;
+
+    const modal = $(`
+        <div class="modal fade" id="taxModal" tabindex="-1" role="dialog" aria-labelledby="taxModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="taxModalLabel">Edit Tax Amount</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Edit tax for <strong>${name}</strong>:</p>
+                        <input type="number" id="taxAmountInput" class="form-control" value="${taxAmount}">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" id="saveTaxAmount" data-id="${id}" data-old-tax="${taxAmount}">Save</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `);
+
+    $('body').append(modal);
+    $('#taxModal').modal('show');
+
+    $(document).off('click', '#saveTaxAmount').on('click', '#saveTaxAmount', function () {
+        const newTax = parseFloat($('#taxAmountInput').val()) || 0;
+        const id = $(this).data('id');
+        const oldTax = parseFloat($(this).data('old-tax')) || 0;
+
+        $.ajax({
+            url: '/update-tax-amount',
+            method: 'POST',
+            data: {
+                id: id,
+                tax_amount: newTax
+            },
+            success: function (response) {
+                if (response.success) {
+                    // Update table
+                    $('.tax-amount[data-id="' + id + '"]').text(newTax.toFixed(2));
+                    $('.tax-amount[data-id="' + id + '"]').data('tax-amount', newTax);
+
+                    // Update bank amount only
+                    const updatedBank = (oldBankAmount + oldTax - newTax).toFixed(2);
+                    $('.bank-amount[data-id="' + id + '"]').text(updatedBank);
+                    $('.bank-amount[data-id="' + id + '"]').data('bankamount', updatedBank);
+
+                    $('#taxModal').modal('hide');
+
+                    // Reload after modal fully hidden
+                    $('#taxModal').on('hidden.bs.modal', function () {
+                        location.reload();
                     });
 
-                    // Close modal on clicking outside or pressing the escape key
-                    $('#taxModal').on('hidden.bs.modal', function() {
-                        $(this).remove(); // Remove modal from the DOM after it is closed
-                    });
-                });
+                    toastr.success('Tax Amount Updated Successfully.');
+                } else {
+                    toastr.error('Failed to update tax amount.');
+                }
+            },
+            error: function () {
+                toastr.error('Server error.');
+            }
+        });
+    });
+
+    $('#taxModal').on('hidden.bs.modal', function () {
+        $(this).remove();
+    });
+});
+
 
 
             });
