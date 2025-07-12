@@ -529,15 +529,16 @@ class SalaryProcessController extends Controller
         $bankAdvance = $advanceAmount * (70 / 100); // 70% of advance goes to bank
         $cashAdvance = $advanceAmount * (30 / 100); // 30% of advance goes to cash
 
-        $BankAmountValue =  $BankAmountValue - $bankDeduction - $bankAdvance - $amount; // Deduct attendance and advance from bank amount
-        $CashAmountValue =  $CashAmountValue - $cashDeduction - $cashAdvance; // Deduct attendance and advance from cash amount
+        $BankAmountValues =  $bankSlab - $bankDeduction - $bankAdvance - $amount; // Deduct attendance and advance from bank amount
+        $CashAmountValues =  $cashSlab - $cashDeduction - $cashAdvance; // Deduct attendance and advance from cash amount
         
         
 
 
         
 
-        $NetPayable = $BankAmountValue - $CashAmountValue;
+        $NetPayable = $BankAmountValues + $CashAmountValues;
+        
         // $newBank = ($NetPayable * 70) / 100;
         // $cashamount = $NetPayable - $newBank;
 
@@ -567,8 +568,8 @@ class SalaryProcessController extends Controller
 
             'form_date' => $formDate,
             'to_date' => $toDate,
-            'bankamount' => $BankAmountValue, // Fixed logic
-            'cashamount' => $CashAmountValue, // Fixed logic
+            'bankamount' => $BankAmountValues, // Fixed logic
+            'cashamount' => $CashAmountValues, // Fixed logic
             'weekendays_amount' => $TotalFridaysAmount ? $TotalFridaysAmount : 0
         ];
 
@@ -577,8 +578,8 @@ class SalaryProcessController extends Controller
             'UnpaidAmount' => 0,
             'NetPayable' => $NetPayable,
             'EmployeeID' => $employeeId,
-            'BankPay' => max(0, $BankAmountValue), // Corrected bank amount
-            'CashPay' => max(0, $CashAmountValue), // Corrected cash amount
+            'BankPay' => max(0, $BankAmountValues), // Corrected bank amount
+            'CashPay' => max(0, $CashAmountValues), // Corrected cash amount
             'Gross' => $salaryslab ? $salaryslab->gross : 0,
             'TotalPayable' => max(0, $netSalaryWIthoutTax - $amount),
             'TotalDeduction' => $TotalDiductionAmount + $amount + $advanceAmount + $ProvidentFund,
