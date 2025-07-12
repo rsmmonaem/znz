@@ -526,92 +526,154 @@
 
 
                 // Arrear amount modal
-                $(document).on('click', '.arrear-amount', function() {
-                    const arrearAmount = parseFloat($(this).data('arrear-amount'));  // Get the current arrear amount
-                    const id = $(this).data('id');  // Get the ID of the clicked element
-                    const name = $(this).data('name');  // Get the name of the clicked employee
-                    const cashamount = $(this).data('cashamount');
-                    // Create the modal
-                    console.log(id);
+                // $(document).on('click', '.arrear-amount', function() {
+                //     const arrearAmount = parseFloat($(this).data('arrear-amount'));  // Get the current arrear amount
+                //     const id = $(this).data('id');  // Get the ID of the clicked element
+                //     const name = $(this).data('name');  // Get the name of the clicked employee
+                //     const cashamount = $(this).data('cashamount');
+                //     // Create the modal
+                //     console.log(id);
 
-                    const modal = $('<div class="modal fade" id="arrearModal" tabindex="-1" role="dialog" aria-labelledby="arrearModalLabel" aria-hidden="true">');
-                    modal.html(`
-                        <div class="modal-dialog" role="document">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="arrearModalLabel">Edit Arrear Amount</h5>
-                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                </div>
-                                <div class="modal-body">
-                                    <p>Are you sure you want to edit the arrear amount for <strong>${name}</strong>?</p>
-                                    <label for="arrearAmountInput">Arrear Amount</label>
-                                    <input type="number" id="arrearAmountInput" class="form-control" value="${arrearAmount}">
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-primary" id="saveArrearAmount" data-id="${id}" data-arrear-amount="${arrearAmount}">Save</button>
-                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                //     const modal = $('<div class="modal fade" id="arrearModal" tabindex="-1" role="dialog" aria-labelledby="arrearModalLabel" aria-hidden="true">');
+                //     modal.html(`
+                //         <div class="modal-dialog" role="document">
+                //             <div class="modal-content">
+                //                 <div class="modal-header">
+                //                     <h5 class="modal-title" id="arrearModalLabel">Edit Arrear Amount</h5>
+                //                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                //                         <span aria-hidden="true">&times;</span>
+                //                     </button>
+                //                 </div>
+                //                 <div class="modal-body">
+                //                     <p>Are you sure you want to edit the arrear amount for <strong>${name}</strong>?</p>
+                //                     <label for="arrearAmountInput">Arrear Amount</label>
+                //                     <input type="number" id="arrearAmountInput" class="form-control" value="${arrearAmount}">
+                //                 </div>
+                //                 <div class="modal-footer">
+                //                     <button type="button" class="btn btn-primary" id="saveArrearAmount" data-id="${id}" data-arrear-amount="${arrearAmount}">Save</button>
+                //                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                //                 </div>
+                //             </div>
+                //         </div>
+                //     `);
+
+                //     // Append the modal to the body
+                //     $('body').append(modal);
+
+                //     // Show the modal
+                //     $('#arrearModal').modal('show');
+
+                //     // Handle save button click
+                //     $('#saveArrearAmount').on('click', function() {
+                //         const arrearAmountInput = $('#arrearAmountInput').val();  // Get the new arrear amount from the input field
+                //         const id = $(this).data('id');  // Get the ID
+                //         const arrearAmount = $(this).data('arrear-amount');  // Get the old arrear amount
+
+                //         // Make the AJAX request to update the arrear amount
+                //         $.ajax({
+                //             url: '/update-arrear-amount',  // Your endpoint for updating the arrear amount
+                //             method: 'POST',
+                //             data: {
+                //                 id: id,
+                //                 arrear_amount: arrearAmountInput
+                //             },
+                //             success: function(response) {
+                //                 if (response.success) {
+                //                     // Update the arrear amount in the table without reloading
+                //                     $('.arrear-amount[data-id="' + id + '"]').text(arrearAmountInput);  // Update the displayed arrear amount
+                //                     $('.arrear-amount[data-id="' + id + '"]').data('arrear-amount', arrearAmountInput);  // Update the data attribute for the arrear amount
+
+                //                     const netPayable = parseFloat($('.net-payable[data-id="' + id + '"]').data('netpayable'));
+                //                     const newNetPayable = isNaN(netPayable) ? parseFloat(arrearAmountInput) : (netPayable + parseFloat(arrearAmountInput));
+
+                //                     const cashamount = parseFloat($('.cash-amount[data-id="' + id + '"]').data('cashamount'));
+                //                     const newCashAmount = isNaN(cashamount) ? parseFloat(arrearAmountInput) : (cashamount + parseFloat(arrearAmountInput));
+
+                //                     $('.net-payable[data-id="' + id + '"]').text(newNetPayable);
+                //                     $('.net-payable[data-id="' + id + '"]').data('netpayable', newNetPayable);
+
+                //                     $('.cash-amount[data-id="' + id + '"]').text(newCashAmount);
+                //                     // Hide the modal
+                //                     $('#arrearModal').modal('hide');  // Close the modal
+                //                     toastr.success('Arrear amount updated successfully.');
+                //                 } else {
+                //                     toastr.error('Failed to update arrear amount.');
+                //                 }
+                //             },
+                //             error: function(xhr, status, error) {
+                //                 console.error('Error:', error);  // Log any errors
+                //                 toastr.error('An error occurred while updating the arrear amount.');
+                //             }
+                //         });
+                //     });
+
+                //     // Close modal on clicking outside or pressing the escape key
+                //     $('#arrearModal').on('hidden.bs.modal', function() {
+                //         $(this).remove();  // Remove modal from the DOM after it is closed
+                //     });
+                // });
+                $(document).on('click', '.arrear-amount', function() {
+                    const arrearAmount = parseFloat($(this).data('arrear-amount'));
+                    const id = $(this).data('id');
+                    const name = $(this).data('name');
+
+                    const modal = $(`
+                        <div class="modal fade" id="arrearModal" tabindex="-1" role="dialog" aria-labelledby="arrearModalLabel" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="arrearModalLabel">Edit Arrear Amount</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p>Edit arrear for <strong>${name}</strong>:</p>
+                                        <input type="number" id="arrearAmountInput" class="form-control" value="${arrearAmount}">
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-primary" id="saveArrearAmount" data-id="${id}">Save</button>
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     `);
-
-                    // Append the modal to the body
                     $('body').append(modal);
-
-                    // Show the modal
                     $('#arrearModal').modal('show');
 
-                    // Handle save button click
                     $('#saveArrearAmount').on('click', function() {
-                        const arrearAmountInput = $('#arrearAmountInput').val();  // Get the new arrear amount from the input field
-                        const id = $(this).data('id');  // Get the ID
-                        const arrearAmount = $(this).data('arrear-amount');  // Get the old arrear amount
+                        const newArrear = $('#arrearAmountInput').val();
+                        const id = $(this).data('id');
 
-                        // Make the AJAX request to update the arrear amount
                         $.ajax({
-                            url: '/update-arrear-amount',  // Your endpoint for updating the arrear amount
+                            url: '/update-arrear-amount',
                             method: 'POST',
                             data: {
                                 id: id,
-                                arrear_amount: arrearAmountInput
+                                arrear_amount: newArrear
                             },
-                            success: function(response) {
+                            success: function (response) {
                                 if (response.success) {
-                                    // Update the arrear amount in the table without reloading
-                                    $('.arrear-amount[data-id="' + id + '"]').text(arrearAmountInput);  // Update the displayed arrear amount
-                                    $('.arrear-amount[data-id="' + id + '"]').data('arrear-amount', arrearAmountInput);  // Update the data attribute for the arrear amount
-
-                                    const netPayable = parseFloat($('.net-payable[data-id="' + id + '"]').data('netpayable'));
-                                    const newNetPayable = isNaN(netPayable) ? parseFloat(arrearAmountInput) : (netPayable + parseFloat(arrearAmountInput));
-
-                                    const cashamount = parseFloat($('.cash-amount[data-id="' + id + '"]').data('cashamount'));
-                                    const newCashAmount = isNaN(cashamount) ? parseFloat(arrearAmountInput) : (cashamount + parseFloat(arrearAmountInput));
-
-                                    $('.net-payable[data-id="' + id + '"]').text(newNetPayable);
-                                    $('.net-payable[data-id="' + id + '"]').data('netpayable', newNetPayable);
-
-                                    $('.cash-amount[data-id="' + id + '"]').text(newCashAmount);
-                                    // Hide the modal
-                                    $('#arrearModal').modal('hide');  // Close the modal
-                                    toastr.success('Arrear amount updated successfully.');
+                                    $('.arrear-amount[data-id="' + id + '"]').text(newHoliday);
+                                    $('.arrear-amount[data-id="' + id + '"]').data('arrear-amount', newArrear);
+                                    $('#arrearModal').modal('hide');
+                                    location.reload();
                                 } else {
-                                    toastr.error('Failed to update arrear amount.');
+                                    toastr.error('Update failed.');
                                 }
                             },
-                            error: function(xhr, status, error) {
-                                console.error('Error:', error);  // Log any errors
-                                toastr.error('An error occurred while updating the arrear amount.');
+                            error: function() {
+                                toastr.error('Server error.');
                             }
                         });
                     });
 
-                    // Close modal on clicking outside or pressing the escape key
                     $('#arrearModal').on('hidden.bs.modal', function() {
-                        $(this).remove();  // Remove modal from the DOM after it is closed
+                        $(this).remove();
                     });
                 });
+                
                 // Tax Amount Edit
                 $(document).on('click', '.tax-amount', function() {
                     const taxAmount = parseFloat($(this).data('tax-amount')); // Get the current tax amount
