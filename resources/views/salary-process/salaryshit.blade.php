@@ -426,24 +426,18 @@
                                 holiday_amount: newHoliday
                             },
                             success: function (response) {
-                                if (response.success) {
-                                    $('.holiday-amount[data-id="' + id + '"]').text(newHoliday);
-                                    $('.holiday-amount[data-id="' + id + '"]').data('holiday-amount', newHoliday);
+    if (response.success) {
+        $('.holiday-amount[data-id="' + id + '"]').text(newHoliday);
+        $('.holiday-amount[data-id="' + id + '"]').data('holiday-amount', newHoliday);
+        $('#holidayModal').modal('hide');
+        location.reload();
+        // ekhane net payable update thakle remove korte hobe
+    } else {
+        toastr.error('Update failed.');
+    }
+}
 
-                                    // Update cashamount cell from response (dhore nei response e ase)
-                                    if (response.updated_cashamount !== undefined) {
-                                        $('.cash-amount[data-id="' + id + '"]').text(parseFloat(response.updated_cashamount).toFixed(2));
-                                        $('.cash-amount[data-id="' + id + '"]').data('cashamount', response.updated_cashamount);
-                                    }
-
-                                    $('#holidayModal').modal('hide');
-
-                                    // Reload the page to reflect changes
-                                    location.reload();
-                                } else {
-                                    toastr.error('Update failed.');
-                                }
-                            },
+                            
                             error: function () {
                                 toastr.error('Server error.');
                             }
