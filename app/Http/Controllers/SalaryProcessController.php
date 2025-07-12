@@ -1052,7 +1052,7 @@ public function UpdateTaxAmount(Request $request)
             ->where('id', $request->id)
             ->update([
                 'tax_amount' => $newTax,
-                'bank_amount' => $newBank,
+                'bankamount' => $newBank,
             ]);
 
         return response()->json([
