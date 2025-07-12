@@ -108,7 +108,8 @@
                                     <th rowspan="2">Net Salary</th>
                                     <th rowspan="2">Advance</th>
                                     <th rowspan="2">Provident Fund</th>
-                                    <th rowspan="2">TAX</th>                                    
+                                    <th rowspan="2">TAX</th>          
+                                    <th rowspan="2">Holiday</th>
                                     <th rowspan="2">Arrear Amount</th>
                                     <th rowspan="2">OT Amount</th>
                                     <th rowspan="2">Net Payable</th>
@@ -142,6 +143,7 @@
                                     <td id="total-advance"></td>
                                     <td id="total-provident-fund"></td>
                                     <td id="total-tax"></td>
+                                    <td id="total-holiday"></td>
                                     <td id="total-arrear"></td>
                                     <td id="total-otamount"></td>
                                     <td id="total-net-payable"></td>
@@ -244,6 +246,7 @@
                                 <td>${item.advance_salary}</td>
                                 <td>${item.provident_fund}</td>
                                 <td class="tax-amount" data-id="${item.id}" data-tax-amount="${item.tax_amount}" data-name="${item.first_name}" >${item.tax_amount || '0.00'}</td>
+                                 <td class="holiday-amount" data-id="${item.id}" data-holiday-amount="0.00" data-name="${item.first_name}">0.00</td>
                                 <td class="arrear-amount" data-name="${item.first_name}" data-arrear-amount="${item.arrear_amount}" data-id="${item.id}" >${item.arrear_amount}</td>
                                 <td class="ot-amount" data-id="${item.id}" >${item.ot_amount ? item.ot_amount : '0.00'}</td>
                                 <td class="net-payable" data-id="${item.id}" data-netpayable="${item.net_salary}">${parseFloat(netPayable).toFixed(2)}</td>
@@ -333,22 +336,28 @@
                             var totalTax = api.column(15).data().reduce(function(a, b) {
                                 return parseFloat(a) + parseFloat(b);
                             }, 0);
-
-                            var totalArrear = api.column(16).data().reduce(function(a, b) {
+                            
+                            var totalHoliday = api.column(16).data().reduce(function(a, b) {
                                 return parseFloat(a) + parseFloat(b);
                             }, 0);
+                            
+                            $('#total-holiday').html(parseFloat(totalHoliday).toFixed(2));
+
                             var totalArrear = api.column(17).data().reduce(function(a, b) {
                                 return parseFloat(a) + parseFloat(b);
                             }, 0);
-                            var totalNetPayable = api.column(18).data().reduce(function(a, b) {
+                            var totalArrear = api.column(18).data().reduce(function(a, b) {
+                                return parseFloat(a) + parseFloat(b);
+                            }, 0);
+                            var totalNetPayable = api.column(19).data().reduce(function(a, b) {
                                 return parseFloat(a) + parseFloat(b);
                             }, 0);
 
-                            var TotalBank = api.column(19).data().reduce(function(a, b) {
+                            var TotalBank = api.column(20).data().reduce(function(a, b) {
                                 return parseFloat(a) + parseFloat(b);
                             })
 
-                            var TotalCash = api.column(20).data().reduce(function(a, b) {
+                            var TotalCash = api.column(21).data().reduce(function(a, b) {
                                 return parseFloat(a) + parseFloat(b);
                             })
 
@@ -380,6 +389,96 @@
                         table.column(4).search(this.value).draw();
                     });
                 }
+                // Holiday amount modal
+                $(document).on('click', '.holiday-amount', function() {
+    const holidayAmount = parseFloat($(this).data('holiday-amount'));
+    const id = $(this).data('id');
+    const name = $(this).data('name');
+
+    // Remove any existing modal first
+    $('#holidayModal').remove();
+
+    const modal = $('<div class="modal fade" id="holidayModal" tabindex="-1" role="dialog" aria-labelledby="holidayModalLabel" aria-hidden="true">');
+    modal.html(`
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Holiday Amount</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span>&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to edit the holiday amount for <strong>${name}</strong>?</p>
+                    <label for="holidayAmountInput">Holiday Amount</label>
+                    <input type="number" id="holidayAmountInput" class="form-control" value="${holidayAmount}">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="saveHolidayAmount" data-id="${id}">Save</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    `);
+
+    $('body').append(modal);
+    $('#holidayModal').modal('show');
+
+    // Remove any existing click event before binding new
+    $(document).off('click', '#saveHolidayAmount');
+
+    // Now bind the save button click event
+    $(document).on('click', '#saveHolidayAmount', function() {
+        const newHolidayAmount = parseFloat($('#holidayAmountInput').val());
+        const id = $(this).data('id');
+
+        $.ajax({
+            url: '/update-holiday-amount',
+            method: 'POST',
+            data: {
+                id: id,
+                holiday_amount: newHolidayAmount
+            },
+            success: function(response) {
+                if (response.success) {
+                    $('.holiday-amount[data-id="' + id + '"]').text(newHolidayAmount.toFixed(2));
+                    $('.holiday-amount[data-id="' + id + '"]').data('holiday-amount', newHolidayAmount);
+
+                    const netPayable = parseFloat($('.net-payable[data-id="' + id + '"]').data('netpayable'));
+                    const newNetPayable = isNaN(netPayable)
+                        ? newHolidayAmount
+                        : (netPayable + newHolidayAmount);
+
+                    $('.net-payable[data-id="' + id + '"]').text(newNetPayable.toFixed(2));
+                    $('.net-payable[data-id="' + id + '"]').data('netpayable', newNetPayable);
+
+                    const cashamount = parseFloat($('.cash-amount[data-id="' + id + '"]').data('cashamount'));
+                    const newCashAmount = isNaN(cashamount)
+                        ? newHolidayAmount
+                        : (cashamount + newHolidayAmount);
+
+                    $('.cash-amount[data-id="' + id + '"]').text(newCashAmount.toFixed(2));
+                    $('.cash-amount[data-id="' + id + '"]').data('cashamount', newCashAmount);
+
+                    $('#holidayModal').modal('hide');
+                    toastr.success('Holiday amount updated successfully.');
+                } else {
+                    toastr.error('Failed to update holiday amount.');
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('Error:', error);
+                toastr.error('An error occurred while updating the holiday amount.');
+            }
+        });
+    });
+
+    $('#holidayModal').on('hidden.bs.modal', function() {
+        $(this).remove();
+    });
+});
+
+
                 // Arrear amount modal
                 $(document).on('click', '.arrear-amount', function() {
                     const arrearAmount = parseFloat($(this).data('arrear-amount'));  // Get the current arrear amount
