@@ -939,10 +939,11 @@ class SalaryProcessController extends Controller
     public function UpdateHolidayAmount(Request $request)
     {
         try {
+            $holidayAmount = floatval($request->holiday_amount);
             DB::table('employee_salary_details')
                 ->where('id', $request->id)
                 ->update([
-                    'holiday_amount' => $request->holiday_amount,
+                    'holiday_amount' => $holidayAmount,
                     'cashamount' => DB::raw("cashamount + {$request->holiday_amount}")
                 ]);
 
