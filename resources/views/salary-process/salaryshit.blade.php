@@ -223,6 +223,7 @@
                         const netPayable =
                             parseFloat(item.net_salary || 0) +
                             parseFloat(item.arrear_amount || 0) +
+                            parseFloat(item.holiday_amount || 0) +
                             parseFloat(item.ot_amount || 0) -
                             parseFloat(item.tax_amount || 0) -
                             parseFloat(item.provident_fund || 0) -
