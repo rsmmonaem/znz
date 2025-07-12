@@ -108,7 +108,9 @@
                                     <th rowspan="2">Net Salary</th>
                                     <th rowspan="2">Advance</th>
                                     <th rowspan="2">Provident Fund</th>
-                                    <th rowspan="2">TAX</th>                                    <th rowspan="2">Arrear Amount</th>
+                                    <th rowspan="2">TAX</th>                                    
+                                    <th rowspan="2">Holiday</th>
+                                    <th rowspan="2">Arrear Amount</th>
                                     <th rowspan="2">OT Amount</th>
                                     <th rowspan="2">Net Payable</th>
                                     <th rowspan="2">Bank Payable</th>
@@ -141,6 +143,7 @@
                                     <td id="total-advance"></td>
                                     <td id="total-provident-fund"></td>
                                     <td id="total-tax"></td>
+                                    <td id="total-holiday"></td>
                                     <td id="total-arrear"></td>
                                     <td id="total-otamount"></td>
                                     <td id="total-net-payable"></td>
@@ -243,6 +246,7 @@
                                 <td>${item.advance_salary}</td>
                                 <td>${item.provident_fund}</td>
                                 <td class="tax-amount" data-id="${item.id}" data-tax-amount="${item.tax_amount}" data-name="${item.first_name}" >${item.tax_amount || '0.00'}</td>
+                                <td class="holiday-amount" data-id="${item.id}" data-tax-amount="${item.holiday}" data-name="${item.first_name}" >${item.holiday || '0.00'}</td>
                                 <td class="arrear-amount" data-name="${item.first_name}" data-arrear-amount="${item.arrear_amount}" data-id="${item.id}" >${item.arrear_amount}</td>
                                 <td class="ot-amount" data-id="${item.id}" >${item.ot_amount ? item.ot_amount : '0.00'}</td>
                                 <td class="net-payable" data-id="${item.id}" data-netpayable="${item.net_salary}">${parseFloat(netPayable).toFixed(2)}</td>
@@ -333,21 +337,21 @@
                                 return parseFloat(a) + parseFloat(b);
                             }, 0);
 
-                            var totalArrear = api.column(16).data().reduce(function(a, b) {
-                                return parseFloat(a) + parseFloat(b);
-                            }, 0);
                             var totalArrear = api.column(17).data().reduce(function(a, b) {
                                 return parseFloat(a) + parseFloat(b);
                             }, 0);
-                            var totalNetPayable = api.column(18).data().reduce(function(a, b) {
+                            var totalArrear = api.column(18).data().reduce(function(a, b) {
+                                return parseFloat(a) + parseFloat(b);
+                            }, 0);
+                            var totalNetPayable = api.column(19).data().reduce(function(a, b) {
                                 return parseFloat(a) + parseFloat(b);
                             }, 0);
 
-                            var TotalBank = api.column(19).data().reduce(function(a, b) {
+                            var TotalBank = api.column(20).data().reduce(function(a, b) {
                                 return parseFloat(a) + parseFloat(b);
                             })
 
-                            var TotalCash = api.column(20).data().reduce(function(a, b) {
+                            var TotalCash = api.column(21).data().reduce(function(a, b) {
                                 return parseFloat(a) + parseFloat(b);
                             })
 
