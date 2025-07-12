@@ -246,7 +246,7 @@
                                 <td>${item.advance_salary}</td>
                                 <td>${item.provident_fund}</td>
                                 <td class="tax-amount" data-id="${item.id}" data-tax-amount="${item.tax_amount}" data-name="${item.first_name}" >${item.tax_amount || '0.00'}</td>
-                                 <td class="holiday-amount" data-id="${item.id}" data-holiday-amount="${item.holiday_amount || 0}" data-name="${item.first_name}">${item.holiday_amount || '0.00'}</td>
+                                 <td class="holiday-amount" data-id="${item.id}" data-holiday-amount="0.00" data-name="${item.first_name}">0.00</td>
                                 <td class="arrear-amount" data-name="${item.first_name}" data-arrear-amount="${item.arrear_amount}" data-id="${item.id}" >${item.arrear_amount}</td>
                                 <td class="ot-amount" data-id="${item.id}" >${item.ot_amount ? item.ot_amount : '0.00'}</td>
                                 <td class="net-payable" data-id="${item.id}" data-netpayable="${item.net_salary}">${parseFloat(netPayable).toFixed(2)}</td>
