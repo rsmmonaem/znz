@@ -612,67 +612,76 @@
                 //         $(this).remove();  // Remove modal from the DOM after it is closed
                 //     });
                 // });
-                $(document).on('click', '.arrear-amount', function() {
-                    const arrearAmount = parseFloat($(this).data('arrear-amount'));
-                    const id = $(this).data('id');
-                    const name = $(this).data('name');
+// Ensure the jQuery code runs after the DOM is ready
+$(document).on('click', '.arrear-amount', function () {
+    const arrearAmount = parseFloat($(this).data('arrear-amount')) || 0;
+    const id = $(this).data('id');
+    const name = $(this).data('name');
 
-                    const modal = $(`
-                        <div class="modal fade" id="arrearModal" tabindex="-1" role="dialog" aria-labelledby="arrearModalLabel" aria-hidden="true">
-                            <div class="modal-dialog" role="document">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="arrearModalLabel">Edit Arrear Amount</h5>
-                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                            <span aria-hidden="true">&times;</span>
-                                        </button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <p>Edit arrear for <strong>${name}</strong>:</p>
-                                        <input type="number" id="arrearAmountInput" class="form-control" value="${arrearAmount}">
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-primary" id="saveArrearAmount" data-id="${id}">Save</button>
-                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    `);
-                    $('body').append(modal);
-                    $('#arrearModal').modal('show');
+    const modal = $(`
+        <div class="modal fade" id="arrearModal" tabindex="-1" role="dialog" aria-labelledby="arrearModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="arrearModalLabel">Edit Arrear Amount</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Edit arrear for <strong>${name}</strong>:</p>
+                        <input type="number" id="arrearAmountInput" class="form-control" value="${arrearAmount}">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" id="saveArrearAmount" data-id="${id}">Save</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `);
 
-                    $('#saveArrearAmount').on('click', function() {
-                        const newArrear = $('#arrearAmountInput').val();
-                        const id = $(this).data('id');
+    $('body').append(modal);
+    $('#arrearModal').modal('show');
 
-                        $.ajax({
-                            url: '/update-arrear-amount',
-                            method: 'POST',
-                            data: {
-                                id: id,
-                                arrear_amount: newArrear
-                            },
-                            success: function (response) {
-                                if (response.success) {
-                                    $('.arrear-amount[data-id="' + id + '"]').text(newHoliday);
-                                    $('.arrear-amount[data-id="' + id + '"]').data('arrear-amount', newArrear);
-                                    $('#arrearModal').modal('hide');
-                                    location.reload();
-                                } else {
-                                    toastr.error('Update failed.');
-                                }
-                            },
-                            error: function() {
-                                toastr.error('Server error.');
-                            }
-                        });
-                    });
+    $(document).off('click', '#saveArrearAmount').on('click', '#saveArrearAmount', function () {
+        const newArrear = $('#arrearAmountInput').val();
+        const id = $(this).data('id');
 
-                    $('#arrearModal').on('hidden.bs.modal', function() {
-                        $(this).remove();
-                    });
-                });
+        $.ajax({
+            url: '/update-arrear-amount',
+            method: 'POST',
+            data: {
+                id: id,
+                arrear_amount: newArrear
+            },
+            success: function (response) {
+                if (response.success) {
+                    $('.arrear-amount[data-id="' + id + '"]').text(parseFloat(newArrear).toFixed(2));
+                    $('.arrear-amount[data-id="' + id + '"]').data('arrear-amount', newArrear);
+
+                    if (response.updated_cashamount !== undefined) {
+                        $('.cash-amount[data-id="' + id + '"]').text(parseFloat(response.updated_cashamount).toFixed(2));
+                        $('.cash-amount[data-id="' + id + '"]').data('cashamount', response.updated_cashamount);
+                    }
+
+                    $('#arrearModal').modal('hide');
+                    location.reload();
+                } else {
+                    toastr.error('Update failed.');
+                }
+            },
+            error: function () {
+                toastr.error('Server error.');
+            }
+        });
+    });
+
+    $('#arrearModal').on('hidden.bs.modal', function () {
+        $(this).remove();
+    });
+});
+
                 
                 // Tax Amount Edit
                 $(document).on('click', '.tax-amount', function() {
