@@ -426,16 +426,16 @@
                                 holiday_amount: newHoliday
                             },
                             success: function (response) {
-    if (response.success) {
-        $('.holiday-amount[data-id="' + id + '"]').text(newHoliday);
-        $('.holiday-amount[data-id="' + id + '"]').data('holiday-amount', newHoliday);
-        $('#holidayModal').modal('hide');
-        location.reload();
-        // ekhane net payable update thakle remove korte hobe
-    } else {
-        toastr.error('Update failed.');
-    }
-}
+                                if (response.success) {
+                                    $('.holiday-amount[data-id="' + id + '"]').text(newHoliday);
+                                    $('.holiday-amount[data-id="' + id + '"]').data('holiday-amount', newHoliday);
+                                    $('#holidayModal').modal('hide');
+                                    location.reload();
+                                    // ekhane net payable update thakle remove korte hobe
+                                } else {
+                                    toastr.error('Update failed.');
+                                }
+                            },
 
                             
                             error: function () {
