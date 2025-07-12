@@ -516,24 +516,28 @@ class SalaryProcessController extends Controller
         $BankAmountValue = ($FinalBankPercentage / 100) * $BankApply;  // Bank portion before tax
         $CashAmountValue = ($FinalCashPercentage / 100) * $BankApply;  // Cash portion before 
 
-        $taxAdvance = $amount + $advanceAmount; 
-        $bankResult = $netSalaryWIthoutTax * ($FinalBankPercentage / 100);
-        $cashResult = $netSalaryWIthoutTax * ($FinalCashPercentage / 100);
 
-        // 70% bank
-        $bankTaxAdv = $taxAdvance * (70 / 100);
+        // salary Slab
+        $bankSlab = $BankAmount->bank_amount;
+        $cashSlab = $BankAmount->cash_amount;
 
-        // 30% cash
-        $cashTaxAdv = $taxAdvance * (30 / 100);
+        //Attendance Deduction
+        $bankDeduction = $TotalDiductionAmount * 70 / 100; // 70% of total deduction goes to bank
+        $cashDeduction = $TotalDiductionAmount * 30 / 100; // 30% of total deduction goes to cash
 
-        $newBank = $bankResult - $bankTaxAdv; // Bank amount after tax and advance
-        $cashamount = $cashResult - $cashTaxAdv; // Cash amount after tax and advance
+        // Advance Deduction
+        $bankAdvance = $advanceAmount * (70 / 100); // 70% of advance goes to bank
+        $cashAdvance = $advanceAmount * (30 / 100); // 30% of advance goes to cash
+
+        $BankAmountValue =  $BankAmountValue - $bankDeduction - $bankAdvance - $amount; // Deduct attendance and advance from bank amount
+        $CashAmountValue =  $CashAmountValue - $cashDeduction - $cashAdvance; // Deduct attendance and advance from cash amount
+        
+        
 
 
+        
 
-        // $bankPercentage = ; 
-
-        $NetPayable = $netSalaryWIthoutTax - $amount-$advanceAmount;
+        $NetPayable = $BankAmountValue - $CashAmountValue;
         // $newBank = ($NetPayable * 70) / 100;
         // $cashamount = $NetPayable - $newBank;
 
@@ -563,8 +567,8 @@ class SalaryProcessController extends Controller
 
             'form_date' => $formDate,
             'to_date' => $toDate,
-            'bankamount' => $newBank, // Fixed logic
-            'cashamount' => $cashamount, // Fixed logic
+            'bankamount' => $BankAmountValue, // Fixed logic
+            'cashamount' => $CashAmountValue, // Fixed logic
             'weekendays_amount' => $TotalFridaysAmount ? $TotalFridaysAmount : 0
         ];
 
@@ -573,8 +577,8 @@ class SalaryProcessController extends Controller
             'UnpaidAmount' => 0,
             'NetPayable' => $NetPayable,
             'EmployeeID' => $employeeId,
-            'BankPay' => max(0, $newBank), // Corrected bank amount
-            'CashPay' => max(0, $cashamount), // Corrected cash amount
+            'BankPay' => max(0, $BankAmountValue), // Corrected bank amount
+            'CashPay' => max(0, $CashAmountValue), // Corrected cash amount
             'Gross' => $salaryslab ? $salaryslab->gross : 0,
             'TotalPayable' => max(0, $netSalaryWIthoutTax - $amount),
             'TotalDeduction' => $TotalDiductionAmount + $amount + $advanceAmount + $ProvidentFund,
