@@ -969,11 +969,7 @@ public function updateHolidayAmount(Request $request)
         }
 
         $employee_id = $employee->employee_id;
-        dd(DB::table('employee_salary_payment_details')
-            ->where('EmployeeID', $employee_id)
-            ->orderBy('id', 'desc')
-            ->limit(1)->get());
-        die();
+        
 
         // Step 2: Update holiday_amount and cashamount
         DB::table('employee_salary_details')
