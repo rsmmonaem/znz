@@ -614,9 +614,10 @@
                 // });
 // Ensure the jQuery code runs after the DOM is ready
 $(document).on('click', '.arrear-amount', function () {
-    const arrearAmount = parseFloat($(this).data('arrear-amount')) || 0;
+    const arrearAmount = parseFloat($(this).data('arrear-amount'));
     const id = $(this).data('id');
     const name = $(this).data('name');
+    const oldCash = parseFloat($('.cash-amount[data-id="' + id + '"]').data('cashamount')) || 0;
 
     const modal = $(`
         <div class="modal fade" id="arrearModal" tabindex="-1" role="dialog" aria-labelledby="arrearModalLabel" aria-hidden="true">
@@ -633,7 +634,7 @@ $(document).on('click', '.arrear-amount', function () {
                         <input type="number" id="arrearAmountInput" class="form-control" value="${arrearAmount}">
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-primary" id="saveArrearAmount" data-id="${id}">Save</button>
+                        <button type="button" class="btn btn-primary" id="saveArrearAmount" data-id="${id}" data-old="${arrearAmount}" data-cash="${oldCash}">Save</button>
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
                     </div>
                 </div>
@@ -645,8 +646,10 @@ $(document).on('click', '.arrear-amount', function () {
     $('#arrearModal').modal('show');
 
     $(document).off('click', '#saveArrearAmount').on('click', '#saveArrearAmount', function () {
-        const newArrear = $('#arrearAmountInput').val();
+        const newArrear = parseFloat($('#arrearAmountInput').val()) || 0;
         const id = $(this).data('id');
+        const oldArrear = parseFloat($(this).data('old'));
+        const oldCash = parseFloat($(this).data('cash'));
 
         $.ajax({
             url: '/update-arrear-amount',
@@ -657,16 +660,17 @@ $(document).on('click', '.arrear-amount', function () {
             },
             success: function (response) {
                 if (response.success) {
-                    $('.arrear-amount[data-id="' + id + '"]').text(parseFloat(newArrear).toFixed(2));
+                    // update table cell
+                    $('.arrear-amount[data-id="' + id + '"]').text(newArrear.toFixed(2));
                     $('.arrear-amount[data-id="' + id + '"]').data('arrear-amount', newArrear);
 
-                    if (response.updated_cashamount !== undefined) {
-                        $('.cash-amount[data-id="' + id + '"]').text(parseFloat(response.updated_cashamount).toFixed(2));
-                        $('.cash-amount[data-id="' + id + '"]').data('cashamount', response.updated_cashamount);
-                    }
+                    // update cash amount
+                    const updatedCash = (oldCash - oldArrear + newArrear).toFixed(2);
+                    $('.cash-amount[data-id="' + id + '"]').text(updatedCash);
+                    $('.cash-amount[data-id="' + id + '"]').data('cashamount', updatedCash);
 
                     $('#arrearModal').modal('hide');
-                    location.reload();
+                    toastr.success('Arrear Amount Updated Successfully.');
                 } else {
                     toastr.error('Update failed.');
                 }
@@ -681,6 +685,7 @@ $(document).on('click', '.arrear-amount', function () {
         $(this).remove();
     });
 });
+
 
                 
                 // Tax Amount Edit
