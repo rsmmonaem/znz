@@ -935,6 +935,20 @@ class SalaryProcessController extends Controller
             return response()->json(['error' => 'Failed to update arrear amount.']);
         }
     }  
+
+    public function updateHolidayAmount(Request $request){
+        try {
+            DB::table('employee_salary_details')
+            ->where('id', $request->id)
+            ->update([
+                'holiday_amount' => $request->holiday_amount,
+                'cashamount' => DB::raw("cashamount + {$request->arrear_amount}")
+            ]);
+            return response()->json(['success' => 'Arrear Amount Updated Successfully.']);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to update arrear amount.']);
+        }
+    }  
     
     // public function UpdateHolidayAmount(Request $request)
     // {
@@ -955,45 +969,45 @@ class SalaryProcessController extends Controller
 
 // app/Http/Controllers/SalaryController.php
 
-public function updateHolidayAmount(Request $request)
-{
-    $id = $request->input('id');
-    $amount = $request->input('holiday_amount');
+// public function updateHolidayAmount(Request $request)
+// {
+//     $id = $request->input('id');
+//     $amount = $request->input('holiday_amount');
 
-    try {
-        // Step 1: Find employee_id from employee_salary_details
-        $employee = DB::table('employee_salary_details')->where('id', $id)->first();
+//     try {
+//         // Step 1: Find employee_id from employee_salary_details
+//         $employee = DB::table('employee_salary_details')->where('id', $id)->first();
 
-        if (!$employee) {
-            return response()->json(['success' => false, 'message' => 'Employee not found.']);
-        }
+//         if (!$employee) {
+//             return response()->json(['success' => false, 'message' => 'Employee not found.']);
+//         }
 
-        $employee_id = $employee->employee_id;
+//         $employee_id = $employee->employee_id;
         
 
-        // Step 2: Update holiday_amount and cashamount
-        DB::table('employee_salary_details')
-            ->where('id', $id)
-            ->update([
-                'holiday_amount' => $amount,
-                'cashamount' => DB::raw("cashamount + $amount")
-            ]);
+//         // Step 2: Update holiday_amount and cashamount
+//         DB::table('employee_salary_details')
+//             ->where('id', $id)
+//             ->update([
+//                 'holiday_amount' => $amount,
+//                 'cashamount' => DB::raw("cashamount + $amount")
+//             ]);
 
-        // Step 3: Update NetPayable in the latest employee_salary_payment_details row
-        DB::table('employee_salary_payment_details')
-            ->where('EmployeeID', $employee_id)
-            ->orderBy('id', 'desc')
-            ->limit(1)
-            ->update([
-                'NetPayable' => DB::raw("NetPayable + $amount")
-            ]);
+//         // Step 3: Update NetPayable in the latest employee_salary_payment_details row
+//         DB::table('employee_salary_payment_details')
+//             ->where('EmployeeID', $employee_id)
+//             ->orderBy('id', 'desc')
+//             ->limit(1)
+//             ->update([
+//                 'NetPayable' => DB::raw("NetPayable + $amount")
+//             ]);
 
-        return response()->json(['success' => true]);
+//         return response()->json(['success' => true]);
 
-    } catch (\Exception $e) {
-        return response()->json(['success' => false, 'message' => $e->getMessage()]);
-    }
-}
+//     } catch (\Exception $e) {
+//         return response()->json(['success' => false, 'message' => $e->getMessage()]);
+//     }
+// }
 
 
 
