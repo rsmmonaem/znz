@@ -953,37 +953,52 @@ class SalaryProcessController extends Controller
     //     }
     // }
 
-    public function UpdateHolidayAmount(Request $request)
-    {
-        try {
-            $holidayAmount = floatval($request->holiday_amount);
+// app/Http/Controllers/SalaryController.php
 
-            // আগে cashamount এর বর্তমান মান আনো
-            $current = DB::table('employee_salary_details')
-                        ->where('id', $request->id)
-                        ->value('cashamount');
+public function updateHolidayAmount(Request $request)
+{
+    $id = $request->input('id');
+    $amount = $request->input('holiday_amount');
 
-            // null হলে 0 ধরে নিও
-            $current = is_null($current) ? 0 : $current;
+    try {
+        // Step 1: Find employee_id from employee_salary_details
+        $employee = DB::table('employee_salary_details')->where('id', $id)->first();
 
-            // নতুন ক্যাশ অ্যামাউন্ট
-            $newCashAmount = $current + $holidayAmount;
-
-            // Update query
-            DB::table('employee_salary_details')
-                ->where('id', $request->id)
-                ->update([
-                    'holiday_amount' => $holidayAmount,
-                    'cashamount'     => $newCashAmount
-                ]);
-
-            return response()->json(['success' => 'Holiday Amount Updated Successfully.']);
-
-        } catch (\Exception $e) {
-            \Log::error('Holiday Amount Update Error: '.$e->getMessage());
-            return response()->json(['error' => 'Failed to update holiday amount.']);
+        if (!$employee) {
+            return response()->json(['success' => false, 'message' => 'Employee not found.']);
         }
+
+        $employee_id = $employee->employee_id;
+        dd(DB::table('employee_salary_payment_details')
+            ->where('EmployeeID', $employee_id)
+            ->orderBy('id', 'desc')
+            ->limit(1)->get());
+        die();
+
+        // Step 2: Update holiday_amount and cashamount
+        DB::table('employee_salary_details')
+            ->where('id', $id)
+            ->update([
+                'holiday_amount' => $amount,
+                'cashamount' => DB::raw("cashamount + $amount")
+            ]);
+
+        // Step 3: Update NetPayable in the latest employee_salary_payment_details row
+        DB::table('employee_salary_payment_details')
+            ->where('EmployeeID', $employee_id)
+            ->orderBy('id', 'desc')
+            ->limit(1)
+            ->update([
+                'NetPayable' => DB::raw("NetPayable + $amount")
+            ]);
+
+        return response()->json(['success' => true]);
+
+    } catch (\Exception $e) {
+        return response()->json(['success' => false, 'message' => $e->getMessage()]);
     }
+}
+
 
 
     
