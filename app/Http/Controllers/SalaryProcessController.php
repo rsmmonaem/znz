@@ -996,40 +996,75 @@ public function updateHolidayAmount(Request $request)
 }
 
 
-public function updateTaxAmount(Request $request)
+// public function updateTaxAmount(Request $request)
+// {
+//     try {
+//         $id = $request->id;
+//         $newTax = floatval($request->tax_amount);
+
+//         // Get previous tax and bank amounts
+//         $record = DB::table('employee_salary_details')->where('id', $id)->first();
+
+//         if (!$record) {
+//             return response()->json(['error' => 'Record not found.']);
+//         }
+
+//         $oldTax = floatval($record->tax_amount);
+//         $oldBank = floatval($record->bank_amount);
+
+//         // Calculate updated bank amount
+//         $updatedBank = $oldBank + $oldTax - $newTax;
+
+//         // Update DB
+//         DB::table('employee_salary_details')->where('id', $id)->update([
+//             'tax_amount' => $newTax,
+//             'bank_amount' => $updatedBank,
+//         ]);
+
+//         return response()->json([
+//             'success' => true,
+//             'updated_bank_amount' => $updatedBank,
+//         ]);
+//     } catch (\Exception $e) {
+//         return response()->json(['error' => 'Failed to update tax amount.']);
+//     }
+// }
+
+public function UpdateTaxAmount(Request $request)
 {
     try {
-        $id = $request->id;
-        $newTax = floatval($request->tax_amount);
+        // Retrieve old tax and bank amounts
+        $row = DB::table('employee_salary_details')->where('id', $request->id)->first();
 
-        // Get previous tax and bank amounts
-        $record = DB::table('employee_salary_details')->where('id', $id)->first();
-
-        if (!$record) {
-            return response()->json(['error' => 'Record not found.']);
+        if (!$row) {
+            return response()->json(['error' => 'Data not found.']);
         }
 
-        $oldTax = floatval($record->tax_amount);
-        $oldBank = floatval($record->bank_amount);
+        $oldTax = (float) $row->tax_amount;
+        $oldBank = (float) $row->bank_amount;
+        $newTax = (float) $request->tax_amount;
 
-        // Calculate updated bank amount
-        $updatedBank = $oldBank + $oldTax - $newTax;
+        // Calculate new bank amount
+        $newBank = $oldBank + $oldTax - $newTax;
 
-        // Update DB
-        DB::table('employee_salary_details')->where('id', $id)->update([
-            'tax_amount' => $newTax,
-            'bank_amount' => $updatedBank,
-        ]);
+        // Update values
+        DB::table('employee_salary_details')
+            ->where('id', $request->id)
+            ->update([
+                'tax_amount' => $newTax,
+                'bank_amount' => $newBank,
+            ]);
 
         return response()->json([
             'success' => true,
-            'updated_bank_amount' => $updatedBank,
+            'updated_bankamount' => $newBank
         ]);
     } catch (\Exception $e) {
-        return response()->json(['error' => 'Failed to update tax amount.']);
+        return response()->json(['error' => 'Failed to update tax amount.', 'message' => $e->getMessage()]);
     }
 }
-    
+
+
     // public function UpdateTaxAmount(Request $request){
     //     try {
     //         DB::table('employee_salary_details')
