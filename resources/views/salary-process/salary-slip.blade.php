@@ -503,6 +503,7 @@
         const netPayableAfeterTax =
             parseFloat(employee.net_salary || 0) +
             parseFloat(employee.arrear_amount || 0) +
+            parseFloat(employee.holiday_amount || 0) +
             parseFloat(employee.ot_amount || 0) -
             parseFloat(employee.tax_amount || 0) -
             parseFloat(employee.provident_fund || 0) -
