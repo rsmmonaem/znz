@@ -321,7 +321,7 @@ $(document).ready(function () {
             const holidayAmount  = parseFloat(item.holiday_amount || 0);
             const workedDays     = parseFloat(item.total_worked_days || 0);
 
-            const netPayable = (netSalary + arrearAmount + otAmount - advanceSalary - providentFund - taxAmount).toFixed(2);
+            const netPayable = (netSalary + arrearAmount + otAmount + holidayAmount - advanceSalary - providentFund - taxAmount).toFixed(2);
 
             // --- Update totals ----
             totalWorkedDays    += workedDays;
