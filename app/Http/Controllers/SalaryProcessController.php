@@ -370,6 +370,12 @@ class SalaryProcessController extends Controller
 
         // Initialize an array to store the Friday dates
         $fridays = WHD::where('user_id', $employeeId)->whereBetween('date', [$formDate, $toDate])->pluck('date')->toArray();
+        
+        $fridayClockCount = DB::table('clocks')
+        ->where('user_id', $employeeId)
+        ->whereIn('date', $fridays)
+        ->count();
+
         // Total Fridays
         $totalFridays = count($fridays);
 
@@ -406,13 +412,7 @@ class SalaryProcessController extends Controller
 
             $yearNumber  = (int)date('Y', strtotime($toDate));
 
-            // $advanceSalary = DB::table('salary_advance')
-            // ->leftJoin('salary_advance_months', 'salary_advance.id', '=', 'salary_advance_months.salary_advance_id')
-            // ->where('employeeId', $employeeId)
-            // ->where('salary_advance.effectiveDate', '<', $toDate)
-            // ->where(DB::raw('YEAR(salary_advance.effectiveDate)'), '=', $yearNumber)
-            // ->select('salary_advance.grossValue', 'salary_advance.grossOption', 'salary_advance_months.month', 'salary_advance_months.amount')
-            // ->get();
+
             
             $advanceSalary = DB::table('salary_advance')
                 ->leftJoin('salary_advance_months', 'salary_advance.id', '=', 'salary_advance_months.salary_advance_id')
@@ -430,14 +430,7 @@ class SalaryProcessController extends Controller
             }
         }
 
-        // $totalWorkedDays = $getTotalPresent + $holidays + $leave + $totalFridays + $spacial_holidays;
-        // $totalWorkedDays = $getTotalPresent + $holidays + $leave + $totalFridays + $spacial_holidays;
-        // $actual_present = $getTotalPresent
-        //         - $totalFridays
-        //         - $lwp
-        //         - $leave
-        //         - $spacial_holidays
-        //         - $holidays;
+        
         $actual_present = $TotalDays
                 - $totalFridays
                 - $lwp
@@ -445,18 +438,19 @@ class SalaryProcessController extends Controller
                 - $spacial_holidays
                 - $holidays;
 
-        $totalWorkedDays = $getTotalPresent  ;
+        $totalWorkedDays = $getTotalPresent - $fridayClockCount;
         $totalAbsents = $TotalDays - $totalWorkedDays;
-       //$totalPresentDays = $getTotalPresent + $holidays + $leave + $totalFridays + $spacial_holidays;
+       
         $perdaysAmount =  $salaryslab ? $salaryslab->gross / $TotalDays : 0;
-        // $GrossAmountSalaryPerDays = $perdaysAmount * $totalWorkedDays;
+        
         $GrossAmountSalaryPerDays = $perdaysAmount * $totalWorkedDays;
 
         $TotalDiductionAmount = $perdaysAmount * $totalAbsents;
+        $holidayAmount = $perdaysAmount * $fridayClockCount;
 
         $TotalFridaysAmount = $perdaysAmount * $totalFridays;
         $GrossSalaryAmountAfterAdvance = $GrossAmountSalaryPerDays;
-        // return $deductionsData->where('salary_type_id', 5);
+        ;
         if(count($deductionsData->where('salary_type_id', 5)) === 0){
             $ProvidentFund = 0;
         }else{
@@ -537,19 +531,8 @@ class SalaryProcessController extends Controller
 
         
 
-        $NetPayable = $BankAmountValues + $CashAmountValues;
+        $NetPayable = $BankAmountValues + $CashAmountValues + $holidayAmount;
         
-        // $newBank = ($NetPayable * 70) / 100;
-        // $cashamount = $NetPayable - $newBank;
-
-
-
-
-        // **Step 2: Deduct tax from bank portion**
-        // $BankAmountValue = max(0, $BankAmountValue - $amount-$advanceAmount); // Deduct Advance amount from bank amount
-
-        // // **Ensure Cash Pay remains valid**
-        // $CashAmountValue = max(0, $netSalaryWIthoutTax - $amount-$advanceAmount-$BankAmountValue); // Remaining salary goes to cash
 
         $TableData = [
             'total_worked_days' => $totalWorkedDays,
@@ -565,23 +548,26 @@ class SalaryProcessController extends Controller
             'tax_amount' => $amount,
             'arrear_amount' => '',
             'remarks' => $remarks,
-
+            'holiday_amount' => $holidayAmount,
+            'holiday' => $fridayClockCount,
             'form_date' => $formDate,
             'to_date' => $toDate,
             'bankamount' => $BankAmountValues, // Fixed logic
-            'cashamount' => $CashAmountValues, // Fixed logic
+            'cashamount' => $CashAmountValues + $holidayAmount, // Fixed logic
             'weekendays_amount' => $TotalFridaysAmount ? $TotalFridaysAmount : 0
         ];
 
         DB::table('employee_salary_payment_details')->insert([
             'PaidAmount' => 0,
             'UnpaidAmount' => 0,
+            'holiday' => $fridayClockCount,
             'NetPayable' => $NetPayable,
+            'holiday_amount' => $holidayAmount,
             'EmployeeID' => $employeeId,
             'BankPay' => max(0, $BankAmountValues), // Corrected bank amount
-            'CashPay' => max(0, $CashAmountValues), // Corrected cash amount
+            'CashPay' =>  $CashAmountValues + $holidayAmount, // Corrected cash amount
             'Gross' => $salaryslab ? $salaryslab->gross : 0,
-            'TotalPayable' => max(0, $netSalaryWIthoutTax - $amount),
+            'TotalPayable' => ( $netSalaryWIthoutTax - $amount) + $holidayAmount,
             'TotalDeduction' => $TotalDiductionAmount + $amount + $advanceAmount + $ProvidentFund,
             'FormDate' => $formDate,
             'ToDate' => $toDate,
@@ -892,6 +878,7 @@ class SalaryProcessController extends Controller
         ->LeftJoin('sections', 'profile.section_id', '=', 'sections.id')
         ->LeftJoin('branchs', 'profile.branch_id', '=', 'branchs.id')
         ->LeftJoin('departments', 'designations.department_id', '=', 'departments.id');
+
         if ($request->branch) {
             $data->where('profile.branch_id', '=', $request->branch);
         }
@@ -1206,7 +1193,8 @@ class SalaryProcessController extends Controller
                 'employee_salary_details.bankamount',
                 'employee_salary_details.cashamount',
                 'employee_salary_details.holiday_amount',
-                'employee_salary_details.weekendays_amount'
+                'employee_salary_details.weekendays_amount',
+                'employee_salary_details.holiday'
             )
             ->get();
 
