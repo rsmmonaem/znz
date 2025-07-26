@@ -546,7 +546,7 @@
                                 <td>Days Of Month:</td>
                                 <td class="text-right">${employee.date_difference}</td>
                                 <td>Attendance:</td>
-                                <td class="text-right">${Number(employee.total_worked_days) - Number(employee.total_fridays)}</td>
+                                <td class="text-right">${Number(employee.total_worked_days)}</td>
                             </tr>
                         </table>
                     </div>
@@ -575,7 +575,7 @@
                                     <td class="text-center">${employee.salaryData[2]?.head || '-'}(9%)</td>
                                     <td class="text-right">${formatCurrency(employee.salaryData[2]?.amount || 0)}</td>
                                     <td class="text-center">Holiday</td>
-                                    <td class="text-right">${employee.weekendays_amount}</td>
+                                    <td class="text-right">${employee.holiday_amount}</td>
                                 </tr>
                                 <tr>
                                     <td class="text-center">${employee.salaryData[3]?.head || '-'}(8%)</td>
@@ -626,8 +626,8 @@
                                     <td class="text-right">${employee.tax_amount ? formatCurrency(employee.tax_amount) : '-'}</td>
                                 </tr>
                                 <tr>
-                                    <td>Others</td>
-                                    <td class="text-right">-</td>
+                                    <td>Absent</td>
+                                    <td class="text-right">${employee.total_absents_fee}</td>
                                     <td>Others</td>
                                     <td class="text-right">-</td>
                                 </tr>
