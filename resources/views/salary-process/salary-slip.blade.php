@@ -495,6 +495,7 @@
         const netPayable = 
             parseFloat(employee.net_salary || 0) +
             parseFloat(employee.arrear_amount || 0) +
+            parseFloat(employee.holiday_amount || 0) +
             parseFloat(employee.ot_amount || 0) -
             parseFloat(employee.tax_amount || 0) -
             parseFloat(employee.provident_fund || 0) -
@@ -598,7 +599,7 @@
                                 </tr>
                                 <tr>
                                     <td colspan="1"><strong>Total Payable</strong></td>
-                                    <td colspan="3" style="text-align: right; margin-right: 20px"><strong>${parseFloat(employee.net_salary) + parseFloat(employee.ot_amount || 0) + parseFloat(employee.arrear_amount || 0)}</strong></td>
+                                    <td colspan="3" style="text-align: right; margin-right: 20px"><strong>${parseFloat(employee.net_salary) + parseFloat(employee.ot_amount || 0) + parseFloat(employee.arrear_amount || 0)+ parseFloat(employee.holiday_amount || 0)}</strong></td>
                                 </tr>
                             </tbody>
                         </table>
