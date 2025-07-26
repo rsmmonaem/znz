@@ -403,7 +403,7 @@
                                 </div>
                                 <div class="modal-body">
                                     <p>Edit holiday for <strong>${name}</strong>:</p>
-                                    <input type="number" id="holidayAmountInput" class="form-control" value="${holidayAmount}">
+                                    <input type="number" id="holidayAmountInput" class="form-control" value="${holidayAmount}" readonly>
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-primary" id="saveHolidayAmount" data-id="${id}">Save</button>
