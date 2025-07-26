@@ -270,10 +270,10 @@ $(document).ready(function () {
                             <th>Conveyance (8% of gross)</th>
                             <th>Others (5% of gross)</th>
                             <th>Net Salary</th>
-                            <th>Advance Salary</th>
                             <th>Holiday</th>
                             <th>Holiday Amount</th>
                             <th>Provident Fund</th>
+                            <th>Advance Salary</th>
                             <th>Tax Amount</th>
                             <th>Arrear Amount</th>
                             <th>OT Amount</th>
@@ -358,10 +358,10 @@ $(document).ready(function () {
                     <td>${nf(conveyance)}</td>
                     <td>${nf(others)}</td>
                     <td>${nf(netSalary)}</td>
-                    <td>${nf(advanceSalary)}</td>
                     <td>${nf(holiday)}</td>
                     <td>${nf(holidayAmount)}</td>
                     <td>${nf(providentFund)}</td>
+                    <td>${nf(advanceSalary)}</td>
                     <td>${nf(taxAmount)}</td>
                     <td>${nf(arrearAmount)}</td>
                     <td>${nf(otAmount)}</td>
@@ -385,10 +385,10 @@ $(document).ready(function () {
                 <td>${nf(totalConveyance)}</td>
                 <td>${nf(totalOthers)}</td>
                 <td>${nf(totalNetSalary)}</td>
-                <td>${nf(totalAdvanceSalary)}</td>
                 <td>${nf(totalHoliday)}</td>
                 <td>${nf(totalHolidayAmount)}</td>
                 <td>${nf(totalProvidentFund)}</td>
+                <td>${nf(totalAdvanceSalary)}</td>
                 <td>${nf(totalTaxAmount)}</td>
                 <td>${nf(totalArrearAmount)}</td>
                 <td>${nf(totalOT)}</td>
@@ -439,10 +439,10 @@ $(document).ready(function () {
                         <th>Total Conveyance</th>
                         <th>Total Others</th>
                         <th>Total Net Salary</th>
-                        <th>Total Advance</th>
                         <th>Total Holiday</th>
                         <th>Total Holiday Amount</th>
                         <th>Total Provident Fund</th>
+                        <th>Total Advance</th>
                         <th>Total Tax Amount</th>
                         <th>Total Arrear</th>
                         <th>Total OT</th>
@@ -461,10 +461,10 @@ $(document).ready(function () {
                         <td>${nf(totalConveyance)}</td>
                         <td>${nf(totalOthers)}</td>
                         <td>${nf(totalNetSalary)}</td>
-                        <td>${nf(totalAdvanceSalary)}</td>
                         <td>${nf(totalHoliday)}</td>
                         <td>${nf(totalHolidayAmount)}</td>
                         <td>${nf(totalProvidentFund)}</td>
+                        <td>${nf(totalAdvanceSalary)}</td>
                         <td>${nf(totalTaxAmount)}</td>
                         <td>${nf(totalArrearAmount)}</td>
                         <td>${nf(totalOT)}</td>
