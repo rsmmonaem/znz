@@ -566,7 +566,7 @@
                                     <td class="text-center">Basic (50% of Gross)</td>
                                     <td class="text-right">${formatCurrency((parseFloat(employee.gross_salary || 0) * 50) / 100)}</td>
                                     <td class="text-center">OT Amount</td>
-                                    <td class="text-right">${employee.ot_amount?employee.ot_amount:' '}</td>
+                                    <td class="text-right">${formatCurrency(parseFloat(employee.arrear_amount || 0))}</td>
                                 </tr>
                                 <tr>
                                     <td class="text-center">House Rent(28% of Gross)</td>
@@ -578,7 +578,7 @@
                                     <td class="text-center">Medical (9% of Gross)</td>
                                     <td class="text-right">${formatCurrency((parseFloat(employee.gross_salary || 0) * 9) / 100)}</td>
                                     <td class="text-center">Holiday</td>
-                                    <td class="text-right">${employee.holiday_amount}</td>
+                                    <td class="text-right">${formatCurrency(parseFloat(employee.holiday_amount || 0))}</td>
                                 </tr>
                                 <tr>
                                     <td class="text-center">Conveyance (8% of Gross)</td>
