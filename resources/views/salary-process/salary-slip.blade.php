@@ -509,6 +509,7 @@
             parseFloat(employee.tax_amount || 0) -
             parseFloat(employee.provident_fund || 0) -
             parseFloat(employee.advance_salary || 0);
+        const grossSalary = parseFloat(employee.gross_salary || 0);
         // HTML structure for a single payslip
         const payslip = `
             <div class="wrapper">
@@ -562,32 +563,32 @@
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td class="text-center">${employee.salaryData[0]?.head || '-'}(50%)</td>
-                                    <td class="text-right">${formatCurrency(employee.salaryData[0]?.amount || 0)}</td>
+                                    <td class="text-center">Basic (50% of Gross)</td>
+                                    <td class="text-right">${formatCurrency((parseFloat(employee.gross_salary || 0) * 50) / 100)}</td>
                                     <td class="text-center">OT Amount</td>
                                     <td class="text-right">${employee.ot_amount?employee.ot_amount:' '}</td>
                                 </tr>
                                 <tr>
-                                    <td class="text-center">${employee.salaryData[1]?.head || '-'}(28%)</td>
-                                    <td class="text-right">${formatCurrency(employee.salaryData[1]?.amount || 0)}</td>
+                                    <td class="text-center">House Rent(28% of Gross)</td>
+                                    <td class="text-right">${formatCurrency((parseFloat(employee.gross_salary || 0) * 28) / 100)}</td>
                                     <td class="text-center">Arrear Amount</td>
                                     <td class="text-right">${employee.arrear_amount}</td>
                                 </tr>
                                 <tr>
-                                    <td class="text-center">${employee.salaryData[2]?.head || '-'}(9%)</td>
-                                    <td class="text-right">${formatCurrency(employee.salaryData[2]?.amount || 0)}</td>
+                                    <td class="text-center">Medical (9% of Gross)</td>
+                                    <td class="text-right">${formatCurrency((parseFloat(employee.gross_salary || 0) * 9) / 100)}</td>
                                     <td class="text-center">Holiday</td>
                                     <td class="text-right">${employee.holiday_amount}</td>
                                 </tr>
                                 <tr>
-                                    <td class="text-center">${employee.salaryData[3]?.head || '-'}(8%)</td>
-                                    <td class="text-right">${formatCurrency(employee.salaryData[3]?.amount || 0)}</td>
+                                    <td class="text-center">Conveyance (8% of Gross)</td>
+                                    <td class="text-right">${formatCurrency((parseFloat(employee.gross_salary || 0) * 8) / 100)}</td>
                                     <td class="text-center">Others</td>
                                     <td class="text-right"></td>
                                 </tr>
                                 <tr>
-                                    <td class="text-center">${employee.salaryData[4]?.head || '-'}(5%)</td>
-                                    <td class="text-right">${formatCurrency(employee.salaryData[4]?.amount || 0)}</td>
+                                    <td class="text-center">Others (5% of Gross)</td>
+                                    <td class="text-right">${formatCurrency((parseFloat(employee.gross_salary || 0) * 5) / 100)}</td>
                                     <td class="text-center"></td>
                                     <td class="text-right"></td>
                                 </tr>
