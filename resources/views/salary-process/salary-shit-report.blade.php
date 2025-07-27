@@ -265,7 +265,7 @@ $(document).ready(function () {
                             <th>Attendance</th>
                             <th>Gross Salary</th>
                             <th>Basic (50% of gross)</th>
-                            <th>Home Rent (28% of gross)</th>
+                            <th>House Rent (28% of gross)</th>
                             <th>Medical (9% of gross)</th>
                             <th>Conveyance (8% of gross)</th>
                             <th>Others (5% of gross)</th>
