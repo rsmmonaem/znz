@@ -563,37 +563,37 @@
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td class="text-center">Basic (50% of Gross)</td>
+                                    <td class="text-left">Basic (50% of Gross)</td>
                                     <td class="text-right">${formatCurrency((parseFloat(employee.gross_salary || 0) * 50) / 100)}</td>
                                     <td class="text-center">OT Amount</td>
                                     <td class="text-right">${formatCurrency(parseFloat(employee.arrear_amount || 0))}</td>
                                 </tr>
                                 <tr>
-                                    <td class="text-center">House Rent(28% of Gross)</td>
+                                    <td class="text-left">House Rent(28% of Gross)</td>
                                     <td class="text-right">${formatCurrency((parseFloat(employee.gross_salary || 0) * 28) / 100)}</td>
                                     <td class="text-center">Arrear Amount</td>
                                     <td class="text-right">${formatCurrency(parseFloat(employee.arrear_amount || 0))}</td>
                                 </tr>
                                 <tr>
-                                    <td class="text-center">Medical (9% of Gross)</td>
+                                    <td class="text-left">Medical (9% of Gross)</td>
                                     <td class="text-right">${formatCurrency((parseFloat(employee.gross_salary || 0) * 9) / 100)}</td>
                                     <td class="text-center">Holiday</td>
                                     <td class="text-right">${formatCurrency(parseFloat(employee.holiday_amount || 0))}</td>
                                 </tr>
                                 <tr>
-                                    <td class="text-center">Conveyance (8% of Gross)</td>
+                                    <td class="text-left">Conveyance (8% of Gross)</td>
                                     <td class="text-right">${formatCurrency((parseFloat(employee.gross_salary || 0) * 8) / 100)}</td>
                                     <td class="text-center">Other Payments</td>
                                     <td class="text-right">${formatCurrency(employee.other_payments || 0)}</td>
                                 </tr>
                                 <tr>
-                                    <td class="text-center">Others (5% of Gross)</td>
+                                    <td class="text-left">Others (5% of Gross)</td>
                                     <td class="text-right">${formatCurrency((parseFloat(employee.gross_salary || 0) * 5) / 100)}</td>
                                     <td class="text-center">Other Payments</td>
                                     <td class="text-right">${formatCurrency(employee.other_payments || 0)}</td>
                                 </tr>
                                 <tr>
-                                    <td class="text-center">Salary</td>
+                                    <td class="text-left">Salary</td>
                                     <td class="text-right">${formatCurrency(employee.gross_salary)}</td>
                                     <td class="text-center">Other Payments</td>
                                     <td class="text-right">${formatCurrency(employee.other_payments || 0)}</td>
