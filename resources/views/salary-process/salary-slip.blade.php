@@ -572,7 +572,7 @@
                                     <td class="text-center">House Rent(28% of Gross)</td>
                                     <td class="text-right">${formatCurrency((parseFloat(employee.gross_salary || 0) * 28) / 100)}</td>
                                     <td class="text-center">Arrear Amount</td>
-                                    <td class="text-right">${employee.arrear_amount}</td>
+                                    <td class="text-right">${formatCurrency(parseFloat(employee.arrear_amount || 0))}</td>
                                 </tr>
                                 <tr>
                                     <td class="text-center">Medical (9% of Gross)</td>
