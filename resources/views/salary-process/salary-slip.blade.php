@@ -583,24 +583,29 @@
                                 <tr>
                                     <td class="text-center">Conveyance (8% of Gross)</td>
                                     <td class="text-right">${formatCurrency((parseFloat(employee.gross_salary || 0) * 8) / 100)}</td>
-                                    <td class="text-center">Others Payments</td>
+                                    <td class="text-center">Other Payments</td>
                                     <td class="text-right">${formatCurrency(employee.other_payments || 0)}</td>
                                 </tr>
                                 <tr>
                                     <td class="text-center">Others (5% of Gross)</td>
                                     <td class="text-right">${formatCurrency((parseFloat(employee.gross_salary || 0) * 5) / 100)}</td>
-                                    <td class="text-center">Others Payments</td>
+                                    <td class="text-center">Other Payments</td>
                                     <td class="text-right">${formatCurrency(employee.other_payments || 0)}</td>
                                 </tr>
                                 <tr>
                                     <td class="text-center">Salary</td>
                                     <td class="text-right">${formatCurrency(employee.gross_salary)}</td>
-                                    <td class="text-center">Others Payments</td>
+                                    <td class="text-center">Other Payments</td>
                                     <td class="text-right">${formatCurrency(employee.other_payments || 0)}</td>
                                 </tr>
                                 <tr>
                                     <td colspan="1"><strong>Total Payable</strong></td>
-                                    <td colspan="3" style="text-align: right; margin-right: 20px"><strong>${parseFloat(employee.gross_salary) + parseFloat(employee.ot_amount || 0) + parseFloat(employee.arrear_amount || 0)+ parseFloat(employee.holiday_amount || 0)}</strong></td>
+                                    <td colspan="3" style="text-align: right; margin-right: 20px"><strong>${formatCurrency(
+                                        (parseFloat(employee.gross_salary || 0) +
+                                        parseFloat(employee.ot_amount || 0) +
+                                        parseFloat(employee.arrear_amount || 0) +
+                                        parseFloat(employee.holiday_amount || 0))
+                                    )}</strong></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -617,8 +622,8 @@
                                 <tr>
                                     <td>Late</td>
                                     <td class="text-right">
-                                        0
-                                        </td>
+                                        0.00
+                                    </td>
                                     <td>Advance</td>
                                     <td class="text-right">${formatCurrency(employee.advance_salary)}</td>
                                 </tr>
@@ -632,11 +637,17 @@
                                     <td>Absent</td>
                                     <td class="text-right">${employee.total_absents_fee}</td>
                                     <td>Others</td>
-                                    <td class="text-right">-</td>
+                                    <td class="text-right">0.00</td>
                                 </tr>
                                 <tr>
                                     <td colspan="1"><strong>Total Deduction</strong></td>
-                                    <td colspan="3" style="text-align: right; margin-right: 20px"><strong>${parseFloat(employee.advance_salary) + parseFloat(employee.provident_fund) + parseFloat(employee.total_absents_fee) + parseFloat(employee.tax_amount || 0)}</strong></td>
+                                    <td colspan="3" style="text-align: right; margin-right: 20px"><strong>${formatCurrency(
+                                        (parseFloat(employee.advance_salary || 0) +
+                                        parseFloat(employee.provident_fund || 0) +
+                                        parseFloat(employee.total_absents_fee || 0) +
+                                        parseFloat(employee.tax_amount || 0))
+                                    )}
+                                    </strong></td>
                                 </tr> 
                                 <tr>
                                     <td colspan="1"><strong>Net Payable:</strong></td>
