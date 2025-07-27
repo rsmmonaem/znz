@@ -566,7 +566,7 @@
                                     <td class="text-left">Basic (50% of Gross)</td>
                                     <td class="text-right">${formatCurrency((parseFloat(employee.gross_salary || 0) * 50) / 100)}</td>
                                     <td class="text-center">OT Amount</td>
-                                    <td class="text-right">${formatCurrency(parseFloat(employee.arrear_amount || 0))}</td>
+                                    <td class="text-right">${formatCurrency(parseFloat(employee.ot_amount || 0))}</td>
                                 </tr>
                                 <tr>
                                     <td class="text-left">House Rent(28% of Gross)</td>
