@@ -536,19 +536,19 @@
                             <tr>
                                 <td>Employee ID:</td>
                                 <td class="text-right">${employee.employee_code}</td>
-                                <td>Employee Name:</td>
+                                <td class="text-center">Employee Name:</td>
                                 <td class="text-right">${employee.first_name}</td>
                             </tr>
                             <tr>
                                 <td>Designation:</td>
                                 <td class="text-right">${employee.designation}</td>
-                                <td>Gross:</td>
+                                <td class="text-center">Gross:</td>
                                 <td class="text-right">${formatCurrency(employee.gross_salary)}</td>
                             </tr>
                             <tr>
                                 <td>Days Of Month:</td>
                                 <td class="text-right">${employee.date_difference}</td>
-                                <td>Attendance:</td>
+                                <td class="text-center">Attendance:</td>
                                 <td class="text-right">${Number(employee.total_worked_days)}</td>
                             </tr>
                         </table>
@@ -624,19 +624,19 @@
                                     <td class="text-right">
                                         0.00
                                     </td>
-                                    <td>Advance</td>
+                                    <td class="text-center">Advance</td>
                                     <td class="text-right">${formatCurrency(employee.advance_salary)}</td>
                                 </tr>
                                 <tr>
                                     <td>Provident Fund</td>
                                     <td class="text-right">${formatCurrency(employee.provident_fund)}</td>
-                                    <td>Tax</td>
+                                    <td class="text-center">Tax</td>
                                     <td class="text-right">${employee.tax_amount ? formatCurrency(employee.tax_amount) : '-'}</td>
                                 </tr>
                                 <tr>
                                     <td>Absent</td>
                                     <td class="text-right">${employee.total_absents_fee}</td>
-                                    <td>Others</td>
+                                    <td class="text-center">Other Payment</td>
                                     <td class="text-right">0.00</td>
                                 </tr>
                                 <tr>
