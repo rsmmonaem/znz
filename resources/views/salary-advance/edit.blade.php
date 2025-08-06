@@ -95,29 +95,29 @@
                                             //print_r($salary_advance_data);
                                         @endphp
                                         
-@for ($month = 1; $month <= 12; $month++)
-    @if(in_array($month, $selectedMonths))
-        @php
-            $amount = 0;
-            foreach ($salary_advance_data as $data) {
-                if ($data->month == $month) {
-                    $amount = $data->amount;
-                    break;
-                }
-            }
-        @endphp
-
-        <div class="col-md-4">
-            <label>{{ date('F', mktime(0, 0, 0, $month, 1)) }}</label>
-            <input id="amount" type="number"
-                   value="{{ $amount }}"
-                   name="months[{{ $month }}]"
-                   class="form-control"
-                   placeholder="Enter amount"
-                   min="0">
-        </div>
-    @endif
-@endfor
+                                        @for ($month = 1; $month <= 12; $month++)
+                                            @if(in_array($month, $selectedMonths))
+                                                @php
+                                                    $amount = 0;
+                                                    foreach ($salary_advance_data as $data) {
+                                                        if ($data->month == $month) {
+                                                            $amount = $data->amount;
+                                                            break;
+                                                        }
+                                                    }
+                                                @endphp
+                                        
+                                                <div class="col-md-4">
+                                                    <label>{{ date('F', mktime(0, 0, 0, $month, 1)) }}</label>
+                                                    <input id="amount" type="number"
+                                                           value="{{ $amount }}"
+                                                           name="months[{{ $month }}]"
+                                                           class="form-control"
+                                                           placeholder="Enter amount"
+                                                           min="0">
+                                                </div>
+                                            @endif
+                                        @endfor
 
                                         </div>
                                     </div>
@@ -129,10 +129,6 @@
                         <div class="col-md-6">
                             <div class="entry-panel">
                                 <div class="form-group">
-                                    <label for="date">Date</label>
-                                    <input type="date" class="form-control" id="date" value="{{ $entry->date }}" />
-                                </div>
-                                <div class="form-group">
                                     <label for="effectiveDate">Effective Date</label>
                                     <input type="date" class="form-control" id="effectiveDate"
                                         value="{{ $entry->effectiveDate }}" />
@@ -140,12 +136,6 @@
                                 <div class="form-group radio-group">
                                     <label>Gross</label>
                                     <div>
-                                        <label><input type="radio" name="grossOption" value="fixed"
-                                                {{ $entry->grossOption == 'fixed' ? 'checked' : '' }} />
-                                            Fixed</label>
-                                        <label><input type="radio" name="grossOption" value="percentage"
-                                                {{ $entry->grossOption == 'percentage' ? 'checked' : '' }} />
-                                            Percentage</label>
                                         <input type="text" class="form-control" name="grossValue"
                                             value="{{ $entry->grossValue }}"
                                             style="display: inline-block; width: auto; margin-left: 10px" />
@@ -194,22 +184,22 @@
                 $('#updateData').click(function() {
                     $('#updateData').attr('disabled', true).text('Saving...');
 
-var monthAmounts = {};
-$('input[name^="months["]').each(function () {
-    var monthKey = $(this).attr('name').match(/\d+/)[0]; // Extract the number inside brackets
-    monthAmounts[monthKey] = $(this).val();
-});
+                    var monthAmounts = {};
+                    $('input[name^="months["]').each(function () {
+                        var monthKey = $(this).attr('name').match(/\d+/)[0]; // Extract the number inside brackets
+                        monthAmounts[monthKey] = $(this).val();
+                    });
 
-var formData = {
-    'employeeId': $('#employeeId').val(),
-    'date': $('#date').val(),
-    'effectiveDate': $('#effectiveDate').val(),
-    'month': $('#month').val(),
-    'amounts': monthAmounts, // 👈 Add this object to your formData
-    'grossOption': $('input[name="grossOption"]:checked').val(),
-    'grossValue': $('input[name="grossValue"]').val(),
-    'remarks': $('#remarks').val(),
-};
+                    var formData = {
+                        'employeeId': $('#employeeId').val(),
+                        'date': $('#date').val(),
+                        'effectiveDate': $('#effectiveDate').val(),
+                        'month': $('#month').val(),
+                        'amounts': monthAmounts, // ðŸ‘ˆ Add this object to your formData
+                        'grossOption': $('input[name="grossOption"]:checked').val(),
+                        'grossValue': $('input[name="grossValue"]').val(),
+                        'remarks': $('#remarks').val(),
+                    };
                     $.ajax({
                         url: '/salary-advance-edit/' + {{ $entry->id }},
                         type: 'POST',

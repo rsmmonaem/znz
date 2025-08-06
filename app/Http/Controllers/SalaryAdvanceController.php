@@ -221,7 +221,7 @@ class SalaryAdvanceController extends Controller
         DB::beginTransaction();
         try {
             DB::table('salary_advance')->where('id', $id)->update(['employeeId' => $request->employeeId,
-                'date' => $request->date,
+                'date' => Carbon::now(),
                 'effectiveDate' => $request->effectiveDate,
                 'grossOption' => $request->grossOption,
                 'grossValue' => $request->grossValue,
