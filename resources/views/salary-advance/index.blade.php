@@ -58,18 +58,8 @@
                               </div>
 
                                 <div class="form-group">
-                                    <label for="month">Month <span class="text-danger">*</span></label>
-                                    <div class="form-group">
-                                        <label for="months">Select Months and Amounts:</label>
-                                        <div class="row">
-                                            @for ($month = 1; $month <= 12; $month++)
-                                                <div class="col-md-4">
-                                                    <label>{{ date('F', mktime(0, 0, 0, $month, 1)) }}</label>
-                                                    <input type="number" name="months[{{ $month }}]" class="form-control" placeholder="Enter amount" min="0">
-                                                </div>
-                                            @endfor
-                                        </div>
-                                    </div>
+                                    <label for="monthCount">Number of Months to Divide <span class="text-danger">*</span></label>
+                                    <input type="number" class="form-control" name="months" id="monthCount" min="1" />
                                 </div>
                             </div>
                         </div>
@@ -78,20 +68,12 @@
                         <div class="col-md-6">
                             <div class="entry-panel">
                                 <div class="form-group">
-                                    <label for="date">Date</label>
-                                    <input type="date" class="form-control" id="date" value="{{ date('Y-m-d') }}" />
-                                </div>
-                                <div class="form-group">
                                     <label for="effectiveDate">Effective Date <span class="text-danger">*</span></label>
                                     <input type="date" class="form-control" id="effectiveDate" />
                                 </div>
                                 <div class="form-group radio-group">
-                                    <label>Gross <span class="text-danger">*</span></label>
+                                    <label>Total Advance <span class="text-danger">*</span></label>
                                     <div>
-                                        <label><input type="radio" name="grossOption" value="fixed" />
-                                            Fixed</label>
-                                        <label><input type="radio" name="grossOption" value="percentage" />
-                                            Percentage</label>
                                         <input type="text" class="form-control" name="grossValue"
                                             style="display: inline-block; width: auto; margin-left: 10px" />
                                     </div>
@@ -148,177 +130,156 @@
     </div>
 @stop
 @section('javascript')
-    <script>
-        $(document).ready(function() {
-            GetData();
-            function Validate(data) {
-                $('#saveData').attr('disabled', false).text('Save');
-                return toastr.error(data);
-            }
-            $('#saveData').click(function() {
-                $('#saveData').attr('disabled', true).text('Saving...');
-                let monthsData = {};
-                $('input[name^="months"]').each(function() {
-                    let month = $(this).attr('name').replace('months[', '').replace(']', ''); 
-                    let amount = $(this).val(); 
-                    if (amount) {
-                        monthsData[month] = amount; 
-                    }
-                });
-                var formData = {
-                    'employeeId': $('#employeeId').val(),
-                    'date': $('#date').val(),
-                    'effectiveDate': $('#effectiveDate').val(),
-                    'months': monthsData,
-                    'grossOption': $('input[name="grossOption"]:checked').val(),
-                    'grossValue': $('input[name="grossValue"]').val(),
-                    'remarks': $('#remarks').val(),
-                    
-                };
+<script>
+    $(document).ready(function() {
+        GetData();
 
-                if(formData.employeeId === '') {
-                    return Validate('Please select employee');
+        function Validate(data) {
+            $('#saveData').attr('disabled', false).text('Save');
+            return toastr.error(data);
+        }
+
+        $('#saveData').click(function() {
+            $('#saveData').attr('disabled', true).text('Saving...');
+
+            var formData = new FormData();
+
+            formData.append('employeeId', $('#employeeId').val());
+            formData.append('date', $('#date').val());
+            formData.append('effectiveDate', $('#effectiveDate').val());
+            formData.append('grossOption', $('input[name="grossOption"]:checked').val());
+            formData.append('grossValue', $('input[name="grossValue"]').val());
+            
+            // Ekhane change
+            $('input[name^="months"]').each(function () {
+                var value = $(this).val();
+                var name = $(this).attr('name'); // e.g. months[1], months[2]
+                if (value) {
+                    formData.append(name, value); // this is important!
                 }
-                if(formData.date === '') {
-                    return Validate('Please select date');
-                }
-                if(formData.effectiveDate === '') {
-                    return Validate('Please select effective date');
-                }
-                // if(formData.grossOption != 'checked') {
-                //     return Validate('Please select gross option');
-                // }
-                if(formData.grossValue === '') {
-                    return Validate('Please enter gross value');
-                }
-
-                $.ajax({
-                    url: '/salary-advance-create',
-                    type: 'POST',
-                    data: formData,
-                    success: function(response) {
-                        // Handle success response
-                        GetData();
-                        $('#saveData').attr('disabled', false).text('Save');
-                        console.log(response);
-                        toastr.success(response.message || 'Data saved successfully.');
-                    },
-                    error: function(xhr) {
-                        $('#saveData').attr('disabled', false).text('Save');
-                        // Handle error response
-                        console.error('Error:', xhr.responseText);
-                        toastr.error('Something went wrong. Please try again.');
-                    }
-                });
-            })
-
-            function GetData() {
-                $.ajax({
-                    url: '/salary-advance-list',
-                    type: 'POST',
-                    success: function(response) {
-                        const datatable = $('#data-table');
-                        datatable.DataTable().destroy();
-                        // Clear the existing table body and rows
-                        var tableBody = $('#table-tbody');
-                        tableBody.empty();
-
-                        // Loop through each item in the response
-                        response.forEach(function(item) {
-                            // Ensure item.month is an array before passing it to getMonthNames
-                            var row = `
-                            <tr>
-                                <td><input type="checkbox" /></td>
-                                <td>${item.employee_code}</td>
-                                <td>${item.first_name}</td>
-                                <td>${item.department}</td>
-                                <td>${item.section}</td>
-                                <td>${item.grossValue}</td>
-                                <td>${item.january_advance_amount}</td>
-<td>${item.february_advance_amount}</td>
-<td>${item.march_advance_amount}</td>
-<td>${item.april_advance_amount}</td>
-<td>${item.may_advance_amount}</td>
-<td>${item.june_advance_amount}</td>
-<td>${item.july_advance_amount}</td>
-<td>${item.august_advance_amount}</td>
-<td>${item.september_advance_amount}</td>
-<td>${item.october_advance_amount}</td>
-<td>${item.november_advance_amount}</td>
-<td>${item.december_advance_amount}</td>
-
-                                <td>${item.effectiveDate}</td>
-                                <td style="display:none">${item.months}</td>
-                                <td>${new Date(item.effectiveDate).getFullYear()}</td>
-                                <td>
-                                    <div class="btn-group btn-group-xs">
-                                        <a href="/salary-advance-edit/${item.id}" class="btn btn-primary btn-sm"><i class="fa fa-edit"></i></a>
-                                    <a href="#" data-id="${item.id}" class="delete-btn btn btn-danger btn-sm"><i class="fa fa-trash"></i></a>
-                                    </div>
-                                </td>
-                            </tr>
-                        `;
-                            tableBody.append(row); // Append each row to the table body
-                        });
-                        // Reinitialize the DataTable after adding new rows
-                        datatable.DataTable({
-                            lengthMenu: [10, 20, 50, 100],
-                        });
-                        bindDeleteBtns();
-                    },
-                    error: function(xhr) {
-                        // Handle error response
-                        console.error('Error:', xhr.responseText);
-                    }
-                });
-            }
-
-            // Function to bind delete button event
-            function bindDeleteBtns() {
-                // Delegate the click event using jQuery for dynamically added elements
-                $('.delete-btn').click(function() {
-                    var id = $(this).data('id');
-                    if (confirm('Are you sure you want to delete this record?')) {
-                        $.ajax({
-                            url: '/salary-advance-delete',
-                            type: 'POST',
-                            data: {
-                                id: id
-                            },
-                            success: function(response) {
-                                console.log(response);
-                                toastr.success(response.message ||
-                                'Data deleted successfully.');
-                                GetData(); // Refresh the data after successful deletion
-                            },
-                            error: function(xhr) {
-                                console.error('Error:', xhr.responseText);
-                                toastr.error('Something went wrong. Please try again.');
-                            }
-                        });
-                    }
-                });
-            }
-            // User Data
-            $('#employeeId').on('change', function(){
-                userData();
             });
-            function userData(){
-                var UserID = document.getElementById('employeeId').value;
-                $.ajax({
-                    url: '/UserData',
-                    type: 'POST',
-                    data: {employeeId: UserID},
-                    success: function(data){
-                        $('#branch').val(data.branch);
-                        $('#department').val(data.department);
-                        $('#section').val(data.section);
-                        $('#designation').val(data.designation);
-                        $('#category').val(data.category);
-                    }
-                });
-            }
 
-        })
-    </script>
+            // Validation
+            if (!formData.get('employeeId')) return Validate('Please select employee');
+            if (!formData.get('date')) return Validate('Please select date');
+            if (!formData.get('effectiveDate')) return Validate('Please select effective date');
+            if (!formData.get('grossValue')) return Validate('Please enter gross value');
+
+            $.ajax({
+                url: '/salary-advance-create',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    $('#saveData').attr('disabled', false).text('Save');
+                    toastr.success(response.message || 'Data saved successfully.');
+                    GetData();
+                },
+                error: function(xhr) {
+                    $('#saveData').attr('disabled', false).text('Save');
+                    console.error('Error:', xhr.responseText);
+                    toastr.error('Something went wrong. Please try again.');
+                }
+            });
+        });
+
+        function GetData() {
+            $.ajax({
+                url: '/salary-advance-list',
+                type: 'POST',
+                success: function(response) {
+                    const datatable = $('#data-table');
+                    datatable.DataTable().destroy();
+
+                    var tableBody = $('#table-tbody');
+                    tableBody.empty();
+
+                    response.forEach(function(item) {
+                        var row = `
+                        <tr>
+                            <td><input type="checkbox" /></td>
+                            <td>${item.employee_code}</td>
+                            <td>${item.first_name}</td>
+                            <td>${item.department}</td>
+                            <td>${item.section}</td>
+                            <td>${item.grossValue}</td>
+                            <td>${item.january_advance_amount}</td>
+                            <td>${item.february_advance_amount}</td>
+                            <td>${item.march_advance_amount}</td>
+                            <td>${item.april_advance_amount}</td>
+                            <td>${item.may_advance_amount}</td>
+                            <td>${item.june_advance_amount}</td>
+                            <td>${item.july_advance_amount}</td>
+                            <td>${item.august_advance_amount}</td>
+                            <td>${item.september_advance_amount}</td>
+                            <td>${item.october_advance_amount}</td>
+                            <td>${item.november_advance_amount}</td>
+                            <td>${item.december_advance_amount}</td>
+                            <td>${item.effectiveDate}</td>
+                            <td style="display:none">${item.months}</td>
+                            <td>${new Date(item.effectiveDate).getFullYear()}</td>
+                            <td>
+                                <div class="btn-group btn-group-xs">
+                                    <a href="/salary-advance-edit/${item.id}" class="btn btn-primary btn-sm"><i class="fa fa-edit"></i></a>
+                                    <a href="#" data-id="${item.id}" class="delete-btn btn btn-danger btn-sm"><i class="fa fa-trash"></i></a>
+                                </div>
+                            </td>
+                        </tr>
+                        `;
+                        tableBody.append(row);
+                    });
+
+                    datatable.DataTable({ lengthMenu: [10, 20, 50, 100] });
+                    bindDeleteBtns();
+                },
+                error: function(xhr) {
+                    console.error('Error:', xhr.responseText);
+                }
+            });
+        }
+
+        function bindDeleteBtns() {
+            $('.delete-btn').click(function() {
+                var id = $(this).data('id');
+                if (confirm('Are you sure you want to delete this record?')) {
+                    $.ajax({
+                        url: '/salary-advance-delete',
+                        type: 'POST',
+                        data: { id: id },
+                        success: function(response) {
+                            toastr.success(response.message || 'Data deleted successfully.');
+                            GetData();
+                        },
+                        error: function(xhr) {
+                            toastr.error('Something went wrong. Please try again.');
+                        }
+                    });
+                }
+            });
+        }
+
+        // Fetch employee data on change
+        $('#employeeId').on('change', function() {
+            userData();
+        });
+
+        function userData() {
+            var UserID = $('#employeeId').val();
+            $.ajax({
+                url: '/UserData',
+                type: 'POST',
+                data: { employeeId: UserID },
+                success: function(data) {
+                    $('#branch').val(data.branch);
+                    $('#department').val(data.department);
+                    $('#section').val(data.section);
+                    $('#designation').val(data.designation);
+                    $('#category').val(data.category);
+                }
+            });
+        }
+    });
+</script>
 @stop
+

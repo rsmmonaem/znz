@@ -12,6 +12,7 @@ use App\User;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class SalaryAdvanceController extends Controller
 {
@@ -88,40 +89,62 @@ class SalaryAdvanceController extends Controller
     }
 
 
-    public function salaryAdvancePost(Request $request){
-       DB::beginTransaction();
-        try {
-            // Inserting data
-            $salary_advance_id = DB::table('salary_advance')->insertGetId([
-                'employeeId' => $request->employeeId,
-                'date' => $request->date,
-                'effectiveDate' => $request->effectiveDate,
-                'grossOption' => $request->grossOption,
-                'grossValue' => $request->grossValue,
-            ]);
+  
 
-            //    return $request->all();
-            $months = $request->months;
-            if (!is_array($months)) {
-                throw new \Exception('Invalid months data. Expected an array.');
+    public function salaryAdvancePost(Request $request)
+    {
+        DB::beginTransaction();
+        try {
+            $totalMonths = (int) $request->input('months'); // e.g. 36
+            $totalAmount = (float) $request->input('grossValue'); // e.g. 36000
+
+            if ($totalMonths <= 0 || $totalAmount <= 0) {
+                throw new \Exception('Invalid month or amount input.');
             }
-            foreach ($months as $month => $amount) {
-                if ($amount > 0) {
+
+            $perMonthAmount = round($totalAmount / $totalMonths, 2); // per month
+
+            // Generate array like: [1 => 1000, 2 => 1000, ..., 36 => 1000]
+            $months = [];
+            for ($i = 1; $i <= $totalMonths; $i++) {
+                $months[$i] = $perMonthAmount;
+            }
+
+            $chunkSize = 12;
+            $monthValues = array_values($months); // Only amounts
+            $chunks = array_chunk($monthValues, $chunkSize);
+
+            foreach ($chunks as $index => $chunk) {
+                $effectiveDate = date('Y-m-d', strtotime("+{$index} year", strtotime($request->effectiveDate)));
+
+                $salary_advance_id = DB::table('salary_advance')->insertGetId([
+                    'employeeId'    => $request->employeeId,
+                    'date'          =>  Carbon::now(),
+                    'effectiveDate' => $effectiveDate,
+                    'grossOption'   => "fixed",
+                    'grossValue'    => $request->grossValue,
+                ]);
+
+                foreach ($chunk as $i => $amount) {
+                    $monthNumber = $i + 1; // 1-12
                     DB::table('salary_advance_months')->insert([
                         'salary_advance_id' => $salary_advance_id,
-                        'month' => $month,
-                        'amount' => $amount
+                        'month'             => $monthNumber,
+                        'amount'            => $amount
                     ]);
                 }
             }
 
             DB::commit();
-            return response()->json(['success', 'Salary Advance added successfully.']);
-        }catch(Exception $e) {
+            return response()->json(['message' => 'Salary Advance saved successfully.']);
+        } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['error', $e->getMessage()]);
+            return response()->json(['error' => $e->getMessage()]);
         }
     }
+
+
+
 
     public function DeleteSalaryAdvance(Request $request){
         DB::beginTransaction();
