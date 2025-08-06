@@ -164,6 +164,8 @@ class EmpoloyeeCreate extends Controller
                 WHD::insert([
                     'user_id' => $user->id,
                     'date'    => $nextFriday->format('Y-m-d'), 
+                    'created_at' => date('Y-m-d H:i:s'),
+                    'updated_at' => date('Y-m-d H:i:s')
                 ]);
 
                 // Next Friday
