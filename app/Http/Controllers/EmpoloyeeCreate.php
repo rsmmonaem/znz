@@ -17,6 +17,7 @@ use App\UserShift;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Image;
+use App\WHD;
 
 class EmpoloyeeCreate extends Controller
 {
@@ -147,6 +148,29 @@ class EmpoloyeeCreate extends Controller
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s')
             ]);
+
+
+            // whd insert part start form here
+            $startDate = Carbon::today();
+            $endDate = Carbon::today()->addYears(1);
+
+            // Loop start from next Friday (or today if today is Friday)
+            $nextFriday = $startDate->copy()->next(Carbon::FRIDAY);
+            if ($startDate->isFriday()) {
+                $nextFriday = $startDate;
+            }
+
+            while ($nextFriday <= $endDate) {
+                WHD::insert([
+                    'user_id' => $user->id,
+                    'date'    => $nextFriday->format('Y-m-d'), 
+                ]);
+
+                // Next Friday
+                $nextFriday->addWeek();
+            }
+            // whd insert part End form here
+
             DB::commit();
             // Return a success response (you could also return the created user, profile, and bank)
             return response()->json([
