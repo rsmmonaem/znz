@@ -167,166 +167,174 @@
     </div>
 @stop
 @section('javascript')
-    <script type="text/javascript">
-        $(document).ready(function() {
-            $('#employee_id').select2();
 
-             $('#branch').on('change', function() {
-                var branch_id = $(this).val();
-                $('#employee_id').val('').trigger('change');
-                HandleBranchWiseEmployees(branch_id, '#employee_id');
-            });
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('#employee_id').select2();
 
-            $('#report').on('click', function() {
-                var formData = {
-                    group: $('#group').val(),
-                    branch: $('#branch').val(),
-                    department: $('#department').val(),
-                    section: $('#section').val(),
-                    designation: $('#designation').val(),
-                    employeeId: $('#employee_id').val(),
-                    reportType: $('#report-type').val(),
-                    category: $('#category').val(),
-                    type: $('#type').val()
-                };
-
-                $.ajax({
-                    url: "{{ url('SalaryReportPOST') }}",
-                    type: 'POST',
-                    data: formData,
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-                    success: function(response) {
-                        console.log(response);
-                        getReport(response);
-                    },
-                    error: function() {
-                        console.log('error');
-                    }
-                })
-            })
-        })
-
-        // Load Report
-        function getReport(response) {
-    // Open a new window
-    var newWindow = window.open('', '_blank', 'width=1200,height=800');
-
-    // Build the content for the new window
-    var content = `
-    <html>
-        <head>
-            <title>Salary Slab Report</title>
-            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.5.2/css/bootstrap.min.css">
-            <style>
-                .center-item {
-                    margin-left: auto;
-                    margin-right: auto;
-                    text-align: center;
-                }
-                .display-flex {
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                    border: 1px solid #ccc;
-                    padding: 10px;
-                    margin: 0 0 20px 0;
-                }
-                table {
-                    width: 100%;
-                    border-collapse: collapse;
-                }
-                th, td {
-                    border: 1px solid #ccc;
-                    padding: 8px;
-                    text-align: left;
-                }
-                .btn {
-                    display: block;
-                    margin: 20px auto;
-                }
-            </style>
-        </head>
-        <body>
-            <div class="display-flex">
-                <div class="left-item">
-                    <img src="{{ URL::to(config('constants.upload_path.logo') . config('config.logo')) }}" width="150px" style="margin-left:20px;">
-                </div>
-                <div class="center-item">
-                    <h4>{{ config('config.company_name') }}</h4>
-                    <h3>Salary Slab Report</h3>
-                    <p>Branch: {{ Auth::user()->profile->branch->name }}</p>
-                    <p>Date: <strong id="date"></strong></p>
-                </div>
-            </div>
-            <table class="table table-bordered report-table">
-                <thead>
-                    <tr>
-                        <th>SL</th>
-                        <th>Name</th>
-                        <th>Designation</th>
-                        <th>Department</th>
-                        <th>Section</th>
-                        <th>DOJ</th>
-                        <th>Grade</th>
-                        <th>Account Number</th>
-                        <th>Bank Amount</th>
-                        <th>Cash Amount</th>
-                        <th>Gross</th>
-                        <th>Basic</th>
-                        <th>House Rent</th>
-                        <th>Medical</th>
-                        <th>Conveyance</th>
-                        <th>Other</th>
-                    </tr>
-                </thead>
-                <tbody>
-    `;
-
-    // Dynamically generate rows from the response data
-    response.forEach((employee, index) => {
-        content += `
-            <tr>
-                <td>${index + 1}</td>
-                <td>${employee.user_info.first_name || ' '}</td>
-                <td>${employee.user_info.designation || ' '}</td>
-                <td>${employee.user_info.departments || ' '}</td>
-                <td>${employee.user_info.section || ' '}</td>
-                <td>${employee.user_info.date_of_joining || ' '}</td>
-                <td>${employee.user_info.grades || ' '}</td>
-                <td>${employee.user_info.account_number || ' '}</td>
-                <td>${employee.user_info.bank_amount || 0}</td>
-                <td>${employee.user_info.cash_amount || 0}</td>
-                <td>${employee.user_info.gross || 0}</td>`;
-
-        // Add salary types dynamically
-        const salaryTypes = ['Basic Salary', 'House Rent', 'Medical','Conveyance', 'Others'];
-        salaryTypes.forEach(type => {
-            const salary = employee.salaries.find(s => s.salary_type.trim() === type);
-            content += `<td>${salary ? salary.amount : 0}</td>`;
+        $('#branch').on('change', function() {
+            var branch_id = $(this).val();
+            $('#employee_id').val('').trigger('change');
+            HandleBranchWiseEmployees(branch_id, '#employee_id');
         });
 
-        content += `</tr>`;
-    });
+        $('#report').on('click', function() {
+            var formData = {
+                group: $('#group').val(),
+                branch: $('#branch').val(),
+                department: $('#department').val(),
+                section: $('#section').val(),
+                designation: $('#designation').val(),
+                employeeId: $('#employee_id').val(),
+                reportType: $('#report-type').val(),
+                category: $('#category').val(),
+                type: $('#type').val()
+            };
 
-    // Close the table and add the print button
-    content += `
-                </tbody>
-            </table>
-            <div class="display-flex">
-                <div class="center-item">
-                    <button onclick="window.print()" class="btn btn-primary">Print</button>
+            $.ajax({
+                url: "{{ url('SalaryReportPOST') }}",
+                type: 'POST',
+                data: formData,
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function(response) {
+                    console.log(response);
+                    getReport(response);
+                },
+                error: function() {
+                    console.log('error');
+                }
+            })
+        })
+    })
+
+    
+    function getReport(response) {
+        
+        var newWindow = window.open('', '_blank', 'width=1200,height=800');
+
+        
+        var content = `
+        <html>
+            <head>
+                <title>Salary Slab Report</title>
+                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.5.2/css/bootstrap.min.css">
+                <style>
+                    .center-item {
+                        margin-left: auto;
+                        margin-right: auto;
+                        text-align: center;
+                    }
+                    .display-flex {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        border: 1px solid #ccc;
+                        padding: 10px;
+                        margin: 0 0 20px 0;
+                    }
+                    table {
+                        width: 100%;
+                        border-collapse: collapse;
+                    }
+                    th, td {
+                        border: 1px solid #ccc;
+                        padding: 8px;
+                        text-align: left;
+                    }
+                    .btn {
+                        display: block;
+                        margin: 20px auto;
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="display-flex">
+                    <div class="left-item">
+                        <img src="{{ URL::to(config('constants.upload_path.logo') . config('config.logo')) }}" width="150px" style="margin-left:20px;">
+                    </div>
+                    <div class="center-item">
+                        <h4>{{ config('config.company_name') }}</h4>
+                        <h3>Salary Slab Report</h3>
+                        <p>Branch: {{ Auth::user()->profile->branch->name }}</p>
+                        <p>Date: <strong id="date"></strong></p>
+                    </div>
                 </div>
-            </div>
-        </body>
-    </html>
-    `;
+                <table class="table table-bordered report-table">
+                    <thead>
+                        <tr>
+                            <th>SL</th>
+                            <th>Name</th>
+                            <th>Designation</th>
+                            <th>Department</th>
+                            <th>Section</th>
+                            <th>DOJ</th>
+                            <th>Grade</th>
+                            <th>Account Number</th>
+                            <th>Bank Amount</th>
+                            <th>Cash Amount</th>
+                            <th>Gross</th>
+                            <th>Basic</th>
+                            <th>House Rent</th>
+                            <th>Medical</th>
+                            <th>Conveyance</th>
+                            <th>Other</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
 
-    // Write the content to the new window
-    newWindow.document.write(content);
-    newWindow.document.close(); // Close the document to apply the styles
-}
+        
+        response.forEach((employee, index) => {
+            let gross = parseFloat(employee.user_info.gross) || 0;
 
-    </script>
+            
+            let basic = Math.round(gross * 0.50);
+            let house = Math.round(gross * 0.28);
+            let medical = Math.round(gross * 0.09);
+            let conveyance = Math.round(gross * 0.08);
+            let others = Math.round(gross * 0.05);
+
+            content += `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td>${employee.user_info.first_name || ' '}</td>
+                    <td>${employee.user_info.designation || ' '}</td>
+                    <td>${employee.user_info.departments || ' '}</td>
+                    <td>${employee.user_info.section || ' '}</td>
+                    <td>${employee.user_info.date_of_joining || ' '}</td>
+                    <td>${employee.user_info.grades || ' '}</td>
+                    <td>${employee.user_info.account_number || ' '}</td>
+                    <td>${employee.user_info.bank_amount || 0}</td>
+                    <td>${employee.user_info.cash_amount || 0}</td>
+                    <td>${gross}</td>
+                    <td>${basic}</td>
+                    <td>${house}</td>
+                    <td>${medical}</td>
+                    <td>${conveyance}</td>
+                    <td>${others}</td>
+                </tr>`;
+        });
+
+        
+        content += `
+                    </tbody>
+                </table>
+                <div class="display-flex">
+                    <div class="center-item">
+                        <button onclick="window.print()" class="btn btn-primary">Print</button>
+                    </div>
+                </div>
+            </body>
+        </html>
+        `;
+
+        
+        newWindow.document.write(content);
+        newWindow.document.close(); 
+    }
+
+
+</script>
 @stop
