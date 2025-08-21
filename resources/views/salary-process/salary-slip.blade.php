@@ -668,7 +668,7 @@
                                             </tr>
                                             <tr>
                                                 <td colspan="1"><strong>Salary in Words:</strong></td>
-                                                <td colspan="3" class="text-center"><strong>${numberToWords(Math.round(netPayableAfeterTax || 0))}</strong></td>
+                                                <td colspan="3" class="text-center"><strong>${numberToWords(Math.round(netPayableAfeterTax || 0))} Only</strong></td>
                                             </tr>
                                         </tbody>
                                     </table>
