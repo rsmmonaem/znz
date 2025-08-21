@@ -658,17 +658,17 @@
                                             <tr>
                                                 <td rowspan="2"><strong>Mode of Payment:</strong></td>
                                             
-                                                <td class="text-right" colspan="2"><strong>Bank Amount:</strong></td>
+                                                <td  colspan="2"><strong style="margin-left: 5px;">Bank Amount:</strong></td>
                                                 <td class="text-right" > ${formatCurrency(Math.round(employee.bankamount || 0))}</td>
                                             </tr>
                                         
                                             <tr>    
-                                                <td colspan="2" class="text-right"><strong>Cash Amount:</strong></td>
+                                                <td colspan="2" ><strong style="margin-left: 5px;">Cash Amount:</strong></td>
                                                 <td  class="text-right"> ${formatCurrency(Math.round(employee.cashamount || 0))}</td>
                                             </tr>
                                             <tr>
                                                 <td colspan="1"><strong>Salary in Words:</strong></td>
-                                                <td colspan="3" class="text-center"><strong>${numberToWords(Math.round(netPayableAfeterTax || 0))} Only</strong></td>
+                                                <td colspan="3" class="text-center" style="font-size: 14px;">${numberToWords(Math.round(netPayableAfeterTax || 0))} Only</td>
                                             </tr>
                                         </tbody>
                                     </table>
