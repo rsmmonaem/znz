@@ -376,339 +376,326 @@
             })
 
             function generatePayslips(data) {
-    // Create a new window
-    const newWindow = window.open('', '_blank', 'width=800,height=600');
+                // Create a new window
+                const newWindow = window.open('', '_blank', 'width=800,height=600');
 
-     // HTML structure for the new window
-    let payslipsHtml = `
-    <html>
-        <head>
-            <title>Payslips</title>
-            <style>
-                .wrapper {
-            font-family: Arial, sans-serif;
-            padding: 20px;
-            background-color: #f9f9f9;
-        }
+                // HTML structure for the new window
+                let payslipsHtml = `
+                    <html>
+                        <head>
+                            <title>Payslips</title>
+                            <style>
+                                .wrapper {
+                                    font-family: Arial, sans-serif;
+                                    padding: 20px;
+                                    background-color: #f9f9f9;
+                                }
 
-        .payslip {
-            max-width: 900px;
-            margin: auto;
-            background: #fff;
-            padding: 0px 20px;
-            border: 1px solid #000;
-            border-radius: 4px;
-        }
+                                .payslip {
+                                    max-width: 900px;
+                                    margin: auto;
+                                    background: #fff;
+                                    padding: 0px 20px;
+                                    border: 1px solid #000;
+                                    border-radius: 4px;
+                                }
 
-       .header {
-            display: flex;
-            align-items: center; 
-            justify-content: space-between; 
-            border-bottom: 5px solid #333;
-            height: 90px;
-        }
+                                .header {
+                                    display: flex;
+                                    align-items: center; 
+                                    justify-content: space-between; 
+                                    border-bottom: 5px solid #333;
+                                    height: 90px;
+                                }
 
-        .logo {
-            flex-shrink: 0; 
-        }
+                                .logo {
+                                    flex-shrink: 0; 
+                                }
 
-        .logo img {
-            max-width: auto;
-            height: 100%;
-        }
-        .company-details {
-            flex-grow: 1; 
-            text-align: center; 
-        }
+                                .logo img {
+                                    max-width: auto;
+                                    height: 100%;
+                                }
+                                .company-details {
+                                    flex-grow: 1; 
+                                    text-align: center; 
+                                }
 
-        .title {
-            text-align: center;
-            margin: 0px 0;
-            font-size: 1.2rem;
-           font-style: italic; 
-        }
+                                .title {
+                                    text-align: center;
+                                    margin: 0px 0;
+                                    font-size: 1.2rem;
+                                font-style: italic; 
+                                }
 
-        .employee-info table,
-        .earnings table,
-        .deductions table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-        }
+                                .employee-info table,
+                                .earnings table,
+                                .deductions table {
+                                    width: 100%;
+                                    border-collapse: collapse;
+                                    margin-bottom: 20px;
+                                }
 
-        .employee-info td,
-        .earnings td,
-        .earnings th,
-        .deductions td,
-        .deductions th {
-            border: 1px solid #000;
-            padding: 8px;
-            font-weight: bold;
-            font-style: italic;
-        }
+                                .employee-info td,
+                                .earnings td,
+                                .earnings th,
+                                .deductions td,
+                                .deductions th {
+                                    border: 1px solid #000;
+                                    padding: 8px;
+                                    font-weight: bold;
+                                    font-style: italic;
+                                }
 
-        .earnings th,
-        .deductions th {
-            background-color: #f2f2f2;
-        }
+                                .earnings th,
+                                .deductions th {
+                                    background-color: #f2f2f2;
+                                }
 
-        .net-payable {
-            margin-top: 20px;
-        }
+                                .net-payable {
+                                    margin-top: 20px;
+                                }
 
-        .net-payable p {
-            font-weight: bold;
-            margin: 5px 0;
-        }
+                                .net-payable p {
+                                    font-weight: bold;
+                                    margin: 5px 0;
+                                }
 
-        .signatures {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 0px;
-        }
+                                .signatures {
+                                    display: flex;
+                                    justify-content: space-between;
+                                    margin-top: 0px;
+                                }
 
-        .employee-info td,
-        .earnings td,
-        .earnings th,
-        .deductions td,
-        .deductions th {
-            border: 1px solid #000;
-            padding: 1px !important;
-            // text-align: center;
-        }
-            .bold {
-                font-weight: bold;
-            }
-            .text-right {
-                text-align: right;
-            }
-            .text-center {
-                text-align: center;
-            }
-            </style>
-        </head>
-        <body>
-    `;
-    
-    // Loop through employee salary data to generate payslips content
-    data.employee_salary_data.forEach(employee => {
-        const netPayable = 
-            parseFloat(employee.net_salary || 0) +
-            parseFloat(employee.arrear_amount || 0) +
-            parseFloat(employee.holiday_amount || 0) +
-            parseFloat(employee.ot_amount || 0) -
-            parseFloat(employee.tax_amount || 0) -
-            parseFloat(employee.provident_fund || 0) -
-            parseFloat(employee.advance_salary || 0);
+                                .employee-info td,
+                                .earnings td,
+                                .earnings th,
+                                .deductions td,
+                                .deductions th {
+                                    border: 1px solid #000;
+                                    padding: 1px !important;
+                                    // text-align: center;
+                                }
+                                .bold {
+                                    font-weight: bold;
+                                }
+                                .text-right {
+                                    text-align: right;
+                                }
+                                .text-center {
+                                    text-align: center;
+                                }
+                            </style>
+                        </head>
+                        <body>
+                `;
+            
+                // Loop through employee salary data to generate payslips content
+                data.employee_salary_data.forEach(employee => {
+                    const netPayable = 
+                        parseFloat(employee.net_salary || 0) +
+                        parseFloat(employee.arrear_amount || 0) +
+                        parseFloat(employee.holiday_amount || 0) +
+                        parseFloat(employee.ot_amount || 0) -
+                        parseFloat(employee.tax_amount || 0) -
+                        parseFloat(employee.provident_fund || 0) -
+                        parseFloat(employee.advance_salary || 0);
 
-        const netPayableAfeterTax =
-            parseFloat(employee.net_salary || 0) +
-            parseFloat(employee.arrear_amount || 0) +
-            parseFloat(employee.holiday_amount || 0) +
-            parseFloat(employee.ot_amount || 0) -
-            parseFloat(employee.tax_amount || 0) -
-            parseFloat(employee.provident_fund || 0) -
-            parseFloat(employee.advance_salary || 0);
-        const grossSalary = parseFloat(employee.gross_salary || 0);
-        // HTML structure for a single payslip
-        const payslip = `
-            <div class="wrapper">
-                <div class="payslip">
-                    <!-- Header -->
-                    <div class="header">
-                        <div class="logo">
-                             ${data.branch.id == 7 ? 'Mohakhali Branch' : `<img src="{{ URL::to(config('constants.upload_path.logo') . config('config.logo')) }}" alt="Logo">`}
+                    const netPayableAfeterTax =
+                        parseFloat(employee.net_salary || 0) +
+                        parseFloat(employee.arrear_amount || 0) +
+                        parseFloat(employee.holiday_amount || 0) +
+                        parseFloat(employee.ot_amount || 0) -
+                        parseFloat(employee.tax_amount || 0) -
+                        parseFloat(employee.provident_fund || 0) -
+                        parseFloat(employee.advance_salary || 0);
+                    const grossSalary = parseFloat(employee.gross_salary || 0);
+                    // HTML structure for a single payslip
+                    const payslip = `
+                        <div class="wrapper">
+                            <div class="payslip">
+                                <!-- Header -->
+                                <div class="header">
+                                    <div class="logo">
+                                        ${data.branch.id == 7 ? 'Mohakhali Branch' : `<img src="{{ URL::to(config('constants.upload_path.logo') . config('config.logo')) }}" alt="Logo">`}
+                                    </div>
+                                    <div class="company-details">
+                                        <h3 class="bold">${data.branch.name ?? ''}</h3>
+                                        <p class="bold">${data.branch.description ?? ''}</p>
+                                    </div>
+                                </div>
+                                <!-- Title -->
+                                <h2 class="title">Salary Pay Slip</h2>
+                                <!-- Employee Info -->
+                                <div class="employee-info">
+                                    <table>
+                                        <tr class="bold">
+                                            <td class="text-left">Month:</td>
+                                            <td colspan="3" class="text-right">${formatDate(employee.created_at)}</td>                               
+                                        </tr>
+                                        <tr>
+                                            <td>Employee ID:</td>
+                                            <td class="text-right">${employee.employee_code}</td>
+                                            <td class="text-center">Employee Name:</td>
+                                            <td class="text-right">${employee.first_name}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Designation:</td>
+                                            <td class="text-right">${employee.designation}</td>
+                                            <td class="text-center">Gross:</td>
+                                            <td class="text-right">${formatCurrency(employee.gross_salary)}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Days Of Month:</td>
+                                            <td class="text-right">${employee.date_difference}</td>
+                                            <td class="text-center">Attendance:</td>
+                                            <td class="text-right">${Number(employee.total_worked_days)}</td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <!-- Earnings -->
+                                <div class="earnings">
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th colspan="4">Earnings</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td class="text-left">Basic (50% of Gross)</td>
+                                                <td class="text-right">${formatCurrency((parseFloat(employee.gross_salary || 0) * 50) / 100)}</td>
+                                                <td class="text-center">OT Amount</td>
+                                                <td class="text-right">${formatCurrency(parseFloat(employee.ot_amount || 0))}</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-left">House Rent(28% of Gross)</td>
+                                                <td class="text-right">${formatCurrency((parseFloat(employee.gross_salary || 0) * 28) / 100)}</td>
+                                                <td class="text-center">Arrear Amount</td>
+                                                <td class="text-right">${formatCurrency(parseFloat(employee.arrear_amount || 0))}</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-left">Medical (9% of Gross)</td>
+                                                <td class="text-right">${formatCurrency((parseFloat(employee.gross_salary || 0) * 9) / 100)}</td>
+                                                <td class="text-center">Holiday</td>
+                                                <td class="text-right">${formatCurrency(parseFloat(employee.holiday_amount || 0))}</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-left">Conveyance (8% of Gross)</td>
+                                                <td class="text-right">${formatCurrency((parseFloat(employee.gross_salary || 0) * 8) / 100)}</td>
+                                                <td class="text-center">Other Payments</td>
+                                                <td class="text-right">${formatCurrency(employee.other_payments || 0)}</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-left">Others (5% of Gross)</td>
+                                                <td class="text-right">${formatCurrency((parseFloat(employee.gross_salary || 0) * 5) / 100)}</td>
+                                                <td class="text-center">Other Payments</td>
+                                                <td class="text-right">${formatCurrency(employee.other_payments || 0)}</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-left">Salary</td>
+                                                <td class="text-right">${formatCurrency(employee.gross_salary)}</td>
+                                                <td class="text-center">Other Payments</td>
+                                                <td class="text-right">${formatCurrency(employee.other_payments || 0)}</td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="1"><strong>Total Payable</strong></td>
+                                                <td colspan="3" style="text-align: right; margin-right: 20px"><strong>${formatCurrency(
+                                                    (parseFloat(employee.gross_salary || 0) +
+                                                    parseFloat(employee.ot_amount || 0) +
+                                                    parseFloat(employee.arrear_amount || 0) +
+                                                    parseFloat(employee.holiday_amount || 0))
+                                                )}</strong></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <!-- Deductions -->
+                                <div class="deductions">
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th colspan="4">Deductions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>Late</td>
+                                                <td class="text-right">0.00</td>
+                                                <td class="text-center">Advance</td>
+                                                <td class="text-right">${formatCurrency(employee.advance_salary)}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Provident Fund</td>
+                                                <td class="text-right">${formatCurrency(employee.provident_fund)}</td>
+                                                <td class="text-center">Tax</td>
+                                                <td class="text-right">${employee.tax_amount ? formatCurrency(employee.tax_amount) : '-'}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Absent</td>
+                                                <td class="text-right">${employee.total_absents_fee}</td>
+                                                <td class="text-center">Others</td>
+                                                <td class="text-right">0.00</td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="1"><strong>Total Deduction</strong></td>
+                                                <td colspan="3" style="text-align: right;">
+                                                    <strong>${formatCurrency(
+                                                        (parseFloat(employee.advance_salary || 0) +
+                                                        parseFloat(employee.provident_fund || 0) +
+                                                        parseFloat(employee.total_absents_fee || 0) +
+                                                        parseFloat(employee.tax_amount || 0))
+                                                    )}</strong>
+                                                </td>
+                                            </tr> 
+                                            <tr>
+                                                <td colspan="1"><strong>Net Payable:</strong></td>
+                                                <td colspan="3" style="text-align: right;">
+                                                    <strong>${formatCurrency(Math.round(netPayableAfeterTax || 0))}</strong>
+                                                </td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td rowspan="2"><strong>Mode of Payment:</strong></td>
+                                            
+                                                <td class="text-right" colspan="2"><strong>Bank Amount:</strong></td>
+                                                <td class="text-right" > ${formatCurrency(Math.round(employee.bankamount || 0))}</td>
+                                            </tr>
+                                        
+                                            <tr>    
+                                                <td colspan="2" class="text-right"><strong>Cash Amount:</strong></td>
+                                                <td  class="text-right"> ${formatCurrency(Math.round(employee.cashamount || 0))}</td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="1"><strong>Salary in Words:</strong></td>
+                                                <td colspan="3" class="text-center"><strong>${numberToWords(Math.round(netPayableAfeterTax || 0))}</strong></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                    
+                                <!-- Signatures -->
+                                <div class="signatures">
+                                    <p>Employee Signature: __________</p>
+                                    <p>Authorized Signature: _________</p>
+                                </div>
+                            </div>
                         </div>
-                        <div class="company-details">
-                            <h3 class="bold">${data.branch.name ?? ''}</h3>
-                            <p class="bold">${data.branch.description ?? ''}</p>
-                        </div>
-                    </div>
-                    <!-- Title -->
-                    <h2 class="title">Salary Pay Slip</h2>
-                    <!-- Employee Info -->
-                    <div class="employee-info">
-                        <table>
-                            <tr class="bold">
-                                <td class="text-left">Month:</td>
-                                <td colspan="3" class="text-right">${formatDate(employee.created_at)}</td>                               
-                            </tr>
-                            <tr>
-                                <td>Employee ID:</td>
-                                <td class="text-right">${employee.employee_code}</td>
-                                <td class="text-center">Employee Name:</td>
-                                <td class="text-right">${employee.first_name}</td>
-                            </tr>
-                            <tr>
-                                <td>Designation:</td>
-                                <td class="text-right">${employee.designation}</td>
-                                <td class="text-center">Gross:</td>
-                                <td class="text-right">${formatCurrency(employee.gross_salary)}</td>
-                            </tr>
-                            <tr>
-                                <td>Days Of Month:</td>
-                                <td class="text-right">${employee.date_difference}</td>
-                                <td class="text-center">Attendance:</td>
-                                <td class="text-right">${Number(employee.total_worked_days)}</td>
-                            </tr>
-                        </table>
-                    </div>
-                    <!-- Earnings -->
-                    <div class="earnings">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th colspan="4">Earnings</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td class="text-left">Basic (50% of Gross)</td>
-                                    <td class="text-right">${formatCurrency((parseFloat(employee.gross_salary || 0) * 50) / 100)}</td>
-                                    <td class="text-center">OT Amount</td>
-                                    <td class="text-right">${formatCurrency(parseFloat(employee.ot_amount || 0))}</td>
-                                </tr>
-                                <tr>
-                                    <td class="text-left">House Rent(28% of Gross)</td>
-                                    <td class="text-right">${formatCurrency((parseFloat(employee.gross_salary || 0) * 28) / 100)}</td>
-                                    <td class="text-center">Arrear Amount</td>
-                                    <td class="text-right">${formatCurrency(parseFloat(employee.arrear_amount || 0))}</td>
-                                </tr>
-                                <tr>
-                                    <td class="text-left">Medical (9% of Gross)</td>
-                                    <td class="text-right">${formatCurrency((parseFloat(employee.gross_salary || 0) * 9) / 100)}</td>
-                                    <td class="text-center">Holiday</td>
-                                    <td class="text-right">${formatCurrency(parseFloat(employee.holiday_amount || 0))}</td>
-                                </tr>
-                                <tr>
-                                    <td class="text-left">Conveyance (8% of Gross)</td>
-                                    <td class="text-right">${formatCurrency((parseFloat(employee.gross_salary || 0) * 8) / 100)}</td>
-                                    <td class="text-center">Other Payments</td>
-                                    <td class="text-right">${formatCurrency(employee.other_payments || 0)}</td>
-                                </tr>
-                                <tr>
-                                    <td class="text-left">Others (5% of Gross)</td>
-                                    <td class="text-right">${formatCurrency((parseFloat(employee.gross_salary || 0) * 5) / 100)}</td>
-                                    <td class="text-center">Other Payments</td>
-                                    <td class="text-right">${formatCurrency(employee.other_payments || 0)}</td>
-                                </tr>
-                                <tr>
-                                    <td class="text-left">Salary</td>
-                                    <td class="text-right">${formatCurrency(employee.gross_salary)}</td>
-                                    <td class="text-center">Other Payments</td>
-                                    <td class="text-right">${formatCurrency(employee.other_payments || 0)}</td>
-                                </tr>
-                                <tr>
-                                    <td colspan="1"><strong>Total Payable</strong></td>
-                                    <td colspan="3" style="text-align: right; margin-right: 20px"><strong>${formatCurrency(
-                                        (parseFloat(employee.gross_salary || 0) +
-                                        parseFloat(employee.ot_amount || 0) +
-                                        parseFloat(employee.arrear_amount || 0) +
-                                        parseFloat(employee.holiday_amount || 0))
-                                    )}</strong></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <!-- Deductions -->
-                    <div class="deductions">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th colspan="4">Deductions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>Late</td>
-                                    <td class="text-right">
-                                        0.00
-                                    </td>
-                                    <td class="text-center">Advance</td>
-                                    <td class="text-right">${formatCurrency(employee.advance_salary)}</td>
-                                </tr>
-                                <tr>
-                                    <td>Provident Fund</td>
-                                    <td class="text-right">${formatCurrency(employee.provident_fund)}</td>
-                                    <td class="text-center">Tax</td>
-                                    <td class="text-right">${employee.tax_amount ? formatCurrency(employee.tax_amount) : '-'}</td>
-                                </tr>
-                                <tr>
-                                    <td>Absent</td>
-                                    <td class="text-right">${employee.total_absents_fee}</td>
-                                    <td class="text-center">Other Payment</td>
-                                    <td class="text-right">0.00</td>
-                                </tr>
-                                <tr>
-                                    <td colspan="1"><strong>Total Deduction</strong></td>
-                                    <td colspan="3" style="text-align: right; margin-right: 20px"><strong>${formatCurrency(
-                                        (parseFloat(employee.advance_salary || 0) +
-                                        parseFloat(employee.provident_fund || 0) +
-                                        parseFloat(employee.total_absents_fee || 0) +
-                                        parseFloat(employee.tax_amount || 0))
-                                    )}
-                                    </strong></td>
-                                </tr> 
-                                <tr>
-                                    <td colspan="1"><strong>Net Payable:</strong></td>
-                                    <td colspan="3" style="text-align: right; margin-right: 20px">
-                                    <strong>
-                                        ${ 
-                                            formatCurrency(Math.round(netPayableAfeterTax || 0))
-                                        }
-                                    </strong>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td colspan="1"><strong>Bank Amount:</strong></td>
-                                    <td colspan="3" style="text-align: right; margin-right: 20px">
-                                    <strong>
-                                        ${ 
-                                            formatCurrency(Math.round(employee.bankamount || 0))
-                                        }
-                                    </strong>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td colspan="1"><strong>Cash Amount:</strong></td>
-                                    <td colspan="3" style="text-align: right; margin-right: 20px">
-                                    <strong>
-                                        ${ 
-                                            formatCurrency(Math.round(employee.cashamount || 0))
-                                        }
-                                    </strong>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td colspan="1"><strong>Salary in Words:</strong></td>
-                                    <td colspan="3" class="text-center"><strong>${numberToWords(Math.round(netPayableAfeterTax || 0))}</strong></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-        
-                    <!-- Signatures -->
-                    <div class="signatures">
-                        <p>Employee Signature: __________</p>
-                        <p>Authorized Signature: _________</p>
-                    </div>
-                </div>
-            </div>
-        `;
-        
-        payslipsHtml += payslip;
-    });
+                    `;
+                    
+                    payslipsHtml += payslip;
+                });
 
-    // Close the HTML tags
-    payslipsHtml += '</body></html>';
+                // Close the HTML tags
+                payslipsHtml += '</body></html>';
 
-    // Write the payslips content to the new window
-    newWindow.document.write(payslipsHtml);
+                // Write the payslips content to the new window
+                newWindow.document.write(payslipsHtml);
 
-    // Optionally, you can print the payslip in the new window after loading
-    // newWindow.document.close();
-    // newWindow.print();
-}
+                // Optionally, you can print the payslip in the new window after loading
+                // newWindow.document.close();
+                // newWindow.print();
+            }
 
             // Helper function to generate earnings
             function generateEarnings(salaryData) {
