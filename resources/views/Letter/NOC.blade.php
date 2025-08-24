@@ -112,6 +112,16 @@
                 margin-bottom: 20px;
             }
 
+            #nocContent {
+                width: 100%;
+                font-size: 14px;           
+                line-height: 1.5;
+                white-space: normal;       
+                word-wrap: break-word;     
+                padding: 20px;             
+                background: #fff;
+            }
+
             @media print {
                 body {
                     margin: 0;
