@@ -178,12 +178,6 @@
                                 @include('common.reportSelect')
                             </div>
                         </div>
-                        <div class="col-md-6" id="affactiveDate">
-                            <div class="form-group">
-                                <label class="col-sm-4 control-label">Affactive Date</label>
-                                <input type="date" class="form-control">
-                            </div>
-                        </div>
                     </div>
                     <button type="button" class="btn btn-primary" style="margin-bottom: 20px" id="getNOC">Generate
                         NOC</button>
@@ -200,16 +194,14 @@
                                 since
                                 <span class="highlight" id="joiningDate"></span> to <span class="highlight"
                                     id="endingDate"></span></span> and
-                                his service length is <span class="highlight" id="serviceLength"></span>. His present
+                                his/her service length is <span class="highlight" id="serviceLength"></span>. His/her present
                                 designation is <span class="highlight" id="designation_name"></span>, in our company.
                             </p>
 
-                            <p>We confirm that we have no objection to <span class="highlight empName"></span> pursuing
-                                other opportunities outside the organization. His conduct and performance have been commendable
-                                throughout his tenure with us.</p>
+                            <p>In his/her time of staying with our company <span class="highlight empName"></span> showed full dedication to his/her work which makes him/her one of the assets of our company. And also we have no objection on his/her decision to resign his/her position.</p>
 
                             <p class="noc-note"><strong>Note:</strong> This certificate has been issued upon request of the
-                                interested parties for reference purposes.</p>
+                                interested parts for reference purposes.</p>
 
                             <div class="noc-signature">
                                 <div class="signature-line">__________________________</div>
