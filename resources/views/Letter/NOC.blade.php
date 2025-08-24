@@ -299,7 +299,7 @@
         function printNOC() {
             var printWindow = window.open('', '', 'width=1200,height=800');
 
-            // Write the HTML structure with the background image applied via style
+            
             printWindow.document.write('<html><head><title>Print NOC</title>');
             printWindow.document.write('<style>');
             printWindow.document.write(`
@@ -400,7 +400,7 @@
             printWindow.document.write('</style>');
             printWindow.document.write('</head><body>');
 
-            // Add the nocContent wrapped in a container
+            
             printWindow.document.write('<div class="noc-container">');
             printWindow.document.write(document.getElementById('nocContent').innerHTML);
             printWindow.document.write('</div>');
@@ -408,15 +408,15 @@
 
             printWindow.document.close();
 
-            // Wait for the content to load and then trigger print
+            
             printWindow.onload = function() {
-                // Ensure the background image is fully loaded
+                
                 const img = new Image();
                 img.onload = function() {
-                    printWindow.print(); // Print after the image is loaded
+                    printWindow.print(); 
                 };
                 img.src =
-                    'https://scontent.fdac5-2.fna.fbcdn.net/v/t39.30808-1/393121278_798706948724860_2546228729910779588_n.jpg?stp=c7.7.186.186a_dst-jpg_p200x200&_nc_cat=103&ccb=1-7&_nc_sid=f4b9fd&_nc_ohc=P_Qg84VXC5IQ7kNvgE1uXHJ&_nc_zt=24&_nc_ht=scontent.fdac5-2.fna&_nc_gid=APdhLEfV5m7g2iNTpKLaWX1&oh=00_AYAk_f9FoAQbtLvKHm28Y9ySQyO8yjNYhccDtt67wSepxQ&oe=67534096'; // Ensure this matches the URL used in the style
+                    'https://scontent.fdac5-2.fna.fbcdn.net/v/t39.30808-1/393121278_798706948724860_2546228729910779588_n.jpg?stp=c7.7.186.186a_dst-jpg_p200x200&_nc_cat=103&ccb=1-7&_nc_sid=f4b9fd&_nc_ohc=P_Qg84VXC5IQ7kNvgE1uXHJ&_nc_zt=24&_nc_ht=scontent.fdac5-2.fna&_nc_gid=APdhLEfV5m7g2iNTpKLaWX1&oh=00_AYAk_f9FoAQbtLvKHm28Y9ySQyO8yjNYhccDtt67wSepxQ&oe=67534096'; 
             };
         }
     </script>
@@ -426,13 +426,16 @@
     <script>
     function downloadPDF() {
         var element = document.getElementById("nocContent");
+
         var opt = {
-            margin:       0.5,
+            margin:       [0.5, 0.5, 0.5, 0.5], 
             filename:     'noc_letter.pdf',
-            image:        { type: 'jpeg', quality: 0.98 },
-            html2canvas:  { scale: 2 },
-            jsPDF:        { unit: 'in', format: 'A4', orientation: 'portrait' }
+            image:        { type: 'jpeg', quality: 1 },
+            html2canvas:  { scale: 2, useCORS: true },
+            jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' },
+            pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
         };
+
         html2pdf().set(opt).from(element).save();
     }
     </script>
