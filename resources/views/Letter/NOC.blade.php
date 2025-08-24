@@ -462,7 +462,7 @@
         var url = window.URL.createObjectURL(blob);
         var a = document.createElement("a");
         a.href = url;
-        a.download = "noc_letter.xls";
+        a.download = "noc_letter.xlsx";
         a.click();
         window.URL.revokeObjectURL(url);
     }
