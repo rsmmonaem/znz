@@ -231,17 +231,17 @@ var content = `
             <thead>
                 <tr>
                     <th>SL</th>
-                    <th>Employee Code</th>
+                    <th>Emp. Code</th>
                     <th>Name</th>
                     <th>Designation</th>
                     <th>Department</th>
                     <th>Section</th>
                     <th>D.Of Join</th>
                     <th>DOB</th>
-                    <th>Blood Group</th>
+                    <th>BG</th>
                     <th>Job Nature</th>
                     <th>Category</th>
-                    <th>Contact Number</th>
+                    <th>Phone</th>
                     <th>Gender</th>
                     <th>Entry Date</th>
                     <th>Last Working Day</th>
