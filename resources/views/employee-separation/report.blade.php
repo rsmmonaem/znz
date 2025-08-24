@@ -236,14 +236,15 @@ var content = `
                     <th>Designation</th>
                     <th>Department</th>
                     <th>Section</th>
-                    <th>DOJ</th>
+                    <th>D.Of Join</th>
                     <th>DOB</th>
                     <th>Blood Group</th>
                     <th>Job Nature</th>
                     <th>Category</th>
                     <th>Contact Number</th>
                     <th>Gender</th>
-                    <th>Date</th>
+                    <th>Entry Date</th>
+                    <th>Last Working Day</th>
                 </tr>
             </thead>
             <tbody>
@@ -267,6 +268,7 @@ response.data.forEach((employee, index) => {
             <td>${employee.contact_number || ' '}</td>
             <td>${employee.gender || ' '}</td>
             <td>${employee.date || ' '}</td>
+            <td>${employee.last_working_day || ' '}</td>
         </tr>
     `;
 });
