@@ -132,52 +132,58 @@
                 {{-- Form Container --}}
                 <div class="container">
                     <!-- Filter Form Section -->
+                    <form>
                     <div class="row">
-                        <form>
-                            <div class="col-md-6">
-                                   <div class="form-section">
-                                    <div class="form-group">
-                                        <label class="col-sm-4 control-label" for="group">Group</label>
-                                        <select class="form-control" name="group" id="group">
-                                            <option value="">J & Z Group</option>
-                                        </select>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="col-sm-4 control-label" for="branch">Branch</label>
-                                        <input type="text" class="form-control" id="branch_form" disabled>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="col-sm-4 control-label" for="department">Department</label>
-                                        <input type="text" class="form-control" id="department_form" disabled>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="col-sm-4 control-label" for="section">Section</label>
-                                       <input type="text" class="form-control" id="section_form" disabled>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="col-sm-4 control-label" for="designation">Designation</label>
-                                       <input type="text" class="form-control" id="designation_form" disabled>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="col-sm-4 control-label" for="employeeID">Employee ID</label>
-                                        <select class="form-control" name="employeeID" id="employeeID">
-                                            <option value="">Select Employee ID</option>
-                                            @foreach ($employee as $e)
-                                                <option value="{{ $e->id }}">{{ $e->employee_code }} -
-                                                    {{ $e->first_name }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
+                        <div class="col-md-6">
+                                <div class="form-section">
                                 <div class="form-group">
-                                    <label class="col-sm-4 control-label" for="reportType">Report Type</label>
-                                    {{-- <input type="text" class="form-control" id="reportType" value="Transfer History"
-                                        readonly> --}}
-                                    @include('common.reportSelect')
+                                    <label class="col-sm-4 control-label" for="group">Group</label>
+                                    <select class="form-control" name="group" id="group">
+                                        <option value="">J & Z Group</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label" for="branch">Branch</label>
+                                    <input type="text" class="form-control" id="branch_form" disabled>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label" for="department">Department</label>
+                                    <input type="text" class="form-control" id="department_form" disabled>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label" for="section">Section</label>
+                                    <input type="text" class="form-control" id="section_form" disabled>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label" for="designation">Designation</label>
+                                    <input type="text" class="form-control" id="designation_form" disabled>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label" for="employeeID">Employee ID</label>
+                                    <select class="form-control" name="employeeID" id="employeeID">
+                                        <option value="">Select Employee ID</option>
+                                        @foreach ($employee as $e)
+                                            <option value="{{ $e->id }}">{{ $e->employee_code }} -
+                                                {{ $e->first_name }}</option>
+                                        @endforeach
+                                    </select>
                                 </div>
                             </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label" for="reportType">Report Type</label>
+                                {{-- <input type="text" class="form-control" id="reportType" value="Transfer History"
+                                    readonly> --}}
+                                @include('common.reportSelect')
+                            </div>
+                        </div>
+                        <div class="col-md-6" id="affactiveDate">
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label">Affactive Date</label>
+                                <input type="date" class="form-control">
+                            </div>
+                        </div>
                     </div>
                     <button type="button" class="btn btn-primary" style="margin-bottom: 20px" id="getNOC">Generate
                         NOC</button>
@@ -419,5 +425,7 @@
             };
         }
     </script>
+
+
 
 @stop
