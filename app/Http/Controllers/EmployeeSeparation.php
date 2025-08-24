@@ -244,6 +244,7 @@ class EmployeeSeparation extends Controller
             'profile.category',
             'profile.contact_number',
             'profile.gender',
+            'employee_separations.last_working_day',
             'employee_separations.entry_date as date'
         )->get();
 
