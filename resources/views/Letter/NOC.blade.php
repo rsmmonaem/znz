@@ -196,7 +196,6 @@
                      <!-- Report Table Section -->
                     {{-- NOC Container --}}
                     <button class="btn btn-primary" style="display: none;" id="print" style="margin-bottom: 20px" onclick="printNOC()">Print NOC</button>
-                    <button onclick="downloadExcel()" class="btn btn-info">Download Excel</button>
                     <button onclick="downloadWord()" class="btn btn-success">Download Word</button>
                     <button onclick="downloadPDF()" class="btn btn-danger">Download PDF</button>
                     <div class="noc-container" style="display: none;" id="nocContent">
@@ -434,20 +433,20 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
 
     <script>
-    function downloadPDF() {
-        var element = document.getElementById("nocContent");
-
-        var opt = {
-            margin:       [0.5, 0.5, 0.5, 0.5], 
-            filename:     'noc_letter.pdf',
-            image:        { type: 'jpeg', quality: 1 },
-            html2canvas:  { scale: 2, useCORS: true },
-            jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' },
-            pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
-        };
-
-        html2pdf().set(opt).from(element).save();
-    }
+        function downloadPDF() {
+            var element = document.getElementById("nocContent");
+        
+            var opt = {
+                margin:       0.3,  
+                filename:     'noc_letter.pdf',
+                image:        { type: 'jpeg', quality: 1 },
+                html2canvas:  { scale: 2, useCORS: true, letterRendering: true, width: element.scrollWidth },
+                jsPDF:        { unit: 'pt', format: 'a4', orientation: 'portrait' }, 
+                pagebreak:    { mode: ['avoid-all'] } 
+            };
+        
+            html2pdf().set(opt).from(element).save();
+        }
     </script>
     <script>
     function downloadWord() {
