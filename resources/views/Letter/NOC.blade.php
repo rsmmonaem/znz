@@ -186,6 +186,9 @@
                      <!-- Report Table Section -->
                     {{-- NOC Container --}}
                     <button class="btn btn-primary" style="display: none;" id="print" style="margin-bottom: 20px" onclick="printNOC()">Print NOC</button>
+                    <button onclick="downloadExcel()" class="btn btn-info">Download Excel</button>
+                    <button onclick="downloadWord()" class="btn btn-success">Download Word</button>
+                    <button onclick="downloadPDF()" class="btn btn-danger">Download PDF</button>
                     <div class="noc-container" style="display: none;" id="nocContent">
                         <div class="noc-date">Date: {{ date('d-m-Y') }}</div>
                         <div class="noc-header">No Objection Certificate (NOC)</div>
@@ -418,6 +421,52 @@
         }
     </script>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
+
+    <script>
+    function downloadPDF() {
+        var element = document.getElementById("nocContent");
+        var opt = {
+            margin:       0.5,
+            filename:     'noc_letter.pdf',
+            image:        { type: 'jpeg', quality: 0.98 },
+            html2canvas:  { scale: 2 },
+            jsPDF:        { unit: 'in', format: 'A4', orientation: 'portrait' }
+        };
+        html2pdf().set(opt).from(element).save();
+    }
+    </script>
+    <script>
+    function downloadWord() {
+        var content = document.getElementById("nocContent").innerHTML;
+        var header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' "+
+                    "xmlns:w='urn:schemas-microsoft-com:office:word' "+
+                    "xmlns='http://www.w3.org/TR/REC-html40'>"+
+                    "<head><meta charset='utf-8'><title>NOC</title></head><body>";
+        var footer = "</body></html>";
+        var sourceHTML = header + content + footer;
+
+        var source = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(sourceHTML);
+        var fileDownload = document.createElement("a");
+        document.body.appendChild(fileDownload);
+        fileDownload.href = source;
+        fileDownload.download = 'noc_letter.doc';
+        fileDownload.click();
+        document.body.removeChild(fileDownload);
+    }
+    </script>
+    <script>
+    function downloadExcel() {
+        var content = document.getElementById("nocContent").innerHTML;
+        var blob = new Blob([content], { type: "application/vnd.ms-excel" });
+        var url = window.URL.createObjectURL(blob);
+        var a = document.createElement("a");
+        a.href = url;
+        a.download = "noc_letter.xls";
+        a.click();
+        window.URL.revokeObjectURL(url);
+    }
+    </script>
 
 
 @stop
