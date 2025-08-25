@@ -11,10 +11,7 @@ class LetterHelpers {
         
         $exits = EmployeeSeparation::where('employee_id', $request->employeeId)->latest('id')->first();
         if($exits){
-            if (!empty($request->effectiveDate)) {
-                $exits->entry_date = $request->effectiveDate;
-                $exits->save();
-            }
+
             $userData = User::leftJoin('profile', 'users.id', '=', 'profile.user_id')
             ->leftJoin('designations', 'users.designation_id', '=', 'designations.id')
             ->leftJoin('employee_separations', 'users.id', '=', 'employee_separations.employee_id')
