@@ -8,6 +8,7 @@ use Carbon\Carbon;
 
 class LetterHelpers {
     public function NOCPOST($request){
+        
         $exits = EmployeeSeparation::where('employee_id', $request->employeeId)->latest('id')->first();
         if($exits){
             if (!empty($request->effectiveDate)) {

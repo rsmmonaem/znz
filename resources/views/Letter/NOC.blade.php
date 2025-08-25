@@ -192,12 +192,12 @@
                                 <input type="date" class="form-control" id="effectiveDate" name="effectiveDate">
                             </div>
 
-                            <div class="form-group">
+                            {{-- <div class="form-group">
                                 <input type="radio" id="active" name="status" value="active">
                                 <label for="active">Active</label><br>
                                 <input type="radio" id="inactive" name="status" value="inactive" checked>
                                 <label for="inactive">Inactive</label>
-                            </div>
+                            </div> --}}
                         </div>
                     </div>
                     <button type="button" class="btn btn-primary" style="margin-bottom: 20px" id="getNOC">Generate
