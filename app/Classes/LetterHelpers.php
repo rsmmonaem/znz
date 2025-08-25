@@ -32,9 +32,19 @@ class LetterHelpers {
             // Format the dates
             if ($userData) {
                 $userData->date_of_joining = Carbon::parse($userData->date_of_joining)->format('d M Y');
-                $userData->entry_date = Carbon::parse($userData->entry_date)->format('d M Y');
-                $dateOfJoining = Carbon::parse($userData->date_of_joining);
-                $entryDate = Carbon::parse($userData->entry_date);
+
+                // যদি effectiveDate দেওয়া থাকে → শুধু show করব
+                if (!empty($request->effectiveDate)) {
+                    $userData->entry_date = Carbon::parse($request->effectiveDate)->format('d M Y');
+                    $dateOfJoining = Carbon::parse($userData->date_of_joining);
+                    $entryDate     = Carbon::parse($request->effectiveDate);
+                } else {
+                    $userData->entry_date = Carbon::parse($userData->entry_date)->format('d M Y');
+                    $dateOfJoining = Carbon::parse($userData->date_of_joining);
+                    $entryDate     = Carbon::parse($userData->entry_date);
+                }
+
+                // Difference বের করা
                 $diff = $dateOfJoining->diff($entryDate);
                 $userData->date_diff = $diff->format('%y years, %m months, %d days');
             }
