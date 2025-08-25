@@ -29,9 +29,11 @@ class LetterController extends Controller {
     }
 
     public function NOCPOST(Request $request){
-        return $request;
-        die();
-        return $this->LetterHelpers->NOCPOST($request);
+        if ($request->status == "inactive") {
+            return $this->LetterHelpers->NOCPOST($request);
+        } else {
+            return response()->json(['message' => 'Done']);
+        }
     }
     
     public function JEC(){

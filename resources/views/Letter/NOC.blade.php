@@ -191,6 +191,13 @@
                                 <label class="col-sm-4 control-label" for="effectiveDate ">Effective Date</label>
                                 <input type="date" class="form-control" id="effectiveDate" name="effectiveDate">
                             </div>
+
+                            <div class="form-group">
+                                <input type="radio" id="active" name="status" value="active">
+                                <label for="active">Active</label><br>
+                                <input type="radio" id="inactive" name="status" value="inactive" checked>
+                                <label for="inactive">Inactive</label>
+                            </div>
                         </div>
                     </div>
                     <button type="button" class="btn btn-primary" style="margin-bottom: 20px" id="getNOC">Generate
@@ -280,6 +287,8 @@
                             $('#serviceLength').text(' ');
                             $('#designation_name').text(' ');
                             $('#effectiveDate').text(' ');
+                            $('#active').text(' ');
+                            $('#inactive').text(' ');
                             $('.empName').text(' ');
                             btnControll();
                             return;
