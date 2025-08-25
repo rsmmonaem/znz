@@ -29,6 +29,8 @@ class LetterController extends Controller {
     }
 
     public function NOCPOST(Request $request){
+        return $request;
+        die();
         return $this->LetterHelpers->NOCPOST($request);
     }
     

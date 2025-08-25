@@ -187,6 +187,10 @@
                                     readonly> --}}
                                 @include('common.reportSelect')
                             </div>
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label" for="effectiveDate ">Effective Date</label>
+                                <input type="date" class="form-control" id="effectiveDate" name="effectiveDate">
+                            </div>
                         </div>
                     </div>
                     <button type="button" class="btn btn-primary" style="margin-bottom: 20px" id="getNOC">Generate
@@ -260,7 +264,8 @@
                     branch: $('#branch').val(),
                     department: $('#department').val(),
                     section: $('#section').val(),
-                    designation: $('#designation').val()
+                    designation: $('#designation').val(),
+                    effectiveDate: $('#effectiveDate').val()
                 }
                 $.ajax({
                     url: "/letter-noc",
@@ -274,6 +279,7 @@
                             $('#endingDate').text(' ');
                             $('#serviceLength').text(' ');
                             $('#designation_name').text(' ');
+                            $('#effectiveDate').text(' ');
                             $('.empName').text(' ');
                             btnControll();
                             return;
