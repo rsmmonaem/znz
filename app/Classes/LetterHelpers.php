@@ -70,6 +70,7 @@ class LetterHelpers {
                     $userData->date_diff = null;
                 }
             }
+            return $userData;
         }
     }
 
