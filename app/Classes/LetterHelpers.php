@@ -30,7 +30,7 @@ class LetterHelpers {
             if ($userData) {
                 $userData->date_of_joining = Carbon::parse($userData->date_of_joining)->format('d M Y');
 
-                // যদি effectiveDate দেওয়া থাকে → শুধু show করব
+                
                 if (!empty($request->effectiveDate)) {
                     $userData->entry_date = Carbon::parse($request->effectiveDate)->format('d M Y');
                     $dateOfJoining = Carbon::parse($userData->date_of_joining);
@@ -41,13 +41,13 @@ class LetterHelpers {
                     $entryDate     = Carbon::parse($userData->entry_date);
                 }
 
-                // Difference বের করা
+                
                 $diff = $dateOfJoining->diff($entryDate);
                 $userData->date_diff = $diff->format('%y years, %m months, %d days');
             }
             return $userData;
         }else{
-            // return response()->json(['message' => 'No data found']);
+            
             $userData = User::leftJoin('profile', 'users.id', '=', 'profile.user_id')
                 ->leftJoin('designations', 'users.designation_id', '=', 'designations.id')
                 ->select(
@@ -61,7 +61,7 @@ class LetterHelpers {
                 ->first();
 
             if ($userData) {
-                // Date formatting
+                
                 $userData->date_of_joining = Carbon::parse($userData->date_of_joining)->format('d M Y');
 
                 
