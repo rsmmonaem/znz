@@ -39,7 +39,37 @@ class LetterHelpers {
             }
             return $userData;
         }else{
-            return response()->json(['message' => 'No data found']);
+            // return response()->json(['message' => 'No data found']);
+            $userData = User::leftJoin('profile', 'users.id', '=', 'profile.user_id')
+                ->leftJoin('designations', 'users.designation_id', '=', 'designations.id')
+                ->select(
+                    'users.id',
+                    'users.first_name as employee_name',
+                    'profile.employee_code',
+                    'profile.date_of_joining',
+                    'designations.name as designation_name'
+                )
+                ->where('users.id', '=', $request->employeeId)
+                ->first();
+
+            if ($userData) {
+                // Date formatting
+                $userData->date_of_joining = Carbon::parse($userData->date_of_joining)->format('d M Y');
+
+                
+                if (!empty($request->effectiveDate)) {
+                    $userData->entry_date = Carbon::parse($request->effectiveDate)->format('d M Y');
+
+                    
+                    $dateOfJoining = Carbon::parse($userData->date_of_joining);
+                    $entryDate = Carbon::parse($request->effectiveDate);
+                    $diff = $dateOfJoining->diff($entryDate);
+                    $userData->date_diff = $diff->format('%y years, %m months, %d days');
+                } else {
+                    $userData->entry_date = null;
+                    $userData->date_diff = null;
+                }
+            }
         }
     }
 
