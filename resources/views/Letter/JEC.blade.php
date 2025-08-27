@@ -296,7 +296,7 @@
                     department: $('#department').val(),
                     section: $('#section').val(),
                     designation: $('#designation').val()
-                    designation: $('#effectiveDate').val()
+                    effectiveDate: $('#effectiveDate').val()
                 }
                 $.ajax({
                     url: "/letter-jec",
