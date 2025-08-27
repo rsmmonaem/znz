@@ -217,7 +217,7 @@
                                 <span class="highlight" id="joiningDate"></span> to <span class="highlight"
                                     id="endingDate"></span></span> and
                                 his/her service length is <span class="highlight" id="serviceLength"></span>. His/her present
-                                designation is <span class="highlight" id="designation_name"></span>, in our company.
+                                designation is <span class="highlight" id="designation_name"></span> and department of <span class="highlight" id="department_name"></span>, in our company.
                             </p>
 
                             <p>In his/her time of staying with our company <span class="highlight empName"></span> showed full dedication to his/her work which makes him/her one of the assets of our company. And also we have no objection on his/her decision to resign his/her position.</p>
@@ -285,6 +285,7 @@
                             $('#endingDate').text(' ');
                             $('#serviceLength').text(' ');
                             $('#designation_name').text(' ');
+                            $('#department_name').text(' ');
                             $('#effectiveDate').text(' ');
                             $('#active').text(' ');
                             $('#inactive').text(' ');
@@ -298,6 +299,7 @@
                             $('#endingDate').text(data.entry_date);
                             $('#serviceLength').text(data.date_diff);
                             $('#designation_name').text(data.designation_name);
+                            $('#department_name').text(data.department_name);
                             $('.empName').text(data.employee_name);
                             btnControll();
                         }
