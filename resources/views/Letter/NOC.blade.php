@@ -210,7 +210,8 @@
                     <button onclick="downloadPDF()" class="btn btn-danger">Download PDF</button>
                     <div class="noc-container" style="display: none;" id="nocContent">
                         <div class="noc-date" style="margin-top: 120px;">Date: {{ date('d-m-Y') }}</div>
-                        <div class="noc-header">No Objection Certificate (NOC)</div>
+                        <div class="noc-header"><strong> No Objection Certificate (NOC) </strong> </div> 
+                        
                         <div class="noc-body">
                             <p>This is to certify that <span class="highlight" id="employeeName"></span> has been our employee
                                 since
