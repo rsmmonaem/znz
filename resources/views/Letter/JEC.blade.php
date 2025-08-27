@@ -192,9 +192,9 @@
     {{-- Start JEC Certificate --}}
     <div class="certificate-container" id="certificateContent" style="display: none;">
         <!-- Header Section -->
-        <div class="header" style="display: flex; justify-content: space-between; border-bottom: 1px solid #ccc">
-            <img src="{{ URL::to(config('constants.upload_path.logo') . config('config.logo')) }}" alt="J & Z Group Logo">
-            <div class="company-info">
+        <div class="header" style="display: flex; justify-content: space-between; margin-bottom: 108px;">
+            <img src="{{ URL::to(config('constants.upload_path.logo') . config('config.logo')) }}" alt="J & Z Group Logo" style="display: none;">
+            <div class="company-info" style="display: none;">
                 <h3>J & Z GROUP</h3>
                 House # 15, Road # 15, Sector # 04, Uttara,<br>
                 Dhaka, Bangladesh-1230
@@ -243,15 +243,6 @@
             </p>
         </div>
 
-        <!-- Footer -->
-        <div class="footer">
-            <img src="{{ URL::to(config('constants.upload_path.logo') . 'JEC_footer.jpg') }}" alt="J & Z Group Logo">
-            <div class="jec-info" style="background: #0091b6; color: #fff">
-                <p>📞 8951022, 58951987, 58957642</p>
-                <p>🌐 www.jandzgroup.com</p>
-                <p>📧 info@jandzgroup.com</p>
-            </div>
-        </div>
     </div>
     {{-- End JEC Certificate --}}
                 </div>
