@@ -52,11 +52,13 @@ class LetterHelpers {
             
             $userData = User::leftJoin('profile', 'users.id', '=', 'profile.user_id')
                 ->leftJoin('designations', 'users.designation_id', '=', 'designations.id')
+                ->leftJoin('departments', 'users.department_id', '=', 'departments.id')
                 ->select(
                     'users.id',
                     'users.first_name as employee_name',
                     'profile.employee_code',
                     'profile.date_of_joining',
+                    'departments.name as department_name',
                     'designations.name as designation_name'
                 )
                 ->where('users.id', '=', $request->employeeId)
