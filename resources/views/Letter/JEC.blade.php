@@ -293,7 +293,7 @@
                     branch: $('#branch').val(),
                     department: $('#department').val(),
                     section: $('#section').val(),
-                    designation: $('#designation').val()
+                    designation: $('#designation').val(),
                     effectiveDate: $('#effectiveDate').val()
                 }
                 $.ajax({
