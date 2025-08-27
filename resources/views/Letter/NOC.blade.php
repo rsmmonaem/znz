@@ -236,6 +236,123 @@
         </div>
         {{-- End Form Containner --}}
     </div>
+
+<script>
+        function downloadWord() {
+            var content = document.getElementById("nocContent").outerHTML;
+
+            var css = `
+                <style>
+                    .noc-container {
+                        padding: 30px;
+                        border-radius: 5px;
+                        position: relative;
+                        width: 210mm;
+                        height: 297mm;
+                        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                        z-index: 1;
+                    }
+
+                    .noc-container::before {
+                            content: '';
+                            position: absolute;
+                            top: 0;
+                            left: 0;
+                            width: 100%;
+                            height: 100%;
+                            background-size: 500px 500px !important; 
+                            background-size: cover;
+                            background-repeat: no-repeat !important;
+                            background-position: center;
+                            opacity: 0.2;
+                            z-index: -1; /* Ensures watermark is behind the text */
+                    }
+                    
+                    .noc-header {
+                        text-align: center;
+                        font-weight: bold;
+                        font-size: 25px;
+                        text-decoration: underline;
+                        margin-bottom: 40px;
+                    }
+
+                    .noc-body {
+                        font-size: 18px;
+                        line-height: 1.6;
+                        position: relative;
+                        z-index: 2;
+                    }
+
+                    .noc-body .highlight {
+                        font-weight: bold;
+                    }
+
+                    .noc-signature {
+                        margin-top: 300px;
+                    }
+
+                    .noc-note {
+                        font-size: 18px;
+                        font-style: italic;
+                        margin-top: 84px;
+                    }
+
+                    .signature-line {
+                        display: inline-block;
+                        margin-top: 30px;
+                        font-weight: bold;
+                    }
+
+                    .noc-date {
+                        text-align: right;
+                        font-size: 18px;
+                        margin-bottom: 20px;
+                        font-weight: bold;
+                    }
+
+                    .noc-header {
+                        text-align: center;
+                        font-weight: bold;
+                        font-size: 25px;
+                        text-decoration: underline;
+                        margin-bottom: 20px;
+                    }
+
+                        @media print {
+                            body {
+                                margin: 0;
+                                padding: 0;
+                                width: 210mm; 
+                                height: 297mm;
+                            }
+                            .noc-container {
+                                width: 100%;
+                                padding: 20mm;
+                            }
+                        }
+                </style>
+            `;
+
+            var sourceHTML = `
+            <html xmlns:o='urn:schemas-microsoft-com:office:office' 
+                xmlns:w='urn:schemas-microsoft-com:office:word' 
+                xmlns='http://www.w3.org/TR/REC-html40'>
+            <head><meta charset='utf-8'><title>NOC</title>${css}</head>
+            <body>${content}</body></html>`;
+
+            var blob = new Blob(['\ufeff', sourceHTML], { type: 'application/msword' });
+            var url = URL.createObjectURL(blob);
+
+            var link = document.createElement("a");
+            link.href = url;
+            link.download = "noc_letter.doc";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            URL.revokeObjectURL(url);
+        }
+</script>
 @stop
 
 @section('javascript')
@@ -452,48 +569,27 @@
             var element = document.getElementById("nocContent");
 
             var opt = {
-                margin:       [0.5, 0.7, 0.5, 0.7], // top, left, bottom, right (inch)
+                margin:       10, // 10mm সবদিকে
                 filename:     'noc_letter.pdf',
-                image:        { type: 'jpeg', quality: 1 },
-                html2canvas:  { scale: 3, useCORS: true, letterRendering: true },
-                jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' },
-                pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true, logging: false },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                pagebreak:    { mode: ['css','legacy'] }
             };
 
-            html2pdf().set(opt).from(element).save();
+            // Scale properly without blank page
+            html2pdf().set(opt).from(element).toPdf().get('pdf').then(function (pdf) {
+                // Fix extra blank page issue
+                const totalPages = pdf.internal.getNumberOfPages();
+                if (totalPages > 1) {
+                    pdf.deletePage(totalPages);
+                }
+            }).save();
         }
     </script>
-    <script>
-    function downloadWord() {
-        var content = document.getElementById("nocContent").innerHTML;
-        var header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' "+
-                    "xmlns:w='urn:schemas-microsoft-com:office:word' "+
-                    "xmlns='http://www.w3.org/TR/REC-html40'>"+
-                    "<head><meta charset='utf-8'><title>NOC</title></head><body>";
-        var footer = "</body></html>";
-        var sourceHTML = header + content + footer;
 
-        var source = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(sourceHTML);
-        var fileDownload = document.createElement("a");
-        document.body.appendChild(fileDownload);
-        fileDownload.href = source;
-        fileDownload.download = 'noc_letter.doc';
-        fileDownload.click();
-        document.body.removeChild(fileDownload);
-    }
-    </script>
-    <script>
-    function downloadExcel() {
-        var content = document.getElementById("nocContent").innerHTML;
-        var blob = new Blob([content], { type: "application/vnd.ms-excel" });
-        var url = window.URL.createObjectURL(blob);
-        var a = document.createElement("a");
-        a.href = url;
-        a.download = "noc_letter.xlsx";
-        a.click();
-        window.URL.revokeObjectURL(url);
-    }
-    </script>
+
+
 
 
 @stop

@@ -188,6 +188,8 @@
                      <!-- Report Table Section -->
                     {{-- NOC Container --}}
                     <button class="btn btn-primary" id="print" style="margin-bottom: 20px; display: none;" onclick="printNOC()">Print JEC</button>
+                    <button onclick="downloadWord()" class="btn btn-success">Download Word</button>
+                    <button onclick="downloadPDF()" class="btn btn-danger">Download PDF</button>
 
     {{-- Start JEC Certificate --}}
     <div class="certificate-container" id="certificateContent" style="display: none;">
@@ -250,6 +252,124 @@
         </div>
         {{-- End Form Containner --}}
     </div>
+
+<script>
+        function downloadWord() {
+            var content = document.getElementById("nocContent").outerHTML;
+
+            var css = `
+                <style>
+                    .noc-container {
+                        padding: 30px;
+                        border-radius: 5px;
+                        position: relative;
+                        width: 210mm;
+                        height: 297mm;
+                        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                        z-index: 1;
+                    }
+
+                    .noc-container::before {
+                            content: '';
+                            position: absolute;
+                            top: 0;
+                            left: 0;
+                            width: 100%;
+                            height: 100%;
+                            background-size: 500px 500px !important; 
+                            background-size: cover;
+                            background-repeat: no-repeat !important;
+                            background-position: center;
+                            opacity: 0.2;
+                            z-index: -1; /* Ensures watermark is behind the text */
+                    }
+                    
+                    .noc-header {
+                        text-align: center;
+                        font-weight: bold;
+                        font-size: 25px;
+                        text-decoration: underline;
+                        margin-bottom: 40px;
+                    }
+
+                    .noc-body {
+                        font-size: 18px;
+                        line-height: 1.6;
+                        position: relative;
+                        z-index: 2;
+                    }
+
+                    .noc-body .highlight {
+                        font-weight: bold;
+                    }
+
+                    .noc-signature {
+                        margin-top: 300px;
+                    }
+
+                    .noc-note {
+                        font-size: 18px;
+                        font-style: italic;
+                        margin-top: 84px;
+                    }
+
+                    .signature-line {
+                        display: inline-block;
+                        margin-top: 30px;
+                        font-weight: bold;
+                    }
+
+                    .noc-date {
+                        text-align: right;
+                        font-size: 18px;
+                        margin-bottom: 20px;
+                        font-weight: bold;
+                    }
+
+                    .noc-header {
+                        text-align: center;
+                        font-weight: bold;
+                        font-size: 25px;
+                        text-decoration: underline;
+                        margin-bottom: 20px;
+                    }
+
+                        @media print {
+                            body {
+                                margin: 0;
+                                padding: 0;
+                                width: 210mm; 
+                                height: 297mm;
+                            }
+                            .noc-container {
+                                width: 100%;
+                                padding: 20mm;
+                            }
+                        }
+                </style>
+            `;
+
+            var sourceHTML = `
+            <html xmlns:o='urn:schemas-microsoft-com:office:office' 
+                xmlns:w='urn:schemas-microsoft-com:office:word' 
+                xmlns='http://www.w3.org/TR/REC-html40'>
+            <head><meta charset='utf-8'><title>NOC</title>${css}</head>
+            <body>${content}</body></html>`;
+
+            var blob = new Blob(['\ufeff', sourceHTML], { type: 'application/msword' });
+            var url = URL.createObjectURL(blob);
+
+            var link = document.createElement("a");
+            link.href = url;
+            link.download = "noc_letter.doc";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            URL.revokeObjectURL(url);
+        }
+</script>
+
 @stop
 
 @section('javascript')
@@ -471,6 +591,32 @@
                 img.src =
                     'https://scontent.fdac5-2.fna.fbcdn.net/v/t39.30808-1/393121278_798706948724860_2546228729910779588_n.jpg?stp=c7.7.186.186a_dst-jpg_p200x200&_nc_cat=103&ccb=1-7&_nc_sid=f4b9fd&_nc_ohc=P_Qg84VXC5IQ7kNvgE1uXHJ&_nc_zt=24&_nc_ht=scontent.fdac5-2.fna&_nc_gid=APdhLEfV5m7g2iNTpKLaWX1&oh=00_AYAk_f9FoAQbtLvKHm28Y9ySQyO8yjNYhccDtt67wSepxQ&oe=67534096'; // Ensure this matches the URL used in the style
             };
+        }
+    </script>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
+
+    <script>
+        function downloadPDF() {
+            var element = document.getElementById("nocContent");
+
+            var opt = {
+                margin:       10, // 10mm সবদিকে
+                filename:     'noc_letter.pdf',
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true, logging: false },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                pagebreak:    { mode: ['css','legacy'] }
+            };
+
+            // Scale properly without blank page
+            html2pdf().set(opt).from(element).toPdf().get('pdf').then(function (pdf) {
+                // Fix extra blank page issue
+                const totalPages = pdf.internal.getNumberOfPages();
+                if (totalPages > 1) {
+                    pdf.deletePage(totalPages);
+                }
+            }).save();
         }
     </script>
 
