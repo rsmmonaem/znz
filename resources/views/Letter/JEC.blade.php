@@ -175,9 +175,11 @@
                                     @include('common.reportSelect')
                                 </div>
                             </div>
-                            <div class="form-group">
-                                <label class="col-sm-4 control-label" for="effectiveDate ">Effective Date</label>
-                                <input type="date" class="form-control" id="effectiveDate" name="effectiveDate">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label" for="effectiveDate ">Effective Date</label>
+                                    <input type="date" class="form-control" id="effectiveDate" name="effectiveDate">
+                                </div>
                             </div>
                             
                     </div>
