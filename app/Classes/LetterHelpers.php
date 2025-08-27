@@ -22,6 +22,7 @@ class LetterHelpers {
                 'profile.employee_code',
                 'profile.date_of_joining',
                 'designations.name as designation_name',
+                'departments.name as department_name',
                 'employee_separations.entry_date'
             )
             ->where('users.id', '=', $request->employeeId)
