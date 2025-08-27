@@ -14,6 +14,7 @@ class LetterHelpers {
 
             $userData = User::leftJoin('profile', 'users.id', '=', 'profile.user_id')
             ->leftJoin('designations', 'users.designation_id', '=', 'designations.id')
+            ->leftJoin('departments', 'users.department_id', '=', 'departments.id')
             ->leftJoin('employee_separations', 'users.id', '=', 'employee_separations.employee_id')
             ->select(
                 'users.id',
@@ -21,7 +22,7 @@ class LetterHelpers {
                 'profile.employee_code',
                 'profile.date_of_joining',
                 'designations.name as designation_name',
-                'employee_separations.entry_date'
+                'employee_separations.entry_date',
             )
             ->where('users.id', '=', $request->employeeId)
             ->latest('employee_separations.id')
@@ -125,6 +126,7 @@ class LetterHelpers {
             $userData = User::leftJoin('profile', 'users.id', '=', 'profile.user_id')
                 ->leftJoin('designations', 'users.designation_id', '=', 'designations.id')
                 ->leftJoin('employee_separations', 'users.id', '=', 'employee_separations.employee_id')
+                ->leftJoin('departments', 'users.department_id', '=', 'departments.id')
                 ->leftJoin('departments', 'designations.department_id', '=', 'departments.id')
                 ->select(
                     'users.id',

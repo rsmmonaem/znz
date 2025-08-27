@@ -211,14 +211,13 @@
                     <div class="noc-container" style="display: none;" id="nocContent">
                         <div class="noc-date" style="margin-top: 120px;">Date: {{ date('d-m-Y') }}</div>
                         <div class="noc-header"><strong> No Objection Certificate (NOC) </strong> </div> 
-                        
                         <div class="noc-body">
                             <p>This is to certify that <span class="highlight" id="employeeName"></span> has been our employee
                                 since
                                 <span class="highlight" id="joiningDate"></span> to <span class="highlight"
                                     id="endingDate"></span></span> and
                                 his/her service length is <span class="highlight" id="serviceLength"></span>. His/her present
-                                designation is <span class="highlight" id="designation_name"></span> and department of <span class="highlight" id="department_name"></span>, in our company.
+                                designation is <span class="highlight" id="designation_name"></span>-<span class="highlight" id="department_name"></span>, in our company.
                             </p>
 
                             <p>In his/her time of staying with our company <span class="highlight empName"></span> showed full dedication to his/her work which makes him/her one of the assets of our company. And also we have no objection on his/her decision to resign his/her position.</p>
