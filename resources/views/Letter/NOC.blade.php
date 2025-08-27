@@ -52,7 +52,6 @@
                     left: 0;
                     width: 100%;
                     height: 100%;
-                    background-image: url('{{ URL::to(config('constants.upload_path.logo') . config('config.logo')) }}');
                     background-size: 500px 500px !important; 
                     background-size: cover;
                     background-repeat: no-repeat !important;
@@ -88,7 +87,7 @@
             .noc-note {
                 font-size: 18px;
                 font-style: italic;
-                margin-top: 10px;
+                margin-top: 84px;
             }
 
             .signature-line {
@@ -383,7 +382,7 @@
             .noc-note {
                 font-size: 18px;
                 font-style: italic;
-                margin-top: 10px;
+                margin-top: 84px;
             }
 
             .signature-line {

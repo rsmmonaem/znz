@@ -83,7 +83,7 @@
         .note {
             font-size: 13px;
             font-style: italic;
-            margin-top: 30px;
+            margin-top: 50px;
         }
 
         .signature {
@@ -398,7 +398,7 @@
         .note {
             font-size: 18px;
             font-style: italic;
-            margin-top: 30px;
+            margin-top: 50px;
         }
 
         .signature {
