@@ -22,7 +22,7 @@ class LetterHelpers {
                 'profile.employee_code',
                 'profile.date_of_joining',
                 'designations.name as designation_name',
-                'employee_separations.entry_date',
+                'employee_separations.entry_date'
             )
             ->where('users.id', '=', $request->employeeId)
             ->latest('employee_separations.id')
