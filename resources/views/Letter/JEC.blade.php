@@ -379,7 +379,7 @@
 
         .title {
             text-align: center;
-            font-size: 24px;
+            font-size: 25px;
             font-weight: bold;
             text-decoration: underline;
             margin: 20px 0;
