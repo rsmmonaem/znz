@@ -349,7 +349,6 @@
                     left: 0;
                     width: 100%;
                     height: 100%;
-                    background-image: url('{{ URL::to(config('constants.upload_path.logo') . config('config.logo')) }}');
                     background-size: 500px 500px !important; 
                     background-size: cover;
                     background-repeat: no-repeat !important;
@@ -433,15 +432,15 @@
             printWindow.document.close();
 
             
-            // printWindow.onload = function() {
+            printWindow.onload = function() {
                 
-            //     const img = new Image();
-            //     img.onload = function() {
-            //         printWindow.print(); 
-            //     };
-            //     img.src =
-            //         'https://scontent.fdac5-2.fna.fbcdn.net/v/t39.30808-1/393121278_798706948724860_2546228729910779588_n.jpg?stp=c7.7.186.186a_dst-jpg_p200x200&_nc_cat=103&ccb=1-7&_nc_sid=f4b9fd&_nc_ohc=P_Qg84VXC5IQ7kNvgE1uXHJ&_nc_zt=24&_nc_ht=scontent.fdac5-2.fna&_nc_gid=APdhLEfV5m7g2iNTpKLaWX1&oh=00_AYAk_f9FoAQbtLvKHm28Y9ySQyO8yjNYhccDtt67wSepxQ&oe=67534096'; 
-            // };
+                const img = new Image();
+                img.onload = function() {
+                    printWindow.print(); 
+                };
+                img.src =
+                    'https://scontent.fdac5-2.fna.fbcdn.net/v/t39.30808-1/393121278_798706948724860_2546228729910779588_n.jpg?stp=c7.7.186.186a_dst-jpg_p200x200&_nc_cat=103&ccb=1-7&_nc_sid=f4b9fd&_nc_ohc=P_Qg84VXC5IQ7kNvgE1uXHJ&_nc_zt=24&_nc_ht=scontent.fdac5-2.fna&_nc_gid=APdhLEfV5m7g2iNTpKLaWX1&oh=00_AYAk_f9FoAQbtLvKHm28Y9ySQyO8yjNYhccDtt67wSepxQ&oe=67534096'; 
+            };
         }
     </script>
 
