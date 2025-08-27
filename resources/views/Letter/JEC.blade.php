@@ -175,6 +175,10 @@
                                     @include('common.reportSelect')
                                 </div>
                             </div>
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label" for="effectiveDate ">Effective Date</label>
+                                <input type="date" class="form-control" id="effectiveDate" name="effectiveDate">
+                            </div>
                     </div>
                     <button type="button" class="btn btn-primary" style="margin-bottom: 20px" id="getNOC">Generate
                         JEC</button>
@@ -289,6 +293,7 @@
                     department: $('#department').val(),
                     section: $('#section').val(),
                     designation: $('#designation').val()
+                    designation: $('#effectiveDate').val()
                 }
                 $.ajax({
                     url: "/letter-jec",
@@ -303,6 +308,7 @@
                             $('#serviceLength').text(' ');
                             $('#designation_name').text(' ');
                             $('.empName').text(' ');
+                            $('.effectiveDate').text(' ');
                             btnControll();
                             return;
                         } else {
