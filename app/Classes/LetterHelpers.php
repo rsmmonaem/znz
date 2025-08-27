@@ -192,7 +192,7 @@ class LetterHelpers {
                 }
             }
 
-            return $userData ?: response()->json(['message' => 'No data found']);
+            return $userData;
         }
     }
 
