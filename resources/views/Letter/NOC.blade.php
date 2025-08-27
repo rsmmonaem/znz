@@ -411,13 +411,13 @@
                             return;
                         } else {
                             toastr.success('Data Fetched Successfully');
-                            $('#employeeName').text(data.employee_name);
-                            $('#joiningDate').text(data.date_of_joining);
-                            $('#endingDate').text(data.entry_date);
-                            $('#serviceLength').text(data.date_diff);
-                            $('#designation_name').text(data.designation_name);
-                            $('#department_name').text(data.department_name);
-                            $('.empName').text(data.employee_name);
+                            $('#employeeName').text(data.employee_name || '');
+                            $('#joiningDate').text(data.date_of_joining || '');
+                            $('#endingDate').text(data.entry_date || '');
+                            $('#serviceLength').text(data.date_diff || '');
+                            $('#designation_name').text(data.designation_name || '');
+                            $('#department_name').text(data.department_name || '');
+                            $('.empName').text(data.employee_name || '');
                             btnControll();
                         }
                     },

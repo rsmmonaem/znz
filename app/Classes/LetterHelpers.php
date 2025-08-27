@@ -87,38 +87,6 @@ class LetterHelpers {
     }
 
     public function JECPOST($request){
-        // $exits = EmployeeSeparation::where('employee_id', $request->employeeId)->latest('id')->first();
-        // if($exits){
-        //     $userData = User::leftJoin('profile', 'users.id', '=', 'profile.user_id')
-        //     ->leftJoin('designations', 'users.designation_id', '=', 'designations.id')
-        //     ->leftJoin('employee_separations', 'users.id', '=', 'employee_separations.employee_id')
-        //     ->leftJoin('departments', 'designations.department_id', '=', 'departments.id')
-        //     ->select(
-        //         'users.id',
-        //         'users.first_name as employee_name',
-        //         'profile.employee_code',
-        //         'profile.date_of_joining',
-        //         'designations.name as designation_name',
-        //         'employee_separations.entry_date',
-        //         'departments.name as department_name'
-        //     )
-        //     ->where('users.id', '=', $request->employeeId)
-        //     ->latest('employee_separations.id')
-        //     ->first();
-        //     if ($userData) {
-        //         $userData->date_of_joining = Carbon::parse($userData->date_of_joining)->format('d M Y');
-        //         $userData->entry_date = Carbon::parse($userData->entry_date)->format('d M Y');
-        //         $dateOfJoining = Carbon::parse($userData->date_of_joining);
-        //         $entryDate = Carbon::parse($userData->entry_date);
-        //         $diff = $dateOfJoining->diff($entryDate);
-        //         $userData->date_diff = $diff->format('%y years, %m months, %d days');
-        //         $userData->department_name = $userData->department_name;
-        //         $userData->designation_name = $userData->designation_name;
-        //     }
-        //     return $userData;
-        // }else{
-        //     return response()->json(['message' => 'No data found']);
-        // }
 
         $exits = EmployeeSeparation::where('employee_id', $request->employeeId)
             ->latest('id')
@@ -138,7 +106,7 @@ class LetterHelpers {
                     'profile.date_of_joining',
                     'designations.name as designation_name',
                     'employee_separations.entry_date',
-                    'departments.name as department_name'
+                    'departments.name as department_name',
                 )
                 ->where('users.id', '=', $request->employeeId)
                 ->latest('employee_separations.id')
@@ -174,7 +142,7 @@ class LetterHelpers {
                     'profile.employee_code',
                     'profile.date_of_joining',
                     'designations.name as designation_name',
-                    'departments.name as department_name'
+                    'departments.name as department_name',
                 )
                 ->where('users.id', '=', $request->employeeId)
                 ->first();
