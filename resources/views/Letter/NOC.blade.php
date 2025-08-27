@@ -210,7 +210,7 @@
                     <button onclick="downloadWord()" class="btn btn-success">Download Word</button>
                     <button onclick="downloadPDF()" class="btn btn-danger">Download PDF</button>
                     <div class="noc-container" style="display: none;" id="nocContent">
-                        <div class="noc-date">Date: {{ date('d-m-Y') }}</div>
+                        <div class="noc-date" style="margin-top: 120px;">Date: {{ date('d-m-Y') }}</div>
                         <div class="noc-header">No Objection Certificate (NOC)</div>
                         <div class="noc-body">
                             <p>This is to certify that <span class="highlight" id="employeeName"></span> has been our employee
@@ -228,7 +228,7 @@
 
                             <div class="noc-signature">
                                 <div class="signature-line">__________________________</div>
-                                <p><span class="font-weight-bold">Saifda Islam Setu</span><br>Manager<br>HR & Business Development<br>J & Z Group</p>
+                                <p><span class="font-weight-bold">Saida Islam Setu</span><br>Manager<br>HR & Business Development<br>J & Z Group</p>
                             </div>
                         </div>
                     </div>
@@ -433,15 +433,15 @@
             printWindow.document.close();
 
             
-            printWindow.onload = function() {
+            // printWindow.onload = function() {
                 
-                const img = new Image();
-                img.onload = function() {
-                    printWindow.print(); 
-                };
-                img.src =
-                    'https://scontent.fdac5-2.fna.fbcdn.net/v/t39.30808-1/393121278_798706948724860_2546228729910779588_n.jpg?stp=c7.7.186.186a_dst-jpg_p200x200&_nc_cat=103&ccb=1-7&_nc_sid=f4b9fd&_nc_ohc=P_Qg84VXC5IQ7kNvgE1uXHJ&_nc_zt=24&_nc_ht=scontent.fdac5-2.fna&_nc_gid=APdhLEfV5m7g2iNTpKLaWX1&oh=00_AYAk_f9FoAQbtLvKHm28Y9ySQyO8yjNYhccDtt67wSepxQ&oe=67534096'; 
-            };
+            //     const img = new Image();
+            //     img.onload = function() {
+            //         printWindow.print(); 
+            //     };
+            //     img.src =
+            //         'https://scontent.fdac5-2.fna.fbcdn.net/v/t39.30808-1/393121278_798706948724860_2546228729910779588_n.jpg?stp=c7.7.186.186a_dst-jpg_p200x200&_nc_cat=103&ccb=1-7&_nc_sid=f4b9fd&_nc_ohc=P_Qg84VXC5IQ7kNvgE1uXHJ&_nc_zt=24&_nc_ht=scontent.fdac5-2.fna&_nc_gid=APdhLEfV5m7g2iNTpKLaWX1&oh=00_AYAk_f9FoAQbtLvKHm28Y9ySQyO8yjNYhccDtt67wSepxQ&oe=67534096'; 
+            // };
         }
     </script>
 

@@ -192,7 +192,7 @@
     {{-- Start JEC Certificate --}}
     <div class="certificate-container" id="certificateContent" style="display: none;">
         <!-- Header Section -->
-        <div class="header" style="display: flex; justify-content: space-between; margin-bottom: 108px;">
+        <div class="header" style="display: flex; justify-content: space-between; margin-bottom: 120px;">
             <img src="{{ URL::to(config('constants.upload_path.logo') . config('config.logo')) }}" alt="J & Z Group Logo" style="display: none;">
             <div class="company-info" style="display: none;">
                 <h3>J & Z GROUP</h3>
