@@ -204,7 +204,7 @@
         </div>
 
         <!-- Title -->
-        <div class="title">Job Experience Certificate</div>
+        <div class="title"><strong>Job Experience Certificate</strong></div>
 
         <!-- Body Text -->
         <div class="body-text">
