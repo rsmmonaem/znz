@@ -210,130 +210,127 @@
     })
 
     
-    function getReport(response) {
-        
-        var newWindow = window.open('', '_blank', 'width=1200,height=800');
+function getReport(response) {
+    var branchName = $('#branch option:selected').text(); 
+    var today = new Date().toLocaleDateString('en-GB'); 
+    
+    var newWindow = window.open('', '_blank', 'width=1200,height=800');
 
-        
-        var content = `
-        <html>
-            <head>
-                <title>Salary Slab Report</title>
-                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.5.2/css/bootstrap.min.css">
-                <style>
-                    .center-item {
-                        margin-left: auto;
-                        margin-right: auto;
-                        text-align: center;
-                    }
-                    .display-flex {
-                        display: flex;
-                        justify-content: space-between;
-                        align-items: center;
-                        border: 1px solid #ccc;
-                        padding: 10px;
-                        margin: 0 0 20px 0;
-                    }
-                    table {
-                        width: 100%;
-                        border-collapse: collapse;
-                    }
-                    th, td {
-                        border: 1px solid #ccc;
-                        padding: 8px;
-                        text-align: left;
-                    }
-                    .btn {
-                        display: block;
-                        margin: 20px auto;
-                    }
-                </style>
-            </head>
-            <body>
-                <div class="display-flex">
-                    <div class="left-item">
-                        <img src="{{ URL::to(config('constants.upload_path.logo') . config('config.logo')) }}" width="150px" style="margin-left:20px;">
-                    </div>
-                    <div class="center-item">
-                        <h4>{{ config('config.company_name') }}</h4>
-                        <h3>Salary Slab Report</h3>
-                        <p>Branch: {{ Auth::user()->profile->branch->name }}</p>
-                        <p>Date: <strong id="date"></strong></p>
-                    </div>
+    var content = `
+    <html>
+        <head>
+            <title>Salary Slab Report</title>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.5.2/css/bootstrap.min.css">
+            <style>
+                .center-item {
+                    margin-left: auto;
+                    margin-right: auto;
+                    text-align: center;
+                }
+                .display-flex {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    border: 1px solid #ccc;
+                    padding: 10px;
+                    margin: 0 0 20px 0;
+                }
+                table {
+                    width: 100%;
+                    border-collapse: collapse;
+                }
+                th, td {
+                    border: 1px solid #ccc;
+                    padding: 8px;
+                    text-align: left;
+                }
+                .btn {
+                    display: block;
+                    margin: 20px auto;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="display-flex">
+                <div class="left-item">
+                    <img src="{{ URL::to(config('constants.upload_path.logo') . config('config.logo')) }}" width="150px" style="margin-left:20px;">
                 </div>
-                <table class="table table-bordered report-table">
-                    <thead>
-                        <tr>
-                            <th>SL</th>
-                            <th>Name</th>
-                            <th>Designation</th>
-                            <th>Department</th>
-                            <th>Section</th>
-                            <th>DOJ</th>
-                            <th>Grade</th>
-                            <th>Account Number</th>
-                            <th>Bank Amount</th>
-                            <th>Cash Amount</th>
-                            <th>Gross</th>
-                            <th>Basic</th>
-                            <th>House Rent</th>
-                            <th>Medical</th>
-                            <th>Conveyance</th>
-                            <th>Other</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-        `;
+                <div class="center-item">
+                    <h4>{{ config('config.company_name') }}</h4>
+                    <h3>Salary Slab Report</h3>
+                    <p>Branch: ${branchName}</p>
+                    <p>Date: <strong>${today}</strong></p>
+                </div>
+            </div>
+            <table class="table table-bordered report-table">
+                <thead>
+                    <tr>
+                        <th>SL</th>
+                        <th>Name</th>
+                        <th>Designation</th>
+                        <th>Department</th>
+                        <th>Section</th>
+                        <th>DOJ</th>
+                        <th>Grade</th>
+                        <th>Account Number</th>
+                        <th>Bank Amount</th>
+                        <th>Cash Amount</th>
+                        <th>Gross</th>
+                        <th>Basic</th>
+                        <th>House Rent</th>
+                        <th>Medical</th>
+                        <th>Conveyance</th>
+                        <th>Other</th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
 
-        
-        response.forEach((employee, index) => {
-            let gross = parseFloat(employee.user_info.gross) || 0;
+    response.forEach((employee, index) => {
+        let gross = parseFloat(employee.user_info.gross) || 0;
+        let basic = Math.round(gross * 0.50);
+        let house = Math.round(gross * 0.28);
+        let medical = Math.round(gross * 0.09);
+        let conveyance = Math.round(gross * 0.08);
+        let others = Math.round(gross * 0.05);
 
-            
-            let basic = Math.round(gross * 0.50);
-            let house = Math.round(gross * 0.28);
-            let medical = Math.round(gross * 0.09);
-            let conveyance = Math.round(gross * 0.08);
-            let others = Math.round(gross * 0.05);
-
-            content += `
-                <tr>
-                    <td>${index + 1}</td>
-                    <td>${employee.user_info.first_name || ' '}</td>
-                    <td>${employee.user_info.designation || ' '}</td>
-                    <td>${employee.user_info.departments || ' '}</td>
-                    <td>${employee.user_info.section || ' '}</td>
-                    <td>${employee.user_info.date_of_joining || ' '}</td>
-                    <td>${employee.user_info.grades || ' '}</td>
-                    <td>${employee.user_info.account_number || ' '}</td>
-                    <td>${employee.user_info.bank_amount || 0}</td>
-                    <td>${employee.user_info.cash_amount || 0}</td>
-                    <td>${gross}</td>
-                    <td>${basic}</td>
-                    <td>${house}</td>
-                    <td>${medical}</td>
-                    <td>${conveyance}</td>
-                    <td>${others}</td>
-                </tr>`;
-        });
-
-        
         content += `
-                    </tbody>
-                </table>
-                <div class="display-flex">
-                    <div class="center-item">
-                        <button onclick="window.print()" class="btn btn-primary">Print</button>
-                    </div>
-                </div>
-            </body>
-        </html>
-        `;
+            <tr>
+                <td>${index + 1}</td>
+                <td>${employee.user_info.first_name || ' '}</td>
+                <td>${employee.user_info.designation || ' '}</td>
+                <td>${employee.user_info.departments || ' '}</td>
+                <td>${employee.user_info.section || ' '}</td>
+                <td>${employee.user_info.date_of_joining || ' '}</td>
+                <td>${employee.user_info.grades || ' '}</td>
+                <td>${employee.user_info.account_number || ' '}</td>
+                <td>${employee.user_info.bank_amount || 0}</td>
+                <td>${employee.user_info.cash_amount || 0}</td>
+                <td>${gross}</td>
+                <td>${basic}</td>
+                <td>${house}</td>
+                <td>${medical}</td>
+                <td>${conveyance}</td>
+                <td>${others}</td>
+            </tr>`;
+    });
 
-        
-        newWindow.document.write(content);
-        newWindow.document.close(); 
-    }
+    content += `
+                </tbody>
+            </table>
+            <div class="display-flex">
+                <div class="center-item">
+                    <button onclick="window.print()" class="btn btn-primary">Print</button>
+                </div>
+            </div>
+        </body>
+    </html>
+    `;
+
+    newWindow.document.write(content);
+    newWindow.document.close();
+}
+
 
 
 </script>
