@@ -221,12 +221,11 @@ function getReport(response) {
         <head>
             <title>Salary Slab Report</title>
             <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.5.2/css/bootstrap.min.css">
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
             <style>
-                .center-item {
-                    margin-left: auto;
-                    margin-right: auto;
-                    text-align: center;
-                }
+                .center-item { text-align: center; }
                 .display-flex {
                     display: flex;
                     justify-content: space-between;
@@ -235,19 +234,10 @@ function getReport(response) {
                     padding: 10px;
                     margin: 0 0 20px 0;
                 }
-                table {
-                    width: 100%;
-                    border-collapse: collapse;
-                }
-                th, td {
-                    border: 1px solid #ccc;
-                    padding: 8px;
-                    text-align: left;
-                }
-                .btn {
-                    display: block;
-                    margin: 20px auto;
-                }
+                table { width: 100%; border-collapse: collapse; }
+                th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+                .btn { display: inline-block; margin: 10px; }
+                .button-group { text-align: center; margin-top: 20px; }
             </style>
         </head>
         <body>
@@ -318,11 +308,27 @@ function getReport(response) {
     content += `
                 </tbody>
             </table>
-            <div class="display-flex">
-                <div class="center-item">
-                    <button onclick="window.print()" class="btn btn-primary">Print</button>
-                </div>
+            <div class="button-group">
+                <button onclick="window.print()" class="btn btn-primary">Print</button>
+                <button onclick="exportExcel()" class="btn btn-success">Export Excel</button>
+                <button onclick="exportPDF()" class="btn btn-danger">Export PDF</button>
             </div>
+
+            <script>
+                function exportExcel(){
+                    var table = document.querySelector(".report-table");
+                    var wb = XLSX.utils.table_to_book(table, {sheet: "Salary Report"});
+                    XLSX.writeFile(wb, "salary_report.xlsx");
+                }
+
+                function exportPDF(){
+                    const { jsPDF } = window.jspdf;
+                    var doc = new jsPDF('l','pt','a4');
+                    doc.text("Salary Slab Report", 40, 40);
+                    doc.autoTable({ html: '.report-table', startY: 60, theme: 'grid' });
+                    doc.save("salary_report.pdf");
+                }
+            </script>
         </body>
     </html>
     `;
@@ -330,6 +336,7 @@ function getReport(response) {
     newWindow.document.write(content);
     newWindow.document.close();
 }
+
 
 
 
