@@ -199,7 +199,6 @@
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
                 success: function(response) {
-                    console.log(response);
                     getReport(response);
                 },
                 error: function() {
@@ -209,45 +208,22 @@
         })
     })
 
-    
-function getReport(response) {
-    var branchName = $('#branch option:selected').text(); 
-    var today = new Date().toLocaleDateString('en-GB'); 
-    
-    var newWindow = window.open('', '_blank', 'width=1200,height=800');
+    function getReport(response) {
+        var branchName = $('#branch option:selected').text(); 
+        var today = new Date().toLocaleDateString('en-GB'); 
+        var newWindow = window.open('', '_blank', 'width=1200,height=800');
 
-    var content = `
-    <html>
+        var content = `
+        <html>
         <head>
             <title>Salary Slab Report</title>
             <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.5.2/css/bootstrap.min.css">
             <style>
-                .center-item {
-                    margin-left: auto;
-                    margin-right: auto;
-                    text-align: center;
-                }
-                .display-flex {
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                    border: 1px solid #ccc;
-                    padding: 10px;
-                    margin: 0 0 20px 0;
-                }
-                table {
-                    width: 100%;
-                    border-collapse: collapse;
-                }
-                th, td {
-                    border: 1px solid #ccc;
-                    padding: 8px;
-                    text-align: left;
-                }
-                .btn {
-                    display: block;
-                    margin: 20px auto;
-                }
+                .center-item { margin-left:auto; margin-right:auto; text-align:center; }
+                .display-flex { display:flex; justify-content:space-between; align-items:center; border:1px solid #ccc; padding:10px; margin:0 0 20px 0; }
+                table { width:100%; border-collapse:collapse; }
+                th, td { border:1px solid #ccc; padding:8px; text-align:left; }
+                .btn { display:inline-block; margin:20px 10px; }
             </style>
         </head>
         <body>
@@ -265,38 +241,26 @@ function getReport(response) {
             <table class="table table-bordered report-table">
                 <thead>
                     <tr>
-                        <th>SL</th>
-                        <th>Name</th>
-                        <th>Designation</th>
-                        <th>Department</th>
-                        <th>Section</th>
-                        <th>DOJ</th>
-                        <th>Grade</th>
-                        <th>Account Number</th>
-                        <th>Bank Amount</th>
-                        <th>Cash Amount</th>
-                        <th>Gross</th>
-                        <th>Basic</th>
-                        <th>House Rent</th>
-                        <th>Medical</th>
-                        <th>Conveyance</th>
-                        <th>Other</th>
+                        <th>SL</th><th>Name</th><th>Designation</th><th>Department</th><th>Section</th>
+                        <th>DOJ</th><th>Grade</th><th>Account Number</th><th>Bank Amount</th>
+                        <th>Cash Amount</th><th>Gross</th><th>Basic</th><th>House Rent</th>
+                        <th>Medical</th><th>Conveyance</th><th>Other</th>
                     </tr>
                 </thead>
                 <tbody>
-    `;
+        `;
 
-    response.forEach((employee, index) => {
-        let gross = parseFloat(employee.user_info.gross) || 0;
-        let basic = Math.round(gross * 0.50);
-        let house = Math.round(gross * 0.28);
-        let medical = Math.round(gross * 0.09);
-        let conveyance = Math.round(gross * 0.08);
-        let others = Math.round(gross * 0.05);
+        response.forEach((employee, index) => {
+            let gross = parseFloat(employee.user_info.gross) || 0;
+            let basic = Math.round(gross * 0.50);
+            let house = Math.round(gross * 0.28);
+            let medical = Math.round(gross * 0.09);
+            let conveyance = Math.round(gross * 0.08);
+            let others = Math.round(gross * 0.05);
 
-        content += `
+            content += `
             <tr>
-                <td>${index + 1}</td>
+                <td>${index+1}</td>
                 <td>${employee.user_info.first_name || ' '}</td>
                 <td>${employee.user_info.designation || ' '}</td>
                 <td>${employee.user_info.departments || ' '}</td>
@@ -306,33 +270,48 @@ function getReport(response) {
                 <td>${employee.user_info.account_number || ' '}</td>
                 <td>${employee.user_info.bank_amount || 0}</td>
                 <td>${employee.user_info.cash_amount || 0}</td>
-                <td>${gross}</td>
-                <td>${basic}</td>
-                <td>${house}</td>
-                <td>${medical}</td>
-                <td>${conveyance}</td>
-                <td>${others}</td>
+                <td>${gross}</td><td>${basic}</td><td>${house}</td>
+                <td>${medical}</td><td>${conveyance}</td><td>${others}</td>
             </tr>`;
-    });
+        });
 
-    content += `
+        content += `
                 </tbody>
             </table>
             <div class="display-flex">
                 <div class="center-item">
                     <button onclick="window.print()" class="btn btn-primary">Print</button>
+                    <button id="exportExcel" class="btn btn-success">Export to Excel</button>
                 </div>
             </div>
         </body>
-    </html>
-    `;
+        </html>
+        `;
 
-    newWindow.document.write(content);
-    newWindow.document.close();
-}
+        newWindow.document.write(content);
+        newWindow.document.close();
 
-
-
-
+        // Excel Export
+        newWindow.document.getElementById('exportExcel').addEventListener('click', function() {
+            var tableHTML = newWindow.document.querySelector('.report-table').outerHTML;
+            var filename = 'Salary_Slab_Report.xls';
+            var uri = 'data:application/vnd.ms-excel;base64,';
+            var template = `
+            <html xmlns:o="urn:schemas-microsoft-com:office:office" 
+                xmlns:x="urn:schemas-microsoft-com:office:excel" 
+                xmlns="http://www.w3.org/TR/REC-html40">
+            <head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet>
+            <x:Name>Salary Slab</x:Name>
+            <x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet>
+            </x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]-->
+            </head><body>${tableHTML}</body></html>
+            `;
+            var base64 = function(s) { return window.btoa(unescape(encodeURIComponent(s))) };
+            var link = newWindow.document.createElement('a');
+            link.href = uri + base64(template);
+            link.download = filename;
+            link.click();
+        });
+    }
 </script>
 @stop
