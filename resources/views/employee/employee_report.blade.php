@@ -319,6 +319,11 @@ response.forEach((item, index) => {
                         h3 {
                             text-align: center;
                         }
+                        @media print {
+                            @page {
+                                size: landscape;
+                            }
+                        }
                     </style>
                 </head>
                 <body>
@@ -333,7 +338,7 @@ response.forEach((item, index) => {
                                 <p>Empoyee Report</p>
                             </div>
                         </div>
-                        <table class="table table-bordered table-striped">
+                        <table class="table table-bordered table-striped report-table">
                             <thead>
                                 <tr>
                                     <th>SL</th>
@@ -359,6 +364,7 @@ response.forEach((item, index) => {
                         <div class="display-flex">
                             <div class="center-item">
                                 <button onclick="window.print()" class="btn btn-primary">Print</button>
+                                <button id="exportExcel" class="btn btn-success">Export to Excel</button>
                             </div>
                         </div>
                     </div>
@@ -368,6 +374,28 @@ response.forEach((item, index) => {
 
             newWindow.document.write(reportHTML);
             newWindow.document.close();
+
+            // Excel Export
+        newWindow.document.getElementById('exportExcel').addEventListener('click', function() {
+            var tableHTML = newWindow.document.querySelector('.report-table').outerHTML;
+            var filename = 'Employee_Report.xls';
+            var uri = 'data:application/vnd.ms-excel;base64,';
+            var template = `
+            <html xmlns:o="urn:schemas-microsoft-com:office:office" 
+                xmlns:x="urn:schemas-microsoft-com:office:excel" 
+                xmlns="http://www.w3.org/TR/REC-html40">
+            <head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet>
+            <x:Name>Salary Slab</x:Name>
+            <x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet>
+            </x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]-->
+            </head><body>${tableHTML}</body></html>
+            `;
+            var base64 = function(s) { return window.btoa(unescape(encodeURIComponent(s))) };
+            var link = newWindow.document.createElement('a');
+            link.href = uri + base64(template);
+            link.download = filename;
+            link.click();
+        });
         },
         error: function (xhr, status, error) {
             console.error(error);
