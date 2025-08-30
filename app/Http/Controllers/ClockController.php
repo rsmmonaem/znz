@@ -1847,6 +1847,10 @@ Class ClockController extends Controller{
 
 	public function dailyattendanceReprtPOST(Request $request) {
 		// Fetch user IDs based on the provided filters
+		$branch = null;
+		if ($request->branch_id) {
+			$branch = Branch::find($request->branch_id);
+		}
 		$userIds = User::leftJoin(
 			'profile',
 			'users.id',
@@ -1939,7 +1943,8 @@ Class ClockController extends Controller{
 			'filtered_data' => $filtered_data,
 			'filtered_totals' => $totals,
 			'startDate' => $request->startDate,
-			'toDate' => $request->endDate
+			'toDate' => $request->endDate,
+			'branch_name'     => $branch ? $branch->name : 'All Branches'
 		];
 		return $response;
 	}
