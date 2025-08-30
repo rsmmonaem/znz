@@ -396,6 +396,7 @@ response.forEach((item, index) => {
             link.download = filename;
             link.click();
         });
+        
         },
         error: function (xhr, status, error) {
             console.error(error);
