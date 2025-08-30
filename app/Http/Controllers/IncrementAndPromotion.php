@@ -300,7 +300,7 @@ class IncrementAndPromotion extends Controller{
         return $query->whereYear('increments_promotions.entry_date', '>=', $customDate);
       })
       ->where('increments_promotions.status','=','approved')
-      ->select('users.id','profile.employee_code','users.first_name','designations.name as designation','departments.name as department','branchs.name as branch','sections.name as section','increments_promotions.amount as promotedAmount','increments_promotions.designation as promotedDesignation','increments_promotions.id','profile.date_of_joining', 'increments_promotions.amount as promotedAmount', 'increments_promotions.old_amount','increments_promotions.promotion', 'increments_promotions.increment', 'branchs.name as branch_name')
+      ->select('users.id','profile.employee_code','users.first_name','designations.name as designation','departments.name as department','branchs.name as branch','sections.name as section','increments_promotions.amount as promotedAmount','increments_promotions.designation as promotedDesignation','increments_promotions.id','profile.date_of_joining', 'increments_promotions.old_amount','increments_promotions.promotion', 'increments_promotions.increment', 'branchs.name as branch_name')
       ->get();
      
       $dataa = [
