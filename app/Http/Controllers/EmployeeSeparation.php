@@ -237,6 +237,7 @@ class EmployeeSeparation extends Controller
             'designations.name as designation',
             'departments.name as department',
             'sections.name as section',
+            'branchs.name as branch_name',
             'profile.date_of_joining',
             'profile.date_of_birth',
             'profile.blood_group',

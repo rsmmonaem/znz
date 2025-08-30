@@ -185,111 +185,138 @@
         function getReport(response) {
             var newWindow = window.open('', '_blank', 'width=1200,height=800');
 
-// Build the content for the new window
-var content = `
-<html>
-    <head>
-        <title>Employee Separation Report</title>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.5.2/css/bootstrap.min.css">
-        <style>
-            .center-item {
-                margin-left: auto;
-                margin-right: auto;
-            }
-            .display-flex {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                border: 1px solid #ccc;
-                padding: 10px;
-                margin: 0 0 20px 0;
-            }
-            table {
-                width: 100%;
-                border-collapse: collapse;
-            }
-            th, td {
-                border: 1px solid #ccc;
-                padding: 8px;
-                text-align: left;
-            }
-        </style>
-    </head>
-    <body>
-        <div class="display-flex">
-            <div class="left-item">
-                <img src="{{ URL::to(config('constants.upload_path.logo') . config('config.logo')) }}" width="150px" style="margin-left:20px;">
-            </div>
-            <div class="center-item">
-                <h4>{{ config('config.company_name') }}</h4>
-                <h3>Employee Separation Report</h3>
-                <p>Branch: {{ Auth::user()->profile->branch->name }}</p>
-                <p>Date: <strong id="date">${response.date}</strong></p>
-            </div>
-        </div>
-        <table class="table table-bordered report-table">
-            <thead>
-                <tr>
-                    <th>SL</th>
-                    <th>Emp. Code</th>
-                    <th>Name</th>
-                    <th>Designation</th>
-                    <th>Department</th>
-                    <th>Section</th>
-                    <th>D.Of Join</th>
-                    <th>DOB</th>
-                    <th>BG</th>
-                    <th>Job Nature</th>
-                    <th>Category</th>
-                    <th>Phone</th>
-                    <th>Gender</th>
-                    <th>Entry Date</th>
-                    <th>Last Working Day</th>
-                </tr>
-            </thead>
-            <tbody>
-`;
+            // Build the content for the new window
+            var content = `
+            <html>
+                <head>
+                    <title>Employee Separation Report</title>
+                    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.5.2/css/bootstrap.min.css">
+                    <style>
+                        .center-item {
+                            margin-left: auto;
+                            margin-right: auto;
+                        }
+                        .display-flex {
+                            display: flex;
+                            justify-content: space-between;
+                            align-items: center;
+                            border: 1px solid #ccc;
+                            padding: 10px;
+                            margin: 0 0 20px 0;
+                        }
+                        table {
+                            width: 100%;
+                            border-collapse: collapse;
+                        }
+                        th, td {
+                            border: 1px solid #ccc;
+                            padding: 8px;
+                            text-align: left;
+                        }
+                        @media print {
+                            @page {
+                                size: landscape;
+                            }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="display-flex">
+                        <div class="left-item">
+                            <img src="{{ URL::to(config('constants.upload_path.logo') . config('config.logo')) }}" width="150px" style="margin-left:20px;">
+                        </div>
+                        <div class="center-item">
+                            <h4>{{ config('config.company_name') }}</h4>
+                            <h3>Employee Separation Report</h3>
+                            <p>Branch: ${response.branch_name}</p>
+                            <p>Date: <strong id="date">${response.date}</strong></p>
+                        </div>
+                    </div>
+                    <table class="table table-bordered report-table">
+                        <thead>
+                            <tr>
+                                <th>SL</th>
+                                <th>Emp. Code</th>
+                                <th>Name</th>
+                                <th>Designation</th>
+                                <th>Department</th>
+                                <th>Section</th>
+                                <th>D.Of Join</th>
+                                <th>DOB</th>
+                                <th>BG</th>
+                                <th>Job Nature</th>
+                                <th>Category</th>
+                                <th>Phone</th>
+                                <th>Gender</th>
+                                <th>Entry Date</th>
+                                <th>Last Working Day</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
 
-// Append rows dynamically from the response data
-response.data.forEach((employee, index) => {
-    content += `
-        <tr>
-            <td>${index + 1}</td>
-            <td>${employee.employee_code || ' '}</td>
-            <td>${employee.first_name || ' '}</td>
-            <td>${employee.designation || ' '}</td>
-            <td>${employee.department || ' '}</td>
-            <td>${employee.section || ' '}</td>
-            <td>${employee.date_of_joining || ' '}</td>
-            <td>${employee.date_of_birth || ' '}</td>
-            <td>${employee.blood_group || ' '}</td>
-            <td>${employee.job_nature || ' '}</td>
-            <td>${employee.category || ' '}</td>
-            <td>${employee.contact_number || ' '}</td>
-            <td>${employee.gender || ' '}</td>
-            <td>${employee.date || ' '}</td>
-            <td>${employee.last_working_day || ' '}</td>
-        </tr>
-    `;
-});
+            // Append rows dynamically from the response data
+            response.data.forEach((employee, index) => {
+                content += `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${employee.employee_code || ' '}</td>
+                        <td>${employee.first_name || ' '}</td>
+                        <td>${employee.designation || ' '}</td>
+                        <td>${employee.department || ' '}</td>
+                        <td>${employee.section || ' '}</td>
+                        <td>${employee.date_of_joining || ' '}</td>
+                        <td>${employee.date_of_birth || ' '}</td>
+                        <td>${employee.blood_group || ' '}</td>
+                        <td>${employee.job_nature || ' '}</td>
+                        <td>${employee.category || ' '}</td>
+                        <td>${employee.contact_number || ' '}</td>
+                        <td>${employee.gender || ' '}</td>
+                        <td>${employee.date || ' '}</td>
+                        <td>${employee.last_working_day || ' '}</td>
+                    </tr>
+                `;
+            });
 
-// Close the table and add the print button
-content += `
-            </tbody>
-        </table>
-        <div class="display-flex">
-            <div class="left-item"></div>
-            <div class="center-item">
-                <button onclick="window.print()" class="btn btn-primary">Print</button>
-            </div>
-        </div>
-    </body>
-</html>
-`;
+            // Close the table and add the print button
+            content += `
+                        </tbody>
+                    </table>
+                    <div class="display-flex">
+                        <div class="left-item"></div>
+                        <div class="center-item">
+                            <button onclick="window.print()" class="btn btn-primary">Print</button>
+                            <button id="exportExcel" class="btn btn-success">Export to Excel</button>
+                        </div>
+                    </div>
+                </body>
+            </html>
+            `;
 
-// Write the content to the new window
-newWindow.document.write(content);
-newWindow.document.close();  // Close the document to apply the styles    
+            // Write the content to the new window
+            newWindow.document.write(content);
+            newWindow.document.close();  // Close the document to apply the styles  
+            // Excel Export
+            newWindow.document.getElementById('exportExcel').addEventListener('click', function() {
+                var tableHTML = newWindow.document.querySelector('.report-table').outerHTML;
+                var filename = 'daily_attendence.xls';
+                var uri = 'data:application/vnd.ms-excel;base64,';
+                var template = `
+                <html xmlns:o="urn:schemas-microsoft-com:office:office" 
+                    xmlns:x="urn:schemas-microsoft-com:office:excel" 
+                    xmlns="http://www.w3.org/TR/REC-html40">
+                <head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet>
+                <x:Name>Salary Slab</x:Name>
+                <x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet>
+                </x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]-->
+                </head><body>${tableHTML}</body></html>
+                `;
+                var base64 = function(s) { return window.btoa(unescape(encodeURIComponent(s))) };
+                var link = newWindow.document.createElement('a');
+                link.href = uri + base64(template);
+                link.download = filename;
+                link.click();
+            });  
         }
     });
   </script>
