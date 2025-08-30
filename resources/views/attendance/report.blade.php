@@ -8,18 +8,7 @@
 @stop
 
 @section('content')
-    {{-- @if (Entrust::can('create_employee'))
-            <div class="col-sm-12 collapse" id="box-detail">
-                <div class="box-info">
-                    <h2>
-                        <strong>{!! trans('messages.add_new') !!}</strong> {!! trans('messages.employee') !!}
-                        <div class="additional-btn">
-                            <button class="btn btn-sm btn-primary" data-toggle="collapse" data-target="#box-detail"><i
-                                    class="fa fa-minus icon"></i> {!! trans('messages.hide') !!}</button>
-                        </div>
-                    </h2>
-                </div>
-        @endif --}}
+
     <style>
         .attendance-report {
             margin: 20px;
@@ -258,6 +247,11 @@
                                     .totals-row td {
                                         font-weight: bold;
                                     }
+                                    @media print {
+                                        @page {
+                                            size: landscape;
+                                        }
+                                    }
                                 </style>
                             </head>
                             <body>
@@ -268,7 +262,7 @@
                                     <div class="center-item">
                                         <h4>{{ config('config.company_name') }}</h4>
                                         <p>Monthly Attendance Report (Date)</p>
-                                        <p>Branch: {{ Auth::user()->profile->branch->name }}</p>
+                                        <p>Branch: ${response.branch_name}</p>
                                         <p>Date: <strong id="date">${response.startDate} to ${response.toDate}</strong></p>
                                     </div>
                                 </div>
@@ -369,6 +363,27 @@
                         // Write the content to the new window
                         newWindow.document.write(content);
                         newWindow.document.close();  // Close the document to apply the styles
+                        // Excel Export
+        newWindow.document.getElementById('exportExcel').addEventListener('click', function() {
+            var tableHTML = newWindow.document.querySelector('.report-table').outerHTML;
+            var filename = 'Employee_Report.xls';
+            var uri = 'data:application/vnd.ms-excel;base64,';
+            var template = `
+            <html xmlns:o="urn:schemas-microsoft-com:office:office" 
+                xmlns:x="urn:schemas-microsoft-com:office:excel" 
+                xmlns="http://www.w3.org/TR/REC-html40">
+            <head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet>
+            <x:Name>Salary Slab</x:Name>
+            <x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet>
+            </x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]-->
+            </head><body>${tableHTML}</body></html>
+            `;
+            var base64 = function(s) { return window.btoa(unescape(encodeURIComponent(s))) };
+            var link = newWindow.document.createElement('a');
+            link.href = uri + base64(template);
+            link.download = filename;
+            link.click();
+        });
 
 
                     }, error: function(xhr, status, error) {

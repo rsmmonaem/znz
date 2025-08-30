@@ -333,7 +333,7 @@ response.forEach((item, index) => {
                                 <img src="{{ URL::to(config('constants.upload_path.logo').config('config.logo')) }}" width="150px" style="margin-left:20px;">
                             </div>
                             <div class="center-item">
-                                <h4>Head Office</h4>
+                                <h3>{{ config('config.company_name') }}</h3>
                                 <p>Address : {{ config('config.address_1') }}</p>
                                 <p>Empoyee Report</p>
                             </div>
@@ -375,7 +375,7 @@ response.forEach((item, index) => {
             newWindow.document.write(reportHTML);
             newWindow.document.close();
 
-            // Excel Export
+        // Excel Export
         newWindow.document.getElementById('exportExcel').addEventListener('click', function() {
             var tableHTML = newWindow.document.querySelector('.report-table').outerHTML;
             var filename = 'Employee_Report.xls';
@@ -396,7 +396,7 @@ response.forEach((item, index) => {
             link.download = filename;
             link.click();
         });
-        
+
         },
         error: function (xhr, status, error) {
             console.error(error);
