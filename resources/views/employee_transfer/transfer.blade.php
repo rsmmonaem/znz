@@ -35,7 +35,14 @@
         .table-container {
             margin-top: 30px;
         }
-    </style>
+
+        @media print {
+            @page {
+                size: landscape;
+            }
+        }
+        
+        </style>
     <div class="row">
         @if (Entrust::can('create_employee'))
             <div class="col-sm-12">
