@@ -306,6 +306,11 @@ $('#getData').on('click', function(e) {
                             padding: 8px;
                             text-align: left;
                         }
+                        @media print {
+                            .btn-print-excel button {
+                                display: none !important;
+                            }
+                        }
                     </style>
                 </head>
                 <body>
@@ -365,7 +370,7 @@ $('#getData').on('click', function(e) {
                     </table>
                     <div class="display-flex">
                         <div class="left-item"></div>
-                        <div class="center-item">
+                        <div class="center-item btn-print-excel">
                             <button onclick="window.print()" class="btn btn-primary">Print</button>
                             <button id="exportExcel" class="btn btn-success">Export to Excel</button>
                         </div>

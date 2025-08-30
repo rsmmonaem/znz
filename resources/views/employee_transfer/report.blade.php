@@ -202,6 +202,13 @@
                                     size: landscape;
                                 }
                             }
+                            
+                            @media print {
+                                .btn-print-excel button {
+                                    display: none !important;
+                                }
+                            }
+                                
                         </style>
                     </head>
                     <body>
@@ -257,7 +264,7 @@
                         </table>
                         <div class="display-flex">
                             <div class="left-item"></div>
-                            <div class="center-item">
+                            <div class="center-item btn-print-excel">
                                 <button onclick="window.print()" class="btn btn-primary">Print</button>
                                 <button id="exportExcel" class="btn btn-success">Export to Excel</button>
                             </div>
