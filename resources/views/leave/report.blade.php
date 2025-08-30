@@ -188,7 +188,6 @@
                         <div class="center-item">
                             <h4>{{ config('config.company_name') }}</h4>
                             <p>Leave Details by Status</p>
-                            <p>Branch: {{ Auth::user()->profile->branch->name }}</p>
                             <p>Date: <strong id="date"></strong></p>
                         </div>
                     </div>
@@ -217,6 +216,7 @@
                                 <div class="left-item"></div>
                                 <div class="center-item">
                                     <button class="btn btn-primary" id="print">Print</button>
+                                    <button id="exportExcel" class="btn btn-success">Export to Excel</button>
                                 </div>
                             </div>
                 </div>
@@ -317,7 +317,7 @@ $('#getData').on('click', function(e) {
                             <h4>{{ config('config.company_name') }}</h4>
                             <h3>Leave Report</h3>
                             <p>Leave Details by Status</p>
-                            <p>Branch: {{ Auth::user()->profile->branch->name }}</p>
+                            <p>Branch: ${response.branch_name}</p>
                             <p>Date: <strong id="date">${response.fromDate} to ${response.toDate}</strong></p>
                         </div>
                     </div>
@@ -367,6 +367,7 @@ $('#getData').on('click', function(e) {
                         <div class="left-item"></div>
                         <div class="center-item">
                             <button onclick="window.print()" class="btn btn-primary">Print</button>
+                            <button id="exportExcel" class="btn btn-success">Export to Excel</button>
                         </div>
                     </div>
                 </body>
@@ -376,9 +377,30 @@ $('#getData').on('click', function(e) {
             // Write the content to the new window
             newWindow.document.write(content);
             newWindow.document.close();  // Close the document to apply the styles
+            newWindow.document.getElementById('exportExcel').addEventListener('click', function() {
+                var tableHTML = newWindow.document.querySelector('.report-table').outerHTML;
+                var filename = 'leave_report.xls';
+                var uri = 'data:application/vnd.ms-excel;base64,';
+                var template = `
+                <html xmlns:o="urn:schemas-microsoft-com:office:office" 
+                    xmlns:x="urn:schemas-microsoft-com:office:excel" 
+                    xmlns="http://www.w3.org/TR/REC-html40">
+                <head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet>
+                <x:Name>Salary Slab</x:Name>
+                <x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet>
+                </x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]-->
+                </head><body>${tableHTML}</body></html>
+                `;
+                var base64 = function(s) { return window.btoa(unescape(encodeURIComponent(s))) };
+                var link = newWindow.document.createElement('a');
+                link.href = uri + base64(template);
+                link.download = filename;
+                link.click();
+            });
         },
         error: function(xhr, status, error) {
             console.error("Error occurred: " + error);
+            toastr.error("No Data Found!");
         }
     });
 });

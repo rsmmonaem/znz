@@ -764,61 +764,67 @@ Class LeaveController extends Controller{
 	}
 
 	public function LeaveReportPOST(Request $request){
-	$user = User::leftJoin('profile', 'users.id', '=', 'profile.user_id')
-    ->leftJoin('designations', 'users.designation_id', '=', 'designations.id')
-    ->leftJoin('departments', 'designations.department_id', '=', 'departments.id')
-    ->leftJoin('sections', 'profile.section_id', '=', 'sections.id')
-    ->when($request->employeeID, function ($query) use ($request) {
-        return $query->where('profile.employee_code', '=', $request->employeeID);
-    })
-    ->when($request->branch, function ($query) use ($request) {
-        return $query->where('profile.branch_id', '=', $request->branch);
-    })
-    ->when($request->section, function ($query) use ($request) {
-        return $query->where('profile.section_id', '=', $request->section);
-    })
-    ->when($request->department, function ($query) use ($request) {
-        return $query->where('departments.id', '=', $request->department);
-    })
-    ->when($request->designation, function ($query) use ($request) {
-        return $query->where('designations.id', '=', $request->designation);
-    })
-    ->select('users.id', 'profile.employee_code as employee_id', 'designations.name as designation_name', 'departments.name as department_name', 'users.first_name', 'sections.name as section_name')
-    ->get();
 
-if ($user->isEmpty()) {
-    return response()->json(['error' => 'No users found'], 404);
-}
+		$user = User::leftJoin('profile', 'users.id', '=', 'profile.user_id')
+		->leftJoin('designations', 'users.designation_id', '=', 'designations.id')
+		->leftJoin('departments', 'designations.department_id', '=', 'departments.id')
+		->leftJoin('sections', 'profile.section_id', '=', 'sections.id')
+		->when($request->employeeID, function ($query) use ($request) {
+			return $query->where('profile.employee_code', '=', $request->employeeID);
+		})
+		->when($request->branch, function ($query) use ($request) {
+			return $query->where('profile.branch_id', '=', $request->branch);
+		})
+		->when($request->section, function ($query) use ($request) {
+			return $query->where('profile.section_id', '=', $request->section);
+		})
+		->when($request->department, function ($query) use ($request) {
+			return $query->where('departments.id', '=', $request->department);
+		})
+		->when($request->designation, function ($query) use ($request) {
+			return $query->where('designations.id', '=', $request->designation);
+		})
+		->select('users.id', 'profile.employee_code as employee_id', 'designations.name as designation_name', 'departments.name as department_name', 'users.first_name', 'sections.name as section_name')
+		->get();
 
-$data = Leave::whereIn('user_id', $user->pluck('id'))
-    ->leftJoin('leave_types', 'leaves.leave_type_id', '=', 'leave_types.id')
-    ->when($request->status, function ($query) use ($request) {
-        return $query->where('leaves.status', '=', $request->status);
-    })
-    ->where('from_date', '>=', $request->fromDate)
-    ->where('to_date', '<=', $request->toDate)
-    ->select('leaves.*', 'leave_types.name as leave_type_name')
-    ->get();
+		if ($user->isEmpty()) {
+			return response()->json(['error' => 'No users found'], 404);
+		}
 
-if ($data->isEmpty()) {
-    return response()->json(['error' => 'No leave records found'], 404);
-}
+		$data = Leave::whereIn('user_id', $user->pluck('id'))
+			->leftJoin('leave_types', 'leaves.leave_type_id', '=', 'leave_types.id')
+			->when($request->status, function ($query) use ($request) {
+				return $query->where('leaves.status', '=', $request->status);
+			})
+			->where('from_date', '>=', $request->fromDate)
+			->where('to_date', '<=', $request->toDate)
+			->select('leaves.*', 'leave_types.name as leave_type_name')
+			->get();
 
-$mergedLeaveRecords = $data->map(function ($leave) use ($user) {
-    $currentUser = $user->Where('id', $leave->user_id)->first();
-    if (!$currentUser) {
-        return $leave->toArray();
-    }
-    return array_merge($currentUser->toArray(), $leave->toArray());
-});
+		if ($data->isEmpty()) {
+			
+			return response()->json(['error' => 'No leave records found'], 404);
+		}
 
-// return response()->json($mergedLeaveRecords);
+		$mergedLeaveRecords = $data->map(function ($leave) use ($user) {
+			$currentUser = $user->Where('id', $leave->user_id)->first();
+			if (!$currentUser) {
+				return $leave->toArray();
+			}
+			return array_merge($currentUser->toArray(), $leave->toArray());
+		});
 
+		// return response()->json($mergedLeaveRecords);
+		$branch = null;
+		if ($request->branch_id) {
+			$branch = Branch::find($request->branch_id);
+		}
 		$finalData = [
 			'data' => $mergedLeaveRecords,
 			'fromDate' => $request->fromDate,
 			'toDate' => $request->toDate,
 			'reportType' => $request->reportType,
+			'branch_name'     => $branch ? $branch->name : 'All Branches',
 		];
 
 		return response()->json($finalData);
