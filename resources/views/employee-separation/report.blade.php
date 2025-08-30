@@ -299,7 +299,7 @@
             // Excel Export
             newWindow.document.getElementById('exportExcel').addEventListener('click', function() {
                 var tableHTML = newWindow.document.querySelector('.report-table').outerHTML;
-                var filename = 'daily_attendence.xls';
+                var filename = 'Employee_separation_report.xls';
                 var uri = 'data:application/vnd.ms-excel;base64,';
                 var template = `
                 <html xmlns:o="urn:schemas-microsoft-com:office:office" 
