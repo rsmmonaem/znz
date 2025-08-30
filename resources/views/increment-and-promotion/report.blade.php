@@ -248,11 +248,6 @@
                             padding: 8px;
                             text-align: left;
                         }
-                        @media print {
-                            @page {
-                                size: landscape;
-                            }
-                        }
                     </style>
                 </head>
                 <body>
