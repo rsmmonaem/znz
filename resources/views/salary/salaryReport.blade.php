@@ -224,6 +224,11 @@
                 table { width:100%; border-collapse:collapse; }
                 th, td { border:1px solid #ccc; padding:8px; text-align:left; }
                 .btn { display:inline-block; margin:20px 10px; }
+                @media print {
+                    @page {
+                        size: landscape;
+                    }
+                }
             </style>
         </head>
         <body>
