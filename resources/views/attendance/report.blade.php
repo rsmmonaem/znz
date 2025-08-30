@@ -354,6 +354,7 @@
                                     <div class="left-item"></div>
                                     <div class="center-item">
                                         <button onclick="window.print()" class="btn btn-primary">Print</button>
+                                        <button id="exportExcel" class="btn btn-success">Export to Excel</button>
                                     </div>
                                 </div>
                             </body>
