@@ -1499,6 +1499,10 @@ Class ClockController extends Controller{
 		$employeeIds = $request->employee_id
 			? (is_array($request->employee_id) ? $request->employee_id : explode(',', $request->employee_id))
 			: null;
+		$branch = null;
+		if ($request->branch_id) {
+			$branch = Branch::find($request->branch_id);
+		}
 		// Fetch user IDs based on the provided filters
 		$userIds = User::leftJoin('profile', 'users.id',
 			'=',
@@ -1590,7 +1594,8 @@ Class ClockController extends Controller{
 			'filtered_data' => $filtered_data,  
 			'filtered_totals' => $totals,
 			'startDate' => $request->startDate,
-			'toDate' => $request->endDate
+			'toDate' => $request->endDate,
+			'branch_name'     => $branch ? $branch->name : 'All Branches'
 		];
 		return $response;
 
