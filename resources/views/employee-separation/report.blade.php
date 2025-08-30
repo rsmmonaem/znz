@@ -228,7 +228,7 @@
                         <div class="center-item">
                             <h4>{{ config('config.company_name') }}</h4>
                             <h3>Employee Separation Report</h3>
-                            <p>Branch: ${response.branch_name}</p>
+                            <p>Branch: ${response.branch_name || "All Branch"}</p>
                             <p>Date: <strong id="date">${response.date}</strong></p>
                         </div>
                     </div>
