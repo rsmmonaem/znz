@@ -305,7 +305,8 @@ class IncrementAndPromotion extends Controller{
      
       $dataa = [
         'data' => $data,
-        'date' => date('Y-m-d')
+        'date' => date('Y-m-d'),
+        'branch_name' => $data->first()->branch_name ?? 'All Branch'
       ];
       return $dataa;
     }
