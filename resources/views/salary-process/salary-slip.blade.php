@@ -95,6 +95,7 @@
             text-align: center;
         }
     </style>
+    
     <div class="row">
         <div class="col-sm-12">
             <div class="box-info">
