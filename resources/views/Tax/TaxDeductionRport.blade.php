@@ -278,7 +278,7 @@
                         <p style="margin:0;">Tax Financial Year : ${response.tax_year}</p>
                     </div>
                 </div>
-                 <table class="table table-bordered table-striped">
+                 <table class="table table-bordered table-striped report-table">
                     <thead>
                         <tr>
                             <th>SL</th>
