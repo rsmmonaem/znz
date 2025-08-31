@@ -190,7 +190,7 @@
             // Excel Export
             newWindow.document.getElementById('exportExcel').addEventListener('click', function() {
                 var tableHTML = newWindow.document.querySelector('.report-table').outerHTML;
-                var filename = 'Employee_Report.xls';
+                var filename = 'cost-unit-wise-challan-listReport.xls';
                 var uri = 'data:application/vnd.ms-excel;base64,';
                 var template = `
                 <html xmlns:o="urn:schemas-microsoft-com:office:office" 
