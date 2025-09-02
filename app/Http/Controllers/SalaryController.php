@@ -589,13 +589,11 @@ Class SalaryController extends Controller{
         return view('salary.salarycertificate', compact('group', 'branch', 'department', 'section', 'employee', 'designation', 'category'));
     }
 
-    public function SalaryCertificateReportPOST(Request $request)
+    public function SalaryCertificateGenerate(Request $request)
     {
         $user = User::leftJoin('profile', 'users.id', '=', 'profile.user_id')
             ->leftJoin('designations', 'users.designation_id', '=', 'designations.id')
             ->leftJoin('departments', 'designations.department_id', '=', 'departments.id')
-            ->leftJoin('sections', 'profile.section_id', '=', 'sections.id')
-            ->leftJoin('grades', 'profile.grade_id', '=', 'grades.id')
             ->where('users.id', $request->employeeId)
             ->select(
                 'users.id',
@@ -603,14 +601,12 @@ Class SalaryController extends Controller{
                 'profile.employee_code',
                 'profile.date_of_joining',
                 'designations.name as designation',
-                'departments.name as department',
-                'sections.name as section',
-                'grades.name as grade'
+                'departments.name as department'
             )
             ->first();
 
         if (!$user) {
-            return response()->json(['error' => 'Employee not found'], 404);
+            return redirect()->back()->with('error', 'Employee not found!');
         }
 
         // Latest salary slab
@@ -619,8 +615,12 @@ Class SalaryController extends Controller{
             ->latest('id')
             ->first();
 
-        $gross = $slab_data ? $slab_data->gross : 0;
-        $tax   = $slab_data && $slab_data->tax ? $slab_data->tax : 0;
+        if (!$slab_data) {
+            return redirect()->back()->with('error', 'Salary data not found!');
+        }
+
+        $gross = $slab_data->gross ?? 0;
+        $tax   = $slab_data->tax ?? 0;
 
         $basic      = round($gross * 0.50);
         $house      = round($gross * 0.28);
@@ -628,26 +628,9 @@ Class SalaryController extends Controller{
         $conveyance = round($gross * 0.08);
         $others     = round($gross * 0.05);
 
-        $certificate = [
-            'employee'   => $user,
-            'gross'      => $gross,
-            'basic'      => $basic,
-            'house'      => $house,
-            'medical'    => $medical,
-            'conveyance' => $conveyance,
-            'others'     => $others,
-        ];
+        $net = $tax > 0 ? ($gross - $tax) : $gross;
 
-        
-        if ($tax > 0) {
-            $certificate['tax'] = $tax;
-            $certificate['net'] = $gross - $tax;
-        } else {
-            
-            $certificate['net'] = $gross;
-        }
-
-        return response()->json($certificate);
+        return view('salary.certificate', compact('user', 'gross', 'basic', 'house', 'medical', 'conveyance', 'others', 'tax', 'net'));
     }
 }
 ?>

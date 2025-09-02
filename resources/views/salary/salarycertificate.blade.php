@@ -17,7 +17,6 @@
 
         .form-section .form-group {
             width: 48%;
-            /* Adjust width to make space for both sides */
         }
 
         .form-group label {
@@ -64,7 +63,6 @@
 
                     <!-- Form Section -->
                     <div class="row">
-                        <!-- Left Section: Filters -->
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="group">Group</label>
@@ -115,34 +113,18 @@
                                 <label for="employee-id">Employee ID</label>
                                 <select class="form-control" id="employee_id">
                                     <option value="">Select Employee ID</option>
-                                    {{-- @foreach ($employee as $e)
-                                        <option value="{{ $e->id }}">{{ $e->first_name }} -
-                                            {{ $e->employee_code }}</option>
-                                    @endforeach --}}
                                 </select>
                             </div>
                         </div>
 
-                        <!-- Right Section: Report Type and Category -->
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="report-type">Report Type</label>
-                                {{-- <select class="form-control" id="report-type">
-                                    <option value="salary-slab">Salary Slab</option>
-                                </select> --}}
-                               @include('common.reportSelect')
+                                @include('common.reportSelect')
                             </div>
                             <div class="form-group">
                                 <label for="category">Category</label>
-                                {{-- <select class="form-control" id="category">
-                                    <option value="">Select Category</option>
-                                    @foreach ($category as $c)
-                                        <option value="{{ $c->id }}">{{ $c->name }}</option>
-                                    @endforeach
-                                    <otion value="owner">Owner</option>
-                                    <option value="staff">Staff</option>
-                                </select> --}}
-                                 @include('common.category')
+                                @include('common.category')
                             </div>
                             <div class="form-group">
                                 <label for="type">Type</label>
@@ -160,14 +142,13 @@
                         <button class="btn btn-primary" id="report">Report</button>
                         <button class="btn btn-danger">Close</button>
                     </div>
-
                 </div>
             </div>
         </div>
     </div>
 @stop
-@section('javascript')
 
+@section('javascript')
 <script type="text/javascript">
     $(document).ready(function() {
         $('#employee_id').select2();
@@ -199,78 +180,88 @@
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
                 success: function(response) {
-                    getCertificate(response);
+                    if(response.error){
+                        toastr.error(response.error);
+                    } else {
+                        getCertificate(response);
+                        toastr.success("Salary certificate generated!");
+                    }
                 },
                 error: function() {
-                    console.log('error');
+                    toastr.error("Something went wrong while generating certificate!");
                 }
             })
         })
     })
 
     function getCertificate(data) {
-    var today = new Date().toLocaleDateString('en-GB'); 
-    var newWindow = window.open('', '_blank', 'width=900,height=800');
+        var today = new Date().toLocaleDateString('en-GB'); 
+        var newWindow = window.open('', '_blank', 'width=900,height=800');
 
-    var content = `
-    <html>
-    <head>
-        <title>Salary Certificate</title>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.5.2/css/bootstrap.min.css">
-        <style>
-            body { font-family: Arial, sans-serif; margin: 40px; }
-            .certificate { border: 2px solid #000; padding: 30px; }
-            .header { text-align: center; margin-bottom: 30px; }
-            .salary-table { width:100%; border-collapse:collapse; margin-top:20px; }
-            .salary-table th, .salary-table td { border:1px solid #000; padding:8px; text-align:center; }
-            .signature { margin-top:50px; text-align:right; }
-            @media print {
-                .btn-print { display:none; }
-            }
-        </style>
-    </head>
-    <body>
-        <div class="certificate">
-            <div class="header">
-                <h3>Salary Certificate</h3>
-                <p>Date: ${today}</p>
+        var taxRow = '';
+        if (data.tax && data.tax > 0) {
+            taxRow = `<tr><th>Tax</th><td>- ${data.tax}</td></tr>`;
+        }
+
+        var content = `
+        <html>
+        <head>
+            <title>Salary Certificate</title>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.5.2/css/bootstrap.min.css">
+            <style>
+                body { font-family: Arial, sans-serif; margin: 40px; }
+                .certificate { border: 2px solid #000; padding: 30px; }
+                .header { text-align: center; margin-bottom: 30px; }
+                .salary-table { width:100%; border-collapse:collapse; margin-top:20px; }
+                .salary-table th, .salary-table td { border:1px solid #000; padding:8px; text-align:center; }
+                .signature { margin-top:50px; text-align:right; }
+                @media print {
+                    .btn-print { display:none; }
+                }
+            </style>
+        </head>
+        <body>
+            <div class="certificate">
+                <div class="header">
+                    <h3>Salary Certificate</h3>
+                    <p>Date: ${today}</p>
+                </div>
+                <p>
+                    This is to certify that <b>${data.employee.first_name}</b> 
+                    (Employee ID: ${data.employee.employee_code}), 
+                    working as <b>${data.employee.designation}</b> in the 
+                    <b>${data.employee.department}</b> department, 
+                    has been employed with us since ${data.employee.date_of_joining}.
+                </p>
+
+                <table class="salary-table">
+                    <tr><th>Basic Salary</th><td>${data.basic}</td></tr>
+                    <tr><th>House Rent</th><td>${data.house}</td></tr>
+                    <tr><th>Medical</th><td>${data.medical}</td></tr>
+                    <tr><th>Conveyance</th><td>${data.conveyance}</td></tr>
+                    <tr><th>Others</th><td>${data.others}</td></tr>
+                    <tr><th><b>Gross Salary</b></th><td><b>${data.gross}</b></td></tr>
+                    ${taxRow}
+                    <tr><th><b>Net Payable</b></th><td><b>${data.net}</b></td></tr>
+                </table>
+
+                <p style="margin-top:20px;">This certificate has been issued upon his request without any liability on the company.</p>
+
+                <div class="signature">
+                    <p>______________________</p>
+                    <p>Authorized Signature</p>
+                </div>
+
+                <div class="btn-print">
+                    <button onclick="window.print()" class="btn btn-primary">Print</button>
+                </div>
             </div>
-            <p>
-                This is to certify that <b>${data.employee.first_name}</b> 
-                (Employee ID: ${data.employee.employee_code}), 
-                working as <b>${data.employee.designation}</b> in the 
-                <b>${data.employee.department}</b> department, 
-                has been employed with us since ${data.employee.date_of_joining}.
-            </p>
+        </body>
+        </html>
+        `;
 
-            <table class="salary-table">
-                <tr><th>Basic Salary</th><td>${data.basic}</td></tr>
-                <tr><th>House Rent</th><td>${data.house}</td></tr>
-                <tr><th>Medical</th><td>${data.medical}</td></tr>
-                <tr><th>Conveyance</th><td>${data.conveyance}</td></tr>
-                <tr><th>Others</th><td>${data.others}</td></tr>
-                <tr><th><b>Gross Salary</b></th><td><b>${data.gross}</b></td></tr>
-            </table>
-
-            <p style="margin-top:20px;">This certificate has been issued upon his request without any liability on the company.</p>
-
-            <div class="signature">
-                <p>______________________</p>
-                <p>Authorized Signature</p>
-            </div>
-
-            <div class="btn-print">
-                <button onclick="window.print()" class="btn btn-primary">Print</button>
-            </div>
-        </div>
-    </body>
-    </html>
-    `;
-
-    newWindow.document.write(content);
-    newWindow.document.close();
-}
-
-
+        newWindow.document.write(content);
+        newWindow.document.close();
+    }
 </script>
 @stop

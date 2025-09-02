@@ -500,7 +500,7 @@ Route::group(['middleware' => ['auth','license','account_valid']], function () {
 	Route::get('salary-report', 'SalaryController@salaryReport');
 
 	Route::get('salary-certificate', 'SalaryController@SalaryCertificate');
-	Route::post('SalaryCertificateReportPOST', 'SalaryController@SalaryCertificateReportPOST');
+	Route::post('/salary-certificate', 'SalaryController@SalaryCertificateGenerate')->name('salary.certificate.generate');
 
 
 
