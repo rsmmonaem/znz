@@ -145,7 +145,9 @@ $(document).ready(function(){
 
         var content = `
         <html>
-        <head><title>Salary Certificate</title></head>
+        <head>
+            <title>Salary Certificate</title>
+        </head>
         <body style="font-family: Arial; margin:40px;">
             <div class="display-flex">
                 <div class="left-item">
@@ -153,7 +155,9 @@ $(document).ready(function(){
                 </div>
                 <div class="center-item">
                     <h4>{{ config('config.company_name') }}</h4>
-                    <h2 style="text-align:center;">Salary Certificate</h2>
+                    <h2 style="text-align:center; display:inline-block; border-bottom: 3px solid black; padding-bottom: 5px;">
+                        TO WHOM IT MAY CONCERN
+                    </h2>
                 </div>
             </div>
             
