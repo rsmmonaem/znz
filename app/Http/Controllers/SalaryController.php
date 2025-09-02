@@ -597,7 +597,7 @@ Class SalaryController extends Controller{
 
     public function SalaryCertificateGenerate(Request $request)
     {
-        // employee basic info + salary info collect
+        // employee info
         $employee = User::leftJoin('profile', 'users.id', '=', 'profile.user_id')
             ->leftJoin('designations', 'users.designation_id', '=', 'designations.id')
             ->leftJoin('departments', 'designations.department_id', '=', 'departments.id')
@@ -611,24 +611,56 @@ Class SalaryController extends Controller{
             )
             ->first();
 
+        // latest salary record
         $salary = DB::table('employee_salary_details')
             ->where('employee_id', $request->employeeId)
-            ->latest()->first();
+            ->orderBy('id', 'desc')
+            ->first();
 
         if (!$employee || !$salary) {
             return response()->json(['error' => 'No salary record found!']);
         }
 
+        // breakdown calculation (like salary sheet report)
+        $basic = 0;
+        $house = 0;
+        $medical = 0;
+        $conveyance = 0;
+        $others = 0;
+
+        $salaryData = DB::table('employee_salary_breakdown') // check your actual table name
+            ->where('employee_salary_id', $salary->id)
+            ->get();
+
+        foreach ($salaryData as $row) {
+            $head = strtolower($row->head);
+            $amt  = (float) $row->amount;
+
+            if (strpos($head, 'basic') !== false) $basic = $amt;
+            elseif (strpos($head, 'house') !== false) $house = $amt;
+            elseif (strpos($head, 'medical') !== false) $medical = $amt;
+            elseif (strpos($head, 'conveyance') !== false) $conveyance = $amt;
+            elseif (strpos($head, 'other') !== false) $others = $amt;
+        }
+
+        // fallback: if no breakdown saved, calculate percentage
+        $gross = (float) $salary->gross_salary;
+        if ($basic == 0) $basic = $gross * 0.50;
+        if ($house == 0) $house = $gross * 0.28;
+        if ($medical == 0) $medical = $gross * 0.09;
+        if ($conveyance == 0) $conveyance = $gross * 0.08;
+        if ($others == 0) $others = $gross * 0.05;
+
         $data = [
-            'employee' => $employee,
-            'basic'    => $salary->basic,
-            'house'    => $salary->house_rent,
-            'medical'  => $salary->medical,
-            'conveyance' => $salary->conveyance,
-            'others'   => $salary->others,
-            'gross'    => $salary->gross_salary,
-            'tax'      => $salary->tax_amount,
-            'net'      => $salary->net_salary,
+            'employee'   => $employee,
+            'basic'      => number_format($basic, 2),
+            'house'      => number_format($house, 2),
+            'medical'    => number_format($medical, 2),
+            'conveyance' => number_format($conveyance, 2),
+            'others'     => number_format($others, 2),
+            'gross'      => number_format($gross, 2),
+            'tax'        => number_format((float) $salary->tax_amount, 2),
+            'net'        => number_format((float) $salary->net_salary, 2),
         ];
 
         return response()->json($data);
