@@ -572,65 +572,66 @@ Class SalaryController extends Controller{
         return response()->json($data);
     }
 
-    public function SalaryCertificate(Request $request){
+    public function SalaryCertificate(Request $request)
+    {
         $group = DB::table('com_group')->get();
         $branch = Branch::all();
         $department = Department::all();
         $designation = Designation::all();
         $section = Section::all();
         $employee = User::LeftJoin('profile', 'users.id', '=', 'profile.user_id')
-            ->select(
-                'users.id',
-                'profile.employee_code',
-                'users.first_name'
-            )
+            ->select('users.id', 'profile.employee_code', 'users.first_name')
             ->get();
         $category = DB::table('category')->get();
-        return view('salary.salarycertificate', compact('group', 'branch', 'department', 'section', 'employee', 'designation', 'category'));
+
+        return view('salary.salarycertificate', compact(
+            'group',
+            'branch',
+            'department',
+            'section',
+            'employee',
+            'designation',
+            'category'
+        ));
     }
 
     public function SalaryCertificateGenerate(Request $request)
     {
-        $user = User::leftJoin('profile', 'users.id', '=', 'profile.user_id')
+        // employee basic info + salary info collect
+        $employee = User::leftJoin('profile', 'users.id', '=', 'profile.user_id')
             ->leftJoin('designations', 'users.designation_id', '=', 'designations.id')
             ->leftJoin('departments', 'designations.department_id', '=', 'departments.id')
             ->where('users.id', $request->employeeId)
             ->select(
-                'users.id',
                 'users.first_name',
                 'profile.employee_code',
-                'profile.date_of_joining',
                 'designations.name as designation',
-                'departments.name as department'
+                'departments.name as department',
+                'profile.date_of_joining'
             )
             ->first();
 
-        if (!$user) {
-            return redirect()->back()->with('error', 'Employee not found!');
+        $salary = DB::table('employee_salary_details')
+            ->where('employee_id', $request->employeeId)
+            ->latest()->first();
+
+        if (!$employee || !$salary) {
+            return response()->json(['error' => 'No salary record found!']);
         }
 
-        // Latest salary slab
-        $slab_data = DB::table('salary_slab')
-            ->where('user_id', $user->id)
-            ->latest('id')
-            ->first();
+        $data = [
+            'employee' => $employee,
+            'basic'    => $salary->basic,
+            'house'    => $salary->house_rent,
+            'medical'  => $salary->medical,
+            'conveyance' => $salary->conveyance,
+            'others'   => $salary->others,
+            'gross'    => $salary->gross_salary,
+            'tax'      => $salary->tax_amount,
+            'net'      => $salary->net_salary,
+        ];
 
-        if (!$slab_data) {
-            return redirect()->back()->with('error', 'Salary data not found!');
-        }
-
-        $gross = $slab_data->gross ?? 0;
-        $tax   = $slab_data->tax ?? 0;
-
-        $basic      = round($gross * 0.50);
-        $house      = round($gross * 0.28);
-        $medical    = round($gross * 0.09);
-        $conveyance = round($gross * 0.08);
-        $others     = round($gross * 0.05);
-
-        $net = $tax > 0 ? ($gross - $tax) : $gross;
-
-        return view('salary.certificate', compact('user', 'gross', 'basic', 'house', 'medical', 'conveyance', 'others', 'tax', 'net'));
+        return response()->json($data);
     }
 }
 ?>
