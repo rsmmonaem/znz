@@ -588,6 +588,66 @@ Class SalaryController extends Controller{
         $category = DB::table('category')->get();
         return view('salary.salarycertificate', compact('group', 'branch', 'department', 'section', 'employee', 'designation', 'category'));
     }
-    
+
+    public function SalaryCertificateReportPOST(Request $request)
+    {
+        $user = User::leftJoin('profile', 'users.id', '=', 'profile.user_id')
+            ->leftJoin('designations', 'users.designation_id', '=', 'designations.id')
+            ->leftJoin('departments', 'designations.department_id', '=', 'departments.id')
+            ->leftJoin('sections', 'profile.section_id', '=', 'sections.id')
+            ->leftJoin('grades', 'profile.grade_id', '=', 'grades.id')
+            ->where('users.id', $request->employeeId)
+            ->select(
+                'users.id',
+                'users.first_name',
+                'profile.employee_code',
+                'profile.date_of_joining',
+                'designations.name as designation',
+                'departments.name as department',
+                'sections.name as section',
+                'grades.name as grade'
+            )
+            ->first();
+
+        if (!$user) {
+            return response()->json(['error' => 'Employee not found'], 404);
+        }
+
+        // Latest salary slab
+        $slab_data = DB::table('salary_slab')
+            ->where('user_id', $user->id)
+            ->latest('id')
+            ->first();
+
+        $gross = $slab_data ? $slab_data->gross : 0;
+        $tax   = $slab_data && $slab_data->tax ? $slab_data->tax : 0;
+
+        $basic      = round($gross * 0.50);
+        $house      = round($gross * 0.28);
+        $medical    = round($gross * 0.09);
+        $conveyance = round($gross * 0.08);
+        $others     = round($gross * 0.05);
+
+        $certificate = [
+            'employee'   => $user,
+            'gross'      => $gross,
+            'basic'      => $basic,
+            'house'      => $house,
+            'medical'    => $medical,
+            'conveyance' => $conveyance,
+            'others'     => $others,
+        ];
+
+        
+        if ($tax > 0) {
+            $certificate['tax'] = $tax;
+            $certificate['net'] = $gross - $tax;
+        } else {
+            
+            $certificate['net'] = $gross;
+        }
+
+        return response()->json($certificate);
+    }
 }
 ?>

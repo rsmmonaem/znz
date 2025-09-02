@@ -498,7 +498,13 @@ Route::group(['middleware' => ['auth','license','account_valid']], function () {
 	Route::post('updatebank-status', 'SalaryController@updateStatus');
 	// Salary
 	Route::get('salary-report', 'SalaryController@salaryReport');
+
 	Route::get('salary-certificate', 'SalaryController@SalaryCertificate');
+	Route::get('SalaryCertificateReportPOST', 'SalaryController@SalaryCertificateReportPOST');
+
+
+
+
 	Route::post('get-user-data-salary', 'SalaryController@getGrossSalary');
 
 	Route::post('SalaryReportPOST', 'SalaryController@SalaryReportPOST');

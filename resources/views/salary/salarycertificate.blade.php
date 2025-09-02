@@ -192,14 +192,14 @@
             };
 
             $.ajax({
-                url: "{{ url('SalaryReportPOST') }}",
+                url: "{{ url('SalaryCertificateReportPOST') }}",
                 type: 'POST',
                 data: formData,
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
                 success: function(response) {
-                    getReport(response);
+                    getCertificate(response);
                 },
                 error: function() {
                     console.log('error');
@@ -208,116 +208,69 @@
         })
     })
 
-    function getReport(response) {
-        var branchName = $('#branch option:selected').text(); 
-        var today = new Date().toLocaleDateString('en-GB'); 
-        var newWindow = window.open('', '_blank', 'width=1200,height=800');
+    function getCertificate(data) {
+    var today = new Date().toLocaleDateString('en-GB'); 
+    var newWindow = window.open('', '_blank', 'width=900,height=800');
 
-        var content = `
-        <html>
-        <head>
-            <title>Salary Certificate</title>
-            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.5.2/css/bootstrap.min.css">
-            <style>
-                .center-item { margin-left:auto; margin-right:auto; text-align:center; }
-                .display-flex { display:flex; justify-content:space-between; align-items:center; border:1px solid #ccc; padding:10px; margin:0 0 20px 0; }
-                table { width:100%; border-collapse:collapse; }
-                th, td { border:1px solid #ccc; padding:8px; text-align:left; }
-                .btn { display:inline-block; margin:20px 10px; }
-                
-                @media print {
-                    .btn-print-excel button {
-                        display: none !important;
-                    }
-                }
-            </style>
-        </head>
-        <body>
-            <div class="display-flex">
-                <div class="left-item">
-                    <img src="{{ URL::to(config('constants.upload_path.logo') . config('config.logo')) }}" width="150px" style="margin-left:20px;">
-                </div>
-                <div class="center-item">
-                    <h4>{{ config('config.company_name') }}</h4>
-                    <h3>Salary Slab Report</h3>
-                    <p>Branch: ${branchName}</p>
-                    <p>Date: <strong>${today}</strong></p>
-                </div>
+    var content = `
+    <html>
+    <head>
+        <title>Salary Certificate</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.5.2/css/bootstrap.min.css">
+        <style>
+            body { font-family: Arial, sans-serif; margin: 40px; }
+            .certificate { border: 2px solid #000; padding: 30px; }
+            .header { text-align: center; margin-bottom: 30px; }
+            .salary-table { width:100%; border-collapse:collapse; margin-top:20px; }
+            .salary-table th, .salary-table td { border:1px solid #000; padding:8px; text-align:center; }
+            .signature { margin-top:50px; text-align:right; }
+            @media print {
+                .btn-print { display:none; }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="certificate">
+            <div class="header">
+                <h3>Salary Certificate</h3>
+                <p>Date: ${today}</p>
             </div>
-            <table class="table table-bordered report-table">
-                <thead>
-                    <tr>
-                        <th>SL</th><th>Name</th><th>Designation</th><th>Department</th><th>Section</th>
-                        <th>DOJ</th><th>Grade</th><th>Account Number</th><th>Bank Amount</th>
-                        <th>Cash Amount</th><th>Gross</th><th>Basic</th><th>House Rent</th>
-                        <th>Medical</th><th>Conveyance</th><th>Other</th>
-                    </tr>
-                </thead>
-                <tbody>
-        `;
+            <p>
+                This is to certify that <b>${data.employee.first_name}</b> 
+                (Employee ID: ${data.employee.employee_code}), 
+                working as <b>${data.employee.designation}</b> in the 
+                <b>${data.employee.department}</b> department, 
+                has been employed with us since ${data.employee.date_of_joining}.
+            </p>
 
-        response.forEach((employee, index) => {
-            let gross = parseFloat(employee.user_info.gross) || 0;
-            let basic = Math.round(gross * 0.50);
-            let house = Math.round(gross * 0.28);
-            let medical = Math.round(gross * 0.09);
-            let conveyance = Math.round(gross * 0.08);
-            let others = Math.round(gross * 0.05);
-
-            content += `
-            <tr>
-                <td>${index+1}</td>
-                <td>${employee.user_info.first_name || ' '}</td>
-                <td>${employee.user_info.designation || ' '}</td>
-                <td>${employee.user_info.departments || ' '}</td>
-                <td>${employee.user_info.section || ' '}</td>
-                <td>${employee.user_info.date_of_joining || ' '}</td>
-                <td>${employee.user_info.grades || ' '}</td>
-                <td>${employee.user_info.account_number || ' '}</td>
-                <td>${employee.user_info.bank_amount || 0}</td>
-                <td>${employee.user_info.cash_amount || 0}</td>
-                <td>${gross}</td><td>${basic}</td><td>${house}</td>
-                <td>${medical}</td><td>${conveyance}</td><td>${others}</td>
-            </tr>`;
-        });
-
-        content += `
-                </tbody>
+            <table class="salary-table">
+                <tr><th>Basic Salary</th><td>${data.basic}</td></tr>
+                <tr><th>House Rent</th><td>${data.house}</td></tr>
+                <tr><th>Medical</th><td>${data.medical}</td></tr>
+                <tr><th>Conveyance</th><td>${data.conveyance}</td></tr>
+                <tr><th>Others</th><td>${data.others}</td></tr>
+                <tr><th><b>Gross Salary</b></th><td><b>${data.gross}</b></td></tr>
             </table>
-            <div class="display-flex">
-                <div class="center-item btn-print-excel">
-                    <button onclick="window.print()" class="btn btn-primary">Print</button>
-                    <button id="exportExcel" class="btn btn-success">Export to Excel</button>
-                </div>
+
+            <p style="margin-top:20px;">This certificate has been issued upon his request without any liability on the company.</p>
+
+            <div class="signature">
+                <p>______________________</p>
+                <p>Authorized Signature</p>
             </div>
-        </body>
-        </html>
-        `;
 
-        newWindow.document.write(content);
-        newWindow.document.close();
+            <div class="btn-print">
+                <button onclick="window.print()" class="btn btn-primary">Print</button>
+            </div>
+        </div>
+    </body>
+    </html>
+    `;
 
-        // Excel Export
-        newWindow.document.getElementById('exportExcel').addEventListener('click', function() {
-            var tableHTML = newWindow.document.querySelector('.report-table').outerHTML;
-            var filename = 'Salary_Slab_Report.xls';
-            var uri = 'data:application/vnd.ms-excel;base64,';
-            var template = `
-            <html xmlns:o="urn:schemas-microsoft-com:office:office" 
-                xmlns:x="urn:schemas-microsoft-com:office:excel" 
-                xmlns="http://www.w3.org/TR/REC-html40">
-            <head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet>
-            <x:Name>Salary Slab</x:Name>
-            <x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet>
-            </x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]-->
-            </head><body>${tableHTML}</body></html>
-            `;
-            var base64 = function(s) { return window.btoa(unescape(encodeURIComponent(s))) };
-            var link = newWindow.document.createElement('a');
-            link.href = uri + base64(template);
-            link.download = filename;
-            link.click();
-        });
-    }
+    newWindow.document.write(content);
+    newWindow.document.close();
+}
+
+
 </script>
 @stop
