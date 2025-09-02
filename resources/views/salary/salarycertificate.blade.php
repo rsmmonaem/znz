@@ -111,7 +111,6 @@
 </div>
 @stop
 
-
 @section('javascript')
 <script>
 $(document).ready(function(){
@@ -134,22 +133,36 @@ $(document).ready(function(){
                     getCertificate(res);
                 }
             }
-        })
+        });
     });
 
     function getCertificate(data){
         var newWindow = window.open('', '_blank','width=900,height=800');
         var today = new Date().toLocaleDateString('en-GB');
 
+        // Remove commas and ensure numeric
+        var netAmount = parseFloat((data.net || '0').toString().replace(/,/g, ''));
+
         var content = `
         <html>
         <head><title>Salary Certificate</title></head>
         <body style="font-family: Arial; margin:40px;">
-            <h2 style="text-align:center;">Salary Certificate</h2>
+            <div class="display-flex">
+                <div class="left-item">
+                    <img src="{{ URL::to(config('constants.upload_path.logo') . config('config.logo')) }}" width="150px" style="margin-left:20px;">
+                </div>
+                <div class="center-item">
+                    <h4>{{ config('config.company_name') }}</h4>
+                    <h2 style="text-align:center;">Salary Certificate</h2>
+                </div>
+            </div>
+            
             <p>Date: ${today}</p>
             <p>This is to certify that <b>${data.employee.first_name}</b> (ID: ${data.employee.employee_code}),
             working as <b>${data.employee.designation}</b> in <b>${data.employee.department}</b> department,
-            has been employed with us since ${data.employee.date_of_joining}.</p>
+            has been employed with us since ${data.employee.date_of_joining}.<br>
+            His Salary Structure is as follows:
+            </p>
             <table border="1" width="100%" cellpadding="6" cellspacing="0">
                 <tr><th>Basic</th><td>${data.basic}</td></tr>
                 <tr><th>House Rent</th><td>${data.house}</td></tr>
@@ -160,15 +173,51 @@ $(document).ready(function(){
                 ${data.tax ? `<tr><th>Tax</th><td>- ${data.tax}</td></tr>` : ''}
                 <tr><th>Net Payable</th><td><b>${data.net}</b></td></tr>
             </table>
-            <p style="margin-top:20px;">This certificate is issued upon request without liability on the company.</p>
+            <p style="margin-top:20px;"><strong>IN WORD: </strong>${numberToWords(netAmount)} Only</p>
             <div style="margin-top:50px; text-align:right;">
                 <p>_______________________</p>
-                <p>Authorized Signature</p>
+                <p>
+                    BabatonSingha (Sagar)<br>
+                    DGM, Head (Finance & Bank Management)<br>
+                    J & Z Group
+                </p>
             </div>
         </body></html>`;
         newWindow.document.write(content);
         newWindow.document.close();
     }
+
+    // Convert number to words (Indian system)
+    function numberToWords(num) {
+        if (isNaN(num) || num === 0) return 'Zero';
+        const a = [
+            '', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven',
+            'Eight', 'Nine', 'Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen',
+            'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'
+        ];
+        const b = [
+            '', '', 'Twenty', 'Thirty', 'Forty', 'Fifty',
+            'Sixty', 'Seventy', 'Eighty', 'Ninety'
+        ];
+
+        function inWords(n) {
+            if (n < 20) return a[n];
+            if (n < 100) return b[Math.floor(n/10)] + (n % 10 ? " " + a[n % 10] : "");
+            if (n < 1000) return a[Math.floor(n/100)] + " Hundred" + (n % 100 ? " " + inWords(n % 100) : "");
+            if (n < 100000) return inWords(Math.floor(n/1000)) + " Thousand" + (n % 1000 ? " " + inWords(n % 1000) : "");
+            if (n < 10000000) return inWords(Math.floor(n/100000)) + " Lakh" + (n % 100000 ? " " + inWords(n % 100000) : "");
+            return inWords(Math.floor(n/10000000)) + " Crore" + (n % 10000000 ? " " + inWords(n % 10000000) : "");
+        }
+
+        // Handle decimal part
+        const [integerPart, decimalPart] = num.toString().split('.');
+        let words = inWords(parseInt(integerPart, 10));
+        if(decimalPart && parseInt(decimalPart) > 0){
+            words += " and " + inWords(parseInt(decimalPart)) + " Paisa";
+        }
+        return words;
+    }
 });
 </script>
+
 @stop
