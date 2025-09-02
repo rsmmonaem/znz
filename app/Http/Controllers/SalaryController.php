@@ -571,6 +571,23 @@ Class SalaryController extends Controller{
         }
         return response()->json($data);
     }
+
+    public function SalaryCertificate(Request $request){
+        $group = DB::table('com_group')->get();
+        $branch = Branch::all();
+        $department = Department::all();
+        $designation = Designation::all();
+        $section = Section::all();
+        $employee = User::LeftJoin('profile', 'users.id', '=', 'profile.user_id')
+            ->select(
+                'users.id',
+                'profile.employee_code',
+                'users.first_name'
+            )
+            ->get();
+        $category = DB::table('category')->get();
+        return view('salary.salarycertificate', compact('group', 'branch', 'department', 'section', 'employee', 'designation', 'category'));
+    }
     
 }
 ?>
