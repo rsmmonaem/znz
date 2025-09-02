@@ -150,11 +150,7 @@ $(document).ready(function(){
         </head>
         <body style="font-family: Arial; margin:40px;">
             <div class="display-flex">
-                <div class="left-item">
-                    <img src="{{ URL::to(config('constants.upload_path.logo') . config('config.logo')) }}" width="150px" style="margin-left:20px;">
-                </div>
-                <div class="center-item">
-                    <h4>{{ config('config.company_name') }}</h4>
+                <div class="center-item" style="margin-top:30px">
                     <h2 style="text-align:center;">
                         TO WHOM IT MAY CONCERN
                     </h2>
