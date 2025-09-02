@@ -155,7 +155,7 @@ $(document).ready(function(){
                 </div>
                 <div class="center-item">
                     <h4>{{ config('config.company_name') }}</h4>
-                    <h2 style="text-align:center; display:inline-block; border-bottom: 3px solid black; padding-bottom: 5px;">
+                    <h2 style="text-align:center;">
                         TO WHOM IT MAY CONCERN
                     </h2>
                 </div>
