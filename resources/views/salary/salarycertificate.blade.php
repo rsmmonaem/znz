@@ -150,8 +150,8 @@ $(document).ready(function(){
         </head>
         <body style="font-family: Arial; margin:40px;">
             <div class="display-flex">
-                <div class="center-item" style="margin-top:30px">
-                    <h2 style="text-align:center;">
+                <div class="center-item">
+                    <h2 style="text-align:center;margin-top: 135px;">
                         TO WHOM IT MAY CONCERN
                     </h2>
                 </div>
