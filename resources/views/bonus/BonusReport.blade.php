@@ -264,7 +264,7 @@
                                 <h2 style="margin:0;" >J & Z Group</h2>
                                 ${response.branch? `<h5 style="margin:0;">${response.branch?.name}</h5>
                                 <p style="margin:0;">Address : ${response.branch?.description} </p>` : ''}
-                                <h2 style="margin:0;">${response.type?.name} Bonus Summary</h2>
+                                <h2 style="margin:0;">${response.type?.name || 'All'} Bonus Summary</h2>
                             </div>
                         </div>
                         <table class="table table-bordered table-striped report-table">
