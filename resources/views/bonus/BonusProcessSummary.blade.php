@@ -57,15 +57,6 @@
                             </div>
 
                             <div class="form-group">
-                                <label class="col-sm-2 control-label">Department</label>
-                                <div class="col-sm-4">
-                                    <select class="form-control" name="department">
-                                        <option value="">Select</option>
-                                        @foreach ($departments as $d)
-                                            <option value="{{ $d->id }}">{{ $d->name }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
 
                                 <label class="col-sm-2 control-label">Bonus Type</label>
                                 <div class="col-sm-4">
@@ -90,27 +81,6 @@
                                 </div>
 
 
-                            </div>
-
-                            <div class="form-group">
-                                <label class="col-sm-2 control-label">Designation</label>
-                                <div class="col-sm-4">
-                                    <select class="form-control" name="designation">
-                                        <option value="">Select</option>
-                                        @foreach ($designation as $d)
-                                            <option value="{{ $d->id }}">{{ $d->name }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="col-sm-2 control-label">Employee ID</label>
-                                <div class="col-sm-4">
-                                    <select class="form-control" name="employee_id" id="employee_id">
-                                        <option value="">Select</option>
-                                    </select>
-                                </div>
                             </div>
 
                             <div class="form-group">
