@@ -70,20 +70,6 @@
                             </div>
 
                             <div class="form-group">
-                                <label class="col-sm-2 control-label">Section</label>
-                                <div class="col-sm-4">
-                                    <select class="form-control" name="section">
-                                        <option value="">Select</option>
-                                        @foreach ($section as $s)
-                                            <option value="{{ $s->id }}">{{ $s->name }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-
-
-                            </div>
-
-                            <div class="form-group">
                                 <div class="col-sm-offset-2 col-sm-10">
                                     <button type="button" id="report" class="btn btn-primary">Report</button>
                                     <button type="reset" class="btn btn-default" id="reset">Close</button>
