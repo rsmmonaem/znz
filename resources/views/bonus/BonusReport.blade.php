@@ -213,7 +213,7 @@
             const reportHTML = `
                 <html>
                 <head>
-                    <title>Gender Wise Report</title>
+                    <title>Bonus Report</title>
                     <style>
                         body {
                             font-family: Arial, sans-serif;
