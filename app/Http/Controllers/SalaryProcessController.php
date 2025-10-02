@@ -1,5 +1,7 @@
 <?php
+
 namespace App\Http\Controllers;
+
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use DB;
@@ -23,35 +25,17 @@ class SalaryProcessController extends Controller
         $department = Department::all();
         $section = Section::all();
         $employee = User::LeftJoin('profile', 'users.id', '=', 'profile.user_id')
-        ->select('users.first_name', 'users.id', 'profile.employee_code')
-        ->get();
+            ->select('users.first_name', 'users.id', 'profile.employee_code')
+            ->get();
         $designation = Designation::all();
         return view('salary-process.index', compact('group', 'branch', 'department', 'section', 'employee', 'designation'));
     }
 
     public function SalaryProcessView(Request $request)
     {
-        //     $employeeId= 55;
-        //     $toDate = date('Y-m-d');
 
-        //     $advanceSalary = DB::table('salary_advance')
-        //     ->leftJoin('salary_advance_months', 'salary_advance.id', '=', 'salary_advance_months.salary_advance_id')
-        //     ->where('employeeId', $employeeId)
-        //     ->where('salary_advance.effectiveDate', '<', $toDate)
-        //     ->select('salary_advance.grossValue', 'salary_advance.grossOption', 'salary_advance_months.month', 'salary_advance_months.amount')
-        //     ->get();
-        
-        // $monthNumber = (int)date('m', strtotime($toDate));
-        // $advanceAmount = 0;
-        
-        // foreach ($advanceSalary as $record) {
-        //     if ($record->month == $monthNumber) {
-        //         $advanceAmount = $record->month; 
-        //     }
-        // }
-        // return $advanceAmount;
-      DB::beginTransaction();
-      try{
+        DB::beginTransaction();
+        try {
             // Define the base query for user data
             $data = User::leftJoin('profile', 'users.id', '=', 'profile.user_id')
                 ->leftJoin('designations', 'users.designation_id', '=', 'designations.id')
@@ -63,7 +47,7 @@ class SalaryProcessController extends Controller
             if ($request->branch || $request->department || $request->section) {
                 $data->whereNotIn('users.id', function ($query) {
                     $query->select('employee_id')->from('employee_separations')
-                    ->where('effective_date', '>', Carbon::now());
+                        ->where('effective_date', '>', Carbon::now());
                 });
             }
             if ($request->branch) {
@@ -123,13 +107,13 @@ class SalaryProcessController extends Controller
                 'processed_employee_ids' => $processedEmployeeIds,
                 'message' => 'Salary processed successfully.',
             ]);
-      }catch(Exception $e){
-        DB::rollBack();
-        return response()->json([
-            'status' => 'error',
-            'message' => 'Failed to process salary: ' . $e->getMessage(),
-        ]);
-      }
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to process salary: ' . $e->getMessage(),
+            ]);
+        }
     }
 
     // start from here MH
@@ -137,35 +121,29 @@ class SalaryProcessController extends Controller
     {
         // Get Employee
         $User = User::LeftJoin('profile', 'users.id', '=', 'profile.user_id')
-        ->LeftJoin('designations', 'users.designation_id', '=', 'designations.id')
-        ->LeftJoin('departments', 'designations.department_id', '=', 'departments.id')
-        ->LeftJoin('sections', 'profile.section_id', '=', 'sections.id')
-        ->LeftJoin('branchs', 'profile.branch_id', '=', 'branchs.id')
-        ->where('users.id', '=', $employeeId)
-        ->select('users.id', 'profile.employee_code', 'users.first_name', 'designations.name as designation', 'departments.name as department', 'sections.name as section', 'branchs.name as branch')
-        ->first();
+            ->LeftJoin('designations', 'users.designation_id', '=', 'designations.id')
+            ->LeftJoin('departments', 'designations.department_id', '=', 'departments.id')
+            ->LeftJoin('sections', 'profile.section_id', '=', 'sections.id')
+            ->LeftJoin('branchs', 'profile.branch_id', '=', 'branchs.id')
+            ->where('users.id', '=', $employeeId)
+            ->select('users.id', 'profile.employee_code', 'users.first_name', 'designations.name as designation', 'departments.name as department', 'sections.name as section', 'branchs.name as branch')
+            ->first();
         // return $User->employee_code;
         // Total Present
         $excludeDates = [];
 
-        // $getTotalPresent = DB::table('clocks')
-        // ->whereBetween('date', [$formDate, $toDate])
-        // ->where('user_id', $employeeId)
-        // ->distinct('date') 
-        // ->count('date');
-
         // Holidays
         $holidays = DB::table('holidays')
-        ->whereBetween('date', [$formDate, $toDate])
-        ->count(DB::raw('DISTINCT date'));
+            ->whereBetween('date', [$formDate, $toDate])
+            ->count(DB::raw('DISTINCT date'));
 
         $holidayDates = DB::select("
         SELECT date 
         FROM holidays 
         WHERE date BETWEEN ? AND ?
         ", [$formDate, $toDate]);
-    
-        $holidayDates = array_map(function($row) {
+
+        $holidayDates = array_map(function ($row) {
             return $row->date;
         }, $holidayDates);
 
@@ -176,7 +154,7 @@ class SalaryProcessController extends Controller
             AND date BETWEEN ? AND ?
         ", [$employeeId, $formDate, $toDate]);
 
-        $spacialHolidayDates = array_map(function($row) {
+        $spacialHolidayDates = array_map(function ($row) {
             return $row->date;
         }, $spacialHolidayDates);
 
@@ -200,18 +178,9 @@ class SalaryProcessController extends Controller
 
         //Spacial Holidays
         $spacial_holidays =  DB::table('spacial_holidays')
-        ->where('user_id', $employeeId)
-        ->whereBetween('date', [$formDate, $toDate])
-        ->count(DB::raw('DISTINCT date'));
-
-        // Leave
-        // $leave = DB::table('leaves')
-        // ->whereBetween('from_date', [$formDate, $toDate])
-        // ->where('user_id', $employeeId)
-        // ->where('leave_type_id', '!=', 9)
-        // ->where('status', 'approved')
-        // ->distinct('from_date') 
-        // ->count('from_date');
+            ->where('user_id', $employeeId)
+            ->whereBetween('date', [$formDate, $toDate])
+            ->count(DB::raw('DISTINCT date'));
 
         $leaveQuery = "
         SELECT DISTINCT from_date AS leave_date FROM leaves
@@ -228,35 +197,35 @@ class SalaryProcessController extends Controller
         AND leave_type_id != 9 
         AND status = 'approved'";
         $leave = DB::table('leaves')
-        ->where('user_id', $employeeId)
-        ->whereBetween('from_date', [$formDate, $toDate])
-        ->where('status', 'approved')
-        ->where('leave_type_id', '!=', 9)
-        ->distinct()
-        ->count('from_date');
+            ->where('user_id', $employeeId)
+            ->whereBetween('from_date', [$formDate, $toDate])
+            ->where('status', 'approved')
+            ->where('leave_type_id', '!=', 9)
+            ->distinct()
+            ->count('from_date');
 
         $host = 'localhost';
         $db   = 'betikrom_znz';
         $user = 'betikrom_znz';
         $pass = 'betikrom_znz';
-        
-        
+
+
         // Declare leaveCount outside to make it accessible later
         $leaveCount = 0;
-        
+
         // Create MySQLi connection
         $conn = new \mysqli($host, $user, $pass, $db);
-        
+
         // Check connection
         if ($conn->connect_error) {
             die("Connection failed: " . $conn->connect_error);
         }
-        
+
         // Escape variables
         $employeeId = (int)$employeeId;
         $formDate = $conn->real_escape_string($formDate);
         $toDate = $conn->real_escape_string($toDate);
-        
+
         // Prepare the query
         $sql = "
             SELECT COUNT(DISTINCT from_date) AS leave_count
@@ -265,20 +234,20 @@ class SalaryProcessController extends Controller
               AND user_id = $employeeId
               AND status = 'approved'
         ";
-        
+
         // Execute the query
         $result = $conn->query($sql);
-        
+
         if ($result) {
             $row = $result->fetch_assoc();
             $leaveCount = $row['leave_count'];
         } else {
             echo "Query error: " . $conn->error;
         }
-        
+
         // Close the connection
         $conn->close();
-        $leave=$leaveCount; // Assign the leave count to the variable
+        $leave = $leaveCount; // Assign the leave count to the variable
 
 
         $lwpQuery = "
@@ -309,7 +278,12 @@ class SalaryProcessController extends Controller
         // Execute the query
 
         $lwpResult = DB::selectOne($lwpQuery, [
-            $formDate, $toDate, $employeeId, $employeeId, $formDate, $toDate
+            $formDate,
+            $toDate,
+            $employeeId,
+            $employeeId,
+            $formDate,
+            $toDate
         ]);
         $lwpDateQuery = "
             SELECT DISTINCT DATE_ADD(l.from_date, INTERVAL seq DAY) AS leave_date
@@ -347,12 +321,12 @@ class SalaryProcessController extends Controller
 
         // Step 2: Final Query to Count Total Present Days excluding these dates
         $getTotalPresentwithLWP = DB::table('clocks')
-        ->whereBetween('date', [$formDate, $toDate])
-        ->where('user_id', $employeeId)
-        ->whereNotIn('date', $excludeDates)
-        ->distinct('date')
-        ->count('date');
-        
+            ->whereBetween('date', [$formDate, $toDate])
+            ->where('user_id', $employeeId)
+            ->whereNotIn('date', $excludeDates)
+            ->distinct('date')
+            ->count('date');
+
         // Step 1: Remove common dates between $lwpDates and $fridays
         $filteredLwpDates = array_diff($lwpDates, $fridays);
 
@@ -361,104 +335,103 @@ class SalaryProcessController extends Controller
 
         $getTotalPresent = ($getTotalPresentwithLWP - $totalFilteredLwp) + count($fridays) + count($leaveDates);
 
-    
+
 
         // Total Days Of Month
         $startDate = Carbon::parse($formDate);
-        $endDate = Carbon::parse($toDate); 
+        $endDate = Carbon::parse($toDate);
         $TotalDays = $startDate->diffInDays($endDate) + 1;
 
         // Initialize an array to store the Friday dates
         $fridays = WHD::where('user_id', $employeeId)->whereBetween('date', [$formDate, $toDate])->pluck('date')->toArray();
-        
+
         $fridayClockCount = DB::table('clocks')
-        ->where('user_id', $employeeId)
-        ->whereIn('date', $fridays)
-        ->count();
+            ->where('user_id', $employeeId)
+            ->whereIn('date', $fridays)
+            ->count();
 
         // Total Fridays
         $totalFridays = count($fridays);
 
-       // Sarary Slab
+        // Sarary Slab
         $salaryslab = DB::table('salary_slab')
-        ->where('user_id', $employeeId)
-        ->where('effactive_date', '<', $toDate)
-        ->select('gross')
-        ->latest('id')
-        ->first();
+            ->where('user_id', $employeeId)
+            ->where('effactive_date', '<', $toDate)
+            ->select('gross')
+            ->latest('id')
+            ->first();
         // Fetch earning salary types only once
         $latestSalaryData = DB::table('salary')
-        ->join('salary_types', 'salary.salary_type_id', '=', 'salary_types.id')
-        ->where('salary.user_id', $employeeId)
-        ->where('salary_types.salary_type', 'earning')
-        ->select('salary.id', 'salary.contract_id', 'salary.salary_type_id', 'salary.amount', 'salary.created_at', 'salary.updated_at', 'salary_types.head', 'salary_types.salary_type')
-        ->orderBy('salary.salary_type_id') 
-        ->orderBy('salary.created_at', 'desc') 
-        ->get(); 
+            ->join('salary_types', 'salary.salary_type_id', '=', 'salary_types.id')
+            ->where('salary.user_id', $employeeId)
+            ->where('salary_types.salary_type', 'earning')
+            ->select('salary.id', 'salary.contract_id', 'salary.salary_type_id', 'salary.amount', 'salary.created_at', 'salary.updated_at', 'salary_types.head', 'salary_types.salary_type')
+            ->orderBy('salary.salary_type_id')
+            ->orderBy('salary.created_at', 'desc')
+            ->get();
         $latestSalaryData = collect($latestSalaryData);
         $latestSalaryData = $latestSalaryData->unique('salary_type_id');
 
         // Fetch Deduction salary types only once
         $deductionsData = DB::table('salary')
-        ->join('salary_types', 'salary.salary_type_id', '=', 'salary_types.id')
-        ->where('salary.user_id', $employeeId)
-        ->where('salary_types.salary_type', 'deduction')
-        ->select('salary.id', 'salary.contract_id', 'salary.salary_type_id', 'salary.amount', 'salary.created_at', 'salary.updated_at', 'salary_types.head', 'salary_types.salary_type')
-        ->orderBy('salary.salary_type_id')
-        ->orderBy('salary.created_at', 'desc')
-        ->get();
+            ->join('salary_types', 'salary.salary_type_id', '=', 'salary_types.id')
+            ->where('salary.user_id', $employeeId)
+            ->where('salary_types.salary_type', 'deduction')
+            ->select('salary.id', 'salary.contract_id', 'salary.salary_type_id', 'salary.amount', 'salary.created_at', 'salary.updated_at', 'salary_types.head', 'salary_types.salary_type')
+            ->orderBy('salary.salary_type_id')
+            ->orderBy('salary.created_at', 'desc')
+            ->get();
         $deductionsData = collect($deductionsData);
         $deductionsData = $deductionsData->unique('salary_type_id');
 
-            $yearNumber  = (int)date('Y', strtotime($toDate));
+        $yearNumber  = (int)date('Y', strtotime($toDate));
 
 
-            
-            $advanceSalary = DB::table('salary_advance')
-                ->leftJoin('salary_advance_months', 'salary_advance.id', '=', 'salary_advance_months.salary_advance_id')
-                ->where('employeeId', $employeeId)
-                ->where(DB::raw('YEAR(salary_advance.effectiveDate)'), '=', $yearNumber)
-                ->select('salary_advance.grossValue', 'salary_advance.grossOption', 'salary_advance_months.month', 'salary_advance_months.amount')
-                ->get();
+
+        $advanceSalary = DB::table('salary_advance')
+            ->leftJoin('salary_advance_months', 'salary_advance.id', '=', 'salary_advance_months.salary_advance_id')
+            ->where('employeeId', $employeeId)
+            ->where(DB::raw('YEAR(salary_advance.effectiveDate)'), '=', $yearNumber)
+            ->select('salary_advance.grossValue', 'salary_advance.grossOption', 'salary_advance_months.month', 'salary_advance_months.amount')
+            ->get();
 
         $monthNumber = (int)date('m', strtotime($toDate));
         $advanceAmount = 0;
-        
+
         foreach ($advanceSalary as $record) {
             if ($record->month == $monthNumber) {
-                $advanceAmount = $record->amount; 
+                $advanceAmount = $record->amount;
             }
         }
 
-        
+
         $actual_present = $TotalDays
-                - $totalFridays
-                - $lwp
-                - $leave
-                - $spacial_holidays
-                - $holidays;
+            - $totalFridays
+            - $lwp
+            - $leave
+            - $spacial_holidays
+            - $holidays;
 
         $totalWorkedDays = $getTotalPresent - $fridayClockCount;
         $totalAbsents = $TotalDays - $totalWorkedDays;
-       
+
         $perdaysAmount =  $salaryslab ? $salaryslab->gross / $TotalDays : 0;
-        
+
         $GrossAmountSalaryPerDays = $perdaysAmount * $totalWorkedDays;
 
         $TotalDiductionAmount = $perdaysAmount * $totalAbsents;
         $holidayAmount = $perdaysAmount * $fridayClockCount;
 
         $TotalFridaysAmount = $perdaysAmount * $totalFridays;
-        $GrossSalaryAmountAfterAdvance = $GrossAmountSalaryPerDays;
-        ;
-        if(count($deductionsData->where('salary_type_id', 5)) === 0){
+        $GrossSalaryAmountAfterAdvance = $GrossAmountSalaryPerDays;;
+        if (count($deductionsData->where('salary_type_id', 5)) === 0) {
             $ProvidentFund = 0;
-        }else{
+        } else {
             $ProvidentFund = $deductionsData->where('salary_type_id', 5)->first()->amount;
         }
 
         $GrossSalaryAmountAfterProvidentFund = $GrossSalaryAmountAfterAdvance - $ProvidentFund;
-        
+
         $monthColumns = [
             1 => 'january',
             2 => 'february',
@@ -478,15 +451,15 @@ class SalaryProcessController extends Controller
         $monthColumn = isset($monthColumns[$monthNumber]) ? $monthColumns[$monthNumber] : null;
 
         $taxAmount = DB::table('tax_month_adjustments')
-        ->where('user_id', $employeeId)
-        ->latest('created_at')
+            ->where('user_id', $employeeId)
+            ->latest('created_at')
             ->first();
         $amount = 0;
         if ($taxAmount) {
             $amount = $taxAmount->$monthColumn;
         }
         // return $taxAmount;
-        $netSalary = $GrossSalaryAmountAfterProvidentFund-$amount;
+        $netSalary = $GrossSalaryAmountAfterProvidentFund - $amount;
         $netSalaryWIthoutTax = $GrossSalaryAmountAfterProvidentFund;
 
         // Fetch the latest salary bank allocation
@@ -498,41 +471,95 @@ class SalaryProcessController extends Controller
 
         $FinalBankPercentage = 0;
         $FinalCashPercentage = 0;
-        if ($BankAmount) {
-            $FinalBankPercentage = $BankAmount->bank_amount / $BankAmount->gross * 100; // Bank percentage
-            $FinalCashPercentage = $BankAmount->cash_amount / $BankAmount->gross * 100; // Cash percentage
-            $RsmBankAmount = $BankAmount->bank_amount-$advanceAmount-$amount;
+
+        //  
+
+        if ($BankAmount->cash_amount > 0 && $BankAmount->bank_amount > 0) {
+            if ($BankAmount) {
+                $FinalBankPercentage = $BankAmount->bank_amount / $BankAmount->gross * 100; // Bank percentage
+                $FinalCashPercentage = $BankAmount->cash_amount / $BankAmount->gross * 100; // Cash percentage
+                $RsmBankAmount = $BankAmount->bank_amount - $advanceAmount - $amount;
+                $RsmCashAmount = $BankAmount->cash_amount;
+            }
+
+            // **Step 1: Divide net salary before tax**
+            $BankApply = $netSalaryWIthoutTax - $amount - $advanceAmount; // Bank portion after tax & advance
+            $BankAmountValue = ($FinalBankPercentage / 100) * $BankApply;  // Bank portion before tax
+            $CashAmountValue = ($FinalCashPercentage / 100) * $BankApply;  // Cash portion before 
+
+
+            // salary Slab
+            $bankSlab = $BankAmount->bank_amount;
+            $cashSlab = $BankAmount->cash_amount;
+
+            //Attendance Deduction
+            $bankDeduction = $TotalDiductionAmount * 70 / 100; // 70% of total deduction goes to bank
+            $cashDeduction = $TotalDiductionAmount * 30 / 100; // 30% of total deduction goes to cash
+
+            // Advance Deduction
+            $bankAdvance = $advanceAmount * (70 / 100); // 70% of advance goes to bank
+            $cashAdvance = $advanceAmount * (30 / 100); // 30% of advance goes to cash
+
+            $BankAmountValues =  $bankSlab - $bankDeduction - $bankAdvance - $amount; // Deduct attendance and advance from bank amount
+            $CashAmountValues =  $cashSlab - $cashDeduction - $cashAdvance; // Deduct attendance and advance from cash amount
+
+        } elseif ($BankAmount->cash_amount > 0 && $BankAmount->bank_amount == 0) {
+
+            // -------------------------------
+            // CASE 2: Cash Amount
+            // -------------------------------
+            $FinalCashPercentage = $BankAmount->cash_amount / $BankAmount->gross * 100;
             $RsmCashAmount = $BankAmount->cash_amount;
+
+            // Divide net salary before tax (pure cash)
+            $CashApply = $netSalaryWIthoutTax - $amount - $advanceAmount;
+            $CashAmountValue = ($FinalCashPercentage / 100) * $CashApply;
+
+            // Slab
+            $cashSlab = $BankAmount->cash_amount;
+
+            // Attendance Deduction (100% cash)
+            $cashDeduction = $TotalDiductionAmount;
+
+            // Advance Deduction (100% cash)
+            $cashAdvance = $advanceAmount;
+
+            $CashAmountValues = $cashSlab - $cashDeduction - $cashAdvance - $amount;
+            $BankAmountValues = 0;
+        } elseif ($BankAmount->cash_amount == 0 && $BankAmount->bank_amount > 0) {
+
+            // -------------------------------
+            // CASE 3: Bank Amount
+            // -------------------------------
+            $FinalBankPercentage = $BankAmount->bank_amount / $BankAmount->gross * 100;
+            $RsmBankAmount = $BankAmount->bank_amount - $advanceAmount - $amount;
+
+            // Divide net salary before tax (pure bank)
+            $BankApply = $netSalaryWIthoutTax - $amount - $advanceAmount;
+            $BankAmountValue = ($FinalBankPercentage / 100) * $BankApply;
+
+            // Slab
+            $bankSlab = $BankAmount->bank_amount;
+
+            // Attendance Deduction (100% bank)
+            $bankDeduction = $TotalDiductionAmount;
+
+            // Advance Deduction (100% bank)
+            $bankAdvance = $advanceAmount;
+
+            $BankAmountValues = $bankSlab - $bankDeduction - $bankAdvance - $amount;
+            $CashAmountValues = 0;
         }
 
-        // **Step 1: Divide net salary before tax**
-        $BankApply = $netSalaryWIthoutTax - $amount-$advanceAmount; // Bank portion after tax & advance
-        $BankAmountValue = ($FinalBankPercentage / 100) * $BankApply;  // Bank portion before tax
-        $CashAmountValue = ($FinalCashPercentage / 100) * $BankApply;  // Cash portion before 
 
 
-        // salary Slab
-        $bankSlab = $BankAmount->bank_amount;
-        $cashSlab = $BankAmount->cash_amount;
-
-        //Attendance Deduction
-        $bankDeduction = $TotalDiductionAmount * 70 / 100; // 70% of total deduction goes to bank
-        $cashDeduction = $TotalDiductionAmount * 30 / 100; // 30% of total deduction goes to cash
-
-        // Advance Deduction
-        $bankAdvance = $advanceAmount * (70 / 100); // 70% of advance goes to bank
-        $cashAdvance = $advanceAmount * (30 / 100); // 30% of advance goes to cash
-
-        $BankAmountValues =  $bankSlab - $bankDeduction - $bankAdvance - $amount; // Deduct attendance and advance from bank amount
-        $CashAmountValues =  $cashSlab - $cashDeduction - $cashAdvance; // Deduct attendance and advance from cash amount
-        
-        
 
 
-        
+
+
 
         $NetPayable = $BankAmountValues + $CashAmountValues + $holidayAmount;
-        
+
 
         $TableData = [
             'total_worked_days' => $totalWorkedDays,
@@ -567,7 +594,7 @@ class SalaryProcessController extends Controller
             'BankPay' => max(0, $BankAmountValues), // Corrected bank amount
             'CashPay' =>  $CashAmountValues + $holidayAmount, // Corrected cash amount
             'Gross' => $salaryslab ? $salaryslab->gross : 0,
-            'TotalPayable' => ( $netSalaryWIthoutTax - $amount) + $holidayAmount,
+            'TotalPayable' => ($netSalaryWIthoutTax - $amount) + $holidayAmount,
             'TotalDeduction' => $TotalDiductionAmount + $amount + $advanceAmount + $ProvidentFund,
             'FormDate' => $formDate,
             'ToDate' => $toDate,
@@ -580,41 +607,44 @@ class SalaryProcessController extends Controller
         return $User->employee_code;
     }
 
+
+
+
     public function SalaryProcessByBranch($employeeId, $formDate, $toDate, $remarks)
     {
         // Get Employee
         $User = User::LeftJoin('profile', 'users.id', '=', 'profile.user_id')
-        ->LeftJoin('designations', 'users.designation_id', '=', 'designations.id')
-        ->LeftJoin('departments', 'designations.department_id', '=', 'departments.id')
-        ->LeftJoin('sections', 'profile.section_id', '=', 'sections.id')
-        ->LeftJoin('branchs', 'profile.branch_id', '=', 'branchs.id')
-        ->where('users.id', '=', $employeeId)
+            ->LeftJoin('designations', 'users.designation_id', '=', 'designations.id')
+            ->LeftJoin('departments', 'designations.department_id', '=', 'departments.id')
+            ->LeftJoin('sections', 'profile.section_id', '=', 'sections.id')
+            ->LeftJoin('branchs', 'profile.branch_id', '=', 'branchs.id')
+            ->where('users.id', '=', $employeeId)
             ->select('users.id', 'profile.employee_code', 'users.first_name', 'designations.name as designation', 'departments.name as department', 'sections.name as section', 'branchs.name as branch')
             ->get();
         // Total Present
         $getTotalPresent = DB::table('clocks')
-        ->whereBetween('date', [$formDate, $toDate])
+            ->whereBetween('date', [$formDate, $toDate])
             ->where('user_id', $employeeId)
             ->distinct('date')
             ->count('date');
 
         // Holidays
         $holidays = DB::table('holidays')
-        ->whereBetween('date', [$formDate, $toDate])
+            ->whereBetween('date', [$formDate, $toDate])
             // ->where('user_id', $employeeId)
             ->distinct('date')
             ->count('date');
 
         //Spacial Holidays
         $spacial_holidays = DB::table('spacial_holidays')
-        ->whereBetween('date', [$formDate, $toDate])
-        ->where('user_id', $employeeId)
-        ->distinct('date')
-        ->count('date');
+            ->whereBetween('date', [$formDate, $toDate])
+            ->where('user_id', $employeeId)
+            ->distinct('date')
+            ->count('date');
 
         // Leave
         $leave = DB::table('leaves')
-        ->whereBetween('from_date', [$formDate, $toDate])
+            ->whereBetween('from_date', [$formDate, $toDate])
             ->where('user_id', $employeeId)
             ->where('status', 'approved')
             ->distinct('from_date')
@@ -625,7 +655,7 @@ class SalaryProcessController extends Controller
 
         // LWP
         $lwp = DB::table('leaves')
-        ->whereBetween('from_date', [$formDate, $toDate])
+            ->whereBetween('from_date', [$formDate, $toDate])
             ->where('user_id', $employeeId)
             ->where('status', 'lwp')
             ->distinct('from_date')
@@ -641,14 +671,14 @@ class SalaryProcessController extends Controller
         $totalFridays = count($fridays);
         // Sarary Slab
         $salaryslab = DB::table('salary_slab')
-        ->where('user_id', $employeeId)
+            ->where('user_id', $employeeId)
             ->select('gross')
             ->latest('id')
             ->first();
         // Fetch earning salary types only once
         $latestSalaryData = DB::table('salary')
-        ->join('salary_types', 'salary.salary_type_id', '=', 'salary_types.id')
-        ->where('salary.user_id', $employeeId)
+            ->join('salary_types', 'salary.salary_type_id', '=', 'salary_types.id')
+            ->where('salary.user_id', $employeeId)
             ->where('salary_types.salary_type', 'earning')
             ->select('salary.id', 'salary.contract_id', 'salary.salary_type_id', 'salary.amount', 'salary.created_at', 'salary.updated_at', 'salary_types.head', 'salary_types.salary_type')
             ->orderBy('salary.salary_type_id')
@@ -659,8 +689,8 @@ class SalaryProcessController extends Controller
 
         // Fetch Deduction salary types only once
         $deductionsData = DB::table('salary')
-        ->join('salary_types', 'salary.salary_type_id', '=', 'salary_types.id')
-        ->where('salary.user_id', $employeeId)
+            ->join('salary_types', 'salary.salary_type_id', '=', 'salary_types.id')
+            ->where('salary.user_id', $employeeId)
             ->where('salary_types.salary_type', 'deduction')
             ->select('salary.id', 'salary.contract_id', 'salary.salary_type_id', 'salary.amount', 'salary.created_at', 'salary.updated_at', 'salary_types.head', 'salary_types.salary_type')
             ->orderBy('salary.salary_type_id')
@@ -670,15 +700,16 @@ class SalaryProcessController extends Controller
         $deductionsData = $deductionsData->unique('salary_type_id');
 
         $advanceSalary = DB::table('salary_advance')
-        ->leftJoin('salary_advance_months', 'salary_advance.id', '=', 'salary_advance_months.salary_advance_id')
-        ->where('employeeId', $employeeId)
-        ->where('salary_advance.effectiveDate', '<', $formDate)
-        ->select('salary_advance.grossValue', 'salary_advance.grossOption', 'salary_advance_months.month', 'salary_advance_months.amount')
-        ->get();
+            ->leftJoin('salary_advance_months', 'salary_advance.id', '=', 'salary_advance_months.salary_advance_id')
+            ->where('employeeId', $employeeId)
+            ->where('salary_advance.effectiveDate', '<', $formDate)
+            ->select('salary_advance.grossValue', 'salary_advance.grossOption', 'salary_advance_months.month', 'salary_advance_months.amount')
+            ->get();
         $monthNumber = (int)date('m', strtotime($toDate));
         $advanceAmount = 0;
         foreach ($advanceSalary as $record) {
-            if ($record->month === $monthNumber
+            if (
+                $record->month === $monthNumber
             ) {
                 $advanceAmount = $record->amount;
                 break;
@@ -687,23 +718,24 @@ class SalaryProcessController extends Controller
 
         // Fetch shift data
         $shiftTime = UserShift::where('user_id', '=', $employeeId)
-        ->LeftJoin('office_shifts', 'user_shifts.office_shift_id', '=', 'office_shifts.id')
-        ->LeftJoin('office_shift_details', 'user_shifts.office_shift_id', '=', 'office_shift_details.office_shift_id')
-        ->select('user_shifts.user_id',
-            'office_shifts.name',
-            'office_shift_details.in_time',
-            'office_shift_details.out_time',
-            'office_shifts.id as shift_id'
-        )
-        ->latest('office_shifts.id')
-        ->first();
+            ->LeftJoin('office_shifts', 'user_shifts.office_shift_id', '=', 'office_shifts.id')
+            ->LeftJoin('office_shift_details', 'user_shifts.office_shift_id', '=', 'office_shift_details.office_shift_id')
+            ->select(
+                'user_shifts.user_id',
+                'office_shifts.name',
+                'office_shift_details.in_time',
+                'office_shift_details.out_time',
+                'office_shifts.id as shift_id'
+            )
+            ->latest('office_shifts.id')
+            ->first();
 
         // Get attendances
         $attendances = Clock::leftJoin('users', 'clocks.user_id', '=', 'users.id')
-        ->whereBetween('date', [$formDate, $toDate])
-        ->where('clocks.user_id', '=', $employeeId)
-        ->select('clocks.date', 'clocks.clock_in', 'clocks.clock_out', 'users.id as user_id', 'users.first_name')
-        ->get();
+            ->whereBetween('date', [$formDate, $toDate])
+            ->where('clocks.user_id', '=', $employeeId)
+            ->select('clocks.date', 'clocks.clock_in', 'clocks.clock_out', 'users.id as user_id', 'users.first_name')
+            ->get();
 
         $totalOvertimeMinutes = 0;
         $totalLateMinutes = 0;
@@ -721,7 +753,8 @@ class SalaryProcessController extends Controller
             $outTime = Carbon::parse($shiftTime->out_time);
 
             foreach ($attendances as $attendance) {
-                if ($attendance->clock_in && $attendance->clock_out
+                if (
+                    $attendance->clock_in && $attendance->clock_out
                 ) {
                     $clockIn = Carbon::parse($attendance->clock_in);
                     $clockOut = Carbon::parse($attendance->clock_out);
@@ -756,7 +789,7 @@ class SalaryProcessController extends Controller
 
         $GrossSalaryAmountAfterProvidentFund = $GrossSalaryAmountAfterAdvance - $ProvidentFund;
 
-        
+
 
         $totalLateApprove = $attendances->count() * 15;
         // Convert totals to hours and minutes
@@ -785,9 +818,9 @@ class SalaryProcessController extends Controller
         $monthColumn = isset($monthColumns[$monthNumber]) ? $monthColumns[$monthNumber] : null;
 
         $taxAmount = DB::table('tax_month_adjustments')
-        ->where('user_id', $employeeId)
-        ->latest('created_at')  
-        ->first(); 
+            ->where('user_id', $employeeId)
+            ->latest('created_at')
+            ->first();
         $amount = 0;
         if ($taxAmount) {
             $amount = $taxAmount->$monthColumn;
@@ -796,7 +829,8 @@ class SalaryProcessController extends Controller
         $TotalFridaysAmount = $perdaysAmount * $totalFridays;
         $BankAmount = DB::table('salary_bank')
             ->where('user_id', $employeeId)
-            ->where('effective_date',
+            ->where(
+                'effective_date',
                 '<=',
                 $formDate
             )
@@ -810,7 +844,7 @@ class SalaryProcessController extends Controller
             $FinalcashAmount = $BankAmount->cash_amount / $BankAmount->gross * 100;
         }
 
-        $ActualBankAmount = max(0,$FinalBankAmount / 100 * $netSalary - $amount);
+        $ActualBankAmount = max(0, $FinalBankAmount / 100 * $netSalary - $amount);
         $ActualCashAmount = $FinalBankAmount > 0 ? $FinalcashAmount / 100 * $netSalary - $amount : ($FinalcashAmount / 100 * $netSalary - $amount);
 
         $TableData = [
@@ -830,18 +864,18 @@ class SalaryProcessController extends Controller
             'to_date' => $toDate,
             'ot_hrs' => $totalOvertimeHrs,
             'ot_amount' => $overtimeSalery,
-            'bankamount' => $ActualBankAmount-$advanceAmount,
-            'cashamount' => $ActualCashAmount-$advanceAmount,
+            'bankamount' => $ActualBankAmount - $advanceAmount,
+            'cashamount' => $ActualCashAmount - $advanceAmount,
             'weekendays_amount' => $TotalFridaysAmount ? $TotalFridaysAmount : 0
-            ];
+        ];
 
         DB::table('employee_salary_payment_details')->insert([
             'PaidAmount' => 0,
             'UnpaidAmount' => 0,
-            'NetPayable' => $netSalary-$advanceAmount,
+            'NetPayable' => $netSalary - $advanceAmount,
             'EmployeeID' => $employeeId,
-            'BankPay' => $ActualBankAmount-$advanceAmount,
-            'CashPay' => $ActualCashAmount-$advanceAmount,
+            'BankPay' => $ActualBankAmount - $advanceAmount,
+            'CashPay' => $ActualCashAmount - $advanceAmount,
             'Gross' => $salaryslab ? $salaryslab->gross : 0,
             'TotalPayable' => max(0, $netSalary - $amount),
             'TotalDeduction' => $TotalDiductionAmount + $amount + $advanceAmount + $ProvidentFund,
@@ -851,33 +885,31 @@ class SalaryProcessController extends Controller
         ]);
         DB::table('employee_salary_details')->insert($TableData);
         return $employeeId;
-
     }
 
-    public function indexSalaryShit(){
-        
-    }
-    public function SalaryShit(){
+    public function indexSalaryShit() {}
+    public function SalaryShit()
+    {
         $group = DB::table('com_group')->get();
         $branch = Branch::all();
         $department = Department::all();
         $section = Section::all();
         $employee = User::LeftJoin('profile', 'users.id', '=', 'profile.user_id')
-        ->select('users.first_name', 'users.id', 'profile.employee_code')
-        ->get();
+            ->select('users.first_name', 'users.id', 'profile.employee_code')
+            ->get();
         $designation = Designation::all();
-        return view('salary-process.salaryshit', compact('group','branch','department','section','employee','designation'));
+        return view('salary-process.salaryshit', compact('group', 'branch', 'department', 'section', 'employee', 'designation'));
     }
 
     public function SalaryShitPost(Request $request)
     {
         // return $request->all();
         $data = User::leftjoin('employee_salary_details', 'users.id', '=', 'employee_salary_details.employee_id')
-        ->leftJoin('profile', 'users.id', '=', 'profile.user_id')
-        ->LeftJoin('designations', 'users.designation_id', '=', 'designations.id')
-        ->LeftJoin('sections', 'profile.section_id', '=', 'sections.id')
-        ->LeftJoin('branchs', 'profile.branch_id', '=', 'branchs.id')
-        ->LeftJoin('departments', 'designations.department_id', '=', 'departments.id');
+            ->leftJoin('profile', 'users.id', '=', 'profile.user_id')
+            ->LeftJoin('designations', 'users.designation_id', '=', 'designations.id')
+            ->LeftJoin('sections', 'profile.section_id', '=', 'sections.id')
+            ->LeftJoin('branchs', 'profile.branch_id', '=', 'branchs.id')
+            ->LeftJoin('departments', 'designations.department_id', '=', 'departments.id');
 
         if ($request->branch) {
             $data->where('profile.branch_id', '=', $request->branch);
@@ -909,53 +941,51 @@ class SalaryProcessController extends Controller
         // // Get the latest bank account for each user using a subquery
     }
 
-    public function UpdateArrearAmount(Request $request){
+    public function UpdateArrearAmount(Request $request)
+    {
         try {
             DB::table('employee_salary_details')
-            ->where('id', $request->id)
-            ->update([
-                'arrear_amount' => $request->arrear_amount,
-                'cashamount' => DB::raw("cashamount + {$request->arrear_amount}")
-            ]);
+                ->where('id', $request->id)
+                ->update([
+                    'arrear_amount' => $request->arrear_amount,
+                    'cashamount' => DB::raw("cashamount + {$request->arrear_amount}")
+                ]);
             return response()->json(['success' => 'Arrear Amount Updated Successfully.']);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Failed to update arrear amount.']);
         }
-    }  
+    }
 
     public function updateOtAmount(Request $request)
-{
-    try {
-        $row = DB::table('employee_salary_details')->where('id', $request->id)->first();
+    {
+        try {
+            $row = DB::table('employee_salary_details')->where('id', $request->id)->first();
 
-        if (!$row) {
-            return response()->json(['error' => 'Data not found.']);
-        }
+            if (!$row) {
+                return response()->json(['error' => 'Data not found.']);
+            }
 
-        $oldOt = (float) $row->ot_amount;
-        $oldCash = (float) $row->cashamount;
-        $newOt = (float) $request->ot_amount;
+            $oldOt = (float) $row->ot_amount;
+            $oldCash = (float) $row->cashamount;
+            $newOt = (float) $request->ot_amount;
 
-        $newCash = $oldCash - $oldOt + $newOt;
+            $newCash = $oldCash - $oldOt + $newOt;
 
-        DB::table('employee_salary_details')
-            ->where('id', $request->id)
-            ->update([
-                'ot_amount' => $newOt,
-                'cashamount' => $newCash,
+            DB::table('employee_salary_details')
+                ->where('id', $request->id)
+                ->update([
+                    'ot_amount' => $newOt,
+                    'cashamount' => $newCash,
+                ]);
+
+            return response()->json([
+                'success' => true,
+                'updated_cashamount' => $newCash
             ]);
-
-        return response()->json([
-            'success' => true,
-            'updated_cashamount' => $newCash
-        ]);
-    } catch (\Exception $e) {
-        return response()->json(['error' => 'Failed to update OT amount.', 'message' => $e->getMessage()]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to update OT amount.', 'message' => $e->getMessage()]);
+        }
     }
-}
-
-    
-
 
     public function updateHolidayAmount(Request $request)
     {
@@ -971,7 +1001,7 @@ class SalaryProcessController extends Controller
             }
 
             $employee_id = $employee->employee_id;
-            
+
 
             // Step 2: Update holiday_amount and cashamount
             DB::table('employee_salary_details')
@@ -991,14 +1021,10 @@ class SalaryProcessController extends Controller
                 ]);
 
             return response()->json(['success' => true]);
-
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()]);
         }
     }
-
-
-
 
     public function UpdateTaxAmount(Request $request)
     {
@@ -1034,28 +1060,27 @@ class SalaryProcessController extends Controller
         }
     }
 
-
-
-
-    public function  SalarySlip() {
+    public function  SalarySlip()
+    {
         $group = DB::table('com_group')->get();
         $branch = Branch::all();
         $department = Department::all();
         $section = Section::all();
         $employee = User::LeftJoin('profile', 'users.id', '=', 'profile.user_id')
-        ->select('users.first_name', 'users.id', 'profile.employee_code')
-        ->get();
+            ->select('users.first_name', 'users.id', 'profile.employee_code')
+            ->get();
         $designation = Designation::all();
-        return view('salary-process.salary-slip', compact('group','branch','department','section','employee','designation'));
+        return view('salary-process.salary-slip', compact('group', 'branch', 'department', 'section', 'employee', 'designation'));
     }
 
-    public function salarySlipPost(Request $request) {
+    public function salarySlipPost(Request $request)
+    {
         $data = User::leftjoin('employee_salary_details', 'users.id', '=', 'employee_salary_details.employee_id')
-        ->leftJoin('profile', 'users.id', '=', 'profile.user_id')
-        ->LeftJoin('designations', 'users.designation_id', '=', 'designations.id')
-        ->LeftJoin('sections', 'profile.section_id', '=', 'sections.id')
-        ->LeftJoin('branchs', 'profile.branch_id', '=', 'branchs.id')
-        ->LeftJoin('departments', 'designations.department_id', '=', 'departments.id');
+            ->leftJoin('profile', 'users.id', '=', 'profile.user_id')
+            ->LeftJoin('designations', 'users.designation_id', '=', 'designations.id')
+            ->LeftJoin('sections', 'profile.section_id', '=', 'sections.id')
+            ->LeftJoin('branchs', 'profile.branch_id', '=', 'branchs.id')
+            ->LeftJoin('departments', 'designations.department_id', '=', 'departments.id');
         if ($request->branch) {
             $data->where('profile.branch_id', '=', $request->branch);
         }
@@ -1085,13 +1110,14 @@ class SalaryProcessController extends Controller
         return $this->SalaryData($user_ids, $request->branch, $request->formDate, $request->toDate);
     }
 
-    public function SalarySheetReport(Request $request) {
+    public function SalarySheetReport(Request $request)
+    {
         $data = User::leftjoin('employee_salary_details', 'users.id', '=', 'employee_salary_details.employee_id')
-        ->leftJoin('profile', 'users.id', '=', 'profile.user_id')
-        ->LeftJoin('designations', 'users.designation_id', '=', 'designations.id')
-        ->LeftJoin('sections', 'profile.section_id', '=', 'sections.id')
-        ->LeftJoin('branchs', 'profile.branch_id', '=', 'branchs.id')
-        ->LeftJoin('departments', 'designations.department_id', '=', 'departments.id');
+            ->leftJoin('profile', 'users.id', '=', 'profile.user_id')
+            ->LeftJoin('designations', 'users.designation_id', '=', 'designations.id')
+            ->LeftJoin('sections', 'profile.section_id', '=', 'sections.id')
+            ->LeftJoin('branchs', 'profile.branch_id', '=', 'branchs.id')
+            ->LeftJoin('departments', 'designations.department_id', '=', 'departments.id');
 
         if ($request->branch) {
             $data->where('profile.branch_id', '=', $request->branch);
@@ -1122,16 +1148,17 @@ class SalaryProcessController extends Controller
         return $this->SalaryData($user_ids, $request->branch, $request->formDate, $request->toDate);
     }
 
-    public function SalaryShitReport() {
+    public function SalaryShitReport()
+    {
         $group = DB::table('com_group')->get();
         $branch = Branch::all();
         $department = Department::all();
         $section = Section::all();
         $employee = User::LeftJoin('profile', 'users.id', '=', 'profile.user_id')
-        ->select('users.first_name', 'users.id', 'profile.employee_code')
-        ->get();
+            ->select('users.first_name', 'users.id', 'profile.employee_code')
+            ->get();
         $designation = Designation::all();
-        return view('salary-process.salary-shit-report', compact('group','branch','department','section','employee','designation'));
+        return view('salary-process.salary-shit-report', compact('group', 'branch', 'department', 'section', 'employee', 'designation'));
     }
 
     public function SalaryData($user_ids, $branch = null, $formDate = null, $toDate = null)
@@ -1141,33 +1168,33 @@ class SalaryProcessController extends Controller
         }
         // Get the latest bank account for each user using a subquery
         $latestBankAccounts = DB::table('bank_accounts')
-        ->select('user_id', DB::raw('MAX(id) as latest_id'))
-        ->groupBy('user_id')
-        ->get();
+            ->select('user_id', DB::raw('MAX(id) as latest_id'))
+            ->groupBy('user_id')
+            ->get();
 
         // Create a lookup array for the latest bank account IDs
         $latestBankAccountsLookup = [];
-        
+
         foreach ($latestBankAccounts as $account) {
             $latestBankAccountsLookup[$account->user_id] = $account->latest_id;
         }
         $latestIds = DB::table('employee_salary_details')
-        ->selectRaw('MAX(id) as latest_id') 
-        ->groupBy('employee_id');
+            ->selectRaw('MAX(id) as latest_id')
+            ->groupBy('employee_id');
 
-        $uniqueLatestIds = $latestIds->pluck('latest_id'); 
+        $uniqueLatestIds = $latestIds->pluck('latest_id');
 
         // Fetch employee salary details and related user data
         $data = DB::table('employee_salary_details')
-        ->leftJoin('users', 'employee_salary_details.employee_id', '=', 'users.id')
-        ->leftJoin('profile', 'users.id', '=', 'profile.user_id')
-        ->leftJoin('designations', 'users.designation_id', '=', 'designations.id')
-        ->leftJoin('bank_accounts', function ($join) use ($latestBankAccountsLookup) {
-            $join->on('employee_salary_details.employee_id', '=', 'bank_accounts.user_id')
-            ->whereIn('bank_accounts.id', $latestBankAccountsLookup);
-        })
-        ->whereIn('employee_salary_details.id', $uniqueLatestIds)
-        ->whereIn('users.id', $user_ids)
+            ->leftJoin('users', 'employee_salary_details.employee_id', '=', 'users.id')
+            ->leftJoin('profile', 'users.id', '=', 'profile.user_id')
+            ->leftJoin('designations', 'users.designation_id', '=', 'designations.id')
+            ->leftJoin('bank_accounts', function ($join) use ($latestBankAccountsLookup) {
+                $join->on('employee_salary_details.employee_id', '=', 'bank_accounts.user_id')
+                    ->whereIn('bank_accounts.id', $latestBankAccountsLookup);
+            })
+            ->whereIn('employee_salary_details.id', $uniqueLatestIds)
+            ->whereIn('users.id', $user_ids)
             ->orderBy('employee_salary_details.id', 'desc')
             ->select(
                 'employee_salary_details.id',
@@ -1186,7 +1213,7 @@ class SalaryProcessController extends Controller
                 'employee_salary_details.arrear_amount',
                 'bank_accounts.account_number', // Only the latest bank account
                 'employee_salary_details.remarks',
-                 DB::raw('DATEDIFF(employee_salary_details.to_date, employee_salary_details.form_date) + 1 as date_difference'), // Calculate date difference
+                DB::raw('DATEDIFF(employee_salary_details.to_date, employee_salary_details.form_date) + 1 as date_difference'), // Calculate date difference
                 'employee_salary_details.total_absents_fee',
                 'employee_salary_details.created_at',
                 'employee_salary_details.ot_amount',
@@ -1207,8 +1234,8 @@ class SalaryProcessController extends Controller
 
             // Fetch latest salary data for the specific user
             $salaryData = DB::table('salary')
-            ->join('salary_types', 'salary.salary_type_id', '=', 'salary_types.id')
-            ->where('salary.user_id', $record->user_id)
+                ->join('salary_types', 'salary.salary_type_id', '=', 'salary_types.id')
+                ->where('salary.user_id', $record->user_id)
                 ->where('salary_types.salary_type', 'earning')
                 ->select(
                     'salary.id',

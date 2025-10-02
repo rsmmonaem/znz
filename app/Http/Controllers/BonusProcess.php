@@ -62,6 +62,7 @@ class BonusProcess extends Controller
         
         return response()->json(['status' => 'success', 'message' => 'Bonus Processed Successfully']);
     }
+    
     private function getBonus($id, $dateofjoining = null, $request = null)
     {
         $dateofjoining = Carbon::parse($dateofjoining);
@@ -88,6 +89,7 @@ class BonusProcess extends Controller
                 // 12 months or more, calculate for 12 months at 50%
                 $bonus = ($grossSalary / 12) * 0.5 * 12;
             }
+
             DB::table('bonus')->insert([
                 'employee_id' => $id,
                 'religion' => $request->religion,
