@@ -472,7 +472,7 @@ class SalaryProcessController extends Controller
         $FinalBankPercentage = 0;
         $FinalCashPercentage = 0;
 
-        //  
+      
 
         if ($BankAmount->cash_amount > 0 && $BankAmount->bank_amount > 0) {
             if ($BankAmount) {
