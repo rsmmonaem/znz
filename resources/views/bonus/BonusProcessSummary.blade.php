@@ -57,15 +57,6 @@
                             </div>
 
                             <div class="form-group">
-                                <label class="col-sm-2 control-label">Department</label>
-                                <div class="col-sm-4">
-                                    <select class="form-control" name="department">
-                                        <option value="">Select</option>
-                                        @foreach ($departments as $d)
-                                            <option value="{{ $d->id }}">{{ $d->name }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
 
                                 <label class="col-sm-2 control-label">Bonus Type</label>
                                 <div class="col-sm-4">
@@ -74,41 +65,6 @@
                                         @foreach ($bonusType as $bt)
                                             <option value="{{ $bt->id }}">{{ $bt->name }}</option>
                                         @endforeach
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="col-sm-2 control-label">Section</label>
-                                <div class="col-sm-4">
-                                    <select class="form-control" name="section">
-                                        <option value="">Select</option>
-                                        @foreach ($section as $s)
-                                            <option value="{{ $s->id }}">{{ $s->name }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-
-
-                            </div>
-
-                            <div class="form-group">
-                                <label class="col-sm-2 control-label">Designation</label>
-                                <div class="col-sm-4">
-                                    <select class="form-control" name="designation">
-                                        <option value="">Select</option>
-                                        @foreach ($designation as $d)
-                                            <option value="{{ $d->id }}">{{ $d->name }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="col-sm-2 control-label">Employee ID</label>
-                                <div class="col-sm-4">
-                                    <select class="form-control" name="employee_id" id="employee_id">
-                                        <option value="">Select</option>
                                     </select>
                                 </div>
                             </div>
@@ -156,7 +112,7 @@
                     designation: designation,
                     employee_id: employee_id,
                     financial_year: $('select[name="financial_year"]').val(), 
-                    bonus_type: $('select[name="bonus_type"]').val(),
+                    bonus_type: $('select[name="bonus_type"]').val() || "All Types",
                 };
 
                 $.ajax({
@@ -211,7 +167,7 @@
             const reportHTML = `
                 <html>
                 <head>
-                    <title>Gender Wise Report</title>
+                    <title>Bonus Summary</title>
                     <style>
                         body {
                             font-family: Arial, sans-serif;
@@ -262,7 +218,7 @@
                                 <h2 style="margin:0;" >J & Z Group</h2>
                                 ${response.branch? `<h5 style="margin:0;">${response.branch?.name}</h5>
                                 <p style="margin:0;">Address : ${response.branch?.description} </p>` : ''}
-                                <h2 style="margin:0;">${response.type?.name} Bonus Summary</h2>
+                                <h2 style="margin:0;">${response.type?.name || 'All'} Bonus Summary</h2>
                             </div>
                         </div>
                         <table class="table table-bordered table-striped report-table">
