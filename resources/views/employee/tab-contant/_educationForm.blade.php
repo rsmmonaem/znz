@@ -10,7 +10,7 @@
                 <select class="form-control" name="education_level[]">
                     <option value="">Select Education Level</option>
                      @foreach ($educationLavel as $subject)
-                         <option value="{{ $subject->name }}" {{ $subject->name == $item->name ? 'selected' : '' }}>{{ $subject->name }}</option>
+                         <option value="{{ $subject->name }}" {{ $subject->name == $item->education_level ? 'selected' : '' }}>{{ $subject->name }}</option>
                      @endforeach
                 </select>
             </div>
