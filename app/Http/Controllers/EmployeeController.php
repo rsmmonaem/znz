@@ -237,8 +237,9 @@ class EmployeeController extends Controller{
         $section = Section::all()->pluck('name','id')->all();
         $grade = Grade::all()->pluck('name','id')->all();
         // return $brach;
-        $education = EmployeeEducation::where('user_id', '=', $employee->id)->get();
+        $education = EmployeeEducation::where('user_id', $employee->id)->get();
         $experience = WorkExperience::where('user_id','=', $employee->id)->get();
+        // dd($education);
         //    return $depertment;
         return view('employee.show',compact('experience','education','section','grade','brach','type', 'riligion','employee','designations','department_id','departments','assets','menu','role','roles','gender','marital_status','custom_field_values','employee_relation','social_custom_field_values','contract_types','earning_salary_types','deduction_salary_types','leave_types','contract_lists','office_shifts','document_types','templates'));
     }
@@ -271,6 +272,8 @@ class EmployeeController extends Controller{
     }
 
     public function profileUpdate(EmployeeProfileRequest $request, $id){
+        
+        
         $employee = User::find($id);
 
         if(!$employee){

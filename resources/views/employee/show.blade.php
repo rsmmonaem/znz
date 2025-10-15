@@ -729,6 +729,7 @@
 							</div>
 						</div>
 					</div>
+					{{-- education include part --}}
 					<div class="tab-pane animated fadeInRight" id="eduex">
 						<div class="user-profile-content-wm">
 							<h2>{!! trans('messages.education') !!}</h2>
@@ -736,6 +737,7 @@
 							@include('employee.tab-contant.experience')
 						</div>
 					</div>
+
 					<div class="tab-pane animated fadeInRight" id="bank-account">
 						<div class="user-profile-content-wm">
 							<h2>{!! trans('messages.add_new').' '.trans('messages.bank_account') !!}</h2>
