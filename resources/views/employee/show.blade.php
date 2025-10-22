@@ -436,13 +436,19 @@
 										'',['class'=>'form-control','placeholder'=>trans('messages.employee_number')])!!}
 									</div>
 								</div>
-								{{-- Nationality --}}
+								{{-- Nationality --}}countries
 								<div class="col-sm-6">
 									<div class="form-group flex-form-group">
-										{!! Form::label('nationality',trans('messages.nationality'))!!}
-										{!! Form::input('text','nationality',isset($employee->Profile->nationality) ?
-										$employee->Profile->nationality :
-										'',['class'=>'form-control','placeholder'=>trans('messages.nationality')])!!}
+										<label for="nationality">{{ trans('messages.nationality') }}</label>
+										<select class="form-control" name="nationality" id="nationality">
+											<option value="">Select</option>
+											@foreach ($countries as $item)
+												<option value="{{ $item->name }}"
+													{{ (isset($employee->Profile->nationality) && $employee->Profile->nationality == $item->name) ? 'selected' : '' }}>
+													{{ $item->name }}
+												</option>
+											@endforeach
+										</select>
 									</div>
 								</div>
 

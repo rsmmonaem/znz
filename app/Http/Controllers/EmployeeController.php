@@ -236,15 +236,17 @@ class EmployeeController extends Controller{
         $brach = Branch::all()->pluck('name','id')->all();
         $section = Section::all()->pluck('name','id')->all();
         $grade = Grade::all()->pluck('name','id')->all();
-        // return $brach;
+
         $education = EmployeeEducation::where('user_id', $employee->id)->get();
         $experience = WorkExperience::where('user_id','=', $employee->id)->get();
-        // dd($education);
-        //    return $depertment;
+        $countries = DB::table('countries')->get();
+        
 
 
-        $employee->load('Profile');
-        return view('employee.show',compact('experience','education','section','grade','brach','type', 'riligion','employee','designations','department_id','departments','assets','menu','role','roles','gender','marital_status','custom_field_values','employee_relation','social_custom_field_values','contract_types','earning_salary_types','deduction_salary_types','leave_types','contract_lists','office_shifts','document_types','templates'));
+
+
+        $employee->load('Profile'); // ----> make sure this line is the last line of this method, is should be upper line of return view
+        return view('employee.show',compact('experience','education','section','grade','brach','type', 'riligion','employee','designations','department_id','departments','assets','menu','role','roles','gender','marital_status','custom_field_values','employee_relation','social_custom_field_values','contract_types','earning_salary_types','deduction_salary_types','leave_types','contract_lists','office_shifts','document_types','templates','countries'));
     }
 
     public function edit(User $employee){
