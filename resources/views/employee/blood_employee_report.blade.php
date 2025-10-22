@@ -201,7 +201,7 @@
             <body>${printContents}</body>
             </html>
         `);
-                $('#print').show();
+            $('#print').show();
                 printFrame[0].contentDocument.close();
                 printFrame[0].contentWindow.focus();
                 printFrame[0].contentWindow.print();
@@ -329,7 +329,7 @@
                                     <img src="{{ URL::to(config('constants.upload_path.logo') . config('config.logo')) }}" width="150px" style="margin-left:20px;">
                                 </div>
                                 <div class="center-item">
-                                    <h4>Head Office</h4>
+                                    <h4>${branch ? $('select[name="branch"] option:selected').text() : 'All Branches'}</h4>
                                     <p>Address : {{ config('config.address_1') }}</p>
                                     <p>Empoyee Report</p>
                                 </div>
