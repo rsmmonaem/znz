@@ -796,4 +796,5 @@
   'salary_report' => 'Salary Report',
   'salary_advance' => 'Salary Advance',
   'salary_slab_report' => 'Salary Slab Report',
+  'joining_period' => 'Joining Period',
 );

@@ -315,23 +315,23 @@
 
 								{{-- Employee Confirm Date --}}
 								<div class="col-sm-6">
-									<div class="form-group flex-form-group d-flex justify-content-between">
-										<label for="joining_period">{{ trans('messages.joining_period') }}</label>
-										<div>
-											<label>
-												<input type="radio" name="joining_period" value="3_month"
-													id="3_month"
-													{{ (isset($employee->Profile->joining_period) && $employee->Profile->joining_period == '3_month') ? 'checked' : '' }}>
-												3 Months
-											</label>
-											<label>
-												<input type="radio" name="joining_period" value="6_month"
-													id="6_month"
-													{{ (isset($employee->Profile->joining_period) && $employee->Profile->joining_period == '6_month') ? 'checked' : '' }}>
-												6 Months
-											</label>
+										<div class="form-group flex-form-group d-flex justify-content-between">
+											<label for="joining_period">{{ trans('messages.joining_period') }}</label>
+											<div>
+												<label>
+													<input type="radio" name="joining_period" value="3_month"
+														id="3_month"
+														{{ (isset($employee->Profile->joining_period) && $employee->Profile->joining_period == '3_month') ? 'checked' : '' }}>
+													3 Months
+												</label>
+												<label>
+													<input type="radio" name="joining_period" value="6_month"
+														id="6_month"
+														{{ (isset($employee->Profile->joining_period) && $employee->Profile->joining_period == '6_month') ? 'checked' : '' }}>
+													6 Months
+												</label>
+											</div>
 										</div>
-									</div>
 									<div style="margin-bottom: 25px;margin-top: -12px;" class="form-group flex-form-group">
 										{!! Form::label('empoloyee_confirm', trans('messages.empoloyee_confirm')) !!}
 										{!! Form::input('text', 'empoloyee_confirm',
