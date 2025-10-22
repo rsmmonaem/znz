@@ -395,8 +395,17 @@
                                 <div class="col-sm-6">
                                     <div class="form-group flex-form-group">
                                         <label for="blood_group">Blood Group</label>
-                                        <input class="form-control" placeholder="Blood Group" name="blood_group"
-                                            type="text" value="" id="blood_group">
+                                        <select class="form-control" name="blood_group">
+                                            <option value="">Select</option>
+                                            <option value="A+">A+</option>
+                                            <option value="A-">A-</option>
+                                            <option value="B+">B+</option>
+                                            <option value="B-">B-</option>
+                                            <option value="AB+">AB+</option>
+                                            <option value="AB-">AB-</option>
+                                            <option value="O+">O+</option>
+                                            <option value="O-">O-</option>
+                                        </select>
                                     </div>
                                 </div>
                                 <div class="col-sm-6">
