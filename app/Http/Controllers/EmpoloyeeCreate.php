@@ -31,7 +31,9 @@ class EmpoloyeeCreate extends Controller
         $sections = Section::all();
         $grades = Grade::all();
         $category = DB::table('category')->get();
-        return view('employee.create-employee',compact('category','designations','departments','branches','sections','grades'));
+        $countries = DB::table('countries')->get();
+
+        return view('employee.create-employee',compact('category','designations','departments','branches','sections','grades','countries'));
     }
 
     public function store(Request $request)

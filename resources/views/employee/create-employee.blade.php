@@ -333,8 +333,12 @@
                                 <div class="col-sm-6">
                                     <div class="form-group flex-form-group">
                                         <label for="nationality">Nationality</label>
-                                        <input class="form-control" placeholder="Nationality" name="nationality"
-                                            type="text" value="" id="nationality">
+                                        <select class="form-control" name="nationality">
+                                            <option value="">Select</option>
+                                            @foreach ($countries as $item)
+                                                <option value="{{ $item->name }}">{{ $item->name }}</option>
+                                            @endforeach                                            
+                                        </select>
                                     </div>
                                 </div>
 
