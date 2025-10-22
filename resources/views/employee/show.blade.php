@@ -447,10 +447,18 @@
 								{{-- Blood Group --}}
 								<div class="col-sm-6">
 									<div class="form-group flex-form-group">
-										{!! Form::label('blood_group',trans('messages.blood_group'))!!}
-										{!! Form::input('text','blood_group',isset($employee->Profile->blood_group) ?
-										$employee->Profile->blood_group :
-										'',['class'=>'form-control','placeholder'=>trans('messages.blood_group')])!!}
+										{!! Form::label('blood_group', trans('messages.blood_group')) !!}
+										<select name="blood_group" class="form-control">
+											<option value="">{{ trans('messages.select') }}</option>
+											<option value="A+" {{ (isset($employee->Profile->blood_group) && $employee->Profile->blood_group == 'A+') ? 'selected' : '' }}>A+</option>
+											<option value="A-" {{ (isset($employee->Profile->blood_group) && $employee->Profile->blood_group == 'A-') ? 'selected' : '' }}>A-</option>
+											<option value="B+" {{ (isset($employee->Profile->blood_group) && $employee->Profile->blood_group == 'B+') ? 'selected' : '' }}>B+</option>
+											<option value="B-" {{ (isset($employee->Profile->blood_group) && $employee->Profile->blood_group == 'B-') ? 'selected' : '' }}>B-</option>
+											<option value="AB+" {{ (isset($employee->Profile->blood_group) && $employee->Profile->blood_group == 'AB+') ? 'selected' : '' }}>AB+</option>
+											<option value="AB-" {{ (isset($employee->Profile->blood_group) && $employee->Profile->blood_group == 'AB-') ? 'selected' : '' }}>AB-</option>
+											<option value="O+" {{ (isset($employee->Profile->blood_group) && $employee->Profile->blood_group == 'O+') ? 'selected' : '' }}>O+</option>
+											<option value="O-" {{ (isset($employee->Profile->blood_group) && $employee->Profile->blood_group == 'O-') ? 'selected' : '' }}>O-</option>
+										</select>
 									</div>
 								</div>
 								{{-- Date of Birth --}}
