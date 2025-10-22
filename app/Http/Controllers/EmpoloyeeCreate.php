@@ -23,10 +23,7 @@ class EmpoloyeeCreate extends Controller
 {
     public function index()
     {
-        $designations = Designation::leftJoin('departments', 'designations.department_id', '=', 'departments.id')
-            ->select('designations.*', 'departments.name as department_name')
-            ->orderBy('designations.designation_name', 'asc') 
-            ->get();
+        $designations = Designation::LeftJoin('departments', 'designations.department_id', '=', 'departments.id') ->select('designations.*', 'departments.name as department_name') ->get();
 
         $departments = Department::orderBy('name', 'asc')->get();   
         $branches    = Branch::orderBy('name', 'asc')->get();       
