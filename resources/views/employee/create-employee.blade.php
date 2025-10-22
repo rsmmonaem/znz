@@ -289,60 +289,6 @@
 									</div>
                                 </div>
 
-                               <script>
-                                    function setConfirmDate() {
-                                        const joiningDateInput = document.getElementById('date_of_joining');
-                                        const confirmDateInput = document.getElementById('confirm_date');
-                                        const joiningPeriodRadios = document.querySelectorAll('input[name="joining_period"]');
-
-                                        // Check if Date of Joining is selected
-                                        if (!joiningDateInput.value) {
-                                            confirmDateInput.value = ''; // Clear Confirm Date if Joining Date is empty
-                                            return;
-                                        }
-
-                                        const joiningDateParts = joiningDateInput.value.split('-'); // Split the date (YYYY-MM-DD)
-                                        const joiningDate = new Date(joiningDateParts[0], joiningDateParts[1] - 1, joiningDateParts[2]); // Month is 0-based
-
-                                        if (isNaN(joiningDate.getTime())) {
-                                            confirmDateInput.value = ''; // Clear Confirm Date if Joining Date is invalid
-                                            console.warn("Invalid 'Date of Joining'.");
-                                            return;
-                                        }
-
-                                        // Determine the number of months to add based on the selected radio button
-                                        let monthsToAdd = 0;
-                                        joiningPeriodRadios.forEach((radio) => {
-                                            if (radio.checked) {
-                                                if (radio.value === '3_month') {
-                                                    monthsToAdd = 3;
-                                                } else if (radio.value === '6_month') {
-                                                    monthsToAdd = 6;
-                                                }
-                                            }
-                                        });
-
-                                        if (monthsToAdd > 0) {
-                                            // Add months to the joining date
-                                            joiningDate.setMonth(joiningDate.getMonth() + monthsToAdd);
-
-                                            // Format the resulting date as YYYY-MM-DD
-                                            const year = joiningDate.getFullYear();
-                                            const month = String(joiningDate.getMonth() + 1).padStart(2, '0'); // Month is 0-based
-                                            const day = String(joiningDate.getDate()).padStart(2, '0');
-                                            confirmDateInput.value = `${year}-${month}-${day}`;
-                                        } else {
-                                            confirmDateInput.value = ''; // Clear if no period is selected
-                                            console.warn("No 'Joining Period' selected.");
-                                        }
-                                    }
-
-                                    // Event listeners
-                                    document.getElementById('date_of_joining').addEventListener('change', setConfirmDate);
-                                    document.querySelectorAll('input[name="joining_period"]').forEach((radio) => {
-                                        radio.addEventListener('change', setConfirmDate);
-                                    });
-                                </script>
                                 <!-- Religion -->
                                 <div class="col-sm-6">
                                     <div class="form-group flex-form-group">

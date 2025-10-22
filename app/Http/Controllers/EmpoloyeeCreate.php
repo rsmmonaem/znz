@@ -51,6 +51,7 @@ class EmpoloyeeCreate extends Controller
             // Create the Profile record for the user
             $userProfile = DB::table('profile')->insert([
                 'user_id' => $user->id,
+                'joining_period' => $request->joining_period,
                 'employee_code' => $request->employee_id,
                 // Personal Information
                 'branch_id' => $request->branch_id,
