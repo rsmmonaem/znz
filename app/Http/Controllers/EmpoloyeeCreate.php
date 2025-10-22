@@ -23,14 +23,16 @@ class EmpoloyeeCreate extends Controller
 {
     public function index()
     {
-        $designations = Designation::LeftJoin('departments', 'designations.department_id', '=', 'departments.id')
-        ->select('designations.*', 'departments.name as department_name')
-        ->get();
-        $departments = Department::all();
-        $branches = Branch::all();
-        $sections = Section::all();
-        $grades = Grade::all();
-        $category = DB::table('category')->get();
+        $designations = Designation::leftJoin('departments', 'designations.department_id', '=', 'departments.id')
+            ->select('designations.*', 'departments.name as department_name')
+            ->orderBy('designations.designation_name', 'asc') 
+            ->get();
+
+        $departments = Department::orderBy('name', 'asc')->get();   
+        $branches    = Branch::orderBy('name', 'asc')->get();       
+        $sections    = Section::orderBy('name', 'asc')->get();      
+        $grades      = Grade::orderBy('name', 'asc')->get();        
+        $category    = DB::table('category')->orderBy('name', 'asc')->get(); 
         $countries = DB::table('countries')->get();
 
         return view('employee.create-employee',compact('category','designations','departments','branches','sections','grades','countries'));
