@@ -400,6 +400,7 @@ class EmployeeController extends Controller{
         $profile->mothers_name = $request->input('mothers_name');
         $profile->gender = $request->input('gender');
         $profile->marital_status = $request->input('marital_status');
+        $profile->joining_period = $request->input('joining_period') ?: null;
         $profile->confirm_date = $request->input('empoloyee_confirm') ?: null;
         $profile->religion = $request->input('reliagion');
         $profile->height = $request->input('height') ?: null;

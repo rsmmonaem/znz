@@ -12,6 +12,8 @@ class Profile extends Eloquent {
 							'marital_status',
 							'date_of_joining',
 							'date_of_leaving',
+							'joining_period',
+							'confirm_date',
 							'photo',
 							'facebook_link',
 							'twitter_link',
