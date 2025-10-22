@@ -227,15 +227,15 @@ class EmployeeController extends Controller{
         $document_types = DocumentType::pluck('name','id')->all();
 
         $templates = \App\Template::whereIsDefault(0)->pluck('name','id')->all();
-        $departments = Department::all();
+        $departments = Department::orderBy('name', 'asc')->get();
         $department_id = Department::where('id',$employee->department_id)->pluck('id')->first();
         $assets = ['rte'];
         $menu = ['employee'];
-        $type = DB::table('category')->get();
+        $type = DB::table('category')->orderBy('name', 'asc')->get();
         $riligion = ['Islam' => 'Islam', 'Hinduism' => 'Hinduism', 'Christianity' => 'Christianity', 'Buddhism' => 'Buddhism', 'Judaism' => 'Judaism', 'Sikhism' => 'Sikhism', 'Jainism' => 'Jainism'];
-        $brach = Branch::all()->pluck('name','id')->all();
-        $section = Section::all()->pluck('name','id')->all();
-        $grade = Grade::all()->pluck('name','id')->all();
+        $brach = Branch::orderBy('name', 'asc')->pluck('name', 'id')->all();
+        $section = Section::orderBy('name', 'asc')->pluck('name','id')->all();
+        $grade = Grade::orderBy('name', 'asc')->pluck('name','id')->all();
 
         $education = EmployeeEducation::where('user_id', $employee->id)->get();
         $experience = WorkExperience::where('user_id','=', $employee->id)->get();
@@ -245,7 +245,7 @@ class EmployeeController extends Controller{
 
 
 
-        $employee->load('Profile'); // ----> make sure this line is the last line of this method, is should be upper line of return view
+        $employee->load('Profile'); // ----> make sure this line is the last line of this method, is should be upper line o
         return view('employee.show',compact('experience','education','section','grade','brach','type', 'riligion','employee','designations','department_id','departments','assets','menu','role','roles','gender','marital_status','custom_field_values','employee_relation','social_custom_field_values','contract_types','earning_salary_types','deduction_salary_types','leave_types','contract_lists','office_shifts','document_types','templates','countries'));
     }
 
