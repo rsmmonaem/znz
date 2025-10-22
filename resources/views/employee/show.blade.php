@@ -436,7 +436,7 @@
 										'',['class'=>'form-control','placeholder'=>trans('messages.employee_number')])!!}
 									</div>
 								</div>
-								{{-- Nationality --}}countries
+								{{-- Nationality --}}
 								<div class="col-sm-6">
 									<div class="form-group flex-form-group">
 										<label for="nationality">{{ trans('messages.nationality') }}</label>
