@@ -62,29 +62,16 @@
                                     <label for="employeeId">Employee ID</label>
                                     <select class="form-control" name="employeeId" id="employeeId">
                                         <option value="">Select Employee ID</option>
-                                        {{-- @foreach ($employee as $e)
-                                            <option value="{{ $e->id }}">{{ $e->first_name }} -
-                                                {{ $e->employee_code }}</option>
-                                        @endforeach --}}
                                     </select>
                                 </div>
                             </div>
                             <div class="col-sm-6">
                                 <div class="form-group">
                                     <label for="reportType">Report Type</label>
-                                    {{-- <select class="form-control" id="reportType">
-                                        <option>Employee List</option>
-                                        <!-- Add more options as necessary -->
-                                    </select> --}}
                                     @include('common.reportSelect')
                                 </div>
                                 <div class="form-group">
                                     <label for="category">Category</label>
-                                    {{-- <select class="form-control" id="category">
-                                        <option value="">Select Category</option>
-                                        <option value="Owner">Owner</option>
-                                        <option value="Staff">Staff</option>
-                                    </select> --}}
                                      @include('common.category')
                                 </div>
                                 <div class="form-group">
@@ -102,42 +89,6 @@
                             <button type="button" class="btn btn-danger">Close</button>
                         </div>
                     </form>
-
-                    {{-- <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th>SL ID</th>
-                                <th>Name</th>
-                                <th>Designation</th>
-                                <th>Department</th>
-                                <th>Section</th>
-                                <th>DOJ</th>
-                                <th>DOB</th>
-                                <th>Blood</th>
-                                <th>Job Nature</th>
-                                <th>Category</th>
-                                <th>Mobile</th>
-                                <th>Gender</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <!-- Table rows will go here -->
-                            <tr>
-                                <td>1</td>
-                                <td>John Doe</td>
-                                <td>Manager</td>
-                                <td>HR</td>
-                                <td>Admin</td>
-                                <td>2020-01-15</td>
-                                <td>1990-05-10</td>
-                                <td>O+</td>
-                                <td>Full-Time</td>
-                                <td>Permanent</td>
-                                <td>1234567890</td>
-                                <td>Male</td>
-                            </tr>
-                        </tbody>
-                    </table> --}}
                 </div>
             </div>
         </div>

@@ -15,4 +15,9 @@ class CommonDependencyController extends Controller{
         return $this->Helpers->GetBranchEmployees($request->branch_id);
     }
 
+    public function branchSeparatedEmployees(Request $request)
+    {
+        return $this->Helpers->GetBranchSeparatedEmployees($request->branch_id);
+    }
+
 }

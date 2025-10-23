@@ -23,6 +23,7 @@ Route::post('/job-application', array('as' => 'job-application.store','uses' => 
 
 // Common Dependency Routes 
 Route::post('branch-employees', 'CommonDependencyController@branchEmployees');
+Route::post('branch-separated-employees', 'CommonDependencyController@branchSeparatedEmployees');
 
 // End Common Dependency Routes
 Route::post('/clock/in', array('as' => 'clock.in', 'uses' => 'ClockController@in'));

@@ -17,6 +17,17 @@ class Helpers{
         return $employees;
     }
 
+    public static function GetBranchSeparatedEmployees($branch_id)
+    {
+        $employees = User::leftJoin('profile', 'users.id', '=', 'profile.user_id')
+            ->select('users.first_name as employee_name', 'users.id', 'profile.employee_code')
+            ->where('profile.branch_id', $branch_id)
+            ->where('users.status', 'Separated')
+            ->get();
+
+        return $employees;
+    }
+
     public function GetUserLeaves($id, $financialYear, $leave_type_id){
         $date_of_joining = Profile::where('user_id', $id)->select('date_of_joining')->first();
         $date_of_joining = $date_of_joining->date_of_joining;
