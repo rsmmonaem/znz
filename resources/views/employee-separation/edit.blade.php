@@ -44,7 +44,7 @@
                                 </div>
                                 <div class="form-group">
                                     <label for="employeeId">Employee ID</label>
-                                    <select class="form-control select2me" id="employeeId" name="employeeId" readonly>
+                                    <select class="form-control select2me" id="employeeId" name="employeeId" disabled>
                                         <option value="">Select Employee ID</option>
                                         @foreach ($employee as $e)
                                             <option value="{{ $e->id }}"
