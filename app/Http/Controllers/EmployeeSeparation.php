@@ -67,6 +67,13 @@ class EmployeeSeparation extends Controller
             // Save the model
             $separation->save();
             // Return response
+
+            $user = User::find($request->input('employeeId'));
+            if ($user) {
+                $user->status = 'Separated';
+                $user->save();
+            }
+            
             return response()->json([
                 'status' => 'success',
                 'message' => 'Employee separation record saved successfully.',
