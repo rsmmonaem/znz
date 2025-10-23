@@ -119,6 +119,11 @@ class EmployeeSeparation extends Controller
     public function destroy($id)
     {
         $separation = AppEmployeeSeparation::find($id);
+        $user = User::find($separation->employee_id);
+        if ($user) {
+            $user->status = 'active';
+            $user->save();
+        }
         $separation->delete();
         return response()->json(['status' => 'success', 'message' => 'Employee separation record deleted successfully.']);
     }
