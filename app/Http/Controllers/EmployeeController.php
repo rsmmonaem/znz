@@ -148,6 +148,7 @@ class EmployeeController extends Controller{
             })
             ->select(
                 'users.id',
+                'users.status',
                 'profile.employee_code',
                 'users.first_name',
                 'designations.name as designation_name',
