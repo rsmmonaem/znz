@@ -101,7 +101,7 @@
           $('#branch').on('change', function() {
             var branch_id = $(this).val();
             $('#employeeId').val('').trigger('change');
-            HandleBranchWiseEmployees(branch_id, '#employeeId');
+            HandleBranchWiseSeparatedEmployees(branch_id, '#employeeId');(branch_id, '#employeeId');
         });
         // Get Report
         $(document).on('click', '#GetReport', function(e) {
@@ -275,5 +275,31 @@
             });  
         }
     });
+    function HandleBranchWiseSeparatedEmployees(branch_id, employee_id, employee_code) {
+        $.ajax({
+            url: '/branch-separated-employees',
+            type: 'POST',
+            data: {
+                branch_id: branch_id,
+                _token: $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function(data) {
+                $(employee_id).val('');
+                $(employee_id).empty();
+                $(employee_id).append($('<option>', { value: '', text: 'Select Employee' }));
+
+                data.forEach(function(employee) {
+                    $(employee_id).append($('<option>', {
+                        value: employee_code ? employee.employee_code : employee.id,
+                        text: employee.employee_code + ' - ' + employee.employee_name
+                    }));
+                });
+            },
+            error: function(xhr, status, error) {
+                console.log("Error: " + error);
+                alert("Failed to load employee data. Please try again.");
+            }
+        });
+    }
   </script>
 @stop
