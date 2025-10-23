@@ -226,6 +226,7 @@
 									<th>Contact Number</th>
 									<th>Gender</th>
 									<th>Branch</th>
+									<th>Status</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -372,6 +373,7 @@ tableBody.append(`
         <td>${item.contact_number || 'N/A'}</td>
         <td>${item.gender || 'N/A'}</td>
         <td>${item.branch_name || 'N/A'}</td>
+        <td>${item.status || 'N/A'}</td>
     </tr>
 `);
 
