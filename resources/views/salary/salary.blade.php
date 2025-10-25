@@ -268,7 +268,14 @@
                             <td>${item.cash_amount}</td>
                             <td><input type="checkbox" data-id="${item.id}" class="status" ${item.status == 1 ? 'checked' : ' '}></td>
                             <td>${item.status == 0 ? 'false' : 'true'}</td>
-                            <td>${item.remarks}</td>`;
+                            <td>
+                                <a href="" class="btn btn-sm btn-primary">
+                                    <i class="fa fa-edit"></i> Edit
+                                </a>
+                                <a href="" class="btn btn-sm btn-danger">
+                                    <i class="fa fa-trash"></i> Delete
+                                </a>
+                            </td>`;
                         row += `</tr>`;
                         tableBody.append(row); // Append each row to the table body
                     });
