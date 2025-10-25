@@ -645,7 +645,10 @@ Class SalaryController extends Controller{
 
 
     public function EditBankPart($id) {
-        return $id;
+        
+        $bankPart = DB::table('salary_bank')->where('id', $id)->first();
+        return view('salary.edit-bank-part', compact('bankPart'));
+
     }
 }
 ?>
