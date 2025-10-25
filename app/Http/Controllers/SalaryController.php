@@ -646,10 +646,15 @@ Class SalaryController extends Controller{
 
     public function EditBankPart($id)
     {
-        $bankPart = DB::table('salary_bank')->where('id', $id)->first();
+        $bankPart = DB::table('salary_bank')
+            ->leftJoin('users', 'salary_bank.user_id', '=', 'users.id')
+            ->leftJoin('profile', 'users.id', '=', 'profile.user_id')
+            ->select('salary_bank.*', 'users.first_name', 'profile.employee_code')
+            ->where('salary_bank.id', $id)
+            ->first();
 
         if (!$bankPart) {
-            return redirect()->back()->with('error', 'Record not found');
+            return redirect()->route('salary-bank-part')->with('error', 'Salary bank record not found');
         }
 
         return view('salary.edit-bank-part', compact('bankPart'));
@@ -658,24 +663,69 @@ Class SalaryController extends Controller{
 
     public function UpdateBankPart(Request $request, $id)
     {
+        // First check if the record exists
+        $existingRecord = DB::table('salary_bank')->where('id', $id)->first();
+        if (!$existingRecord) {
+            return redirect()->route('salary-bank-part')->with('error', 'Salary bank record not found');
+        }
+
         $request->validate([
             'effective_date' => 'required|date',
-            'gross'          => 'required|numeric',
-            'bank_amount'    => 'required|numeric',
-            'cash_amount'    => 'required|numeric',
+            'gross'          => 'required|numeric|min:0',
+            'bank_amount'    => 'required|numeric|min:0',
+            'cash_amount'    => 'required|numeric|min:0',
+        ], [
+            'effective_date.required' => 'Effective date is required',
+            'effective_date.date' => 'Please enter a valid date',
+            'gross.required' => 'Gross salary is required',
+            'gross.numeric' => 'Gross salary must be a number',
+            'gross.min' => 'Gross salary cannot be negative',
+            'bank_amount.required' => 'Bank amount is required',
+            'bank_amount.numeric' => 'Bank amount must be a number',
+            'bank_amount.min' => 'Bank amount cannot be negative',
+            'cash_amount.required' => 'Cash amount is required',
+            'cash_amount.numeric' => 'Cash amount must be a number',
+            'cash_amount.min' => 'Cash amount cannot be negative',
         ]);
 
-        $data = [
-            'effective_date' => $request->effective_date,
-            'gross'          => $request->gross,
-            'bank_amount'    => $request->bank_amount,
-            'cash_amount'    => $request->cash_amount,
-            'updated_at'     => now(),
-        ];
+        // Validate that bank amount + cash amount equals gross
+        $totalAmount = $request->bank_amount + $request->cash_amount;
+        if (abs($totalAmount - $request->gross) > 0.01) {
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['amount_mismatch' => 'Bank Amount + Cash Amount must equal Gross Salary']);
+        }
 
-        DB::table('salary_bank')->where('id', $id)->update($data);
+        try {
+            $data = [
+                'effective_date' => $request->effective_date,
+                'gross'          => $request->gross,
+                'bank_amount'    => $request->bank_amount,
+                'cash_amount'    => $request->cash_amount,
+                'updated_at'     => now(),
+            ];
 
-        return redirect()->route('salary-bank-part')->with('success', 'Bank Part Updated Successfully.');
+            $updated = DB::table('salary_bank')->where('id', $id)->update($data);
+
+            if ($updated) {
+                // Log the activity
+                $this->logActivity([
+                    'module' => 'salary', 
+                    'activity' => 'activity_updated', 
+                    'secondary_id' => $existingRecord->user_id
+                ]);
+
+                return redirect()->route('salary-bank-part')->with('success', 'Salary bank part updated successfully');
+            } else {
+                return redirect()->back()
+                    ->withInput()
+                    ->with('error', 'Failed to update salary bank part. Please try again.');
+            }
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'An error occurred while updating the record: ' . $e->getMessage());
+        }
     }
 
 
