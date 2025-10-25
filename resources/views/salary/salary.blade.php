@@ -269,7 +269,7 @@
                             <td><input type="checkbox" data-id="${item.id}" class="status" ${item.status == 1 ? 'checked' : ' '}></td>
                             <td>${item.status == 0 ? 'false' : 'true'}</td>
                             <td>
-                                <a href="" class="btn btn-sm btn-primary">
+                                <a href="{{ route('edit-bank-part', ['id' => item.id]) }}" class="btn btn-sm btn-primary">
                                     <i class="fa fa-edit"></i> Edit
                                 </a>
                                 <a href="" class="btn btn-sm btn-danger">
