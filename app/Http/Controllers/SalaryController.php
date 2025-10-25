@@ -713,7 +713,6 @@ Class SalaryController extends Controller{
                 'gross'          => $request->gross,
                 'bank_amount'    => $request->bank_amount,
                 'cash_amount'    => $request->cash_amount,
-                'updated_at'     => now(),
             ];
 
             $updated = DB::table('salary_bank')->where('id', $id)->update($data);
