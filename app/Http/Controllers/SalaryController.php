@@ -663,40 +663,51 @@ Class SalaryController extends Controller{
 
     public function UpdateBankPart(Request $request, $id)
     {
-        // First check if the record exists
-        $existingRecord = DB::table('salary_bank')->where('id', $id)->first();
-        if (!$existingRecord) {
-            return redirect()->route('salary-bank-part')->with('error', 'Salary bank record not found');
-        }
-
-        $request->validate([
-            'effective_date' => 'required|date',
-            'gross'          => 'required|numeric|min:0',
-            'bank_amount'    => 'required|numeric|min:0',
-            'cash_amount'    => 'required|numeric|min:0',
-        ], [
-            'effective_date.required' => 'Effective date is required',
-            'effective_date.date' => 'Please enter a valid date',
-            'gross.required' => 'Gross salary is required',
-            'gross.numeric' => 'Gross salary must be a number',
-            'gross.min' => 'Gross salary cannot be negative',
-            'bank_amount.required' => 'Bank amount is required',
-            'bank_amount.numeric' => 'Bank amount must be a number',
-            'bank_amount.min' => 'Bank amount cannot be negative',
-            'cash_amount.required' => 'Cash amount is required',
-            'cash_amount.numeric' => 'Cash amount must be a number',
-            'cash_amount.min' => 'Cash amount cannot be negative',
-        ]);
-
-        // Validate that bank amount + cash amount equals gross
-        $totalAmount = $request->bank_amount + $request->cash_amount;
-        if (abs($totalAmount - $request->gross) > 0.01) {
-            return redirect()->back()
-                ->withInput()
-                ->withErrors(['amount_mismatch' => 'Bank Amount + Cash Amount must equal Gross Salary']);
-        }
-
         try {
+            // First check if the record exists
+            $existingRecord = DB::table('salary_bank')->where('id', $id)->first();
+            if (!$existingRecord) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Salary bank record not found'
+                ], 404);
+            }
+
+            // Manual validation (no CSRF)
+            $errors = [];
+            
+            if (!$request->has('effective_date') || empty($request->effective_date)) {
+                $errors[] = 'Effective date is required';
+            }
+            
+            if (!$request->has('gross') || !is_numeric($request->gross) || $request->gross < 0) {
+                $errors[] = 'Gross salary must be a valid positive number';
+            }
+            
+            if (!$request->has('bank_amount') || !is_numeric($request->bank_amount) || $request->bank_amount < 0) {
+                $errors[] = 'Bank amount must be a valid positive number';
+            }
+            
+            if (!$request->has('cash_amount') || !is_numeric($request->cash_amount) || $request->cash_amount < 0) {
+                $errors[] = 'Cash amount must be a valid positive number';
+            }
+            
+            // Validate that bank amount + cash amount equals gross
+            if (empty($errors)) {
+                $totalAmount = $request->bank_amount + $request->cash_amount;
+                if (abs($totalAmount - $request->gross) > 0.01) {
+                    $errors[] = 'Bank Amount + Cash Amount must equal Gross Salary';
+                }
+            }
+            
+            if (!empty($errors)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => implode(', ', $errors)
+                ], 400);
+            }
+
+            // Update the record
             $data = [
                 'effective_date' => $request->effective_date,
                 'gross'          => $request->gross,
@@ -715,16 +726,22 @@ Class SalaryController extends Controller{
                     'secondary_id' => $existingRecord->user_id
                 ]);
 
-                return redirect()->route('salary-bank-part')->with('success', 'Salary bank part updated successfully');
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Salary bank part updated successfully'
+                ]);
             } else {
-                return redirect()->back()
-                    ->withInput()
-                    ->with('error', 'Failed to update salary bank part. Please try again.');
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to update salary bank part. Please try again.'
+                ], 500);
             }
+            
         } catch (\Exception $e) {
-            return redirect()->back()
-                ->withInput()
-                ->with('error', 'An error occurred while updating the record: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred while updating the record: ' . $e->getMessage()
+            ], 500);
         }
     }
 
