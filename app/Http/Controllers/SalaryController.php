@@ -652,7 +652,7 @@ Class SalaryController extends Controller{
             return redirect()->back()->with('error', 'Record not found');
         }
 
-        return view('salary.edit_bank_part', compact('bankPart'));
+        return view('salary.edit-bank-part', compact('bankPart'));
     }
 
 
