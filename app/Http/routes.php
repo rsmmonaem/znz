@@ -500,8 +500,8 @@ Route::group(['middleware' => ['auth','license','account_valid']], function () {
 	// Edit Bank Part Page
 	Route::get('/edit-bank-part/{id}', 'SalaryController@EditBankPart')->name('edit-bank-part');
 
-	// Update Bank Part (use PUT as per Laravel convention)
-	Route::put('/update-bank-part/{id}', 'SalaryController@UpdateBankPart')->name('update-bank-part');
+	// Update Bank Part
+	Route::post('/update-bank-part/{id}', 'SalaryController@UpdateBankPart')->name('update-bank-part');
 
 	// Salary
 	Route::get('salary-report', 'SalaryController@salaryReport');

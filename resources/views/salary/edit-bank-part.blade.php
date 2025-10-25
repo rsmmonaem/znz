@@ -86,7 +86,7 @@
 
                 <form action="{{ route('update-bank-part', $bankPart->id) }}" method="POST" id="editBankPartForm">
                     @csrf
-                    @method('PUT')
+                    <input type="hidden" name="action" value="update">
                     
                     <div class="row">
                         <!-- Left Column -->
