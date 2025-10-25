@@ -650,5 +650,23 @@ Class SalaryController extends Controller{
         return view('salary.edit-bank-part', compact('bankPart'));
 
     }
+
+
+    public function UpdateBankPart(Request $request, $id) {
+        $effectiveDate = $request->effective_date;
+        $gross = $request->gross;
+        $bankAmount = $request->bank_amount;
+        $cashAmount = $request->cash_amount;
+
+        $data = [
+            'effective_date' => $effectiveDate,
+            'bank_amount' => $bankAmount,
+            'cash_amount' => $cashAmount,
+            'gross' => $gross
+        ];
+
+        DB::table('salary_bank')->where('id', $id)->update($data);
+        return redirect()->route('salary-bank-part')->withSuccess('Bank Part Updated Successfully');
+    }
 }
 ?>

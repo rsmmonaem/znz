@@ -152,7 +152,7 @@
                                     <th>Cash Amount</th>
                                     <th>Hold</th>
                                     <th>Status</th>
-                                    <th>Remarks</th>
+                                    <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody id="tbody">
