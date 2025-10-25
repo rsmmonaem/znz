@@ -50,10 +50,10 @@
                     <h4>Employee Information</h4>
                     <div class="row">
                         <div class="col-sm-6">
-                            <strong>Employee ID:</strong> {{ $bankPart->employee_code ?? 'N/A' }}
+                            <strong>Employee ID:</strong> {{ isset($bankPart->employee_code) ? $bankPart->employee_code : 'N/A' }}
                         </div>
                         <div class="col-sm-6">
-                            <strong>Employee Name:</strong> {{ $bankPart->first_name ?? 'N/A' }}
+                            <strong>Employee Name:</strong> {{ isset($bankPart->first_name) ? $bankPart->first_name : 'N/A' }}
                         </div>
                     </div>
                 </div>
@@ -94,13 +94,13 @@
                             <div class="form-group flex-form-group">
                                 <label for="gross">{!! trans('messages.gross') !!} {!! trans('messages.salary') !!} <span class="text-danger">*</span></label>
                                 <input type="number" class="form-control" id="gross" name="gross"
-                                    value="{{ old('gross', $bankPart->gross) }}" required step="0.01" min="0">
+                                    value="{{ old('gross') ? old('gross') : $bankPart->gross }}" required step="0.01" min="0">
                             </div>
 
                             <div class="form-group flex-form-group">
                                 <label for="cash_amount">{!! trans('messages.cash') !!} {!! trans('messages.amount') !!} <span class="text-danger">*</span></label>
                                 <input type="number" class="form-control" id="cash_amount" name="cash_amount"
-                                    value="{{ old('cash_amount', $bankPart->cash_amount) }}" required step="0.01" min="0">
+                                    value="{{ old('cash_amount') ? old('cash_amount') : $bankPart->cash_amount }}" required step="0.01" min="0">
                             </div>
                         </div>
 
@@ -109,13 +109,13 @@
                             <div class="form-group flex-form-group">
                                 <label for="effective_date">{!! trans('messages.effective') !!} {!! trans('messages.date') !!} <span class="text-danger">*</span></label>
                                 <input type="date" class="form-control" id="effective_date" name="effective_date"
-                                    value="{{ old('effective_date', $bankPart->effective_date) }}" required>
+                                    value="{{ old('effective_date') ? old('effective_date') : $bankPart->effective_date }}" required>
                             </div>
 
                             <div class="form-group flex-form-group">
                                 <label for="bank_amount">{!! trans('messages.bank') !!} {!! trans('messages.amount') !!} <span class="text-danger">*</span></label>
                                 <input type="number" class="form-control" id="bank_amount" name="bank_amount"
-                                    value="{{ old('bank_amount', $bankPart->bank_amount) }}" required step="0.01" min="0">
+                                    value="{{ old('bank_amount') ? old('bank_amount') : $bankPart->bank_amount }}" required step="0.01" min="0">
                             </div>
                         </div>
                     </div>
