@@ -109,9 +109,6 @@
                         <button type="submit" class="btn btn-success" id="updateBtn">
                             <i class="fa fa-save"></i> {!! trans('messages.update') !!}
                         </button>
-                        <button type="button" class="btn btn-default" id="cancelBtn">
-                            <i class="fa fa-times"></i> {!! trans('messages.cancel') !!}
-                        </button>
                     </div>
                 </form>
             </div>
