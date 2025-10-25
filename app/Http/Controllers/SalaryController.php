@@ -744,6 +744,48 @@ Class SalaryController extends Controller{
         }
     }
 
+    public function DeleteBankPart(Request $request, $id)
+    {
+        try {
+            // First check if the record exists
+            $existingRecord = DB::table('salary_bank')->where('id', $id)->first();
+            if (!$existingRecord) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Salary bank record not found'
+                ], 404);
+            }
+
+            // Delete the record
+            $deleted = DB::table('salary_bank')->where('id', $id)->delete();
+
+            if ($deleted) {
+                // Log the activity
+                $this->logActivity([
+                    'module' => 'salary', 
+                    'activity' => 'activity_deleted', 
+                    'secondary_id' => $existingRecord->user_id
+                ]);
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Salary bank record deleted successfully'
+                ]);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to delete salary bank record. Please try again.'
+                ], 500);
+            }
+            
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred while deleting the record: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
 
 }
 ?>

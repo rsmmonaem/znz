@@ -202,6 +202,7 @@
                                     <th>Medical</th>
                                     <th>Conveyance</th>
                                     <th>Others</th>
+                                    <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody id="tableData">
@@ -340,6 +341,13 @@
                         item.salaries.forEach(function (salary) {
                             row += `<td>${salary.amount}</td>`;
                         });
+
+                        // Add action column with delete button
+                        row += `<td>
+                            <button type="button" class="btn btn-sm btn-danger delete-salary-slab" data-id="${item.id}" data-employee="${item.user_info.employee_code}">
+                                <i class="fa fa-trash"></i> Delete
+                            </button>
+                        </td>`;
 
                         row += `</tr>`;
                         tableBody.append(row); // Append each row to the table body
