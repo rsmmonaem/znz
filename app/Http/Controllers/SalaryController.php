@@ -644,29 +644,40 @@ Class SalaryController extends Controller{
     }
 
 
-    public function EditBankPart($id) {
-        
+    public function EditBankPart($id)
+    {
         $bankPart = DB::table('salary_bank')->where('id', $id)->first();
-        return view('salary.edit-bank-part', compact('bankPart'));
 
+        if (!$bankPart) {
+            return redirect()->back()->with('error', 'Record not found');
+        }
+
+        return view('salary.edit_bank_part', compact('bankPart'));
     }
 
 
-    public function UpdateBankPart(Request $request, $id) {
-        $effectiveDate = $request->effective_date;
-        $gross = $request->gross;
-        $bankAmount = $request->bank_amount;
-        $cashAmount = $request->cash_amount;
+    public function UpdateBankPart(Request $request, $id)
+    {
+        $request->validate([
+            'effective_date' => 'required|date',
+            'gross'          => 'required|numeric',
+            'bank_amount'    => 'required|numeric',
+            'cash_amount'    => 'required|numeric',
+        ]);
 
         $data = [
-            'effective_date' => $effectiveDate,
-            'bank_amount' => $bankAmount,
-            'cash_amount' => $cashAmount,
-            'gross' => $gross
+            'effective_date' => $request->effective_date,
+            'gross'          => $request->gross,
+            'bank_amount'    => $request->bank_amount,
+            'cash_amount'    => $request->cash_amount,
+            'updated_at'     => now(),
         ];
 
         DB::table('salary_bank')->where('id', $id)->update($data);
-        return redirect()->route('salary-bank-part')->withSuccess('Bank Part Updated Successfully');
+
+        return redirect()->route('salary-bank-part')->with('success', 'Bank Part Updated Successfully.');
     }
+
+
 }
 ?>
