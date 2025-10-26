@@ -260,7 +260,7 @@
                     var tableBody = $('#tbody');
                     tableBody.empty();
                     response.forEach(function(item) {
-                     var editUrl = '/edit-bank-part/' + item.id;
+                      var editUrl = '/edit-bank-part/' + item.id;
 
 
 
@@ -273,7 +273,7 @@
                             <td><input type="checkbox" data-id="${item.id}" class="status" ${item.status == 1 ? 'checked' : ' '}></td>
                             <td>${item.status == 0 ? 'false' : 'true'}</td>
                             <td>
-                                <a href="/edit-bank-part/{{ $item->id }}" class="btn btn-xs btn-primary">
+                                <a href="${editUrl}" class="btn btn-xs btn-primary">
                                     <i class="fa fa-edit"></i> Edit
                                 </a>
                                 <button class="btn btn-xs btn-danger delete-btn" data-id="{{ $item->id }}">
