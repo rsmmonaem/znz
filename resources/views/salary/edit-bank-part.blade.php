@@ -23,15 +23,6 @@
             <div class="user-profile-content-wm">
                 <h2>{!! trans('messages.edit') !!} {!! trans('messages.Salary_BankPart') !!}</h2>
 
-                <!-- Employee Info -->
-                <div class="employee-info">
-                    <h4>Employee Information</h4>
-                    <div class="row">
-                        <div class="col-sm-6"><strong>Employee ID:</strong> {{ $bankPart->employee_code }}</div>
-                        <div class="col-sm-6"><strong>Employee Name:</strong> {{ $bankPart->first_name }}</div>
-                    </div>
-                </div>
-
 
 
                 <!-- Edit Form -->
