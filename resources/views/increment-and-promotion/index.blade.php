@@ -293,7 +293,7 @@
                                     <a href="#" data-id="${inandpro.id}" class="btn btn-danger btn-xs" id="deleteIncriments"><i class="fa fa-trash"></i></a>
                                 </div>
                             </td>
-                            <td>${inandpro.employee_code}</td>
+                            <td>${inandpro.employee_code} - ${inandpro.first_name}</td>
                             <td>${inandpro.predesignation}</td>
                             <td>${inandpro.designation}</td>
                             <td>${inandpro.grade_name}</td>
