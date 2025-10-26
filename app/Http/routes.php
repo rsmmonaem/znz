@@ -3,7 +3,7 @@
 use Illuminate\Routing\Router;
 
 Route::get('/get-districts/{id}', function ($id) {
-	$districts = DB::table('districts')->where('division_id', $id)->get();
+	$districts = DB::table('districts')->where('division_id', $id)->orderBy('name', 'ASC')->get();
 	return response()->json($districts);
 });
 
