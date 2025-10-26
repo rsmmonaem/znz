@@ -211,7 +211,7 @@
                         <tr>
                             <td><input class="checkAllRow" value="${item.id}" type="checkbox"></th></td>
                             <td><input style="width:100px" type="text" name="paid_amount" value="${item.PaidAmount}"/></td>
-                            <td><input style="width:100px" type="text" value="${item.TotalPayable}"/></td>
+                            <td><input style="width:100px" type="text" value="${item.UnpaidAmount}"/></td>
                             <td>${new Date(item.ToDate).toLocaleString('default', { month: 'long' })}</td>
                             <td>${item.NetPayable}</td>
                             <td>${item.employee_code}</td>

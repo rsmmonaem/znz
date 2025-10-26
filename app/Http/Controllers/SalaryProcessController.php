@@ -586,7 +586,7 @@ class SalaryProcessController extends Controller
 
         DB::table('employee_salary_payment_details')->insert([
             'PaidAmount' => 0,
-            'UnpaidAmount' => 0,
+            'UnpaidAmount' => ($netSalaryWIthoutTax - $amount) + $holidayAmount,
             'holiday' => $fridayClockCount,
             'NetPayable' => $NetPayable,
             'holiday_amount' => $holidayAmount,
