@@ -500,7 +500,7 @@ Route::group(['middleware' => ['auth','license','account_valid']], function () {
 	// Edit Bank Part Page
 	// Route::get('/edit-bank-part/{id}', 'SalaryController@EditBankPart');
 
-	Route::get('salary-bank-part/{id}/edit', 'SalaryBankPartController@bankedit')->name('edit-bank-part');
+	Route::get('edit-bank-part/{id}', 'SalaryBankPartController@bankedit')->name('edit-bank-part');
 	Route::post('update-bank-part/{id}', 'SalaryBankPartController@bankupdate');
 
 	// Delete Bank Part
