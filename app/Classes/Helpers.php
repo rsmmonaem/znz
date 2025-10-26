@@ -13,6 +13,7 @@ class Helpers{
         ->select('users.first_name as employee_name', 'users.id','profile.employee_code')
         ->where('profile.branch_id', $branch_id)
         ->where('users.status', 'active')
+        ->orderBy('profile.employee_code', 'ASC')
         ->get();
         return $employees;
     }
@@ -23,6 +24,7 @@ class Helpers{
             ->select('users.first_name as employee_name', 'users.id', 'profile.employee_code')
             ->where('profile.branch_id', $branch_id)
             ->where('users.status', 'Separated')
+            ->orderBy('profile.employee_code', 'ASC')
             ->get();
 
         return $employees;
