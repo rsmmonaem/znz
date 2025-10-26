@@ -31,9 +31,9 @@ class EmpoloyeeCreate extends Controller
         $grades      = Grade::orderBy('name', 'asc')->get();        
         $category    = DB::table('category')->orderBy('name', 'asc')->get(); 
         $countries = DB::table('countries')->orderBy('name', 'asc')->get();
-        $divisions = DB::table('divisions')->orderBy('name', 'asc')->get();
+        $division = DB::table('divisions')->orderBy('name', 'asc')->get();
 
-        return view('employee.create-employee',compact('category','designations','departments','branches','sections','grades','countries','divisions'));
+        return view('employee.create-employee',compact('category','designations','departments','branches','sections','grades','countries','division'));
     }
 
     public function store(Request $request)
