@@ -13,7 +13,7 @@ class Helpers{
         ->select('users.first_name as employee_name', 'users.id','profile.employee_code')
         ->where('profile.branch_id', $branch_id)
         ->where('users.status', 'active')
-        ->orderBy('profile.employee_code', 'ASC')
+        ->orderByRaw('CAST(profile.employee_code AS UNSIGNED) ASC')
         ->get();
         return $employees;
     }
