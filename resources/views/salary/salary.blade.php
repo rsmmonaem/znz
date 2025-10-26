@@ -144,22 +144,39 @@
 </div>
 @stop
 
+
 @section('javascript')
 <script>
 $(document).ready(function(){
-    // Load employees on branch change
+
+    // Initialize DataTable once
+    var dt = $('#datatable').DataTable({
+        lengthMenu: [10, 20, 50, 100],
+        columnDefs: [
+            { orderable: false, targets: [4,6] } // checkbox & action not orderable
+        ]
+    });
+
+    // --- LOAD ALL DATA ON PAGE LOAD ---
+    LoadBankPart();
+
+    // --- Branch change ---
     $('#branch').on('change', function(){
         var branch_id = $(this).val();
         $('#employeeId').val('');
         HandleBranchWiseEmployees(branch_id, '#employeeId');
-        ClearFormAndTable();
+
+        // When branch changes, show all data again
+        LoadBankPart();
     });
 
-    // Employee select
+    // --- Employee select ---
     $('#employeeId').on('change', function(){
         var employeeId = $(this).val();
         if(employeeId==''){
-            ClearFormAndTable();
+            // No employee selected => show all data
+            LoadBankPart();
+            ClearEmployeeForm();
             return;
         }
 
@@ -172,20 +189,17 @@ $(document).ready(function(){
                 $('#designation').val(res.designation);
                 $('#category').val(res.category);
                 $('#gross').val(res.gross);
-                GetBankPart(employeeId);
             },
             error:function(){
-                ClearFormAndTable();
+                ClearEmployeeForm();
             }
         });
+
+        // Load data for selected employee only
+        LoadBankPart(employeeId);
     });
 
-    function validate(msg){
-        toastr.error(msg);
-        $('#saveData').attr('disabled', false).text('Save');
-        return false;
-    }
-
+    // --- Save button ---
     $('#saveData').on('click', function(){
         $(this).attr('disabled', true).text('Saving...');
         const FormData = {
@@ -208,7 +222,7 @@ $(document).ready(function(){
             headers:{'X-CSRF-TOKEN':'{{ csrf_token() }}'},
             data:FormData,
             success:function(res){
-                GetBankPart(FormData.employeeId);
+                LoadBankPart(FormData.employeeId);
                 $('#saveData').attr('disabled', false).text('Save');
                 toastr.success(res.message || 'Data saved successfully.');
             },
@@ -218,83 +232,82 @@ $(document).ready(function(){
             }
         });
     });
-});
 
-function ClearFormAndTable(){
-    $('#name,#designation,#category,#gross').val('');
-    const dt = $('#datatable');
-    dt.DataTable().destroy();
-    $('#tbody').html('<tr><td colspan="8" class="text-center">No data found</td></tr>');
-    dt.DataTable({lengthMenu:[10,20,50,100]});
-}
+    function validate(msg){
+        toastr.error(msg);
+        $('#saveData').attr('disabled', false).text('Save');
+        return false;
+    }
 
-function GetBankPart(employeeId=''){
-    $.ajax({
-        url:'/GetBankPart',
-        type:'GET',
-        data:{employeeId:employeeId},
-        success:function(res){
-            const dt = $('#datatable');
-            dt.DataTable().destroy();
-            var tbody = $('#tbody');
-            tbody.empty();
+    function ClearEmployeeForm(){
+        $('#name,#designation,#category,#gross').val('');
+    }
 
-            if(res.length==0){
-                tbody.append('<tr><td colspan="7" class="text-center">No data found</td></tr>');
-            } else {
-                res.forEach(function(item){
-                    let row = `<tr>
-                        <td>${item.employee_code}</td>
-                        <td>${item.effective_date}</td>
-                        <td>${item.bank_amount}</td>
-                        <td>${item.cash_amount}</td>
-                        <td><input type="checkbox" data-id="${item.id}" class="status" ${item.status==1?'checked':''}></td>
-                        <td>${item.status==0?'false':'true'}</td>
-                        <td>
-                            <a href="/edit-bank-part/${item.id}" class="btn btn-xs btn-primary"><i class="fa fa-edit"></i> Edit</a>
-                            <button class="btn btn-xs btn-danger delete-btn" data-id="${item.id}"><i class="fa fa-trash"></i> Delete</button>
-                        </td>
-                    </tr>`;
-                    tbody.append(row);
-                });
-            }
- 
-            dt.DataTable({lengthMenu:[10,20,50,100]});
-        },
-        error:function(){ console.log('error'); }
+    // --- Load bank part data ---
+    function LoadBankPart(employeeId=''){
+        $.ajax({
+            url:'/GetBankPart',
+            type:'GET',
+            data:{employeeId:employeeId},
+            success:function(res){
+                dt.clear();
+
+                if(res.length==0){
+                    dt.row.add(['No data found','','','','','','']).draw();
+                } else {
+                    res.forEach(function(item){
+                        dt.row.add([
+                            item.employee_code,
+                            item.effective_date,
+                            item.bank_amount,
+                            item.cash_amount,
+                            `<input type="checkbox" data-id="${item.id}" class="status" ${item.status==1?'checked':''}>`,
+                            item.status==0?'false':'true',
+                            `<a href="/edit-bank-part/${item.id}" class="btn btn-xs btn-primary"><i class="fa fa-edit"></i> Edit</a>
+                             <button class="btn btn-xs btn-danger delete-btn" data-id="${item.id}"><i class="fa fa-trash"></i> Delete</button>`
+                        ]);
+                    });
+                    dt.draw();
+                }
+            },
+            error:function(){ console.log('error'); }
+        });
+    }
+
+    // --- Delete button ---
+    $(document).on('click','.delete-btn', function(){
+        var id = $(this).data('id');
+        if(!confirm('Are you sure to delete this record?')) return;
+        $.ajax({
+            url:'/delete-bank-part/'+id,
+            type:'GET',
+            success:function(res){
+                toastr.success(res.message);
+                var employeeId = $('#employeeId').val();
+                LoadBankPart(employeeId);
+            },
+            error:function(){ toastr.error('Delete failed'); }
+        });
     });
-}
 
-$(document).on('click','.delete-btn', function(){
-    var id = $(this).data('id');
-    if(!confirm('Are you sure to delete this record?')) return;
-    $.ajax({
-        url:'/delete-bank-part/'+id,
-        type:'GET',
-        success:function(res){
-            toastr.success(res.message);
-            var employeeId = $('#employeeId').val();
-            GetBankPart(employeeId);
-        },
-        error:function(){ toastr.error('Delete failed'); }
+    // --- Status toggle ---
+    $(document).on('change','.status', function(){
+        var id = $(this).data('id');
+        var status = $(this).is(':checked')?1:0;
+        $.ajax({
+            url:'/updatebank-status',
+            type:'POST',
+            headers:{'X-CSRF-TOKEN':'{{ csrf_token() }}'},
+            data:{id:id,status:status},
+            success:function(res){
+                var employeeId = $('#employeeId').val();
+                LoadBankPart(employeeId);
+                toastr.success(res.message || 'Status updated successfully.');
+            },
+            error:function(){ toastr.error('Failed to update status.'); }
+        });
     });
-});
 
-$(document).on('change','.status', function(){
-    var id = $(this).data('id');
-    var status = $(this).is(':checked')?1:0;
-    $.ajax({
-        url:'/updatebank-status',
-        type:'POST',
-        headers:{'X-CSRF-TOKEN':'{{ csrf_token() }}'},
-        data:{id:id,status:status},
-        success:function(res){
-            var employeeId = $('#employeeId').val();
-            GetBankPart(employeeId);
-            toastr.success(res.message || 'Status updated successfully.');
-        },
-        error:function(){ toastr.error('Failed to update status.'); }
-    });
 });
 </script>
 @stop
