@@ -22,11 +22,7 @@
         <div class="box-info full">
             <h2 class="text-center">Edit Salary Bank Part</h2>
 
-            <!-- Employee Info -->
-            <div class="employee-info">
-                <div><strong>Employee ID:</strong> {{ $bankPart->employee_code }}</div>
-                <div><strong>Employee Name:</strong> {{ $bankPart->first_name }} {{ $bankPart->last_name }}</div>
-            </div>
+
 
             <!-- Form -->
             <div class="container">
