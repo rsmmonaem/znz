@@ -402,19 +402,32 @@ Class SalaryController extends Controller{
 
 
     public function bankedit($id) {
-        $data = DB::table('salary_bank')->where('id', $id)->first();
-        return view('salary.edit-bank-part', compact('data'));
+        $bankPart = DB::table('salary_bank')->where('id', $id)->first();
+        return view('salary.edit-bank-part', compact('bankPart'));
     }
+
+    // public function UpdateBankPart(Request $request) {
+    //     DB::table('salary_bank')->where('id', $request->id)->update([
+    //         'bank_amount' => $request->bank_amount,
+    //         'cash_amount' => $request->cash_amount,
+    //         'remarks' => $request->remarks,
+    //         'effective_date' => $request->effective_date
+    //     ]);
+    //     return redirect('/salary-bank-part')->with('success', 'Updated Successfully');
+    // }
+
 
     public function UpdateBankPart(Request $request) {
         DB::table('salary_bank')->where('id', $request->id)->update([
-            'bank_amount' => $request->bank_amount,
-            'cash_amount' => $request->cash_amount,
-            'remarks' => $request->remarks,
-            'effective_date' => $request->effective_date
+            'bank_amount'     => $request->bank_amount,
+            'cash_amount'     => $request->cash_amount,
+            'remarks'         => $request->remarks,
+            'effective_date'  => $request->effective_date
         ]);
+
         return redirect('/salary-bank-part')->with('success', 'Updated Successfully');
     }
+
 
     public function DeleteBankPart($id) {
         DB::table('salary_bank')->where('id', $id)->delete();
