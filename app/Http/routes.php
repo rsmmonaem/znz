@@ -502,7 +502,7 @@ Route::group(['middleware' => ['auth','license','account_valid']], function () {
 
 
 	Route::get('edit-bank-part/{id}', 'SalaryController@bankedit');
-	Route::post('update-bank-part', 'SalaryController@UpdateBankPart');
+	Route::post('update-bank-part', 'SalaryController@UpdateBankPart')->name('salary.bankpart.update');
 	Route::get('delete-bank-part/{id}', 'SalaryController@DeleteBankPart');
 
 	// Salary

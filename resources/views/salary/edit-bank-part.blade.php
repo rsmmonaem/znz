@@ -26,7 +26,7 @@
 
 
                 <!-- Edit Form -->
-                <form method="POST" action="{{ url('update-bank-part') }}">
+                <form method="POST" action="{{ route('salary.bankpart.update') }}">
                     {{ csrf_field() }}
                     <input type="hidden" name="id" value="{{ $bankPart->id }}">
                     <div class="row">
