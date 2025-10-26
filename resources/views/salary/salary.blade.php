@@ -273,13 +273,15 @@
                             <td><input type="checkbox" data-id="${item.id}" class="status" ${item.status == 1 ? 'checked' : ' '}></td>
                             <td>${item.status == 0 ? 'false' : 'true'}</td>
                             <td>
-                                <a href="${editUrl}" class="btn btn-sm btn-primary">
+                                <a href="/edit-bank-part/{{ $item->id }}" class="btn btn-xs btn-primary">
                                     <i class="fa fa-edit"></i> Edit
                                 </a>
-                                <a href="" class="btn btn-sm btn-danger">
+                                <button class="btn btn-xs btn-danger delete-btn" data-id="{{ $item->id }}">
                                     <i class="fa fa-trash"></i> Delete
-                                </a>
-                            </td>`;
+                                </button>
+                            </td>
+                            
+                            `;
                         row += `</tr>`;
                         tableBody.append(row); // Append each row to the table body
                     });
@@ -294,6 +296,22 @@
                 }
             })
         }
+
+        $(document).on('click', '.delete-btn', function() {
+            var id = $(this).data('id');
+            if(!confirm('Are you sure to delete this record?')) return;
+            $.ajax({
+                url: '/delete-bank-part/' + id,
+                type: 'GET',
+                success: function(response) {
+                    toastr.success(response.message);
+                    GetBankPart();
+                },
+                error: function() {
+                    toastr.error('Delete failed.');
+                }
+            });
+        });
 
         // Update Status 
       $(document).on('change', '.status', function () {

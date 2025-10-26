@@ -398,8 +398,32 @@ Class SalaryController extends Controller{
         ->orderby('salary_bank.id','desc')
         ->get();
         return $data;
-     }
+    }
 
+
+    public function bankedit($id) {
+        $data = DB::table('salary_bank')->where('id', $id)->first();
+        return view('salary.edit_bank_part', compact('data'));
+    }
+
+    public function UpdateBankPart(Request $request) {
+        DB::table('salary_bank')->where('id', $request->id)->update([
+            'bank_amount' => $request->bank_amount,
+            'cash_amount' => $request->cash_amount,
+            'remarks' => $request->remarks,
+            'effective_date' => $request->effective_date
+        ]);
+        return redirect('/salary-bank-part')->with('success', 'Updated Successfully');
+    }
+
+    public function DeleteBankPart($id) {
+        DB::table('salary_bank')->where('id', $id)->delete();
+        return response()->json(['message' => 'Deleted Successfully']);
+    }
+
+    
+    
+    
     public function updateStatus(Request $request) {
         $oldData = DB::table('salary_bank')->where('id', $request->id)->first();
         $data = [
@@ -642,52 +666,6 @@ Class SalaryController extends Controller{
         ];
 
         return response()->json($data);
-    }
-
-
-
-
-    public function bankedit($id)
-    {
-        // Fetch record by ID
-        $bankPart = SalaryBankPart::leftJoin('employee', 'salary_bank_part.employee_id', '=', 'employee.id')
-            ->select('salary_bank_part.*', 'employee.employee_code', 'employee.first_name')
-            ->where('salary_bank_part.id', $id)
-            ->first();
-
-        if (!$bankPart) {
-            return redirect('salary-bank-part')->withErrors('Record not found.');
-        }
-
-        return view('salary.edit_bank_part', compact('bankPart'));
-    }
-
-    public function bankupdate(Request $request, $id)
-    {
-        $rules = [
-            'gross' => 'required|numeric|min:0',
-            'bank_amount' => 'required|numeric|min:0',
-            'cash_amount' => 'required|numeric|min:0',
-            'effective_date' => 'required|date',
-        ];
-
-        $validator = Validator::make($request->all(), $rules);
-        if ($validator->fails()) {
-            return Response::json(['message' => $validator->errors()->first()], 422);
-        }
-
-        $bankPart = SalaryBankPart::find($id);
-        if (!$bankPart) {
-            return Response::json(['message' => 'Salary Bank Part not found.'], 404);
-        }
-
-        $bankPart->gross = $request->gross;
-        $bankPart->bank_amount = $request->bank_amount;
-        $bankPart->cash_amount = $request->cash_amount;
-        $bankPart->effective_date = $request->effective_date;
-        $bankPart->save();
-
-        return Response::json(['message' => 'Updated successfully'], 200);
     }
 
 
