@@ -81,11 +81,23 @@ class SalaryPaidUnpaidController extends Controller
        try{
             $data = DB::table('employee_salary_payment_details')->whereIn('id', $ids)->get();
             foreach ($data as $d) {
-                DB::table('employee_salary_payment_details')->where('id', $d->id)
-                ->update([
-                    'PaidAmount' => $d->UnpaidAmount,
-                    'UnpaidAmount' => 0,
-                ]);
+                
+                if (!empty($d->PaidAmount) && $d->PaidAmount > 0) {
+                    DB::table('employee_salary_payment_details')
+                        ->where('id', $d->id)
+                        ->update([
+                            'PaidAmount'   => DB::raw("PaidAmount + $d->UnpaidAmount"),
+                            'UnpaidAmount' => 0,
+                        ]);
+                } else {
+                    
+                    DB::table('employee_salary_payment_details')
+                        ->where('id', $d->id)
+                        ->update([
+                            'PaidAmount'   => $d->UnpaidAmount,
+                            'UnpaidAmount' => 0,
+                        ]);
+                }
             }
             return response()->json(['message' => 'Paid Amount Updated Successfully.']);
        }catch(\Exception $e){
