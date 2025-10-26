@@ -16,6 +16,7 @@ use App\User;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use Validator;
+use Response;
 
 Class SalaryController extends Controller{
     use BasicController;
@@ -644,104 +645,47 @@ Class SalaryController extends Controller{
     }
 
 
-    public function EditBankPart($id)
+     public function edit($id)
     {
-        $bankPart = DB::table('salary_bank')
-            ->leftJoin('users', 'salary_bank.user_id', '=', 'users.id')
-            ->leftJoin('profile', 'users.id', '=', 'profile.user_id')
-            ->select('salary_bank.*', 'users.first_name', 'profile.employee_code')
-            ->where('salary_bank.id', $id)
+        // Fetch record by ID
+        $bankPart = SalaryBankPart::leftJoin('employee', 'salary_bank_part.employee_id', '=', 'employee.id')
+            ->select('salary_bank_part.*', 'employee.employee_code', 'employee.first_name')
+            ->where('salary_bank_part.id', $id)
             ->first();
 
         if (!$bankPart) {
-            return redirect()->route('salary-bank-part')->with('error', 'Salary bank record not found');
+            return redirect('salary-bank-part')->withErrors('Record not found.');
         }
 
-        return view('salary.edit-bank-part', compact('bankPart'));
+        return view('salary.edit_bank_part', compact('bankPart'));
     }
 
-
-    public function UpdateBankPart(Request $request, $id)
+    public function update(Request $request, $id)
     {
-        try {
-            // First check if the record exists
-            $existingRecord = DB::table('salary_bank')->where('id', $id)->first();
-            if (!$existingRecord) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Salary bank record not found'
-                ], 404);
-            }
+        $rules = [
+            'gross' => 'required|numeric|min:0',
+            'bank_amount' => 'required|numeric|min:0',
+            'cash_amount' => 'required|numeric|min:0',
+            'effective_date' => 'required|date',
+        ];
 
-            // Manual validation (no CSRF)
-            $errors = [];
-            
-            if (!$request->has('effective_date') || empty($request->effective_date)) {
-                $errors[] = 'Effective date is required';
-            }
-            
-            if (!$request->has('gross') || !is_numeric($request->gross) || $request->gross < 0) {
-                $errors[] = 'Gross salary must be a valid positive number';
-            }
-            
-            if (!$request->has('bank_amount') || !is_numeric($request->bank_amount) || $request->bank_amount < 0) {
-                $errors[] = 'Bank amount must be a valid positive number';
-            }
-            
-            if (!$request->has('cash_amount') || !is_numeric($request->cash_amount) || $request->cash_amount < 0) {
-                $errors[] = 'Cash amount must be a valid positive number';
-            }
-            
-            // Validate that bank amount + cash amount equals gross
-            if (empty($errors)) {
-                $totalAmount = $request->bank_amount + $request->cash_amount;
-                if (abs($totalAmount - $request->gross) > 0.01) {
-                    $errors[] = 'Bank Amount + Cash Amount must equal Gross Salary';
-                }
-            }
-            
-            if (!empty($errors)) {
-                return response()->json([
-                    'success' => false,
-                    'message' => implode(', ', $errors)
-                ], 400);
-            }
-
-            // Update the record
-            $data = [
-                'effective_date' => $request->effective_date,
-                'gross'          => $request->gross,
-                'bank_amount'    => $request->bank_amount,
-                'cash_amount'    => $request->cash_amount,
-            ];
-
-            $updated = DB::table('salary_bank')->where('id', $id)->update($data);
-
-            if ($updated) {
-                // Log the activity
-                $this->logActivity([
-                    'module' => 'salary', 
-                    'activity' => 'activity_updated', 
-                    'secondary_id' => $existingRecord->user_id
-                ]);
-
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Salary bank part updated successfully'
-                ]);
-            } else {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Failed to update salary bank part. Please try again.'
-                ], 500);
-            }
-            
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'An error occurred while updating the record: ' . $e->getMessage()
-            ], 500);
+        $validator = Validator::make($request->all(), $rules);
+        if ($validator->fails()) {
+            return Response::json(['message' => $validator->errors()->first()], 422);
         }
+
+        $bankPart = SalaryBankPart::find($id);
+        if (!$bankPart) {
+            return Response::json(['message' => 'Salary Bank Part not found.'], 404);
+        }
+
+        $bankPart->gross = $request->gross;
+        $bankPart->bank_amount = $request->bank_amount;
+        $bankPart->cash_amount = $request->cash_amount;
+        $bankPart->effective_date = $request->effective_date;
+        $bankPart->save();
+
+        return Response::json(['message' => 'Updated successfully'], 200);
     }
 
     public function DeleteBankPart(Request $request, $id)
