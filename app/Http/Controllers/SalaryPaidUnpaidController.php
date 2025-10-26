@@ -89,30 +89,41 @@ class SalaryPaidUnpaidController extends Controller
        }
     }
 
-    public function SalaryPaidUnpaidPertialPaid(Request $request){
+   public function SalaryPaidUnpaidPertialPaid(Request $request)
+    {
         $idWithAmount = $request->input('idWithAmount'); // Retrieve the input array
+
         try {
             // Extract only the IDs from the input
             $ids = array_map(function ($item) {
                 return $item['id'];
             }, $idWithAmount);
+
             // Fetch matching data from the database
             $data = DB::table('employee_salary_payment_details')->whereIn('id', $ids)->get();
+
             foreach ($data as $d) {
                 // Find the corresponding amount for the current ID using array_filter
                 $filtered = array_filter($idWithAmount, function ($item) use ($d) {
                     return $item['id'] == $d->id;
                 });
+
                 // Get the first match from the filtered array
                 $amount = reset($filtered)['amount'];
-                // Update the PaidAmount column with the corresponding amount
+
+                // Update PaidAmount and reduce UnpaidAmount
                 DB::table('employee_salary_payment_details')
-                ->where('id', $d->id)
-                ->update(['PaidAmount' => $amount]);
+                    ->where('id', $d->id)
+                    ->update([
+                        'PaidAmount'   => $amount,
+                        'UnpaidAmount' => DB::raw("UnpaidAmount - $amount")
+                    ]);
             }
-            return response()->json(['message' => 'Paid Amount Updated Successfully.']);
+
+            return response()->json(['message' => 'Paid and Unpaid Amounts Updated Successfully.']);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
+
 }
