@@ -12,36 +12,33 @@
         .panel-section {
             margin: 20px 0;
         }
-
         .form-group {
             display: flex;
             align-items: center;
         }
-
         .form-group label {
             width: 150px;
             margin-right: 10px;
         }
-
         .form-group input,
         .form-group select {
             flex: 1;
         }
-
         .action-buttons {
             text-align: center;
             margin-top: 20px;
         }
-
         .table-container {
             margin-top: 30px;
         }
     </style>
+
     <div class="row">
         <div class="col-sm-12">
             <div class="box-info">
                 <div class="container">
                     <h2 class="text-center">Salary Bank Panel</h2>
+
                     <!-- Entry Panel -->
                     <div class="panel-section">
                         <form>
@@ -56,6 +53,7 @@
                                             @endforeach
                                         </select>
                                     </div>
+
                                     <div class="form-group">
                                         <label for="branch">Branch <span class="text-danger">*</span></label>
                                         <select class="form-control" id="branch">
@@ -65,6 +63,7 @@
                                             @endforeach
                                         </select>
                                     </div>
+
                                     <div class="form-group">
                                         <label for="department">Department</label>
                                         <select class="form-control" id="department">
@@ -74,6 +73,7 @@
                                             @endforeach
                                         </select>
                                     </div>
+
                                     <div class="form-group">
                                         <label for="section">Section</label>
                                         <select class="form-control" id="section">
@@ -83,16 +83,14 @@
                                             @endforeach
                                         </select>
                                     </div>
+
                                     <div class="form-group">
                                         <label for="employeeId">Employee ID <span class="text-danger">*</span></label>
                                         <select class="form-control" style="width: 100%" id="employeeId">
                                             <option value="">Select</option>
-                                            {{-- @foreach ($employee as $e)
-                                                <option value="{{ $e->id }}">{{ $e->first_name }} -
-                                                    {{ $e->employee_code }}</option>
-                                            @endforeach --}}
                                         </select>
                                     </div>
+
                                     <div class="form-group">
                                         <label>Name</label>
                                         <input type="text" class="form-control" id="name" disabled>
@@ -110,6 +108,7 @@
                                         <input type="text" class="form-control" id="gross" disabled>
                                     </div>
                                 </div>
+
                                 <div class="col-sm-6">
                                     <div class="form-group">
                                         <label for="entryDate">Entry Date <span class="text-danger">*</span></label>
@@ -123,16 +122,13 @@
                                         <label for="bankAmount">Bank Amount<span class="text-danger">*</span></label>
                                         <input type="text" class="form-control" id="bankAmount">
                                     </div>
-                                    {{-- <div class="form-group">
-                                        <label for="bankAmount">Cash Amount</label>
-                                        <input type="text" class="form-control" id="cahsAmount" readonly>
-                                    </div> --}}
                                     <div class="form-group">
                                         <label for="remarks">Remarks</label>
                                         <input type="text" class="form-control" id="remarks">
                                     </div>
                                 </div>
                             </div>
+
                             <div class="action-buttons">
                                 <button type="button" class="btn btn-success" id="saveData">Save</button>
                                 <button type="button" class="btn btn-danger">Close</button>
@@ -155,9 +151,7 @@
                                     <th>Action</th>
                                 </tr>
                             </thead>
-                            <tbody id="tbody">
-                               
-                            </tbody>
+                            <tbody id="tbody"></tbody>
                         </table>
                     </div>
                 </div>
@@ -174,7 +168,9 @@
                 $('#employeeId').val('').trigger('change');
                 HandleBranchWiseEmployees(branch_id, '#employeeId');
             });
-            GetBankPart()
+
+            GetBankPart();
+
             $('#employeeId').on('change', function() {
                 var employeeId = $(this).val();
                 $.ajax({
@@ -194,14 +190,15 @@
                         console.log('error');
                     }
                 });
-            })
-             function validate(data) {
+            });
+
+            function validate(data) {
                 toastr.error(data);
                 $('#saveData').attr('disabled', false);
                 $('#saveData').text('Save');
                 return false;
             }
-            // Save Data
+
             $('#saveData').on('click', function() {
                 $('#saveData').attr('disabled', true);
                 $('#saveData').text('Saving...');
@@ -213,18 +210,12 @@
                     bankAmount: $('#bankAmount').val(),
                     remarks: $('#remarks').val(),
                 };
-                if(FormData.employeeId === '') {
-                    return validate('Please select employee');
-                }
-                if(FormData.entryDate === '') {
-                    return validate('Please select entry date');
-                }
-                if(FormData.effectiveDate === '') {
-                    return validate('Please select effective date');
-                }
-                if(FormData.bankAmount === '') {
-                    return validate('Please enter bank amount');
-                }
+
+                if (FormData.employeeId === '') return validate('Please select employee');
+                if (FormData.entryDate === '') return validate('Please select entry date');
+                if (FormData.effectiveDate === '') return validate('Please select effective date');
+                if (FormData.bankAmount === '') return validate('Please enter bank amount');
+
                 $.ajax({
                     url: '/salary-bank-part-create',
                     type: 'POST',
@@ -236,19 +227,17 @@
                         GetBankPart();
                         $('#saveData').attr('disabled', false);
                         $('#saveData').text('Save');
-                        console.log(response);
                         toastr.success(response.message || 'Data saved successfully.');
-                        // getData();
                     },
                     error: function() {
                         $('#saveData').attr('disabled', false);
                         $('#saveData').text('Save');
-                        console.log('error');
                         toastr.error('Data save failed.');
                     }
                 });
-            })
-        })
+            });
+        });
+
         function GetBankPart() {
             $.ajax({
                 url: '/GetBankPart',
@@ -259,34 +248,30 @@
 
                     var tableBody = $('#tbody');
                     tableBody.empty();
+
                     response.forEach(function(item) {
-                      var editUrl = '/edit-bank-part/' + item.id;
-
-
-
-                        var row = `<tr>
-                            <td><input type="checkbox"></td>
-                            <td>${item.employee_code}</td>
-                            <td>${item.effective_date}</td>
-                            <td>${item.bank_amount}</td>
-                            <td>${item.cash_amount}</td>
-                            <td><input type="checkbox" data-id="${item.id}" class="status" ${item.status == 1 ? 'checked' : ' '}></td>
-                            <td>${item.status == 0 ? 'false' : 'true'}</td>
-                            <td>
-                                <a href="${editUrl}" class="btn btn-xs btn-primary">
-                                    <i class="fa fa-edit"></i> Edit
-                                </a>
-                                <button class="btn btn-xs btn-danger delete-btn" data-id="{{ $item->id }}">
-                                    <i class="fa fa-trash"></i> Delete
-                                </button>
-                            </td>
-                            
-                            `;
-                        row += `</tr>`;
-                        tableBody.append(row); // Append each row to the table body
+                        var editUrl = '/edit-bank-part/' + item.id;
+                        var row = `
+                            <tr>
+                                <td><input type="checkbox"></td>
+                                <td>${item.employee_code}</td>
+                                <td>${item.effective_date}</td>
+                                <td>${item.bank_amount}</td>
+                                <td>${item.cash_amount}</td>
+                                <td><input type="checkbox" data-id="${item.id}" class="status" ${item.status == 1 ? 'checked' : ''}></td>
+                                <td>${item.status == 0 ? 'false' : 'true'}</td>
+                                <td>
+                                    <a href="${editUrl}" class="btn btn-xs btn-primary">
+                                        <i class="fa fa-edit"></i> Edit
+                                    </a>
+                                    <button class="btn btn-xs btn-danger delete-btn" data-id="${item.id}">
+                                        <i class="fa fa-trash"></i> Delete
+                                    </button>
+                                </td>
+                            </tr>`;
+                        tableBody.append(row);
                     });
 
-                    // Reinitialize the DataTable after adding new rows
                     datatable.DataTable({
                         lengthMenu: [10, 20, 50, 100],
                     });
@@ -294,12 +279,12 @@
                 error: function() {
                     console.log('error');
                 }
-            })
+            });
         }
 
         $(document).on('click', '.delete-btn', function() {
             var id = $(this).data('id');
-            if(!confirm('Are you sure to delete this record?')) return;
+            if (!confirm('Are you sure to delete this record?')) return;
             $.ajax({
                 url: '/delete-bank-part/' + id,
                 type: 'GET',
@@ -313,8 +298,7 @@
             });
         });
 
-        // Update Status 
-      $(document).on('change', '.status', function () {
+        $(document).on('change', '.status', function() {
             var id = $(this).data('id');
             var status = $(this).is(':checked') ? 1 : 0;
 
@@ -324,15 +308,12 @@
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
-                data: {
-                    id: id,
-                    status: status
-                },
-                success: function (response) {
+                data: { id: id, status: status },
+                success: function(response) {
                     GetBankPart();
                     toastr.success(response.message || 'Status updated successfully.');
                 },
-                error: function () {
+                error: function() {
                     toastr.error('Failed to update status.');
                 }
             });
