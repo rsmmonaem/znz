@@ -258,8 +258,8 @@
                     <td>${employee.section || ''}</td>
                     <td>${employee.date_of_joining || ''}</td>
                     <td>${(parseFloat(employee.old_amount) || 0) + (parseFloat(employee.promotedAmount) || 0)}</td>
-                    <td>${employee.increment || ''}</td>
-                    <td>${employee.promotion || ''}</td>
+                    <td>${employee.promotedAmount || ''}</td>
+                    <td>${employee.promotedDesignation || ''}</td>
                 </tr>
             `;
         });
