@@ -240,7 +240,7 @@ function GetBankPart(employeeId=''){
             tbody.empty();
 
             if(res.length==0){
-                tbody.append('<tr><td colspan="8" class="text-center">No data found</td></tr>');
+                tbody.append('<tr><td colspan="7" class="text-center">No data found</td></tr>');
             } else {
                 res.forEach(function(item){
                     let row = `<tr>
