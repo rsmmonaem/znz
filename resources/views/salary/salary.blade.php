@@ -1,322 +1,233 @@
 @extends('layouts.default')
 
 @section('breadcrumb')
-    <ul class="breadcrumb">
-        <li><a href="/dashboard">{!! trans('messages.dashboard') !!}</a></li>
-        <li class="active">{!! trans('messages.Salary_BankPart') !!}</li>
-    </ul>
+<ul class="breadcrumb">
+    <li><a href="/dashboard">{!! trans('messages.dashboard') !!}</a></li>
+    <li class="active">{!! trans('messages.Salary_BankPart') !!}</li>
+</ul>
 @stop
 
 @section('content')
-    <style>
-        .panel-section {
-            margin: 20px 0;
-        }
-        .form-group {
-            display: flex;
-            align-items: center;
-        }
-        .form-group label {
-            width: 150px;
-            margin-right: 10px;
-        }
-        .form-group input,
-        .form-group select {
-            flex: 1;
-        }
-        .action-buttons {
-            text-align: center;
-            margin-top: 20px;
-        }
-        .table-container {
-            margin-top: 30px;
-        }
-    </style>
+<style>
+.panel-section{margin:20px 0;}
+.form-group{display:flex;align-items:center;margin-bottom:10px;}
+.form-group label{width:150px;margin-right:10px;}
+.form-group input, .form-group select{flex:1;}
+.action-buttons{text-align:center;margin-top:20px;}
+.table-container{margin-top:30px;}
+</style>
 
-    <div class="row">
-        <div class="col-sm-12">
-            <div class="box-info">
-                <div class="container">
-                    <h2 class="text-center">Salary Bank Panel</h2>
+<div class="row">
+    <div class="col-sm-12">
+        <div class="box-info">
+            <div class="container">
+                <h2 class="text-center">Salary Bank Panel</h2>
 
-                    <!-- Entry Panel -->
-                    <div class="panel-section">
-                        <form>
-                            <div class="row">
-                                <div class="col-sm-6">
-                                    <div class="form-group">
-                                        <label for="group">Group</label>
-                                        <select class="form-control" id="group">
-                                            <option value="">Select</option>
-                                            @foreach ($group as $g)
-                                                <option value="{{ $g->id }}" selected>{{ $g->name }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label for="branch">Branch <span class="text-danger">*</span></label>
-                                        <select class="form-control" id="branch">
-                                            <option value="">Select</option>
-                                            @foreach ($branch as $b)
-                                                <option value="{{ $b->id }}">{{ $b->name }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label for="department">Department</label>
-                                        <select class="form-control" id="department">
-                                            <option value="">Select</option>
-                                            @foreach ($department as $d)
-                                                <option value="{{ $d->id }}">{{ $d->name }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label for="section">Section</label>
-                                        <select class="form-control" id="section">
-                                            <option value="">Select</option>
-                                            @foreach ($section as $s)
-                                                <option value="{{ $s->id }}">{{ $s->name }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label for="employeeId">Employee ID <span class="text-danger">*</span></label>
-                                        <select class="form-control" style="width: 100%" id="employeeId">
-                                            <option value="">Select</option>
-                                        </select>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label>Name</label>
-                                        <input type="text" class="form-control" id="name" disabled>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Designation</label>
-                                        <input type="text" class="form-control" id="designation" disabled>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Category</label>
-                                        <input type="text" class="form-control" id="category" disabled>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Gross</label>
-                                        <input type="text" class="form-control" id="gross" disabled>
-                                    </div>
+                <!-- Entry Panel -->
+                <div class="panel-section">
+                    <form id="bankForm">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label>Employee ID <span class="text-danger">*</span></label>
+                                    <select class="form-control" id="employeeId">
+                                        <option value="">Select</option>
+                                        @foreach($employee as $e)
+                                            <option value="{{ $e->id }}">{{ $e->first_name }} - {{ $e->employee_code }}</option>
+                                        @endforeach
+                                    </select>
                                 </div>
-
-                                <div class="col-sm-6">
-                                    <div class="form-group">
-                                        <label for="entryDate">Entry Date <span class="text-danger">*</span></label>
-                                        <input type="date" class="form-control" id="entryDate" value="{{ date('Y-m-d') }}">
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="effectiveDate">Effective Date <span class="text-danger">*</span></label>
-                                        <input type="date" class="form-control" id="effectiveDate">
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="bankAmount">Bank Amount<span class="text-danger">*</span></label>
-                                        <input type="text" class="form-control" id="bankAmount">
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="remarks">Remarks</label>
-                                        <input type="text" class="form-control" id="remarks">
-                                    </div>
+                                <div class="form-group">
+                                    <label>Name</label>
+                                    <input type="text" id="name" class="form-control" disabled>
+                                </div>
+                                <div class="form-group">
+                                    <label>Designation</label>
+                                    <input type="text" id="designation" class="form-control" disabled>
+                                </div>
+                                <div class="form-group">
+                                    <label>Category</label>
+                                    <input type="text" id="category" class="form-control" disabled>
+                                </div>
+                                <div class="form-group">
+                                    <label>Gross</label>
+                                    <input type="text" id="gross" class="form-control" disabled>
                                 </div>
                             </div>
 
-                            <div class="action-buttons">
-                                <button type="button" class="btn btn-success" id="saveData">Save</button>
-                                <button type="button" class="btn btn-danger">Close</button>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label>Entry Date <span class="text-danger">*</span></label>
+                                    <input type="date" class="form-control" id="entryDate" value="{{ date('Y-m-d') }}">
+                                </div>
+                                <div class="form-group">
+                                    <label>Effective Date <span class="text-danger">*</span></label>
+                                    <input type="date" class="form-control" id="effectiveDate">
+                                </div>
+                                <div class="form-group">
+                                    <label>Bank Amount <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="bankAmount">
+                                </div>
+                                <div class="form-group">
+                                    <label>Remarks</label>
+                                    <input type="text" class="form-control" id="remarks">
+                                </div>
                             </div>
-                        </form>
-                    </div>
+                        </div>
+                        <div class="action-buttons">
+                            <button type="button" class="btn btn-success" id="saveData">Save</button>
+                            <button type="button" class="btn btn-danger">Close</button>
+                        </div>
+                    </form>
+                </div>
 
-                    <!-- Data Table -->
-                    <div class="table-container">
-                        <table class="table table-bordered table-striped" id="datatable">
-                            <thead>
-                                <tr>
-                                    <th><input type="checkbox"></th>
-                                    <th>Emp ID</th>
-                                    <th>Effective Date</th>
-                                    <th>Bank Amount</th>
-                                    <th>Cash Amount</th>
-                                    <th>Hold</th>
-                                    <th>Status</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tbody"></tbody>
-                        </table>
-                    </div>
+                <!-- Data Table -->
+                <div class="table-container">
+                    <table class="table table-bordered table-striped" id="datatable">
+                        <thead>
+                            <tr>
+                                <th><input type="checkbox"></th>
+                                <th>Emp ID</th>
+                                <th>Effective Date</th>
+                                <th>Bank Amount</th>
+                                <th>Cash Amount</th>
+                                <th>Hold</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody"></tbody>
+                    </table>
                 </div>
             </div>
         </div>
     </div>
+</div>
 @stop
 
 @section('javascript')
-    <script>
-        $(document).ready(function() {
-            $('#branch').on('change', function() {
-                var branch_id = $(this).val();
-                $('#employeeId').val('').trigger('change');
-                HandleBranchWiseEmployees(branch_id, '#employeeId');
-            });
+<script>
+$(document).ready(function(){
 
-            GetBankPart();
+    // Load default table
+    GetBankPart();
 
-            $('#employeeId').on('change', function() {
-                var employeeId = $(this).val();
-                $.ajax({
-                    url: '/get-user-data-salary',
-                    type: 'POST',
-                    data: {
-                        employeeId: employeeId,
-                        _token: '{{ csrf_token() }}'
-                    },
-                    success: function(response) {
-                        $('#name').val(response.first_name);
-                        $('#designation').val(response.designation);
-                        $('#category').val(response.category);
-                        $('#gross').val(response.gross);
-                    },
-                    error: function() {
-                        console.log('error');
-                    }
-                });
-            });
+    // Employee change
+    $('#employeeId').on('change', function(){
+        let employeeId = $(this).val();
 
-            function validate(data) {
-                toastr.error(data);
-                $('#saveData').attr('disabled', false);
-                $('#saveData').text('Save');
-                return false;
+        // Fill employee info
+        $.ajax({
+            url:'/get-user-data-salary',
+            type:'POST',
+            data:{ employeeId: employeeId, _token:'{{ csrf_token() }}' },
+            success:function(res){
+                $('#name').val(res.first_name);
+                $('#designation').val(res.designation);
+                $('#category').val(res.category);
+                $('#gross').val(res.gross);
             }
+        });
 
-            $('#saveData').on('click', function() {
-                $('#saveData').attr('disabled', true);
-                $('#saveData').text('Saving...');
-                const FormData = {
-                    employeeId: $('#employeeId').val(),
-                    entryDate: $('#entryDate').val(),
-                    effectiveDate: $('#effectiveDate').val(),
-                    gross: $('#gross').val(),
-                    bankAmount: $('#bankAmount').val(),
-                    remarks: $('#remarks').val(),
-                };
+        // Update table
+        GetBankPart(employeeId);
+    });
 
-                if (FormData.employeeId === '') return validate('Please select employee');
-                if (FormData.entryDate === '') return validate('Please select entry date');
-                if (FormData.effectiveDate === '') return validate('Please select effective date');
-                if (FormData.bankAmount === '') return validate('Please enter bank amount');
+    function validate(msg){
+        toastr.error(msg);
+        $('#saveData').attr('disabled', false).text('Save');
+        return false;
+    }
 
-                $.ajax({
-                    url: '/salary-bank-part-create',
-                    type: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-                    data: FormData,
-                    success: function(response) {
-                        GetBankPart();
-                        $('#saveData').attr('disabled', false);
-                        $('#saveData').text('Save');
-                        toastr.success(response.message || 'Data saved successfully.');
-                    },
-                    error: function() {
-                        $('#saveData').attr('disabled', false);
-                        $('#saveData').text('Save');
-                        toastr.error('Data save failed.');
-                    }
+    // Save bank part
+    $('#saveData').on('click', function(){
+        $(this).attr('disabled', true).text('Saving...');
+        let FormData = {
+            employeeId: $('#employeeId').val(),
+            entryDate: $('#entryDate').val(),
+            effectiveDate: $('#effectiveDate').val(),
+            gross: $('#gross').val(),
+            bankAmount: $('#bankAmount').val(),
+            remarks: $('#remarks').val()
+        };
+
+        if(FormData.employeeId=='') return validate('Select employee');
+        if(FormData.entryDate=='') return validate('Select entry date');
+        if(FormData.effectiveDate=='') return validate('Select effective date');
+        if(FormData.bankAmount=='') return validate('Enter bank amount');
+
+        $.ajax({
+            url:'/salary-bank-part-create',
+            type:'POST',
+            data:FormData,
+            headers:{'X-CSRF-TOKEN':'{{ csrf_token() }}'},
+            success:function(res){
+                GetBankPart();
+                $('#saveData').attr('disabled', false).text('Save');
+                toastr.success(res.message);
+            },
+            error:function(){ 
+                $('#saveData').attr('disabled', false).text('Save');
+                toastr.error('Save failed');
+            }
+        });
+    });
+});
+
+// Load table data
+function GetBankPart(employeeId=''){
+    $.ajax({
+        url:'/GetBankPart',
+        type:'GET',
+        data:{employeeId:employeeId},
+        success:function(res){
+            const dt = $('#datatable');
+            dt.DataTable().destroy();
+            let tbody = $('#tbody');
+            tbody.empty();
+            if(res.length==0){
+                tbody.append('<tr><td colspan="8" class="text-center">No data found</td></tr>');
+            } else {
+                res.forEach(function(item){
+                    let row = `<tr>
+                        <td><input type="checkbox"></td>
+                        <td>${item.employee_code}</td>
+                        <td>${item.effective_date}</td>
+                        <td>${item.bank_amount}</td>
+                        <td>${item.cash_amount}</td>
+                        <td><input type="checkbox" data-id="${item.id}" class="status" ${item.status==1?'checked':''}></td>
+                        <td>${item.status==0?'false':'true'}</td>
+                        <td>
+                            <a href="/edit-bank-part/${item.id}" class="btn btn-xs btn-primary"><i class="fa fa-edit"></i> Edit</a>
+                            <button class="btn btn-xs btn-danger delete-btn" data-id="${item.id}"><i class="fa fa-trash"></i> Delete</button>
+                        </td>
+                    </tr>`;
+                    tbody.append(row);
                 });
-            });
-        });
-
-        function GetBankPart() {
-            $.ajax({
-                url: '/GetBankPart',
-                type: 'GET',
-                success: function(response) {
-                    const datatable = $('#datatable');
-                    datatable.DataTable().destroy();
-
-                    var tableBody = $('#tbody');
-                    tableBody.empty();
-
-                    response.forEach(function(item) {
-                        var editUrl = '/edit-bank-part/' + item.id;
-                        var row = `
-                            <tr>
-                                <td><input type="checkbox"></td>
-                                <td>${item.employee_code}</td>
-                                <td>${item.effective_date}</td>
-                                <td>${item.bank_amount}</td>
-                                <td>${item.cash_amount}</td>
-                                <td><input type="checkbox" data-id="${item.id}" class="status" ${item.status == 1 ? 'checked' : ''}></td>
-                                <td>${item.status == 0 ? 'false' : 'true'}</td>
-                                <td>
-                                    <a href="${editUrl}" class="btn btn-xs btn-primary">
-                                        <i class="fa fa-edit"></i> Edit
-                                    </a>
-                                    <button class="btn btn-xs btn-danger delete-btn" data-id="${item.id}">
-                                        <i class="fa fa-trash"></i> Delete
-                                    </button>
-                                </td>
-                            </tr>`;
-                        tableBody.append(row);
-                    });
-
-                    datatable.DataTable({
-                        lengthMenu: [10, 20, 50, 100],
-                    });
-                },
-                error: function() {
-                    console.log('error');
-                }
-            });
+            }
+            dt.DataTable({lengthMenu:[10,20,50,100]});
         }
+    });
+}
 
-        $(document).on('click', '.delete-btn', function() {
-            var id = $(this).data('id');
-            if (!confirm('Are you sure to delete this record?')) return;
-            $.ajax({
-                url: '/delete-bank-part/' + id,
-                type: 'GET',
-                success: function(response) {
-                    toastr.success(response.message);
-                    GetBankPart();
-                },
-                error: function() {
-                    toastr.error('Delete failed.');
-                }
-            });
-        });
+// Delete
+$(document).on('click','.delete-btn',function(){
+    let id=$(this).data('id');
+    if(!confirm('Are you sure?')) return;
+    $.get('/delete-bank-part/'+id,function(res){
+        toastr.success(res.message);
+        GetBankPart();
+    });
+});
 
-        $(document).on('change', '.status', function() {
-            var id = $(this).data('id');
-            var status = $(this).is(':checked') ? 1 : 0;
-
-            $.ajax({
-                url: '/updatebank-status',
-                type: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                data: { id: id, status: status },
-                success: function(response) {
-                    GetBankPart();
-                    toastr.success(response.message || 'Status updated successfully.');
-                },
-                error: function() {
-                    toastr.error('Failed to update status.');
-                }
-            });
-        });
-    </script>
+// Status change
+$(document).on('change','.status',function(){
+    let id=$(this).data('id');
+    let status=$(this).is(':checked')?1:0;
+    $.post('/updatebank-status',{id:id,status:status,_token:'{{ csrf_token() }}'},function(res){
+        toastr.success(res.message);
+        GetBankPart();
+    });
+});
+</script>
 @stop

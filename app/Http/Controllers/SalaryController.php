@@ -390,14 +390,25 @@ Class SalaryController extends Controller{
         return response()->json(['success']);
     }
 
-    public function GetBankPart() {   
-        $data = DB::table('salary_bank')
-        ->leftjoin('users', 'salary_bank.user_id', '=', 'users.id')
-        ->leftjoin('profile', 'users.id', '=', 'profile.user_id')
-        ->select('users.id', 'profile.employee_code', 'users.first_name', 'salary_bank.*')
-        ->orderby('salary_bank.id','desc')
-        ->get();
-        return $data;
+    public function GetBankPart(Request $request)
+    {
+        $query = DB::table('salary_bank')
+            ->join('users', 'salary_bank.user_id', '=', 'users.id')
+            ->join('profile', 'users.id', '=', 'profile.user_id')
+            ->select(
+                'salary_bank.*',
+                'users.first_name',
+                'profile.employee_code'
+            );
+
+        // If an employeeId is provided, filter
+        if($request->has('employeeId') && $request->employeeId != '') {
+            $query->where('salary_bank.user_id', $request->employeeId);
+        }
+
+        $data = $query->get();
+
+        return response()->json($data);
     }
 
 
