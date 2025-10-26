@@ -400,9 +400,7 @@
 
                 </div>
 
-                @php 
-                  $division = DB::table('divisions')->get();
-                @endphp
+
                 @include('employee.Create_page.PresentAdd')
 
                 @include('employee.Create_page.PermanentAdd')

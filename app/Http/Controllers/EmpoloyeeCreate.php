@@ -30,7 +30,7 @@ class EmpoloyeeCreate extends Controller
         $sections    = Section::orderBy('name', 'asc')->get();      
         $grades      = Grade::orderBy('name', 'asc')->get();        
         $category    = DB::table('category')->orderBy('name', 'asc')->get(); 
-        $countries = DB::table('countries')->get();
+        $countries = DB::table('countries')->orderBy('name', 'asc')->get();
         $divisions = DB::table('divisions')->orderBy('name', 'asc')->get();
 
         return view('employee.create-employee',compact('category','designations','departments','branches','sections','grades','countries','divisions'));
