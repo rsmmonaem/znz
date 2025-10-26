@@ -408,16 +408,20 @@ Class SalaryController extends Controller{
 
 
 
-    public function UpdateBankPart(Request $request) {
-        DB::table('salary_bank')->where('id', $request->id)->update([
-            'bank_amount'     => $request->bank_amount,
-            'cash_amount'     => $request->cash_amount,
-            'remarks'         => $request->remarks,
-            'effective_date'  => $request->effective_date
-        ]);
+    public function UpdateBankPart(Request $request)
+{
+    DB::table('salary_bank')->where('id', $request->id)->update([
+        'bank_amount'     => $request->bank_amount,
+        'cash_amount'     => $request->cash_amount,
+        'remarks'         => $request->remarks,
+        'effective_date'  => $request->effective_date
+    ]);
 
-        return redirect('/salary-bank-part')->with('success', 'Updated Successfully');
-    }
+    return response()->json([
+        'status' => 'success',
+        'message' => 'Updated successfully'
+    ]);
+}
 
 
     public function DeleteBankPart($id) {

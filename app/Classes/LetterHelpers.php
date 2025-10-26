@@ -59,7 +59,7 @@ class LetterHelpers {
                     'profile.employee_code',
                     'profile.date_of_joining',
                     'departments.name as department_name',
-                    'designations.name as designation_name'
+                    'designations.name as designation_name',
                 )
                 ->where('users.id', '=', $request->employeeId)
                 ->first();
@@ -106,7 +106,7 @@ class LetterHelpers {
                     'profile.date_of_joining',
                     'designations.name as designation_name',
                     'employee_separations.entry_date',
-                    'departments.name as department_name'
+                    'departments.name as department_name',
                 )
                 ->where('users.id', '=', $request->employeeId)
                 ->latest('employee_separations.id')

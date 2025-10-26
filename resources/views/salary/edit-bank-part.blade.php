@@ -4,14 +4,14 @@
 <ul class="breadcrumb">
     <li><a href="/dashboard">{!! trans('messages.dashboard') !!}</a></li>
     <li><a href="/salary-bank-part">{!! trans('messages.Salary_BankPart') !!}</a></li>
-    <li class="active">{!! trans('messages.edit') !!} {!! trans('messages.Salary_BankPart') !!}</li>
+    <li class="active">{!! trans('messages.edit') !!}</li>
 </ul>
 @stop
 
 @section('content')
 <style>
-    .flex-form-group { display: flex; align-items: center; }
-    .flex-form-group label { margin-bottom: 0; margin-right: 10px; min-width: 120px; flex-shrink: 0; }
+    .flex-form-group { display: flex; align-items: center; margin-bottom: 15px; }
+    .flex-form-group label { min-width: 120px; margin-right: 10px; font-weight: bold; flex-shrink: 0; }
     .flex-form-group .form-control { flex-grow: 1; }
     .employee-info { background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin-bottom: 20px; }
     .action-buttons { text-align: center; margin-top: 30px; }
@@ -20,59 +20,87 @@
 <div class="row">
     <div class="col-sm-12">
         <div class="box-info full">
-            <div class="user-profile-content-wm">
-                <h2>{!! trans('messages.edit') !!} {!! trans('messages.Salary_BankPart') !!}</h2>
+            <h2 class="text-center">Edit Salary Bank Part</h2>
 
+            <!-- Employee Info -->
+            <div class="employee-info">
+                <div><strong>Employee ID:</strong> {{ $bankPart->employee_code }}</div>
+                <div><strong>Employee Name:</strong> {{ $bankPart->first_name }} {{ $bankPart->last_name }}</div>
+            </div>
 
-
-                <!-- Edit Form -->
-                <form method="POST" action="{{ route('salary.bankpart.update') }}">
-                    {{ csrf_field() }}
-                    <input type="hidden" name="id" value="{{ $bankPart->id }}">
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <div class="form-group flex-form-group">
-                                <label for="gross">Gross Salary</label>
-                                <input type="number" class="form-control" id="gross" name="gross"
-                                    value="{{ $bankPart->gross }}" step="0.01" min="0" readonly>
-                            </div>
-
-                            <div class="form-group flex-form-group">
-                                <label for="cash_amount">Cash Amount</label>
-                                <input type="number" class="form-control" id="cash_amount" name="cash_amount"
-                                    value="{{ $bankPart->cash_amount }}" step="0.01" min="0" required>
-                            </div>
-
-                            <div class="form-group flex-form-group">
-                                <label for="remarks">Remarks</label>
-                                <input type="text" class="form-control" id="remarks" name="remarks"
-                                    value="{{ $bankPart->remarks }}">
-                            </div>
+            <!-- Form -->
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="flex-form-group">
+                            <label for="gross">Gross Salary</label>
+                            <input type="number" id="gross" class="form-control" value="{{ $bankPart->gross }}" readonly>
                         </div>
-
-                        <div class="col-sm-6">
-                            <div class="form-group flex-form-group">
-                                <label for="effective_date">Effective Date</label>
-                                <input type="date" class="form-control" id="effective_date" name="effective_date"
-                                    value="{{ $bankPart->effective_date }}" required>
-                            </div>
-
-                            <div class="form-group flex-form-group">
-                                <label for="bank_amount">Bank Amount</label>
-                                <input type="number" class="form-control" id="bank_amount" name="bank_amount"
-                                    value="{{ $bankPart->bank_amount }}" step="0.01" min="0" required>
-                            </div>
+                        <div class="flex-form-group">
+                            <label for="cash_amount">Cash Amount</label>
+                            <input type="number" id="cash_amount" class="form-control" value="{{ $bankPart->cash_amount }}" step="0.01" min="0">
+                        </div>
+                        <div class="flex-form-group">
+                            <label for="remarks">Remarks</label>
+                            <input type="text" id="remarks" class="form-control" value="{{ $bankPart->remarks }}">
                         </div>
                     </div>
 
-                    <div class="action-buttons">
-                        <button type="submit" class="btn btn-success">
-                            <i class="fa fa-save"></i> Update
-                        </button>
+                    <div class="col-md-6">
+                        <div class="flex-form-group">
+                            <label for="bank_amount">Bank Amount</label>
+                            <input type="number" id="bank_amount" class="form-control" value="{{ $bankPart->bank_amount }}" step="0.01" min="0">
+                        </div>
+                        <div class="flex-form-group">
+                            <label for="effective_date">Effective Date</label>
+                            <input type="date" id="effective_date" class="form-control" value="{{ $bankPart->effective_date }}">
+                        </div>
                     </div>
-                </form>
+                </div>
+
+                <div class="action-buttons">
+                    <button type="button" class="btn btn-success" id="updateBankPart">Update</button>
+                    <a href="/salary-bank-part" class="btn btn-danger">Close</a>
+                </div>
             </div>
         </div>
     </div>
 </div>
-@endsection
+@stop
+
+@section('javascript')
+<script>
+$(document).ready(function() {
+
+    $('#updateBankPart').click(function() {
+        $(this).attr('disabled', true).text('Saving...');
+
+        var formData = {
+            id: {{ $bankPart->id }},
+            gross: $('#gross').val(),
+            cash_amount: $('#cash_amount').val(),
+            bank_amount: $('#bank_amount').val(),
+            remarks: $('#remarks').val(),
+            effective_date: $('#effective_date').val(),
+            _token: '{{ csrf_token() }}'
+        };
+
+        $.ajax({
+            url: '/update-bank-part',
+            type: 'POST',
+            data: formData,
+            success: function(response) {
+                $('#updateBankPart').attr('disabled', false).text('Update');
+                toastr.success(response.message || 'Data updated successfully.');
+            },
+            error: function(xhr) {
+                $('#updateBankPart').attr('disabled', false).text('Update');
+                console.error(xhr.responseText);
+                toastr.error('Something went wrong. Please try again.');
+            }
+        });
+    });
+
+});
+</script>
+@stop
