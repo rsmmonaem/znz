@@ -258,7 +258,7 @@ function GetBankPart(employeeId=''){
                     tbody.append(row);
                 });
             }
-
+ 
             dt.DataTable({lengthMenu:[10,20,50,100]});
         },
         error:function(){ console.log('error'); }
