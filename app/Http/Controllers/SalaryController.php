@@ -645,7 +645,9 @@ Class SalaryController extends Controller{
     }
 
 
-     public function edit($id)
+
+
+    public function bankedit($id)
     {
         // Fetch record by ID
         $bankPart = SalaryBankPart::leftJoin('employee', 'salary_bank_part.employee_id', '=', 'employee.id')
@@ -660,7 +662,7 @@ Class SalaryController extends Controller{
         return view('salary.edit_bank_part', compact('bankPart'));
     }
 
-    public function update(Request $request, $id)
+    public function bankupdate(Request $request, $id)
     {
         $rules = [
             'gross' => 'required|numeric|min:0',
@@ -687,6 +689,10 @@ Class SalaryController extends Controller{
 
         return Response::json(['message' => 'Updated successfully'], 200);
     }
+
+
+
+
 
     public function DeleteBankPart(Request $request, $id)
     {

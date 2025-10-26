@@ -498,8 +498,8 @@ Route::group(['middleware' => ['auth','license','account_valid']], function () {
 	Route::get('GetBankPart', 'SalaryController@GetBankPart'); 
 	Route::post('updatebank-status', 'SalaryController@updateStatus');
 	// Edit Bank Part Page
-	Route::get('salary-bank-part/{id}/edit', 'SalaryBankPartController@edit');
-	Route::post('update-bank-part/{id}', 'SalaryBankPartController@update');
+	Route::get('salary-bank-part/{id}/edit', 'SalaryBankPartController@bankedit');
+	Route::post('update-bank-part/{id}', 'SalaryBankPartController@bankupdate');
 
 	// Delete Bank Part
 	Route::post('/delete-bank-part/{id}', 'SalaryController@DeleteBankPart')->name('delete-bank-part');
