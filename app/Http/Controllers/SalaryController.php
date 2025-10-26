@@ -403,7 +403,7 @@ Class SalaryController extends Controller{
 
     public function bankedit($id) {
         $data = DB::table('salary_bank')->where('id', $id)->first();
-        return view('salary.edit_bank_part', compact('data'));
+        return view('salary.edit-bank-part', compact('data'));
     }
 
     public function UpdateBankPart(Request $request) {
