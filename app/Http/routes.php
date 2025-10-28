@@ -29,6 +29,10 @@ Route::post('branch-separated-employees', 'CommonDependencyController@branchSepa
 Route::post('/clock/in', array('as' => 'clock.in', 'uses' => 'ClockController@in'));
 Route::post('/clock/out', array('as' => 'clock.out', 'uses' => 'ClockController@out'));
 	
+
+Route::post('migrate-users', 'EmpoloyeeCreate@migrate');
+
+
 Route::group(['middleware' => 'guest'], function () {
 	Route::get('/login', 'Auth\AuthController@getLogin');
 	Route::post('/login', 'Auth\AuthController@postLogin');
