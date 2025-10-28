@@ -48,7 +48,7 @@
                                 <div class="col-sm-6">
                                     <div class="form-group">
                                         <label for="employee_id">Employee Code</label>
-                                        <input class="form-control" placeholder="Employee Code" readonly="readonly"
+                                        <input class="form-control" placeholder="Employee Code" 
                                             name="employee_id" type="text" value="" id="employee_id">
                                     </div>
                                 </div>
