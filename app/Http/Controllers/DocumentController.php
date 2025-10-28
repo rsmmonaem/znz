@@ -26,7 +26,6 @@ Class DocumentController extends Controller{
 			$data .= '<tr>
 				<td>'.$document->DocumentType->name.'</td>
 				<td>'.$document->title.'</td>
-				<td>'.showDate($document->date_of_expiry).'</td>
 				<td>'.$document->description.'</td>
 				<td>'.(($document->status) ? '<span class="badge badge-success">'.trans('messages.active').'</span>' : '<span class="badge badge-danger">'.trans('messages.in_active').'</span>').'</td>
 				<td>

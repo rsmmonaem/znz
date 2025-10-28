@@ -1050,7 +1050,6 @@
 										<tr>
 											<th>{!! trans('messages.document_type') !!}</th>
 											<th>{!! trans('messages.title') !!}</th>
-											<th>{!! trans('messages.date_of_expiry') !!}</th>
 											<th>{!! trans('messages.description') !!}</th>
 											<th>{!! trans('messages.status') !!}</th>
 											<th data-sortable="false">{!! trans('messages.option') !!}</th>
