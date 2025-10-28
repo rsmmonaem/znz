@@ -242,7 +242,8 @@ class EmployeeController extends Controller{
         $assets = ['rte'];
         $menu = ['employee'];
         $type = DB::table('category')->orderBy('name', 'asc')->get();
-        $riligion = ['Islam' => 'Islam', 'Hinduism' => 'Hinduism', 'Christianity' => 'Christianity', 'Buddhism' => 'Buddhism', 'Judaism' => 'Judaism', 'Sikhism' => 'Sikhism', 'Jainism' => 'Jainism'];
+        $religion = ['Islam' => 'Islam', 'Hinduism' => 'Hinduism', 'Christianity' => 'Christianity', 'Buddhism' => 'Buddhism', 'Judaism' => 'Judaism', 'Sikhism' => 'Sikhism', 'Jainism' => 'Jainism'];
+
         $brach = Branch::orderBy('name', 'asc')->pluck('name', 'id')->all();
         $section = Section::orderBy('name', 'asc')->pluck('name','id')->all();
         $grade = Grade::orderBy('name', 'asc')->pluck('name','id')->all();
@@ -256,7 +257,7 @@ class EmployeeController extends Controller{
 
 
         $employee->load('Profile'); // ----> make sure this line is the last line of this method, is should be upper line o
-        return view('employee.show',compact('experience','education','section','grade','brach','type', 'riligion','employee','designations','department_id','departments','assets','menu','role','roles','gender','marital_status','custom_field_values','employee_relation','social_custom_field_values','contract_types','earning_salary_types','deduction_salary_types','leave_types','contract_lists','office_shifts','document_types','templates','countries'));
+        return view('employee.show',compact('experience','education','section','grade','brach','type', 'riligion','employee','designations','department_id','departments','assets','menu','role','roles','gender','marital_status','custom_field_values','employee_relation','social_custom_field_values','contract_types','earning_salary_types','deduction_salary_types','leave_types','contract_lists','office_shifts','document_types','templates','countries','religion'));
     }
 
     public function edit(User $employee){
