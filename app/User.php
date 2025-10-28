@@ -120,7 +120,17 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
         return ucfirst($this->first_name) . " " . ucfirst($this->last_name);
     }
 
+    // public function getFullNameWithDesignationAttribute(){
+    //     return ucfirst($this->first_name).' '.ucfirst($this->last_name).' ('.$this->Designation->name.' in '.ucfirst($this->Designation->Department->name).')';
+    // }  -----> old code 
+
+    // JUST USE FOR MIGRATE
+
     public function getFullNameWithDesignationAttribute(){
-        return ucfirst($this->first_name).' '.ucfirst($this->last_name).' ('.$this->Designation->name.' in '.ucfirst($this->Designation->Department->name).')';
+        $designation = $this->Designation; // relation fetch
+        $departmentName = ($designation && $designation->Department) ? ucfirst($designation->Department->name) : 'N/A';
+        $designationName = $designation ? $designation->name : 'N/A';
+
+        return ucfirst($this->first_name).' '.ucfirst($this->last_name).' ('.$designationName.' in '.$departmentName.')';
     }
 }
