@@ -4,7 +4,10 @@
 <ul class="breadcrumb">
 	<li><a href="/dashboard">{!! trans('messages.dashboard') !!}</a></li>
 	<li><a href="/employee">{!! trans('messages.employee') !!}</a></li>
-	<li class="active">{!! trans('messages.profile').' : '.$employee->full_name_with_designation !!}</li>
+	<li class="active">
+		{!! trans('messages.profile').' : '.
+		(isset($employee) && $employee->full_name_with_designation ? $employee->full_name_with_designation : 'N/A') !!}
+	</li>
 </ul>
 @stop
 
