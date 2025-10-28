@@ -145,13 +145,13 @@
 										{!! Form::label('category',trans('messages.category'),['class' =>
 										'control-label'])!!}
 										{{-- {!! Form::select('category', [null=>trans('messages.select_one')] + $type ,($employee->Profile->category) ? $employee->Profile->category : '',['class'=>'form-control input-xlarge select2me','placeholder'=>trans('messages.select_one')])!!} --}}
-										<select name="category" id="category"
-											class="form-control input-xlarge select2me">
+										<select name="category" id="category" class="form-control input-xlarge select2me">
 											<option value="">Select One</option>
-											@foreach ($type as $type)
-											<option value="{{ $type->name }}"
-												{{ $employee->Profile->category == $type->name ? 'selected' : '' }}>
-												{{ $type->name }}</option>
+											@foreach ($type as $t)
+												<option value="{{ $t->name }}"
+													{{ isset($employee->Profile) && $employee->Profile->category == $t->name ? 'selected' : '' }}>
+													{{ $t->name }}
+												</option>
 											@endforeach
 										</select>
 									</div>
@@ -169,10 +169,11 @@
 										@php $job_nature = DB::table('job-nature')->get(); @endphp
 										<select name="job_nature" id="job_nature" class="form-control">
 											<option value="">Select One</option>
-											@foreach ($job_nature as $type)
-											<option value="{{ $type->name }}"
-												{{ $employee->profile->job_nature == $type->name ? 'selected' : '' }}>
-												{{ $type->name }}</option>
+											@foreach ($job_nature as $jn)
+												<option value="{{ $jn->name }}"
+													{{ isset($employee->profile) && $employee->profile->job_nature == $jn->name ? 'selected' : '' }}>
+													{{ $jn->name }}
+												</option>
 											@endforeach
 										</select>
 										{{-- </div> --}}
