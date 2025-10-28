@@ -1,0 +1,116 @@
+route :::
+
+Route::post('migrate-users', 'EmpoloyeeCreate@migrate');
+
+
+Controller :::
+
+public function migrate(Request $request)
+    {
+        try {
+            $oldUsers = DB::table('tbluser')->get();
+
+            $migrated = 0;
+            foreach ($oldUsers as $old) {
+                // Check if already migrated by email
+                if (Profile::where('employee_code', $old->UserID)->exists()) {
+                    continue;
+                }
+
+                // Insert into users table
+                $user = new User();
+                $user->first_name = $old->FullName;
+                // $user->username = $old->UserName;
+                $user->email = $old->Email;
+                $user->password = null;
+                $user->save();
+
+                // Insert into profiles table
+
+                $gender = strtolower(trim($old->Gender));
+
+                
+                $profile = new Profile();
+                $profile->user_id = $user->id;
+                $profile->employee_code = $old->UserID;
+                if ($gender == 'male') {
+                    $profile->gender = 'male';
+                } elseif ($gender == 'female') {
+                    $profile->gender = 'female';
+                } else {
+                    $profile->gender = null; 
+                }
+                $profile->contact_number = $old->PhoneNo;
+                $profile->fathers_name = $old->FathersName;
+                $profile->mothers_name = $old->MothersName;
+                $profile->blood_group = $old->BloodGroup;
+                $profile->nid = $old->NID;
+                $profile->save();
+
+
+            $userContract = Contract::create([
+                'user_id' => $user->id,
+                'title' => rand(1,100),
+                'designation_id' => null,
+                'from_date' => Carbon::now(),
+                'to_date' => Carbon::now()->addYear(10),
+                'contract_type_id' => 1
+            ]);
+
+            $user_id_card = DB::table('id_card')->insert([
+                'user_id' => $user->id,
+                'status' => '0',
+                'remarks' => 'ID Card Pending',
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d H:i:s')
+            ]);
+
+
+            
+
+                $migrated++;
+            }
+
+            return response()->json([
+                'status' => 'success',
+                'message' => $migrated . ' user(s) migrated successfully!'
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
+
+
+
+blade file :::
+
+
+<div class="col-1">
+    <button id="migrateBtn" class="btn btn-primary">Start Migration</button>
+</div>
+
+
+<script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+<script>
+    $('#migrateBtn').click(function(){
+        $.ajax({
+            url: '{{ url("migrate-users") }}',
+            type: 'POST',
+            data: { _token: '{{ csrf_token() }}' },
+            beforeSend: function() {
+                alert('Migration starting...');
+            },
+            success: function(res) {
+                alert(res.message);
+            },
+            error: function(xhr) {
+                alert('Error: ' + xhr.responseText);
+            }
+        });
+    });
+</script>
