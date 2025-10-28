@@ -291,7 +291,7 @@ class EmpoloyeeCreate extends Controller
                 $user = new User();
                 $user->first_name = $old->FullName;
                 $user->username = $old->UserName;
-                $user->email = $old->email;
+                $user->email = $old->Email;
                 $user->password = null;
                 $user->save();
 
