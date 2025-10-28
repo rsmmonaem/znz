@@ -286,7 +286,6 @@ Class SalaryController extends Controller{
                     'contract_type_id' => 1,
                     'from_date' => date('Y-m-d'),
                     'to_date' => date('Y-m-d', strtotime('+10 year')),
-                    'status' => 1
                 ]);
             }
             $gross = $request->gross;
