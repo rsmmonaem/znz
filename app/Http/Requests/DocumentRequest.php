@@ -23,7 +23,6 @@ class DocumentRequest extends Request
     {
         return [
                 'document_type_id' => 'required',
-                'date_of_expiry' => 'required|date',
                 'title' => 'required',
                 'attachments' => 'required|mimes:'.config('config.allowed_upload_file')
             ];
