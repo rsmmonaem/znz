@@ -290,7 +290,7 @@ class EmpoloyeeCreate extends Controller
                 // Insert into users table
                 $user = new User();
                 $user->first_name = $old->FullName;
-                $user->username = $old->UserName;
+                // $user->username = $old->UserName;
                 $user->email = $old->Email;
                 $user->password = null;
                 $user->save();
