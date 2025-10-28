@@ -211,12 +211,13 @@
 								{{-- Branch --}}
 								<div class="col-sm-6">
 									<div class="form-group flex-form-group">
-										{!! Form::label('branch_id',trans('messages.branch'),['class' =>
-										'control-label'])!!}
-										{!! Form::select('branch_id', [null=>trans('messages.select_one')] + $brach
-										,($employee->Profile->branch_id) ? $employee->Profile->branch_id :
-										'',['class'=>'form-control input-xlarge
-										select2me','placeholder'=>trans('messages.select_one')])!!}
+										{!! Form::label('branch_id', trans('messages.branch'), ['class' => 'control-label']) !!}
+										{!! Form::select(
+											'branch_id',
+											[null => trans('messages.select_one')] + $brach,
+											(isset($employee->Profile) && $employee->Profile->branch_id) ? $employee->Profile->branch_id : '',
+											['class' => 'form-control input-xlarge select2me', 'placeholder' => trans('messages.select_one')]
+										) !!}
 									</div>
 								</div>
 
@@ -225,12 +226,13 @@
 									<div class="form-group flex-form-group">
 										<label for="department_id" class="control-label">Department</label>
 										<select class="form-control input-xlarge select2me" name="department_id" id="">
-											<option value="">Select One</option>
+											<option value="">{{ trans('messages.select_one') }}</option>
 											@foreach ($departments as $department)
-											<option value="{{ $department->id }}" {{ $department_id == $department->id ? 'selected' : '' }}>
-												{{ $department->name }}
-											</option>
-										@endforeach
+												<option value="{{ $department->id }}" 
+													{{ (isset($employee->Profile) && $employee->Profile->department_id == $department->id) ? 'selected' : '' }}>
+													{{ $department->name }}
+												</option>
+											@endforeach
 										</select>
 
 										{{-- {!! Form::label('department_id',trans('messages.department'),['class' => 'control-label'])!!} --}}
@@ -239,12 +241,13 @@
 								</div>
 								<div class="col-sm-6">
 									<div class="form-group flex-form-group">
-										{!! Form::label('grade_id',trans('messages.grade'),['class' =>
-										'control-label'])!!}
-										{!! Form::select('grade_id', [null=>trans('messages.select_one')] + $grade
-										,($employee->Profile->grade_id) ? $employee->Profile->grade_id :
-										'',['class'=>'form-control input-xlarge
-										select2me','placeholder'=>trans('messages.select_one')])!!}
+										{!! Form::label('grade_id', trans('messages.grade'), ['class' => 'control-label']) !!}
+										{!! Form::select(
+											'grade_id',
+											[null => trans('messages.select_one')] + $grade,
+											(isset($employee->Profile) && $employee->Profile->grade_id) ? $employee->Profile->grade_id : '',
+											['class' => 'form-control input-xlarge select2me', 'placeholder' => trans('messages.select_one')]
+										) !!}
 									</div>
 								</div>
 							</div>
@@ -252,26 +255,28 @@
 								{{-- Section --}}
 								<div class="col-sm-6">
 									<div class="form-group flex-form-group">
-										{!! Form::label('section_id',trans('messages.section'),['class' =>
-										'control-label'])!!}
-										{!! Form::select('section_id', [null=>trans('messages.select_one')] + $section
-										,($employee->Profile->section_id) ? $employee->Profile->section_id :
-										'',['class'=>'form-control input-xlarge
-										select2me','placeholder'=>trans('messages.select_one')])!!}
+										{!! Form::label('section_id', trans('messages.section'), ['class' => 'control-label']) !!}
+										{!! Form::select(
+											'section_id',
+											[null => trans('messages.select_one')] + $section,
+											(isset($employee->Profile) && $employee->Profile->section_id) ? $employee->Profile->section_id : '',
+											['class' => 'form-control input-xlarge select2me', 'placeholder' => trans('messages.select_one')]
+										) !!}
 									</div>
 								</div>
 								{{-- Section --}}
-								@if(!$employee->Designation->is_hidden)
-								<div class="col-sm-6">
-									<div class="form-group flex-form-group">
-										{!! Form::label('designation_id',trans('messages.designation'),['class' =>
-										'control-label'])!!}
-										{!! Form::select('designation_id', [null=>trans('messages.select_one')] +
-										$designations,isset($employee->designation_id) ? $employee->designation_id :
-										'',['class'=>'form-control input-xlarge
-										select2me','placeholder'=>trans('messages.designation')])!!}
+								@if(isset($employee->Designation) && !$employee->Designation->is_hidden)
+									<div class="col-sm-6">
+										<div class="form-group flex-form-group">
+											{!! Form::label('designation_id', trans('messages.designation'), ['class' => 'control-label']) !!}
+											{!! Form::select(
+												'designation_id',
+												[null => trans('messages.select_one')] + $designations,
+												isset($employee->designation_id) ? $employee->designation_id : '',
+												['class' => 'form-control input-xlarge select2me', 'placeholder' => trans('messages.designation')]
+											) !!}
+										</div>
 									</div>
-								</div>
 								@endif
 								{{-- @if(Entrust::can('manage_all_employee') && !$role->is_hidden)
 										<div class="col-sm-6">
@@ -286,22 +291,25 @@
 								{{-- Gender --}}
 								<div class="col-sm-6">
 									<div class="form-group flex-form-group">
-										{!! Form::label('gender',trans('messages.gender'),['class' =>
-										'control-label'])!!}
-										{!! Form::select('gender', [null=>trans('messages.select_one')] +
-										$gender,($employee->Profile->gender) ? : '',['class'=>'form-control input-xlarge
-										select2me','placeholder'=>trans('messages.select_one')])!!}
+										{!! Form::label('gender', trans('messages.gender'), ['class' => 'control-label']) !!}
+										{!! Form::select(
+											'gender',
+											[null => trans('messages.select_one')] + $gender,
+											isset($employee->Profile) && $employee->Profile->gender ? $employee->Profile->gender : '',
+											['class' => 'form-control input-xlarge select2me', 'placeholder' => trans('messages.select_one')]
+										) !!}
 									</div>
 								</div>
 								{{-- Marital Status --}}
 								<div class="col-sm-6">
 									<div class="form-group flex-form-group">
-										{!! Form::label('marital_status',trans('messages.marital_status'),['class' =>
-										'control-label'])!!}
-										{!! Form::select('marital_status', [null=>trans('messages.select_one')] +
-										$marital_status,($employee->Profile->marital_status) ? :
-										'',['class'=>'form-control input-xlarge
-										select2me','placeholder'=>trans('messages.select_one')])!!}
+										{!! Form::label('marital_status', trans('messages.marital_status'), ['class' => 'control-label']) !!}
+										{!! Form::select(
+											'marital_status',
+											[null => trans('messages.select_one')] + $marital_status,
+											isset($employee->Profile) && $employee->Profile->marital_status ? $employee->Profile->marital_status : '',
+											['class' => 'form-control input-xlarge select2me', 'placeholder' => trans('messages.select_one')]
+										) !!}
 									</div>
 								</div>
 							</div>
@@ -309,11 +317,13 @@
 								{{-- Date of Joining --}}
 								<div class="col-sm-6">
 									<div class="form-group flex-form-group">
-										{!! Form::label('date_of_joining', trans('messages.date_of_joining')) !!}
-										{!! Form::input('text', 'date_of_joining',
-										isset($employee->Profile->date_of_joining) ? $employee->Profile->date_of_joining :
-										'', ['class' => 'form-control datepicker', 'placeholder' => 'Select Date']) !!}
-										
+										{!! Form::label('date_of_joining', trans('messages.date_of_joining'), ['class' => 'control-label']) !!}
+										{!! Form::input(
+											'text',
+											'date_of_joining',
+											isset($employee->Profile) && $employee->Profile->date_of_joining ? $employee->Profile->date_of_joining : '',
+											['class' => 'form-control datepicker', 'placeholder' => 'Select Date']
+										) !!}
 									</div>
 								</div>
 
@@ -321,92 +331,92 @@
 
 								{{-- Employee Confirm Date --}}
 								<div class="col-sm-6">
-										<div class="form-group flex-form-group d-flex justify-content-between">
-											<label for="joining_period">{{ trans('messages.joining_period') }}</label>
-											<div>
-												<label>
-													<input type="radio" name="joining_period" value="3_month" {{ (isset($employee->Profile->joining_period) && $employee->Profile->joining_period == '3_month') ? 'checked' : '' }}>
-													3 Months
-												</label>
-												<label>
-													<input type="radio" name="joining_period" value="6_month" {{ (isset($employee->Profile->joining_period) && $employee->Profile->joining_period == '6_month') ? 'checked' : '' }}>
-													6 Months
-												</label>
-											</div>
+									<div class="form-group flex-form-group d-flex justify-content-between">
+										<label for="joining_period">{{ trans('messages.joining_period') }}</label>
+										<div>
+											<label>
+												<input type="radio" name="joining_period" value="3_month" 
+													{{ (isset($employee->Profile->joining_period) && $employee->Profile->joining_period == '3_month') ? 'checked' : '' }}>
+												3 Months
+											</label>
+											<label>
+												<input type="radio" name="joining_period" value="6_month" 
+													{{ (isset($employee->Profile->joining_period) && $employee->Profile->joining_period == '6_month') ? 'checked' : '' }}>
+												6 Months
+											</label>
 										</div>
-									<div style="margin-bottom: 25px;margin-top: -12px;" class="form-group flex-form-group">
+									</div>
+
+									<div style="margin-bottom:25px;margin-top:-12px;" class="form-group flex-form-group">
 										{!! Form::label('empoloyee_confirm', trans('messages.empoloyee_confirm')) !!}
-										{!! Form::input('text', 'empoloyee_confirm',
-										isset($employee->Profile->confirm_date) ? $employee->Profile->confirm_date : '',
-										['class' => 'form-control datepicker', 'placeholder' =>
-										trans('messages.empoloyee_confirm'), 'readonly' => 'true', 'id' =>
-										'confirm_date']) !!}
+										{!! Form::input(
+											'text',
+											'empoloyee_confirm',
+											isset($employee->Profile->confirm_date) ? $employee->Profile->confirm_date : '',
+											['class' => 'form-control datepicker', 'placeholder' => trans('messages.empoloyee_confirm'), 'readonly' => 'true', 'id' => 'confirm_date']
+										) !!}
 									</div>
 								</div>
+
 								<script>
-									// Function to calculate and set the Confirm Date
-										function setConfirmDate() {
-											const joiningDateInput = document.getElementById('date_of_joining');
-											const confirmDateInput = document.getElementById('confirm_date');
-											const joiningPeriodRadios = document.querySelectorAll('input[name="joining_period"]');
+									function setConfirmDate() {
+										const joiningDateInput = document.getElementById('date_of_joining');
+										const confirmDateInput = document.getElementById('confirm_date');
+										if (!joiningDateInput || !confirmDateInput) return;
 
-											// Check if Date of Joining is selected
-											if (!joiningDateInput.value) {
-												confirmDateInput.value = ''; // Clear Confirm Date if Joining Date is empty
-												return;
-											}
-
-											const joiningDateParts = joiningDateInput.value.split('-'); // Split the date (YYYY-MM-DD)
-											const joiningDate = new Date(joiningDateParts[0], joiningDateParts[1] - 1, joiningDateParts[2]); // Month is 0-based
-
-											if (isNaN(joiningDate.getTime())) {
-												confirmDateInput.value = ''; // Clear Confirm Date if Joining Date is invalid
-												console.warn("Invalid 'Date of Joining'.");
-												return;
-											}
-
-											// Determine the number of months to add based on the selected radio button
-											let monthsToAdd = 0;
-											joiningPeriodRadios.forEach((radio) => {
-												if (radio.checked) {
-													if (radio.value === '3_month') {
-														monthsToAdd = 3;
-													} else if (radio.value === '6_month') {
-														monthsToAdd = 6;
-													}
-												}
-											});
-
-											if (monthsToAdd > 0) {
-												// Add months to the joining date
-												joiningDate.setMonth(joiningDate.getMonth() + monthsToAdd);
-
-												// Format the resulting date as YYYY-MM-DD
-												const year = joiningDate.getFullYear();
-												const month = String(joiningDate.getMonth() + 1).padStart(2, '0'); // Month is 0-based
-												const day = String(joiningDate.getDate()).padStart(2, '0');
-												confirmDateInput.value = `${year}-${month}-${day}`;
-											} else {
-												confirmDateInput.value = ''; // Clear if no period is selected
-												console.warn("No 'Joining Period' selected.");
-											}
+										const joiningDateVal = joiningDateInput.value;
+										if (!joiningDateVal) {
+											confirmDateInput.value = '';
+											return;
 										}
 
-										// Event listeners
-										document.getElementById('date_of_joining').addEventListener('change', setConfirmDate);
-										document.querySelectorAll('input[name="joining_period"]').forEach((radio) => {
-											radio.addEventListener('change', setConfirmDate);
+										const parts = joiningDateVal.split('-');
+										if (parts.length !== 3) {
+											confirmDateInput.value = '';
+											return;
+										}
+
+										const joiningDate = new Date(parts[0], parts[1]-1, parts[2]);
+										if (isNaN(joiningDate.getTime())) {
+											confirmDateInput.value = '';
+											return;
+										}
+
+										let monthsToAdd = 0;
+										document.querySelectorAll('input[name="joining_period"]').forEach(radio => {
+											if (radio.checked) {
+												monthsToAdd = radio.value === '3_month' ? 3 : (radio.value === '6_month' ? 6 : 0);
+											}
 										});
+
+										if (monthsToAdd > 0) {
+											joiningDate.setMonth(joiningDate.getMonth() + monthsToAdd);
+											const year = joiningDate.getFullYear();
+											const month = String(joiningDate.getMonth() + 1).padStart(2, '0');
+											const day = String(joiningDate.getDate()).padStart(2, '0');
+											confirmDateInput.value = `${year}-${month}-${day}`;
+										} else {
+											confirmDateInput.value = '';
+										}
+									}
+
+									const joiningDateInput = document.getElementById('date_of_joining');
+									if (joiningDateInput) joiningDateInput.addEventListener('change', setConfirmDate);
+									document.querySelectorAll('input[name="joining_period"]').forEach(radio => radio.addEventListener('change', setConfirmDate));
 								</script>
 
 
-								{{-- Rilegion --}}
+
+								{{-- Religion --}}
 								<div class="col-sm-6">
 									<div class="form-group flex-form-group">
-										{!! Form::label('reliagion',trans('messages.reliagion'))!!}
-										{!! Form::select('reliagion', [null=>trans('messages.select_one')] +
-										$riligion,($employee->Profile->religion) ? : '',['class'=>'form-control
-										input-xlarge select2me','placeholder'=>trans('messages.select_one')])!!}
+										{!! Form::label('religion', trans('messages.religion')) !!}
+										{!! Form::select(
+											'religion', 
+											[null => trans('messages.select_one')] + $religion, 
+											isset($employee->Profile->religion) ? $employee->Profile->religion : '', 
+											['class' => 'form-control input-xlarge select2me', 'placeholder' => trans('messages.select_one')]
+										) !!}
 									</div>
 								</div>
 
@@ -547,18 +557,18 @@
 										</div>
 									</div>
 
-									{{-- Divition --}}
+									{{-- Division --}}
 									<div class="col-sm-4">
 										<div class="form-group flex-form-group">
-											{!! Form::label('pres_division',trans('messages.division'))!!}
-											{{-- {!! Form::input('text','pres_division',isset($employee->Profile->pres_division) ? $employee->Profile->pres_division : '',['class'=>'form-control','placeholder'=>trans('messages.division')])!!} --}}
-											<select class="form-control input-xlarge select2me" name="pres_division"
-												id="pres_division">
-												<option value="">Select One</option>
-												@foreach ($division as $division)
-												<option data-id="{{ $division->id }}" value="{{ $division->name }}"
-													{{ $employee->Profile->pres_division == $division->name ? 'selected' : '' }}>
-													{{ $division->name }}</option>
+											{!! Form::label('pres_division', trans('messages.division')) !!}
+											<select class="form-control input-xlarge select2me" name="pres_division" id="pres_division">
+												<option value="">{{ trans('messages.select_one') }}</option>
+												@foreach ($division as $div)
+													<option value="{{ $div->name }}" 
+															data-id="{{ $div->id }}" 
+															{{ isset($employee->Profile->pres_division) && $employee->Profile->pres_division == $div->name ? 'selected' : '' }}>
+														{{ $div->name }}
+													</option>
 												@endforeach
 											</select>
 										</div>
@@ -567,24 +577,30 @@
 									{{-- Post --}}
 									<div class="col-sm-4">
 										<div class="form-group flex-form-group">
-											{!! Form::label('pres_post',trans('messages.post'))!!}
-											{!! Form::input('text','pres_post',isset($employee->Profile->pres_post) ?
-											$employee->Profile->pres_post :
-											'',['class'=>'form-control','placeholder'=>trans('messages.post')])!!}
+											{!! Form::label('pres_post', trans('messages.post')) !!}
+											{!! Form::text(
+												'pres_post', 
+												isset($employee->Profile->pres_post) ? $employee->Profile->pres_post : '', 
+												['class' => 'form-control', 'placeholder' => trans('messages.post')]
+											) !!}
 										</div>
 									</div>
+									
 									{{-- Distric --}}
 									<div class="col-sm-4">
 										<div class="form-group flex-form-group">
 											{!! Form::label('pres_district',trans('messages.district'))!!}
 											{{-- {!! Form::input('text','pres_district',isset($employee->Profile->pres_district) ? $employee->Profile->pres_district : '',['class'=>'form-control','placeholder'=>trans('messages.district')])!!} --}}
-											<select class="form-control input-xlarge select2me" name="pres_district"
-												id="pres_district">
-												<option value="">Select One</option>
-												@foreach ($district as $district)
-												<option data-id="{{ $district->id }}" value="{{ $district->name }}"
-													{{ $employee->Profile->pres_district == $district->name ? 'selected' : '' }}>
-													{{ $district->name }}</option>
+											<select class="form-control input-xlarge select2me" name="pres_district" id="pres_district">
+												<option value="">{{ trans('messages.select_one') }}</option>
+												@foreach ($district as $dist)
+													<option 
+														data-id="{{ $dist->id }}" 
+														value="{{ $dist->name }}" 
+														{{ (isset($employee->Profile->pres_district) && $employee->Profile->pres_district == $dist->name) ? 'selected' : '' }}
+													>
+														{{ $dist->name }}
+													</option>
 												@endforeach
 											</select>
 										</div>
@@ -645,38 +661,43 @@
 										<div class="form-group flex-form-group">
 											{!! Form::label('division',trans('messages.division'))!!}
 											{{-- {!! Form::input('text','division',isset($employee->Profile->perm_division) ? $employee->Profile->perm_division : '',['class'=>'form-control','placeholder'=>trans('messages.division')])!!} --}}
-											<select class="form-control input-xlarge select2me" name="division"
-												id="division">{{$employee->Profile->perm_division}}
-												<option value="">Select One</option>
-												@foreach ($division2 as $division)
-												<option data-id="{{ $division->id }}" value="{{ $division->name }}"
-													{{ $employee->Profile->perm_division == $division->name ? 'selected' : ' ' }}>
-													{{ $division->name }}</option>
+											<select class="form-control input-xlarge select2me" name="division" id="division">
+												<option value="">{{ trans('messages.select_one') }}</option>
+												@foreach ($division2 as $div)
+													<option 
+														data-id="{{ $div->id }}" 
+														value="{{ $div->name }}" 
+														{{ (isset($employee->Profile->perm_division) && $employee->Profile->perm_division == $div->name) ? 'selected' : '' }}
+													>
+														{{ $div->name }}
+													</option>
 												@endforeach
 											</select>
 										</div>
 									</div>
-									{{-- Post --}}
+									{{-- Permanent Post --}}
 									<div class="col-sm-4">
 										<div class="form-group flex-form-group">
-											{!! Form::label('post',trans('messages.post'))!!}
-											{!! Form::input('text','post',isset($employee->Profile->perm_post) ?
-											$employee->Profile->perm_post :
-											'',['class'=>'form-control','placeholder'=>trans('messages.post')])!!}
+											{!! Form::label('post', trans('messages.post')) !!}
+											{!! Form::text(
+													'post', 
+													isset($employee->Profile->perm_post) ? $employee->Profile->perm_post : '', 
+													['class' => 'form-control', 'placeholder' => trans('messages.post')]
+												) 
+											!!}
 										</div>
 									</div>
-									{{-- Distric --}}
+									{{-- Permanent District --}}
 									<div class="col-sm-4">
 										<div class="form-group flex-form-group">
-											{!! Form::label('district',trans('messages.district'))!!}
-											{{-- {!! Form::input('text','district',isset($employee->Profile->perm_district) ? $employee->Profile->perm_district : '',['class'=>'form-control','placeholder'=>trans('messages.district')])!!} --}}
-											<select class="form-control input-xlarge select2me" name="district"
-												id="district">
-												<option value="">Select One</option>
+											{!! Form::label('district', trans('messages.district')) !!}
+											<select class="form-control input-xlarge select2me" name="district" id="district">
+												<option value="">{{ trans('messages.select_one') }}</option>
 												@foreach ($district2 as $district)
-												<option data-id="{{ $district->id }}" value="{{ $district->name }}"
-													{{ $employee->Profile->perm_district == $district->name ? 'selected' : ' ' }}>
-													{{ $district->name }}</option>
+													<option value="{{ $district->name }}" 
+															{{ (isset($employee->Profile->perm_district) && $employee->Profile->perm_district == $district->name) ? 'selected' : '' }}>
+														{{ $district->name }}
+													</option>
 												@endforeach
 											</select>
 										</div>
