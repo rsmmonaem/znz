@@ -281,7 +281,7 @@ Class SalaryController extends Controller{
             $contact = Contract::where('user_id', $employee_id)->latest()->first();
 
             if (!$contact) {
-                Contract::insert([
+                $contact = Contract::create([
                     'user_id' => $employee_id,
                     'contract_type_id' => 1,
                     'from_date' => date('Y-m-d'),
