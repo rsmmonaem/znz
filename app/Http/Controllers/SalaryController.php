@@ -281,7 +281,13 @@ Class SalaryController extends Controller{
             $contact = Contract::where('user_id', $employee_id)->latest()->first();
 
             if (!$contact) {
-                return response()->json(['message' => trans('contract Not Found'), 'status' => 'error'], 200, array('Access-Controll-Allow-Origin' => '*'));
+                Contract::insert([
+                    'user_id' => $employee_id,
+                    'contract_type_id' => 1,
+                    'from_date' => date('Y-m-d'),
+                    'to_date' => date('Y-m-d', strtotime('+10 year')),
+                    'status' => 1
+                ]);
             }
             $gross = $request->gross;
 
