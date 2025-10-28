@@ -1022,12 +1022,12 @@
 								</div>
 							</div>
 							<div class="col-sm-6">
-								<div class="form-group flex-form-group">
+								{{-- <div class="form-group flex-form-group">
 									{!! Form::label('date_of_expiry',trans('messages.date_of_expiry'))!!}
 									{!! Form::input('text','date_of_expiry','',['class'=>'form-control
 									datepicker','placeholder'=>trans('messages.date_of_expiry'),'readonly' =>
 									'true'])!!}
-								</div>
+								</div> --}}
 								<div class="form-group flex-form-group">
 									{!! Form::label('description',trans('messages.description'),[])!!}
 									{!! Form::textarea('description','',['size' => '30x3', 'class' => 'form-control',
