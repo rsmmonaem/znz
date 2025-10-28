@@ -73,9 +73,18 @@ class EmployeeController extends Controller{
         $designation_users = User::select('designation_id', DB::raw('count(*) as total'))
              ->groupBy('designation_id')
              ->get();
-        $designation_user_stat[] = array('Designation','Count');
+        // $designation_user_stat[] = array('Designation','Count');
+        // foreach($designation_users as $designation_user){
+        //     $designation_user_stat[] = array($designation_user->Designation->name, $designation_user->total);
+        // }
+
+        $designation_user_stat[] = array('Designation', 'Count'); // header
+
         foreach($designation_users as $designation_user){
-            $designation_user_stat[] = array($designation_user->Designation->name, $designation_user->total);
+            $designation_user_stat[] = array(
+                $designation_user->Designation ? $designation_user->Designation->name : 'N/A',
+                $designation_user->total
+            );
         }
 
         $status_users = User::select('status', DB::raw('count(*) as total'))

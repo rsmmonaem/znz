@@ -366,8 +366,8 @@ tableBody.append(`
         <td>${item.designation_name || 'N/A'}</td>
         <td>${item.department_name || 'N/A'}</td>
         <td>${item.category || 'N/A'}</td>
-        <td>${item.date_of_joining || 'N/A'}</td>
-        <td>${item.date_of_birth || 'N/A'}</td>
+        <td>${formatDate(item.date_of_joining)}</td>
+        <td>${formatDate(item.date_of_birth)}</td>
         <td>${item.blood_group || 'N/A'}</td>
         <td>${item.job_nature || 'N/A'}</td>
         <td>${item.contact_number || 'N/A'}</td>
