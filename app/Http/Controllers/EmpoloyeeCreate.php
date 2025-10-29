@@ -277,7 +277,7 @@ class EmpoloyeeCreate extends Controller
     public function migrate(Request $request)
     {
         try {
-            $oldUsers = DB::table('tbluser')->where('BranchName',"KASUNDI RESTORA LTD (BUFT)")->get();
+            $oldUsers = DB::table('tbluser')->where('BranchName',"JUNE FOODS LTD, (UTTARA FACTORY)")->get();
 
             $migrated = 0;
             foreach ($oldUsers as $old) {
@@ -313,7 +313,7 @@ class EmpoloyeeCreate extends Controller
                 $profile->fathers_name = $old->FathersName;
                 $profile->mothers_name = $old->MothersName;
                 $profile->blood_group = $old->BloodGroup;
-                $profile->branch_id = 52;
+                $profile->branch_id = 53;
                 $profile->nid = $old->NID;
                 $profile->save();
 
@@ -343,7 +343,7 @@ class EmpoloyeeCreate extends Controller
 
             return response()->json([
                 'status' => 'success',
-                'message' => $migrated . "user(s) migrated successfully to KASUNDI RESTORA LTD (BUFT)!"
+                'message' => $migrated . "user(s) migrated successfully to JUNE FOODS LTD, (UTTARA FACTORY)!"
             ]);
 
         } catch (\Exception $e) {
