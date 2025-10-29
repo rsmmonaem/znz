@@ -277,7 +277,7 @@ class EmpoloyeeCreate extends Controller
     public function migrate(Request $request)
     {
         try {
-            $oldUsers = DB::table('tbluser')->where('BranchName',"HOTEL KOLLOL BY J & Z GROUP, COX' BAZAR")->get();
+            $oldUsers = DB::table('tbluser')->where('BranchName',"Image, EPZ")->get();
 
             $migrated = 0;
             foreach ($oldUsers as $old) {
@@ -343,7 +343,7 @@ class EmpoloyeeCreate extends Controller
 
             return response()->json([
                 'status' => 'success',
-                'message' => $migrated . "user(s) migrated successfully to Hotel Kollol by J&Z Group!"
+                'message' => $migrated . "user(s) migrated successfully to Image, EPZ!"
             ]);
 
         } catch (\Exception $e) {
