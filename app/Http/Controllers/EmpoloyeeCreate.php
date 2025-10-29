@@ -313,7 +313,7 @@ class EmpoloyeeCreate extends Controller
                 $profile->fathers_name = $old->FathersName;
                 $profile->mothers_name = $old->MothersName;
                 $profile->blood_group = $old->BloodGroup;
-                $profile->branch_id = 24;
+                $profile->branch_id = 56;
                 $profile->nid = $old->NID;
                 $profile->save();
 
