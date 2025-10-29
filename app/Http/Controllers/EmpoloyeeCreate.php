@@ -277,9 +277,10 @@ class EmpoloyeeCreate extends Controller
     public function migrate(Request $request)
     {
         try {
-            $oldUsers = DB::table('tbluser')->where('BranchName','J & Z HOLDINGS LTD. CUMILLA')->get();
+            $oldUsers = DB::table('tbluser')->where('BranchName','KRL (DHANMONDI)')->get();
 
             $migrated = 0;
+            $migratedIds = [];
             foreach ($oldUsers as $old) {
                 // Check if already migrated by email
                 if (Profile::where('employee_code', $old->UserID)->exists()) {
@@ -313,7 +314,7 @@ class EmpoloyeeCreate extends Controller
                 $profile->fathers_name = $old->FathersName;
                 $profile->mothers_name = $old->MothersName;
                 $profile->blood_group = $old->BloodGroup;
-                $profile->branch_id = 34;
+                $profile->branch_id = 17;
                 $profile->nid = $old->NID;
                 $profile->save();
 
@@ -339,11 +340,13 @@ class EmpoloyeeCreate extends Controller
             
 
                 $migrated++;
+                $migratedIds[] = $user->id;
             }
 
             return response()->json([
                 'status' => 'success',
-                'message' => $migrated . ' user(s) migrated successfully from J & Z HOLDINGS LTD. CUMILLA!'
+                'message' => $migrated . ' user(s) migrated successfully from Kasundi Restora Ltd. (Dhanmondi Branch)!',
+                'migrated_ids' => $migratedIds
             ]);
 
         } catch (\Exception $e) {
