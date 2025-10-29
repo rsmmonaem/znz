@@ -5,7 +5,7 @@ Route::post('migrate-users', 'EmpoloyeeCreate@migrate');
 
 Controller :::
 
-public function migrate(Request $request)
+    public function migrate(Request $request)
     {
         try {
             $oldUsers = DB::table('tbluser')->get();
