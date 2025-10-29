@@ -277,10 +277,9 @@ class EmpoloyeeCreate extends Controller
     public function migrate(Request $request)
     {
         try {
-            $oldUsers = DB::table('tbluser')->where('BranchName','KRL (DHANMONDI)')->get();
+            $oldUsers = DB::table('tbluser')->where('BranchName','ICDDRB')->get();
 
             $migrated = 0;
-            $migratedIds = [];
             foreach ($oldUsers as $old) {
                 // Check if already migrated by email
                 if (Profile::where('employee_code', $old->UserID)->exists()) {
@@ -314,39 +313,37 @@ class EmpoloyeeCreate extends Controller
                 $profile->fathers_name = $old->FathersName;
                 $profile->mothers_name = $old->MothersName;
                 $profile->blood_group = $old->BloodGroup;
-                $profile->branch_id = 17;
+                $profile->branch_id = 37;
                 $profile->nid = $old->NID;
                 $profile->save();
 
 
-            $userContract = Contract::create([
-                'user_id' => $user->id,
-                'title' => rand(1,100),
-                'designation_id' => null,
-                'from_date' => Carbon::now(),
-                'to_date' => Carbon::now()->addYear(10),
-                'contract_type_id' => 1
-            ]);
+                $userContract = Contract::create([
+                    'user_id' => $user->id,
+                    'title' => rand(1,100),
+                    'designation_id' => null,
+                    'from_date' => Carbon::now(),
+                    'to_date' => Carbon::now()->addYear(10),
+                    'contract_type_id' => 1
+                ]);
 
-            $user_id_card = DB::table('id_card')->insert([
-                'user_id' => $user->id,
-                'status' => '0',
-                'remarks' => 'ID Card Pending',
-                'created_at' => date('Y-m-d H:i:s'),
-                'updated_at' => date('Y-m-d H:i:s')
-            ]);
+                $user_id_card = DB::table('id_card')->insert([
+                    'user_id' => $user->id,
+                    'status' => '0',
+                    'remarks' => 'ID Card Pending',
+                    'created_at' => date('Y-m-d H:i:s'),
+                    'updated_at' => date('Y-m-d H:i:s')
+                ]);
 
 
             
 
                 $migrated++;
-                $migratedIds[] = $user->id;
             }
 
             return response()->json([
                 'status' => 'success',
-                'message' => $migrated . ' user(s) migrated successfully from Kasundi Restora Ltd. (Dhanmondi Branch)!',
-                'migrated_ids' => $migratedIds
+                'message' => $migrated . ' user(s) migrated successfully from Kasundi Restora Ltd. (ICDDRB Branch)!'
             ]);
 
         } catch (\Exception $e) {
