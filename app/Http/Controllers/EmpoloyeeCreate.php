@@ -343,7 +343,7 @@ class EmpoloyeeCreate extends Controller
 
             return response()->json([
                 'status' => 'success',
-                'message' => $migrated . ' user(s) migrated successfully from Kasundi Catering Service (Sunnydale)!'
+                'message' => $migrated . ' user(s) migrated successfully to Kasundi Catering Service (Sunnydale)!'
             ]);
 
         } catch (\Exception $e) {
