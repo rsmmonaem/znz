@@ -278,7 +278,7 @@ class EmpoloyeeCreate extends Controller
     public function migrate(Request $request)
     {
         try {
-            $oldUsers = DB::table('tbluser')->get();
+            $oldUsers = DB::table('tbluser        ')->get();
 
             $migrated = 0;
             foreach ($oldUsers as $old) {
