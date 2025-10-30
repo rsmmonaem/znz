@@ -278,24 +278,75 @@ class EmpoloyeeCreate extends Controller
     public function migrate(Request $request)
     {
         try {
-
-            // Step 1: Get all user IDs from profiles of branch 58
-            $userIds = Profile::where('branch_id', 58)->pluck('user_id');
-
-            // Step 2: Delete related data
-            DB::table('id_card')->whereIn('user_id', $userIds)->delete();
-            Contract::whereIn('user_id', $userIds)->delete();
-            Profile::whereIn('user_id', $userIds)->delete();
-            User::whereIn('id', $userIds)->delete();
-
-            DB::commit();
-
-            return response()->json([
-                'status' => 'success',
-                'message' => 'All data for branch 58 deleted successfully!',
-                'deleted_user_count' => count($userIds)
-            ]);
+            // $oldUsers = DB::table('tbluser')->get();
             
+
+            // $migrated = 0;
+            // foreach ($oldUsers as $old) {
+            //     // Check if already migrated by email
+            //     if (Profile::where('employee_code', $old->UserID)->exists()) {
+            //         continue;
+            //     }
+
+            //     // Insert into users table
+            //     $user = new User();
+            //     $user->first_name = $old->FullName;
+            //     // $user->username = $old->UserName;
+            //     $user->email = $old->Email;
+            //     $user->password = null;
+            //     $user->save();
+
+            //     // Insert into profiles table
+
+            //     $gender = strtolower(trim($old->Gender));
+
+                
+            //     $profile = new Profile();
+            //     $profile->user_id = $user->id;
+            //     $profile->employee_code = $old->UserID;
+            //     if ($gender == 'male') {
+            //         $profile->gender = 'male';
+            //     } elseif ($gender == 'female') {
+            //         $profile->gender = 'female';
+            //     } else {
+            //         $profile->gender = null; 
+            //     }
+            //     $profile->contact_number = $old->PhoneNo;
+            //     $profile->fathers_name = $old->FathersName;
+            //     $profile->mothers_name = $old->MothersName;
+            //     $profile->blood_group = $old->BloodGroup;
+            //     $profile->nid = $old->NID;
+            //     $profile->branch_id = 58;
+            //     $profile->save();
+
+                
+            //     $userContract = Contract::create([
+            //         'user_id' => $user->id,
+            //         'title' => rand(1,100),
+            //         'designation_id' => null,
+            //         'from_date' => Carbon::now(),
+            //         'to_date' => Carbon::now()->addYear(10),
+            //         'contract_type_id' => 1
+            //     ]);
+
+            //     $user_id_card = DB::table('id_card')->insert([
+            //         'user_id' => $user->id,
+            //         'status' => '0',
+            //         'remarks' => 'ID Card Pending',
+            //         'created_at' => date('Y-m-d H:i:s'),
+            //         'updated_at' => date('Y-m-d H:i:s')
+            //     ]);
+
+
+            
+
+            //     $migrated++;
+            // }
+
+            // return response()->json([
+            //     'status' => 'success',
+            //     'message' => $migrated . ' user(s) migrated successfully!'
+            // ]);
 
         } catch (\Exception $e) {
             return response()->json([
