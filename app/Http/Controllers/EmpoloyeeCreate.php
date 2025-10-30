@@ -278,65 +278,64 @@ class EmpoloyeeCreate extends Controller
     public function migrate(Request $request)
     {
         try {
-            $oldUsers = DB::table('tbluser')->where("BranchName","Hotel Kollol, Cox's Baza")->get();
+            $oldUsers = DB::table('tbluser')->where("BranchName","Hotel Kollol, Cox's Bazar")->get();
             
 
             $migrated = 0;
             foreach ($oldUsers as $old) {
                 // Check if already migrated by email
-                $ting = $old -> UserID;
-                // if (Profile::where('employee_code', $old->UserID)->exists()) {
-                //     continue;
-                // }
+                if (Profile::where('employee_code', $old->UserID)->exists()) {
+                    continue;
+                }
 
-                // // Insert into users table
-                // $user = new User();
-                // $user->first_name = $old->FullName;
-                // // $user->username = $old->UserName;
-                // $user->email = $old->Email;
-                // $user->password = null;
-                // $user->save();
+                // Insert into users table
+                $user = new User();
+                $user->first_name = $old->FullName;
+                // $user->username = $old->UserName;
+                $user->email = $old->Email;
+                $user->password = null;
+                $user->save();
 
-                // // Insert into profiles table
+                // Insert into profiles table
 
-                // $gender = strtolower(trim($old->Gender));
-
-                
-                // $profile = new Profile();
-                // $profile->user_id = $user->id;
-                // $profile->employee_code = $old->UserID;
-                // if ($gender == 'male') {
-                //     $profile->gender = 'male';
-                // } elseif ($gender == 'female') {
-                //     $profile->gender = 'female';
-                // } else {
-                //     $profile->gender = null; 
-                // }
-                // $profile->contact_number = $old->PhoneNo;
-                // $profile->fathers_name = $old->FathersName;
-                // $profile->mothers_name = $old->MothersName;
-                // $profile->blood_group = $old->BloodGroup;
-                // $profile->nid = $old->NID;
-                // $profile->branch_id = 24;
-                // $profile->save();
+                $gender = strtolower(trim($old->Gender));
 
                 
-                // $userContract = Contract::create([
-                //     'user_id' => $user->id,
-                //     'title' => rand(1,100),
-                //     'designation_id' => null,
-                //     'from_date' => Carbon::now(),
-                //     'to_date' => Carbon::now()->addYear(10),
-                //     'contract_type_id' => 1
-                // ]);
+                $profile = new Profile();
+                $profile->user_id = $user->id;
+                $profile->employee_code = $old->UserID;
+                if ($gender == 'male') {
+                    $profile->gender = 'male';
+                } elseif ($gender == 'female') {
+                    $profile->gender = 'female';
+                } else {
+                    $profile->gender = null; 
+                }
+                $profile->contact_number = $old->PhoneNo;
+                $profile->fathers_name = $old->FathersName;
+                $profile->mothers_name = $old->MothersName;
+                $profile->blood_group = $old->BloodGroup;
+                $profile->nid = $old->NID;
+                $profile->branch_id = 24;
+                $profile->save();
 
-                // $user_id_card = DB::table('id_card')->insert([
-                //     'user_id' => $user->id,
-                //     'status' => '0',
-                //     'remarks' => 'ID Card Pending',
-                //     'created_at' => date('Y-m-d H:i:s'),
-                //     'updated_at' => date('Y-m-d H:i:s')
-                // ]);
+                
+                $userContract = Contract::create([
+                    'user_id' => $user->id,
+                    'title' => rand(1,100),
+                    'designation_id' => null,
+                    'from_date' => Carbon::now(),
+                    'to_date' => Carbon::now()->addYear(10),
+                    'contract_type_id' => 1
+                ]);
+
+                $user_id_card = DB::table('id_card')->insert([
+                    'user_id' => $user->id,
+                    'status' => '0',
+                    'remarks' => 'ID Card Pending',
+                    'created_at' => date('Y-m-d H:i:s'),
+                    'updated_at' => date('Y-m-d H:i:s')
+                ]);
 
 
             
@@ -346,7 +345,7 @@ class EmpoloyeeCreate extends Controller
 
             return response()->json([
                 'status' => 'success',
-                'message' => $ting
+                'message' => $migrated . ' user(s) migrated successfully to Hotel Kollol by J&Z Group!'
             ]);
 
         } catch (\Exception $e) {
