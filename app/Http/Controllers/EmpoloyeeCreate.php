@@ -278,7 +278,7 @@ class EmpoloyeeCreate extends Controller
     public function migrate(Request $request)
     {
         try {
-            $oldUsers = DB::table('tbluser        ')->get();
+            $oldUsers = DB::table('tbluser')->get();
 
             $migrated = 0;
             foreach ($oldUsers as $old) {
@@ -315,6 +315,7 @@ class EmpoloyeeCreate extends Controller
                 $profile->mothers_name = $old->MothersName;
                 $profile->blood_group = $old->BloodGroup;
                 $profile->nid = $old->NID;
+                $profile->branch_id = 58;
                 $profile->save();
 
 
