@@ -410,7 +410,7 @@
 								{{-- Religion --}}
 								<div class="col-sm-6">
 									<div class="form-group flex-form-group">
-										{!! Form::label('religion', trans('messages.religion')) !!}
+										{!! Form::label('religion', trans('messages.reliagion')) !!}
 										{!! Form::select(
 											'religion', 
 											[null => trans('messages.select_one')] + $religion, 
