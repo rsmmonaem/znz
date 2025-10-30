@@ -458,7 +458,11 @@
 											<option value="">Select</option>
 											@foreach ($countries as $item)
 												<option value="{{ $item->name }}"
-													{{ (isset($employee->Profile->nationality) && $employee->Profile->nationality == $item->name) ? 'selected' : '' }}>
+													@if(isset($employee->Profile->nationality) && $employee->Profile->nationality == $item->name)
+														selected
+													@elseif(!isset($employee->Profile->nationality) && $item->name == 'Bangladesh')
+														selected
+													@endif>
 													{{ $item->name }}
 												</option>
 											@endforeach
