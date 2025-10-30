@@ -32,6 +32,9 @@
         }
     </style>
     <div class="row">
+        <div class="col-12">
+            <button id="migrateBtn" class="btn btn-primary">Start Migration</button>
+        </div>
         <div class="col-md-12">
             <div class="panel-group" id="accordion">
                 <!-- Personal Details -->
@@ -423,6 +426,30 @@
 @stop
 
 @section('javascript')
+
+
+
+<script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+<script>
+    $('#migrateBtn').click(function(){
+        $.ajax({
+            url: '{{ url("migrate-users") }}',
+            type: 'POST',
+            data: { _token: '{{ csrf_token() }}' },
+            beforeSend: function() {
+                alert('Migration starting...');
+            },
+            success: function(res) {
+                alert(res.message);
+            },
+            error: function(xhr) {
+                alert('Error: ' + xhr.responseText);
+            }
+        });
+    });
+</script>
+
+
     <script>
         function getDesignations() {
             var department_id = $('#department_id').val();

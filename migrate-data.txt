@@ -90,7 +90,7 @@ Controller :::
 blade file :::
 
 
-<div class="col-1">
+<div class="col-12">
     <button id="migrateBtn" class="btn btn-primary">Start Migration</button>
 </div>
 
