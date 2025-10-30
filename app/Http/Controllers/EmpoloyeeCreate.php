@@ -278,32 +278,24 @@ class EmpoloyeeCreate extends Controller
     public function migrate(Request $request)
     {
         try {
-            $oldUsers = DB::table('tbluser')->get();
 
-            $missing = [];
+            // Step 1: Get all user IDs from profiles of branch 58
+            $userIds = Profile::where('branch_id', 58)->pluck('user_id');
 
-            foreach ($oldUsers as $old) {
-                $exists = Profile::where('employee_code', $old->UserID)->exists();
+            // Step 2: Delete related data
+            DB::table('id_card')->whereIn('user_id', $userIds)->delete();
+            Contract::whereIn('user_id', $userIds)->delete();
+            Profile::whereIn('user_id', $userIds)->delete();
+            User::whereIn('id', $userIds)->delete();
 
-                if (!$exists) {
-                    $missing[] = [
-                        'UserID' => $old->UserID,
-                    ];
-                }
-            }
+            DB::commit();
 
-            if (count($missing) > 0) {
-                return response()->json([
-                    'status' => 'missing',
-                    'message' => count($missing) . ' user(s) missing in profile table.',
-                    'data' => $missing
-                ]);
-            } else {
-                return response()->json([
-                    'status' => 'ok',
-                    'message' => 'All tbluser records exist in profile table.'
-                ]);
-            }
+            return response()->json([
+                'status' => 'success',
+                'message' => 'All data for branch 58 deleted successfully!',
+                'deleted_user_count' => count($userIds)
+            ]);
+            
 
         } catch (\Exception $e) {
             return response()->json([
