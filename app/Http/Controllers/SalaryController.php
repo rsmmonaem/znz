@@ -514,6 +514,7 @@ Class SalaryController extends Controller{
             ->leftJoin('departments', 'designations.department_id', '=', 'departments.id')
             ->leftJoin('sections', 'profile.section_id', '=', 'sections.id')
             ->leftJoin('grades', 'profile.grade_id', '=', 'grades.id')
+            ->where('users.status', 'active')
             ->when(!empty($request->employeeId), function ($query) use ($request) {
                 return $query->where('users.id', $request->employeeId);
             })
