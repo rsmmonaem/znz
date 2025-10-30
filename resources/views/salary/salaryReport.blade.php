@@ -251,10 +251,23 @@
             <table class="table table-bordered report-table">
                 <thead>
                     <tr>
-                        <th>SL</th><th>Name</th><th>Designation</th><th>Department</th><th>Section</th>
-                        <th>DOJ</th><th>Grade</th><th>Account Number</th><th>Bank Amount</th>
-                        <th>Cash Amount</th><th>Gross</th><th>Basic</th><th>House Rent</th>
-                        <th>Medical</th><th>Conveyance</th><th>Other</th>
+                        <th>SL</th>
+                        <th>Employee ID</th>
+                        <th>Name</th>
+                        <th>Designation</th>
+                        <th>Department</th>
+                        <th>Section</th>
+                        <th>DOJ</th>
+                        <th>Grade</th>
+                        <th>Account Number</th>
+                        <th>Bank Amount</th>
+                        <th>Cash Amount</th>
+                        <th>Gross</th>
+                        <th>Basic</th>
+                        <th>House Rent</th>
+                        <th>Medical</th>
+                        <th>Conveyance</th>
+                        <th>Other</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -271,6 +284,7 @@
             content += `
             <tr>
                 <td>${index+1}</td>
+                <td>${employee.user_info.employee_code || ' '}</td>
                 <td>${employee.user_info.first_name || ' '}</td>
                 <td>${employee.user_info.designation || ' '}</td>
                 <td>${employee.user_info.departments || ' '}</td>
