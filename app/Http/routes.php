@@ -2,6 +2,17 @@
 
 use Illuminate\Routing\Router;
 
+Route::get('/clear-all', function() {
+
+    \Artisan::call('route:clear');
+    \Artisan::call('config:clear');
+    \Artisan::call('cache:clear');
+    \Artisan::call('view:clear');
+    \Artisan::call('optimize');
+
+    return '<h3>✅ All caches cleared & optimized successfully!</h3>';
+});
+
 Route::get('/get-districts/{id}', function ($id) {
 	$districts = DB::table('districts')->where('division_id', $id)->orderBy('name', 'ASC')->get();
 	return response()->json($districts);

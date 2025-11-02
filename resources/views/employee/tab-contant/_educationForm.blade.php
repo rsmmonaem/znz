@@ -25,8 +25,36 @@
             </div>
             <div class="col-md-4">
                 <label for="boardUniversity">Board/University</label>
-                <input type="text" class="form-control" name="board[]" value="{{ $item->board }}">
+                <select class="form-control" name="board[]">
+                    <option value="">Select Board / University</option>
+                    @php
+                        $boards = [
+                            'Dhaka',
+                            'Chittagong',
+                            'Rajshahi',
+                            'Comilla',
+                            'Jessore',
+                            'Barisal',
+                            'Sylhet',
+                            'Dinajpur',
+                            'Mymensingh',
+                            'Madrasah',
+                            'Technical',
+                            'National University',
+                            'Bangladesh Open University',
+                            'Private University',
+                            'Foreign University'
+                        ];
+                    @endphp
+
+                    @foreach($boards as $board)
+                        <option value="{{ $board }}" {{ ($item->board == $board) ? 'selected' : '' }}>
+                            {{ $board }}
+                        </option>
+                    @endforeach
+                </select>
             </div>
+
         </div>
         <div class="form-group row education-form">
             <div class="col-md-4">
