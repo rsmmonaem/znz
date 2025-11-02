@@ -558,7 +558,7 @@ use Services_Twilio_RestException;
 			$user = \App\User::find($id);
 			$profile = $user->Profile;
 			$name = ($user->full_name) ? : $user->username;
-			$tooltip = $name.' : '.$user->Designation->full_designation;
+			$tooltip = $name . ($designation ? ' : ' . $designation : '');
 			if($size == null)
 				$size = '40px';
 			if(isset($profile->photo))
