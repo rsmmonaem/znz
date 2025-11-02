@@ -43,6 +43,7 @@
                             'National University',
                             'Bangladesh Open University',
                             'Private University',
+                            'Public University',
                             'Foreign University'
                         ];
                     @endphp
