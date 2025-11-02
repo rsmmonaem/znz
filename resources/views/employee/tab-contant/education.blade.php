@@ -44,14 +44,14 @@
                 // Collect form data from all .form-container sections
                 document.querySelectorAll('.form-container').forEach(function(form) {
                     const formData = {
-                          const education_level = form.querySelector('select[name="education_level[]"]')?.value || '';
-                            const subject = form.querySelector('select[name="subject[]"]')?.value || '';
-                            const board = form.querySelector('input[name="board[]"]')?.value || '';
-                            const institute = form.querySelector('input[name="institute[]"]')?.value || '';
-                            const result_type = form.querySelector('select[name="result_type[]"]')?.value || '';
-                            const grade = form.querySelector('input[name="grade[]"]')?.value || '';
-                            const passing_year = form.querySelector('select[name="passing_year[]"]')?.value || '';
-                            const user_id = {{ $employee->id }}
+                        education_level: form.querySelector('select[name="education_level[]"]')?.value || '',
+                        subject: form.querySelector('select[name="subject[]"]')?.value || '',
+                        board: form.querySelector('input[name="board[]"]')?.value || '',
+                        institute: form.querySelector('input[name="institute[]"]')?.value || '',
+                        result_type: form.querySelector('select[name="result_type[]"]')?.value || '',
+                        grade: form.querySelector('input[name="grade[]"]')?.value || '',
+                        passing_year: form.querySelector('select[name="passing_year[]"]')?.value || '',
+                        user_id: {{ $employee->id }}
                     };
                     educationData.push(formData);
                 });
