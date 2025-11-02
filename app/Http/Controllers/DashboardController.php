@@ -138,7 +138,10 @@ class DashboardController extends Controller
             );
         }
 
+        
+        
         foreach($all_anniversaries as $all_anniversary){
+            
             $number = date('Y') - date('Y',strtotime($all_anniversary->date_of_joining));
             if($number)
             $celebrations[strtotime(date('d M',strtotime($all_anniversary->date_of_joining)))] = array(
@@ -148,7 +151,7 @@ class DashboardController extends Controller
                 'id' => $all_anniversary->User->id,
                 'number' => $number.'<sup>'.daySuffix($number).'</sup>'.' '.trans('messages.work_anniversary'),
                 'name' => $all_anniversary->User->full_name,
-                'designation' => $all_anniversary->User->Designation->full_designation
+                'designation' => ($all_anniversary->User->Designation) ? $all_anniversary->User->Designation->full_designation : '',
             );
         }
 
