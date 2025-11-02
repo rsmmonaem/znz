@@ -1097,61 +1097,34 @@
 
 @section('javascript')
 <script type="text/javascript">
-$(function(){ // ensure DOM ready
-    initGetDistricts('#division', '#district');
-    initGetDistricts('#pres_division', '#pres_district');
+	getDistricts('#division', '#district');
+           getDistricts('#pres_division', '#pres_district');
+            // Division Change
+           function getDistricts(divisionElement, districtElement) {
+            $(divisionElement).change(function() {
+                var division_id = $(this).find('option:selected').data('id'); // Get selected division id
 
-    function initGetDistricts(divisionSelector, districtSelector) {
-        var $div = $(divisionSelector);
-        var $dist = $(districtSelector);
-
-        // if either element missing, bail out quietly (prevents null/value errors)
-        if (!$div.length || !$dist.length) {
-            console.warn('Selector not found:', divisionSelector, districtSelector);
-            return;
-        }
-
-        // on change handler
-        $div.on('change', function() {
-            // Prefer option data-id if present, otherwise fall back to the select value
-            var division_id = $(this).find(':selected').data('id') ?? $(this).val();
-
-            // reset district select immediately
-            $dist.empty().append($('<option>', { value: '', text: 'Select District' }));
-
-            if (!division_id && division_id !== 0) {
-                // nothing selected
-                return;
-            }
-
-            // AJAX to get districts
-            $.ajax({
-                url: '/get-districts/' + encodeURIComponent(division_id),
-                type: 'GET',
-                dataType: 'json'
-            }).done(function(data) {
-                // Expecting data to be an array of objects: [{ id: 1, name: 'Dhaka' }, ...]
-                if (!Array.isArray(data)) {
-                    console.error('Unexpected response format for districts:', data);
-                    return;
+                if (division_id) {
+                    // Make an AJAX request to get the districts
+                    $.ajax({
+                        url: '/get-districts/' + division_id,
+                        type: 'GET',
+                        dataType: 'json',
+                        success: function(data) {
+                            // Empty the district dropdown and add a default option
+                            $(districtElement).empty().append('<option value="">Select District</option>');
+                            
+                            // Loop through the returned districts and append them to the dropdown
+                            $.each(data, function(key, value) {
+                                $(districtElement).append('<option value="' + value.name + '">' + value.name + '</option>');
+                            });
+                        }
+                    });
+                } else {
+                    // If no division is selected, reset the district dropdown
+                    $(districtElement).empty().append('<option value="">Select District</option>');
                 }
-
-                data.forEach(function(item) {
-                    // support both {id, name} and {name} shapes
-                    var val = item.id ?? item.name;
-                    var txt = item.name ?? item;
-                    $dist.append($('<option>', { value: val, text: txt }));
-                });
-            }).fail(function(jqXHR, textStatus, err) {
-                console.error('Failed to load districts:', textStatus, err);
             });
-        });
-
-        // optional: if there is already a selected division on page load, populate districts
-        if ($div.val()) {
-            $div.trigger('change');
         }
-    }
-});
 </script>
 @stop
