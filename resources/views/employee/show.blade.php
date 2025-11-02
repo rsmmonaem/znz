@@ -460,8 +460,6 @@
 												<option value="{{ $item->name }}"
 													@if(isset($employee->Profile->nationality) && $employee->Profile->nationality == $item->name)
 														selected
-													@elseif(!isset($employee->Profile->nationality) && $item->name == 'Bangladesh')
-														selected
 													@endif>
 													{{ $item->name }}
 												</option>
@@ -469,6 +467,7 @@
 										</select>
 									</div>
 								</div>
+
 
 								{{-- Blood Group --}}
 								<div class="col-sm-6">
