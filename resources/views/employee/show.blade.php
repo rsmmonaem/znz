@@ -265,7 +265,7 @@
 									</div>
 								</div>
 								{{-- Section --}}
-								@if(isset($employee->Designation) && !$employee->Designation->is_hidden)
+								{{-- @if(isset($employee->Designation) && !$employee->Designation->is_hidden) --}}
 									<div class="col-sm-6">
 										<div class="form-group flex-form-group">
 											{!! Form::label('designation_id', trans('messages.designation'), ['class' => 'control-label']) !!}
@@ -277,7 +277,7 @@
 											) !!}
 										</div>
 									</div>
-								@endif
+								{{-- @endif --}}
 								{{-- @if(Entrust::can('manage_all_employee') && !$role->is_hidden)
 										<div class="col-sm-6">
 										  <div class="form-group flex-form-group">
