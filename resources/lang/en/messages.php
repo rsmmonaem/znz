@@ -198,7 +198,7 @@
   'nationality' => 'Nationality',
   'banglga_name' => 'Bangla Name',
   'blood_group' => 'Blood Group',
-  'birth' => 'Birth',
+  'birth' => 'Birth Certificate',
   'nid' => 'NID',
   'passport' => 'Passport',
   'tin' => 'TIN',
