@@ -229,16 +229,15 @@
 											<option value="">{{ trans('messages.select_one') }}</option>
 											@foreach ($departments as $department)
 												<option value="{{ $department->id }}" 
-													{{ (isset($employee->Profile) && $employee->Profile->department_id == $department->id) ? 'selected' : '' }}>
+													{{ (isset($employee) && $employee->department_id == $department->id) ? 'selected' : '' }}>
 													{{ $department->name }}
 												</option>
 											@endforeach
 										</select>
-
-										{{-- {!! Form::label('department_id',trans('messages.department'),['class' => 'control-label'])!!} --}}
-										{{-- {!! From::select('department_id',[null=>trans('messages.select_one')] + $department ,($employee->Profile->department_id) ? $employee->Profile->department_id : '',['class'=>'form-control input-xlarge select2me','placeholder'=>trans('messages.select_one')]) !!} --}}
 									</div>
 								</div>
+
+
 								<div class="col-sm-6">
 									<div class="form-group flex-form-group">
 										{!! Form::label('grade_id', trans('messages.grade'), ['class' => 'control-label']) !!}
