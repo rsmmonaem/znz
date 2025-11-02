@@ -228,8 +228,8 @@
 										<select class="form-control input-xlarge select2me" name="department_id" id="">
 											<option value="">{{ trans('messages.select_one') }}</option>
 											@foreach ($departments as $department)
-												<option value="{{ $department->id }}" 
-													{{ (isset($employee) && $employee->department_id == $department->id) ? 'selected' : '' }}>
+												<option value="{{ $department->id }}"
+													{{ (!empty($employee->department_id) && $employee->department_id == $department->id) ? 'selected' : '' }}>
 													{{ $department->name }}
 												</option>
 											@endforeach
