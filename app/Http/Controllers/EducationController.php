@@ -13,20 +13,16 @@ class EducationController extends Controller{
         EmployeeEducation::where('user_id', $decodedData[0]['user_id'])->delete();
         if (!empty($decodedData) && is_array($decodedData)) {
             foreach ($decodedData as $education) {
-                EmployeeEducation::updateOrCreate(
-                    [
-                        'user_id' => $education['user_id'],
-                        'education_level' => $education['education_level'],
-                        'subject' => $education['subject'],
-                    ],
-                    [
-                        'board' => $education['board'],
-                        'institute' => $education['institute'],
-                        'result_type' => $education['result_type'],
-                        'grade' => $education['grade'],
-                        'passing_year' => $education['passing_year'],
-                    ]
-                );
+                EmployeeEducation::create([
+                    'user_id' => $education['user_id'],
+                    'education_level' => $education['education_level'] ?? null,
+                    'subject' => $education['subject'] ?? null,
+                    'board' => $education['board'] ?? null,
+                    'institute' => $education['institute'] ?? null,
+                    'result_type' => $education['result_type'] ?? null,
+                    'grade' => $education['grade'] ?? null,
+                    'passing_year' => $education['passing_year'] ?? null,
+                ]);
             }
             return response()->json(['status'=> 'success' ,'message' => 'Education data inserted successfully'], 200);
         }
