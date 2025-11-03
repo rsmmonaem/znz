@@ -19,6 +19,13 @@
 </div>
 
 <div class="form-group">
+    <label>Employee ID</label>
+    <select class="form-control" name="employee_id" id="employee_id">
+        <option value="">Select Employee</option>
+    </select>
+</div>
+
+<div class="form-group">
     <label>Days</label><br>
     @php
         $days = ['Saturday', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
@@ -30,9 +37,14 @@
     @endforeach
 </div>
 
+{{-- from date to date  --}}
+
 <div class="form-group">
-    <label>Employee ID</label>
-    <select class="form-control" name="employee_id" id="employee_id">
-        <option value="">Select Employee</option>
-    </select>
+    <label>From Date</label>
+    <input type="date" name="fromdate" id="fromdate" class="form-control">
+</div>
+
+<div class="form-group">
+    <label>To Date</label>
+    <input type="date" name="todate" id="todate" class="form-control">
 </div>

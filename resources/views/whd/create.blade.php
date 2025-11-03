@@ -44,11 +44,15 @@
                $('#save').text('Please Wait...');
                $('#save').attr('disabled', true);
                const formData = {
-                   branch_id: $('#branch_id').val(),
-                   employee_id: $('#employee_id').val(),
-                   group_id: $('#group_id').val(),
-                   date : $('#date').val(),
-                   _token: $('meta[name="csrf-token"]').attr('content')
+                    branch_id: $('#branch_id').val(),
+                    employee_id: $('#employee_id').val(),
+                    group_id: $('#group_id').val(),
+                    days: $("input[name='days[]']:checked").map(function() {
+                        return $(this).val();
+                    }).get(),
+                    fromdate : $('#fromdate').val(),
+                    todate : $('#todate').val(),
+                    _token: $('meta[name="csrf-token"]').attr('content')
                };
                if(formData.branch_id == 0) {
                    return validate('Please select branch');
@@ -56,6 +60,13 @@
                if(formData.date == '') {
                    return validate('Please select date');
                }
+               if(formData.fromdate == '') {
+                   return validate('Please select from date');
+               }
+               if(formData.todate == '') {
+                   return validate('Please select to date');
+               }
+
                $.ajax({
                    url: '/whd-create',
                    type: 'POST',
