@@ -209,31 +209,31 @@ Class SalaryController extends Controller{
 
     public function SalarySlabList(Request $request)
     {
-        // Get all users with their profiles
+        
         $users = \App\User::with('profile')->where(['users.id' => $request->query('id')])->get();
 
-        // Fetch earning salary types only once
+        
         $earning_salary_types = \App\SalaryType::where('salary_type', '=', 'earning')->get();
 
-        $data = []; // Initialize an array for storing all users' data
+        $data = []; 
 
         foreach ($users as $user) {
-            // Get the latest contract for the current user
+            
             $latest_contract = \App\Contract::whereUserId($user->id)
-                ->latest('id') // Ensure it fetches the latest contract by ID
+                ->latest('id') 
                 ->first();
 
-            // Check if a contract exists before proceeding
+            
             if ($latest_contract) {
-                // Fetch the salaries associated with the latest contract
+                
                 $contract_salaries = \App\Salary::where('contract_id', $latest_contract->id)
                 ->latest('id') 
                 ->get();
 
-                // Fetch the latest salary slab for the current user
+                
                 $slab_data = DB::table('salary_slab')
                     ->where('user_id', $user->id)
-                    ->latest('id') // Ensure it fetches the latest salary slab
+                    ->latest('id') 
                     ->first();
 
                 $contractData = [
@@ -250,14 +250,12 @@ Class SalaryController extends Controller{
                         'salaries' => [],
                     ];
 
-                // Assuming $earning_salary_types is already defined elsewhere in your code
                 foreach ($earning_salary_types as $earning_salary_type) {
-                    // Filter the salary group to get the correct salary type
+                    
                     $salary = $contract_salaries->filter(function ($salary) use ($earning_salary_type) {
                         return $salary->salary_type_id == $earning_salary_type->id;
                     })->first();
 
-                    // Default amount to 0 if no matching salary is found
                     $amount = $salary ? floor($salary->amount) : 0;
 
                     $contractData['salaries'][] = [
@@ -266,7 +264,7 @@ Class SalaryController extends Controller{
                     ];
                 }
 
-                $data[] = $contractData; // Add contract data to the main data array
+                $data[] = $contractData; 
             }
         }
 
