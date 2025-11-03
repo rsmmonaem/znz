@@ -46,7 +46,7 @@
                     const formData = {
                         education_level: form.querySelector('select[name="education_level[]"]')?.value || '',
                         subject: form.querySelector('select[name="subject[]"]')?.value || '',
-                        board: form.querySelector('input[name="board[]"]')?.value || '',
+                        board: form.querySelector('select[name="board[]"]')?.value || '',
                         institute: form.querySelector('input[name="institute[]"]')?.value || '',
                         result_type: form.querySelector('select[name="result_type[]"]')?.value || '',
                         grade: form.querySelector('input[name="grade[]"]')?.value || '',
