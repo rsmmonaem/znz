@@ -14,14 +14,14 @@ class EducationController extends Controller{
         if (!empty($decodedData) && is_array($decodedData)) {
             foreach ($decodedData as $education) {
                 EmployeeEducation::create([
-                    'user_id' => $education['user_id'],
-                    'education_level' => $education['education_level'] ?? null,
-                    'subject' => $education['subject'] ?? null,
-                    'board' => $education['board'] ?? null,
-                    'institute' => $education['institute'] ?? null,
-                    'result_type' => $education['result_type'] ?? null,
-                    'grade' => $education['grade'] ?? null,
-                    'passing_year' => $education['passing_year'] ?? null,
+                    'user_id' => isset($education['user_id']) ? $education['user_id'] : null,
+                    'education_level' => isset($education['education_level']) ? $education['education_level'] : null,
+                    'subject' => isset($education['subject']) ? $education['subject'] : null,
+                    'board' => isset($education['board']) ? $education['board'] : null,
+                    'institute' => isset($education['institute']) ? $education['institute'] : null,
+                    'result_type' => isset($education['result_type']) ? $education['result_type'] : null,
+                    'grade' => isset($education['grade']) ? $education['grade'] : null,
+                    'passing_year' => isset($education['passing_year']) ? $education['passing_year'] : null,
                 ]);
             }
             return response()->json(['status'=> 'success' ,'message' => 'Education data inserted successfully'], 200);
