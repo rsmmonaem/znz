@@ -321,13 +321,13 @@
                     const salaryTable_wrapper = $('.table-container');
                     salaryTable_wrapper.show();
                     const datatable = $('#salaryTable');
-                    // Destroy the existing DataTable to reinitialize with new data
+                    
                     datatable.DataTable().destroy();
 
                     var tableBody = $('#tableData');
-                    tableBody.empty(); // Clear the existing table body
+                    tableBody.empty(); 
 
-                    // Loop through each user in the data
+                    
                     data.forEach(function (item) {
                         var row = `<tr>
                             <td><input type="checkbox"></td>
@@ -337,12 +337,12 @@
                             <td>${item.user_info.entry_date ? item.user_info.entry_date : ' '}</td>
                             <td>${item.user_info.gross ? item.user_info.gross : ' '}</td>`;
 
-                        // Loop through each salary type and add to row
+                        
                         item.salaries.forEach(function (salary) {
                             row += `<td>${salary.amount}</td>`;
                         });
 
-                        // Add action column with delete button
+                        
                         row += `<td>
                             <button type="button" class="btn btn-sm btn-danger delete-salary-slab" data-id="${item.id}" data-employee="${item.user_info.employee_code}">
                                 <i class="fa fa-trash"></i> Delete
@@ -350,10 +350,10 @@
                         </td>`;
 
                         row += `</tr>`;
-                        tableBody.append(row); // Append each row to the table body
+                        tableBody.append(row); 
                     });
 
-                    // Reinitialize the DataTable after adding new rows
+                    
                     datatable.DataTable({
                         lengthMenu: [10, 20, 50, 100],
                     });
