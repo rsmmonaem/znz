@@ -77,28 +77,56 @@ class whdController extends Controller{
         return view('whd.create', compact('branch', 'group'));
     }
 
-    public function store(Request $request){
-        $dates = explode(',', $request->date);
-        if($request->employee_id != null){
-            foreach ($dates as $value) {
+    public function store(Request $request)
+    {
+        // Validation
+        $request->validate([
+            'branch_id' => 'required',
+            'fromdate' => 'required|date',
+            'todate' => 'required|date|after_or_equal:fromdate',
+            'days' => 'required|array|min:1',
+        ]);
+
+        // convert days into lowercase for easier match
+        $selectedDays = array_map('strtolower', $request->days);
+
+        $from = new \DateTime($request->fromdate);
+        $to = new \DateTime($request->todate);
+        $to->modify('+1 day'); // include end date
+
+        $allDates = [];
+
+        // loop from fromdate to todate
+        for ($date = clone $from; $date < $to; $date->modify('+1 day')) {
+            $dayName = strtolower($date->format('l')); // e.g. 'saturday'
+            if (in_array($dayName, $selectedDays)) {
+                $allDates[] = $date->format('Y-m-d');
+            }
+        }
+
+        // if employee_id provided
+        if ($request->employee_id) {
+            foreach ($allDates as $d) {
                 WHD::updateOrCreate(
-                    ['user_id' => $request->employee_id, 'date' => $value], 
-                    ['user_id' => $request->employee_id, 'date' => $value] 
+                    ['user_id' => $request->employee_id, 'date' => $d],
+                    ['user_id' => $request->employee_id, 'date' => $d]
                 );
             }
-            return response()->json(['success', 'WHD Created Successfully.']);
-        }else{
+        } else {
+            // get all employees of branch
             $users = Profile::where('branch_id', $request->branch_id)->get();
-            foreach ($users as $e) {
-                foreach ($dates as $value) {
+
+            foreach ($users as $user) {
+                foreach ($allDates as $d) {
                     WHD::updateOrCreate(
-                        ['user_id' => $e->user_id, 'date' => $value], 
-                        ['user_id' => $e->user_id, 'date' => $value] 
+                        ['user_id' => $user->user_id, 'date' => $d],
+                        ['user_id' => $user->user_id, 'date' => $d]
                     );
                 }
             }
-            return response()->json(['success', 'WHD Created Successfully.']);
         }
+
+        return response()->json(['success' => true, 'message' => 'WHD Created Successfully.']);
     }
 
     public function destroy($id){
