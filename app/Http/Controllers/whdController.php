@@ -131,6 +131,6 @@ class whdController extends Controller{
 
     public function destroy($id){
         WHD::find($id)->delete();
-        return response()->json(['success', 'WHD Deleted Successfully.']);
+        return response()->json(['success' => true, 'message' => 'WHD Deleted Successfully.']);
     }
 }
