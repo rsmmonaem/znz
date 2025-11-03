@@ -336,7 +336,9 @@
                                         <select class="form-control" name="nationality">
                                             <option value="">Select</option>
                                             @foreach ($countries as $item)
-                                                <option value="{{ $item->name }}">{{ $item->name }}</option>
+                                                <option value="{{ $item->name }}" {{ $item->name == 'Bangladesh' ? 'selected' : '' }}>
+                                                    {{ $item->name }}
+                                                </option>
                                             @endforeach                                            
                                         </select>
                                     </div>
