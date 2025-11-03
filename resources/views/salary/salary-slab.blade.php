@@ -280,7 +280,7 @@ $(document).ready(function() {
 
                 // ✅ Reset all fields except entryDate
                 $('#salaryForm')[0].reset();
-                $('#gross, #basic1, #houseRent1, #medical1, #conveyance1, #others1').val('');
+                $('#gross, #basic1, #houseRent1, #medical1, #conveyance1, #others1, #effectiveDate').val('');
                 $('#entryDate').val('{{ date("Y-m-d") }}'); // keep today's date
             },
             error: function() {
