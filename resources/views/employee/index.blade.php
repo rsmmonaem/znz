@@ -323,14 +323,6 @@ function populateEmployeeTable(data) {
 
     // Append the data row
     data.forEach((item, index) => {
-        const deleteAction = `
-            <form method="POST" onsubmit="return confirm('Are you sure?')" action="/employee/${item.id}" style="display:inline;">
-                <input type="hidden" name="_method" value="DELETE">
-                <input type="hidden" name="_token" value="${$('meta[name="csrf-token"]').attr('content')}">
-                <button type="submit" class="btn btn-danger btn-xs" title="Delete">
-                    <i class="fa fa-trash"></i>
-                </button>
-            </form>`;
 
         const actions = `
             <div class="btn-group btn-group-xs">
