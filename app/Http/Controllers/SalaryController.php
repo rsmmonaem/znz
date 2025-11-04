@@ -542,6 +542,7 @@ Class SalaryController extends Controller{
                 'departments.name as departments',
                 'designations.name as designation'
             )
+            ->orderBy('profile.employee_code', 'asc')
             ->get('users.id');
 
         // Fetch earning salary types only once
