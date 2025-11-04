@@ -542,7 +542,7 @@ Class SalaryController extends Controller{
                 'departments.name as departments',
                 'designations.name as designation'
             )
-            ->orderBy('profile.employee_code', 'asc')
+            ->orderByRaw('CAST(profile.employee_code AS UNSIGNED) ASC')
             ->get('users.id');
 
         // Fetch earning salary types only once
