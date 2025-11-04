@@ -274,19 +274,26 @@ $(document).ready(function(){
         });
     }
 
-    $(document).on('click','.delete-btn', function(){
+    $(document).on('click', '.delete-btn', function () {
         var id = $(this).data('id');
-        if(!confirm('Are you sure to delete this record?')) return;
-        $.ajax({
-            url:'/delete-bank-part/'+id,
-            type:'GET',
-            success:function(res){
-                toastr.success(res.message);
-                var employeeId = $('#employeeId').val();
-                LoadBankPart(employeeId);
-            },
-            error:function(){ toastr.error('Delete failed'); }
-        });
+        
+        // SweetAlert or default confirm
+        if (confirm('Are you sure you want to delete this record?')) {
+            $.ajax({
+                url: '/delete-bank-part/' + id,
+                type: 'GET',
+                success: function (res) {
+                    toastr.success(res.message || 'Record deleted successfully.');
+                    var employeeId = $('#employeeId').val();
+                    LoadBankPart(employeeId);
+                },
+                error: function () {
+                    toastr.error('Delete failed');
+                }
+            });
+        } else {
+            toastr.info('Delete canceled');
+        }
     });
 
     $(document).on('change','.status', function(){
