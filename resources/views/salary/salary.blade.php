@@ -15,6 +15,7 @@
     .form-group input, .form-group select { flex: 1; }
     .action-buttons { text-align: center; margin-top: 20px; }
     .table-container { margin-top: 30px; }
+    #saveData { display: none; } /* hide initially */
 </style>
 
 <div class="row">
@@ -25,7 +26,7 @@
 
                 <!-- Entry Panel -->
                 <div class="panel-section">
-                    <form>
+                    <form id="bankForm">
                         <div class="row">
                             <div class="col-sm-6">
                                 <div class="form-group">
@@ -115,7 +116,7 @@
 
                         <div class="action-buttons">
                             <button type="button" class="btn btn-success" id="saveData">Save</button>
-                            <button type="button" class="btn btn-danger">Close</button>
+                            <button type="button" class="btn btn-danger" id="resetForm">Reset</button>
                         </div>
                     </form>
                 </div>
@@ -149,36 +150,31 @@
 <script>
 $(document).ready(function(){
 
-    // Initialize DataTable once
     var dt = $('#datatable').DataTable({
         lengthMenu: [10, 20, 50, 100],
-        columnDefs: [
-            { orderable: false, targets: [4,6] } // checkbox & action not orderable
-        ]
+        columnDefs: [{ orderable: false, targets: [4,6] }]
     });
 
-    // --- LOAD ALL DATA ON PAGE LOAD ---
     LoadBankPart();
 
-    // --- Branch change ---
     $('#branch').on('change', function(){
         var branch_id = $(this).val();
         $('#employeeId').val('');
         HandleBranchWiseEmployees(branch_id, '#employeeId');
-
-        // When branch changes, show all data again
         LoadBankPart();
     });
 
-    // --- Employee select ---
     $('#employeeId').on('change', function(){
         var employeeId = $(this).val();
-        if(employeeId==''){
-            // No employee selected => show all data
+
+        if(employeeId == ''){
+            $('#saveData').hide(); // hide save when not selected
             LoadBankPart();
             ClearEmployeeForm();
             return;
         }
+
+        $('#saveData').show(); // show save when selected
 
         $.ajax({
             url:'/get-user-data-salary',
@@ -190,16 +186,12 @@ $(document).ready(function(){
                 $('#category').val(res.category);
                 $('#gross').val(res.gross);
             },
-            error:function(){
-                ClearEmployeeForm();
-            }
+            error:function(){ ClearEmployeeForm(); }
         });
 
-        // Load data for selected employee only
         LoadBankPart(employeeId);
     });
 
-    // --- Save button ---
     $('#saveData').on('click', function(){
         $(this).attr('disabled', true).text('Saving...');
         const FormData = {
@@ -223,14 +215,24 @@ $(document).ready(function(){
             data:FormData,
             success:function(res){
                 LoadBankPart(FormData.employeeId);
-                $('#saveData').attr('disabled', false).text('Save');
                 toastr.success(res.message || 'Data saved successfully.');
+
+                // Reset all inputs except Entry Date
+                $('#bankForm').find('input[type="text"], input[type="date"], select').not('#entryDate').val('');
+                $('#entryDate').val('{{ date('Y-m-d') }}');
+                $('#saveData').attr('disabled', false).text('Save');
             },
             error:function(){
                 $('#saveData').attr('disabled', false).text('Save');
                 toastr.error('Data save failed.');
             }
         });
+    });
+
+    $('#resetForm').on('click', function(){
+        $('#bankForm').find('input[type="text"], input[type="date"], select').not('#entryDate').val('');
+        $('#entryDate').val('{{ date('Y-m-d') }}');
+        $('#saveData').hide();
     });
 
     function validate(msg){
@@ -243,7 +245,6 @@ $(document).ready(function(){
         $('#name,#designation,#category,#gross').val('');
     }
 
-    // --- Load bank part data ---
     function LoadBankPart(employeeId=''){
         $.ajax({
             url:'/GetBankPart',
@@ -251,7 +252,6 @@ $(document).ready(function(){
             data:{employeeId:employeeId},
             success:function(res){
                 dt.clear();
-
                 if(res.length==0){
                     dt.row.add(['No data found','','','','','','']).draw();
                 } else {
@@ -274,7 +274,6 @@ $(document).ready(function(){
         });
     }
 
-    // --- Delete button ---
     $(document).on('click','.delete-btn', function(){
         var id = $(this).data('id');
         if(!confirm('Are you sure to delete this record?')) return;
@@ -290,7 +289,6 @@ $(document).ready(function(){
         });
     });
 
-    // --- Status toggle ---
     $(document).on('change','.status', function(){
         var id = $(this).data('id');
         var status = $(this).is(':checked')?1:0;

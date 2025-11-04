@@ -372,6 +372,10 @@ Class SalaryController extends Controller{
         $remarks = $request->remarks;
         $cashAmout = $gross - $bankAmount;
 
+        if(!$gross) {
+            return response()->json(['message' => 'Gross Amount does not exists for this employee.', 'status' => 'error'], 200, array('Access-Controll-Allow-Origin' => '*'));
+        }
+
         $data = [
             'user_id' => $employeeId,
             'effective_date' => $effectiveDate,
