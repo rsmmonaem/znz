@@ -356,7 +356,6 @@ $(document).on('click', '.delete-salary-slab', function() {
         cancelButtonColor: "#d33",
     }).then((result) => {
         if (result.isConfirmed) {
-            console.log('/salary-slab-delete/' + id);
             $.ajax({
                 url: '/salary-slab-delete/' + id,
                 type: 'DELETE',
