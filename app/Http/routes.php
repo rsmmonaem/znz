@@ -482,6 +482,8 @@ Route::group(['middleware' => ['auth','license','account_valid']], function () {
 	Route::get('/salary-slab', 'SalaryController@salary');
 	Route::post('/salary-slab-create', 'SalaryController@CreateSlab');
 	Route::get('/slary-slab-list', 'SalaryController@SalarySlabList');
+	Route::delete('/salary-slab-delete/{id}', 'SalaryController@salaryslabdestroy')->name('salary.slab.delete');
+
 	Route::get('salary-advance', 'SalaryAdvanceController@index');
 	Route::post('salary-advance-create', 'SalaryAdvanceController@salaryAdvancePost');
 	Route::post('salary-advance-list', 'SalaryAdvanceController@GetAllDate');

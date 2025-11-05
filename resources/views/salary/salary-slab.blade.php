@@ -216,6 +216,7 @@
 @stop
 
 @section('javascript')
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 $(document).ready(function() {
     $('#branch').on('change', function() {
@@ -278,10 +279,9 @@ $(document).ready(function() {
                 toastr.success(data.message || 'Slab created successfully.');
                 getData(data.data);
 
-                // ✅ Reset all fields except entryDate
                 $('#salaryForm')[0].reset();
                 $('#gross, #basic1, #houseRent1, #medical1, #conveyance1, #others1, #effectiveDate').val('');
-                $('#entryDate').val('{{ date("Y-m-d") }}'); // keep today's date
+                $('#entryDate').val('{{ date("Y-m-d") }}');
             },
             error: function() {
                 $('#saveData').attr('disabled', false).text('Save');
@@ -339,5 +339,37 @@ function getData(id = null) {
         }
     });
 }
+
+// ✅ Delete confirm with SweetAlert
+$(document).on('click', '.delete-salary-slab', function() {
+    var id = $(this).data('id');
+    var row = $(this).closest('tr');
+
+    Swal.fire({
+        title: "Are you sure?",
+        text: "This salary slab will be permanently deleted.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Yes, delete it!",
+        cancelButtonText: "Cancel",
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                url: '/salary-slab-delete/' + id,
+                type: 'DELETE',
+                data: { _token: '{{ csrf_token() }}' },
+                success: function(response) {
+                    Swal.fire('Deleted!', response.message || 'Salary slab deleted.', 'success');
+                    row.fadeOut(500, function() { $(this).remove(); });
+                },
+                error: function() {
+                    Swal.fire('Error!', 'Failed to delete.', 'error');
+                }
+            });
+        }
+    });
+});
 </script>
 @stop

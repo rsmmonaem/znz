@@ -339,6 +339,29 @@ Class SalaryController extends Controller{
         }
     }
 
+    public function salaryslabdestroy($id)
+    {
+        try {
+            // Find the slab first
+            $slab = DB::table('salary_slab')->where('id', $id)->first();
+
+            if (!$slab) {
+                return response()->json(['message' => 'Salary slab not found.'], 404);
+            }
+
+            // Delete the record
+            DB::table('salary_slab')->where('id', $id)->delete();
+
+            return response()->json(['message' => 'Salary slab deleted successfully.'], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Something went wrong while deleting.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
     // public function getSalaryData(){
     //     Salary::LeftJoin('contacts', 'salary.contract_id' ,'=', 'contacts.id')
     //     ->LeftJoin('users', 'contacts.user_id' ,'=', 'users.id')
