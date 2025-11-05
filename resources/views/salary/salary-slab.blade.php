@@ -268,7 +268,7 @@ $(document).ready(function() {
             others: $('#others').val(),
             management: $('input[name="management"]:checked').val()
         };
-
+        
         $.ajax({
             url: '/salary-slab-create',
             type: "POST",
@@ -323,7 +323,7 @@ function getData(id = null) {
                 });
 
                 row += `<td>
-                    <button type="button" class="btn btn-sm btn-danger delete-salary-slab" data-id="${item.id}">
+                    <button type="button" class="btn btn-sm btn-danger delete-salary-slab" data-id="${item.user_info.slab_id}">
                         <i class="fa fa-trash"></i> Delete
                     </button>
                 </td></tr>`;
@@ -356,6 +356,7 @@ $(document).on('click', '.delete-salary-slab', function() {
         cancelButtonColor: "#d33",
     }).then((result) => {
         if (result.isConfirmed) {
+            console.log('/salary-slab-delete/' + id);
             $.ajax({
                 url: '/salary-slab-delete/' + id,
                 type: 'DELETE',

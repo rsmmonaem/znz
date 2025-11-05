@@ -243,6 +243,7 @@ Class SalaryController extends Controller{
                             'entry_date' => isset($slab_data->entrydate) ? date('Y-m-d', strtotime($slab_data->entrydate)) : null,
                             'effective_date' => isset($slab_data->effactive_date) ? date('Y-m-d', strtotime($slab_data->effactive_date)) : null,
                             'gross' => isset($slab_data->gross) ? $slab_data->gross : null,
+                            'slab_id' => isset($slab_data->id) ? $slab_data->id : null
                         ],
                         'contract_details' => [
                             'from_date' => $latest_contract->from_date,
@@ -342,16 +343,12 @@ Class SalaryController extends Controller{
     public function salaryslabdestroy($id)
     {
         try {
-            // Find the slab first
             $slab = DB::table('salary_slab')->where('id', $id)->first();
-
             if (!$slab) {
                 return response()->json(['message' => 'Salary slab not found.'], 404);
             }
-
-            // Delete the record
+    
             DB::table('salary_slab')->where('id', $id)->delete();
-
             return response()->json(['message' => 'Salary slab deleted successfully.'], 200);
 
         } catch (\Exception $e) {
@@ -360,7 +357,7 @@ Class SalaryController extends Controller{
                 'error' => $e->getMessage(),
             ], 500);
         }
-    }
+    } 
 
     // public function getSalaryData(){
     //     Salary::LeftJoin('contacts', 'salary.contract_id' ,'=', 'contacts.id')
