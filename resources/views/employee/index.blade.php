@@ -324,7 +324,7 @@ function populateEmployeeTable(data) {
     // Append the data row
     data.forEach((item, index) => {
 		const deleteAction = `
-            <form method="POST" onsubmit="return confirm('Are you sure?')" action="/employee/${item.id}" style="display:inline;">
+            <form method="POST" onsubmit="return confirm('Are you sure?')" action="/employee/${item.id}" style="display:none;">
                 <input type="hidden" name="_method" value="DELETE">
                 <input type="hidden" name="_token" value="${$('meta[name="csrf-token"]').attr('content')}">
                 <button type="submit" class="btn btn-danger btn-xs" title="Delete">
