@@ -157,10 +157,9 @@
 @stop
 
 @section('javascript')
-<script type="text/javascript">
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
+<script type="text/javascript">
     // ✅ Fetch employee details
     $('#employeeId').on('change', function() {
         const id = $(this).val();
