@@ -455,6 +455,7 @@
 										<label for="nationality">{{ trans('messages.nationality') }}</label>
 										<select class="form-control" name="nationality" id="nationality">
 											<option value="">Select</option>
+											<option value="Bangladesh" {{ isset($employee->Profile->nationality) && $employee->Profile->nationality == 'Bangladesh' ? 'selected' : '' }}>Bangladesh</option>
 											@foreach ($countries as $item)
 												<option value="{{ $item->name }}"
 													@if(isset($employee->Profile->nationality) && $employee->Profile->nationality == $item->name)
