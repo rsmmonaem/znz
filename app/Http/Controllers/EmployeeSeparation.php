@@ -118,6 +118,7 @@ class EmployeeSeparation extends Controller
                 'doj' => $profile->date_of_joining,
                 'section' => $section,
                 'entry_date' => date('Y-m-d'),
+                'effective_date' => date('Y-m-d'),
                 'separation_arise_date' => date('Y-m-d'),
                 'last_working_day' => date('Y-m-d'),
                 'created_at' => date('Y-m-d H:i:s'),
