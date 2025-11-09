@@ -133,6 +133,23 @@
                     </div>
                 </form>
 
+<hr>
+<h3 class="text-center mt-4">Quick Separation Entry (By Employee Code)</h3>
+
+<div class="row">
+    <div class="col-sm-6 col-sm-offset-3">
+        <form id="quickSeparationForm">
+            <div class="form-group">
+                <label for="employeeCode">Employee Code</label>
+                <input type="text" class="form-control" id="employeeCode" placeholder="Enter Employee Code" required>
+            </div>
+            <div class="text-center">
+                <button type="button" id="quickSaveBtn" class="btn btn-success">Insert Separation</button>
+            </div>
+        </form>
+    </div>
+</div>
+
                 <table class="table table-bordered" id="datatable" style="margin-top:20px">
                     <thead>
                         <tr>
@@ -325,5 +342,37 @@
             }
         });
     });
+</script>
+<script>
+$('#quickSaveBtn').on('click', function(e) {
+    e.preventDefault();
+    const code = $('#employeeCode').val().trim();
+    if (!code) {
+        toastr.error('Please enter an employee code.');
+        return;
+    }
+
+    $(this).attr('disabled', true).text('Please Wait...');
+
+    $.ajax({
+        url: '/quick-separation-insert',
+        type: 'POST',
+        data: { employee_code: code },
+        success: function(response) {
+            $('#quickSaveBtn').attr('disabled', false).text('Insert Separation');
+            if (response.status === 'success') {
+                toastr.success(response.message);
+                $('#employeeCode').val('');
+                getSeparationData();
+            } else {
+                toastr.error(response.message);
+            }
+        },
+        error: function() {
+            $('#quickSaveBtn').attr('disabled', false).text('Insert Separation');
+            toastr.error('Something went wrong.');
+        }
+    });
+});
 </script>
 @stop

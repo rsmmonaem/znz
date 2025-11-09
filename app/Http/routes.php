@@ -444,6 +444,9 @@ Route::group(['middleware' => ['auth','license','account_valid']], function () {
 	Route::get('/employee-separation/{id}/edit', 'EmployeeSeparation@edit');
 	Route::put('/employee-separation/{id}', 'EmployeeSeparation@update')->name('employee-separation.update');
 	Route::post('/employee-separation-report', 'EmployeeSeparation@reportPost');
+
+	// Quick Separation
+	Route::post('/quick-separation-insert', 'EmployeeSeparation@quickInsert');
 	// Empoloyee Separation
 	Route::get('/date-wise-attendance', 'ClockController@dateWiseAttendance');
 	Route::post('/date-wise-attendance', array('as'=>'clock.date-wise-attendance','uses'=>'ClockController@postDateWiseAttendance'));

@@ -89,6 +89,51 @@ class EmployeeSeparation extends Controller
         }
     }
 
+    public function quickInsert(Request $request)
+    {
+        try {
+            $code = $request->input('employee_code');
+            if (!$code) {
+                return response()->json(['status' => 'error', 'message' => 'Employee code is required.']);
+            }
+
+            $profile = DB::table('profile')->where('employee_code', $code)->first();
+
+            if (!$profile) {
+                return response()->json(['status' => 'error', 'message' => 'No employee found for this code.']);
+            }
+
+            $user = DB::table('users')->where('id', $profile->user_id)->first();
+            $branch = DB::table('branchs')->where('id', $profile->branch_id)->value('name');
+            $section = DB::table('sections')->where('id', $profile->section_id)->value('name');
+            $designation = DB::table('designations')->where('id', $user->designation_id)->value('name');
+
+            DB::table('employee_separations')->insert([
+                'employee_id' => $user->id,
+                'employee_name' => $user->first_name,
+                'branch' => $branch,
+                'separation_type' => 'Resignation',
+                'designation' => $designation,
+                'doj' => $profile->date_of_joining,
+                'section' => $section,
+                'entry_date' => now(),
+                'separation_arise_date' => now(),
+                'last_working_day' => now(),
+                'created_at' => now(),
+            ]);
+
+            DB::table('users')->where('id', $user->id)->update(['status' => 'Separated']);
+
+            return response()->json(['status' => 'success', 'message' => 'Employee separation inserted successfully.']);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to insert separation record.',
+                'error' => $e->getMessage(),
+            ]);
+        }
+    }
+
     // Get Employee Separetion Lists
     public function lists()
     {
