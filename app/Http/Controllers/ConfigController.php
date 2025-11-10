@@ -47,6 +47,17 @@ Class ConfigController extends Controller{
 		return view('configuration.permission',compact('permissions','permission_role','category', 'employees', 'roles'));
 	}
 
+	public function getEmployeeUsername($id)
+	{
+		$user = DB::table('users')->where('id', $id)->select('username')->first();
+
+		if ($user) {
+			return response()->json(['status' => 'success', 'username' => $user->username]);
+		} else {
+			return response()->json(['status' => 'error', 'username' => null]);
+		}
+	}
+
 	public function api(Request $request){
 		$user = Auth::user();
 		$user->auth_token = str_random(40);

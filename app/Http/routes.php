@@ -92,6 +92,7 @@ Route::group(['middleware' => ['auth','license','account_valid']], function () {
 	Route::group(['middleware' => ['config_accessible']], function () {
 		Route::get('/configuration', 'ConfigController@index'); 
 		Route::get('/permission', 'ConfigController@permission'); 
+		Route::get('/get-employee-username/{id}', 'ConfigController@getEmployeeUsername');
 		Route::post('/save-user-role', 'ConfigController@permissionSave');
 		Route::get('/check-update','AccountController@checkUpdate');
 		Route::post('/configuration', array('as' => 'configuration.store','uses' => 'ConfigController@store')); 

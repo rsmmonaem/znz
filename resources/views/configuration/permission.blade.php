@@ -16,25 +16,42 @@
 					</div>
 					<div class="clear"></div>
 					<div class="form">
+
+						{{-- Employee Select --}}
 						<div class="form-group">
 							<select name="employee_id" id="employee_id" class="form-control">
 								<option value="">Select Employee</option>
 								@foreach($employees as $employee)
-								<option value="{{ $employee->id }}">{{ $employee->name.'-'.$employee->employee_id }}</option>
+									<option value="{{ $employee->id }}">{{ $employee->name.'-'.$employee->employee_id }}</option>
 								@endforeach
 							</select>
 						</div>
+
+						{{-- Username Input --}}
+						<div class="form-group">
+							<input class="form-control" name="username" id="username" placeholder="Enter Username" value="">
+						</div>
+
+						{{-- Role --}}
 						<div class="form-group">
 							<select name="role_id" id="role_id" class="form-control">
 								<option value="">Select Role</option>
 								@foreach($roles as $role)
-								<option value="{{ $role->id }}">{{ $role->name }}</option>
+									<option value="{{ $role->id }}">{{ $role->name }}</option>
 								@endforeach
 							</select>
 						</div>
+
+						{{-- Password --}}
 						<div class="form-group">
-							<button class="btn btn-primary" id="save_permission">Save</button>
+							<input class="form-control" name="password" id="password" placeholder="Enter Password" value="">
 						</div>
+
+						{{-- Button --}}
+						<div class="form-group">
+							<button class="btn btn-primary" id="save_permission">Save Permission</button>
+						</div>
+
 					</div>
 				</div>
 			</div>
@@ -81,27 +98,57 @@
 		</div>
 	@stop
 @section('javascript')
-	<script type="text/javascript">
-		$(document).ready(function() {
-			$('#save_permission').on('click',function(e){
-				const FormData = {
-					employee_id: $('#employee_id').val(),
-					role_id: $('#role_id').val()
-				}
-				e.preventDefault();
-				$.ajax({
-					url: '/save-user-role',
-					data: FormData,
-					type: 'POST',
-					success: function(data){
-						if(data.status == 'success'){
-							toastr.success(data.message);
-						}else{
-							toastr.error(data.message);
-						}
-					}	
-				});
-			});
-		});
-	</script>
+<script type="text/javascript">
+$(document).ready(function(){
+
+    // When Employee selected → Fetch username via AJAX
+    $('#employee_id').on('change', function(){
+        const emp_id = $(this).val();
+        $('#username').val(''); // reset first
+
+        if(emp_id !== ''){
+            $.ajax({
+                url: '/get-employee-username/' + emp_id,
+                type: 'GET',
+                success: function(data){
+                    if(data.status === 'success'){
+                        $('#username').val(data.username ?? '');
+                    } else {
+                        $('#username').val('');
+                    }
+                }
+            });
+        }
+    });
+
+    // Save button click
+    $('#save_permission').on('click', function(e){
+        e.preventDefault();
+
+        const FormData = {
+            employee_id: $('#employee_id').val(),
+            username: $('#username').val(),
+            role_id: $('#role_id').val(),
+            password: $('#password').val(),
+        };
+
+        $.ajax({
+            url: '/save-user-role',
+            type: 'POST',
+            data: FormData,
+            success: function(data){
+                if(data.status === 'success'){
+                    toastr.success(data.message);
+                } else {
+                    toastr.error(data.message);
+                }
+            },
+            error: function(){
+                toastr.error('Something went wrong!');
+            }
+        });
+    });
+
+});
+</script>
 @stop
