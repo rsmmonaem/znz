@@ -397,14 +397,55 @@ Class ConfigController extends Controller{
         return redirect('/dashboard');
 	}
 
+	// public function permissionSave(Request $request){
+	// 	$data = $request->all();
+	// 	// return $data;
+	// 	DB::table('role_user')->insert([
+	// 		'user_id' => $data['employee_id'],
+	// 		'role_id' => $data['role_id']
+	// 	]);
+	// 	return response()->json(['message' => 'Permission Updated', 'status' => 'success'], 200, array('Access-Controll-Allow-Origin' => '*'));
+	// }
+
 	public function permissionSave(Request $request){
 		$data = $request->all();
-		// return $data;
-		DB::table('role_user')->insert([
-			'user_id' => $data['employee_id'],
-			'role_id' => $data['role_id']
+
+		if (empty($data['employee_id']) || empty($data['role_id']) || empty($data['password'])) {
+			return response()->json(['status' => 'error', 'message' => 'All fields are required']);
+		}
+
+		// Username uniqueness check
+		if (!empty($data['username'])) {
+			$exists = DB::table('users')
+				->where('username', $data['username'])
+				->where('id', '!=', $data['employee_id'])
+				->exists();
+
+			if ($exists) {
+				return response()->json(['status' => 'error', 'message' => 'Username already exists!']);
+			}
+		}
+
+		DB::table('users')->where('id', $data['employee_id'])->update([
+			'username' => $data['username'],
+			'password' => bcrypt($data['password']),
 		]);
-		return response()->json(['message' => 'Permission Updated', 'status' => 'success'], 200, array('Access-Controll-Allow-Origin' => '*'));
+
+		// Role assign
+		$already = DB::table('role_user')
+			->where('user_id', $data['employee_id'])
+			->where('role_id', $data['role_id'])
+			->first();
+
+		if (!$already) {
+			DB::table('role_user')->insert([
+				'user_id' => $data['employee_id'],
+				'role_id' => $data['role_id']
+			]);
+		}
+
+		return response()->json(['status' => 'success', 'message' => 'Permission & username updated successfully']);
+		
 	}
 
 }
