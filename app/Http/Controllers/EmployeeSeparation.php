@@ -39,15 +39,24 @@ class EmployeeSeparation extends Controller
             "Physical disability"
         ];
         $employee = User::LeftJoin('profile', 'users.id', '=', 'profile.user_id')
-        ->select('users.first_name', 'users.id', 'profile.employee_code')
-        ->get();
+            ->select('users.first_name', 'users.id', 'profile.employee_code')
+            ->get();
         return view('employee-separation.create', compact('separetionType', 'employee'));
     }
-    
+
     // Get Employee Separetion Data Store
     public function store(Request $request)
     {
         try {
+
+            $exists = DB::table('employee_separations')->where('employee_id', $request->input('employeeId'))->exists();
+
+            if ($exists) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'This employee already has a separation record.',
+                ]);
+            }
             // Insert data into the table
             $separation = new AppEmployeeSeparation();
             $separation->employee_id = $request->input('employeeId');
@@ -74,14 +83,13 @@ class EmployeeSeparation extends Controller
                 $user->status = 'Separated';
                 $user->save();
             }
-            
+
             return response()->json([
                 'status' => 'success',
                 'message' => 'Employee separation record saved successfully.',
                 'data' => $separation,
             ]);
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'Failed to save employee separation record.',
@@ -96,6 +104,15 @@ class EmployeeSeparation extends Controller
             $code = $request->input('employee_code');
             if (!$code) {
                 return response()->json(['status' => 'error', 'message' => 'Employee code is required.']);
+            }
+
+            $exists = DB::table('employee_separations')->where('employee_id', $code)->exists();
+
+            if ($exists) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'This employee already has a separation record.',
+                ]);
             }
 
             $profile = DB::table('profile')->where('employee_code', $code)->first();
@@ -140,26 +157,26 @@ class EmployeeSeparation extends Controller
     public function lists()
     {
         $separation = AppEmployeeSeparation::LeftJoin('profile', 'employee_separations.employee_id', '=', 'profile.user_id')
-        ->select(
-            'employee_separations.employee_name', 
-            'employee_separations.id', 
-            'employee_separations.designation',
-            'employee_separations.branch',
-            'employee_separations.doj',
-            'employee_separations.section',
-            'employee_separations.separation_type',
-            'employee_separations.reason',
-            'employee_separations.entry_date',
-            'employee_separations.separation_arise_date',
-            'employee_separations.last_working_day',
-            'employee_separations.effective_date',
-            'employee_separations.notice_period',
-            'employee_separations.mandatory_notice',
-            'employee_separations.short_day',
-            'profile.employee_code as employee_id'
-        )
-        ->orderby('id','desc')
-        ->get();
+            ->select(
+                'employee_separations.employee_name',
+                'employee_separations.id',
+                'employee_separations.designation',
+                'employee_separations.branch',
+                'employee_separations.doj',
+                'employee_separations.section',
+                'employee_separations.separation_type',
+                'employee_separations.reason',
+                'employee_separations.entry_date',
+                'employee_separations.separation_arise_date',
+                'employee_separations.last_working_day',
+                'employee_separations.effective_date',
+                'employee_separations.notice_period',
+                'employee_separations.mandatory_notice',
+                'employee_separations.short_day',
+                'profile.employee_code as employee_id'
+            )
+            ->orderby('id', 'desc')
+            ->get();
         return $separation;
     }
 
@@ -200,11 +217,11 @@ class EmployeeSeparation extends Controller
             "Physical disability"
         ];
         $employee = User::LeftJoin('profile', 'users.id', '=', 'profile.user_id')
-        ->select('users.first_name', 'users.id', 'profile.employee_code')
-        ->get();
+            ->select('users.first_name', 'users.id', 'profile.employee_code')
+            ->get();
         $separation = AppEmployeeSeparation::find($id);
         // return $separation;
-        return view('employee-separation.edit', compact('separation','employee', 'separationType'));
+        return view('employee-separation.edit', compact('separation', 'employee', 'separationType'));
     }
     // Get Employee Separetion Update
     public function update(Request $request, $id)
@@ -238,11 +255,11 @@ class EmployeeSeparation extends Controller
     {
         $id = $request->id;
         $user = User::LeftJoin('profile', 'users.id', '=', 'profile.user_id')
-        ->LeftJoin('designations', 'users.designation_id', '=', 'designations.id')
-        ->leftJoin('sections', 'profile.section_id', '=', 'sections.id')
-        ->LeftJoin('branchs', 'profile.branch_id', '=', 'branchs.id')
-        ->select('users.id', 'users.first_name', 'profile.employee_code', 'profile.date_of_joining', 'designations.name as designation', 'sections.name as section', 'branchs.name as branch','profile.category')
-        ->where('users.id', '=', $id)->first();
+            ->LeftJoin('designations', 'users.designation_id', '=', 'designations.id')
+            ->leftJoin('sections', 'profile.section_id', '=', 'sections.id')
+            ->LeftJoin('branchs', 'profile.branch_id', '=', 'branchs.id')
+            ->select('users.id', 'users.first_name', 'profile.employee_code', 'profile.date_of_joining', 'designations.name as designation', 'sections.name as section', 'branchs.name as branch', 'profile.category')
+            ->where('users.id', '=', $id)->first();
         return $user;
     }
     public function  Report()
@@ -251,20 +268,21 @@ class EmployeeSeparation extends Controller
         $designation = Designation::get();
         $section = Section::get();
         $employee = User::LeftJoin('profile', 'users.id', '=', 'profile.user_id')
-        ->select('users.first_name', 'users.id', 'profile.employee_code')
-        ->get();
+            ->select('users.first_name', 'users.id', 'profile.employee_code')
+            ->get();
         $department = Department::get();
-        return view('employee-separation.report', compact('branch', 'designation', 'section', 'employee','department'));
+        return view('employee-separation.report', compact('branch', 'designation', 'section', 'employee', 'department'));
     }
 
-    public function  reportPost(Request $request){
+    public function  reportPost(Request $request)
+    {
         // return $request->all();
         $data = AppEmployeeSeparation::leftJoin('users', 'employee_separations.employee_id', '=', 'users.id')
-        ->leftJoin('profile', 'users.id', '=', 'profile.user_id')
-        ->LeftJoin('designations', 'users.designation_id', '=', 'designations.id')
-        ->LeftJoin('sections', 'profile.section_id', '=', 'sections.id')
-        ->LeftJoin('branchs', 'profile.branch_id', '=', 'branchs.id')
-        ->LeftJoin('departments', 'designations.department_id', '=', 'departments.id');
+            ->leftJoin('profile', 'users.id', '=', 'profile.user_id')
+            ->LeftJoin('designations', 'users.designation_id', '=', 'designations.id')
+            ->LeftJoin('sections', 'profile.section_id', '=', 'sections.id')
+            ->LeftJoin('branchs', 'profile.branch_id', '=', 'branchs.id')
+            ->LeftJoin('departments', 'designations.department_id', '=', 'departments.id');
         if ($request->branch) {
             $data->where('profile.branch_id', '=', $request->branch);
         }
@@ -310,7 +328,7 @@ class EmployeeSeparation extends Controller
 
         $response = array();
         $response['data'] = $data;
-        $response['date'] = $request->fromDate. ' to ' . $request->toDate;
+        $response['date'] = $request->fromDate . ' to ' . $request->toDate;
         return $response;
     }
 }
