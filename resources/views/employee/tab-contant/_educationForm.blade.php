@@ -1,6 +1,11 @@
 @php
-  $educationLavel = DB::table('employee_education_lavel')->get();
-  $employee_education_class_subject = DB::table('employee_education_class_subject')->get();
+  $educationLavel = DB::table('employee_education_lavel')
+      ->orderBy('name', 'asc')
+      ->get();
+
+  $employee_education_class_subject = DB::table('employee_education_class_subject')
+      ->orderBy('name', 'asc')
+      ->get();
 @endphp
 @forelse ($education as $item)
     <div class="form-container">
