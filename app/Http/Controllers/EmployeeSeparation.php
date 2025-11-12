@@ -106,15 +106,6 @@ class EmployeeSeparation extends Controller
                 return response()->json(['status' => 'error', 'message' => 'Employee code is required.']);
             }
 
-            $exists = DB::table('employee_separations')->where('employee_id', $code)->exists();
-
-            if ($exists) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'This employee already has a separation record.',
-                ]);
-            }
-
             $profile = DB::table('profile')->where('employee_code', $code)->first();
 
             if (!$profile) {
@@ -125,6 +116,15 @@ class EmployeeSeparation extends Controller
             $branch = DB::table('branchs')->where('id', $profile->branch_id)->value('name');
             $section = DB::table('sections')->where('id', $profile->section_id)->value('name');
             $designation = DB::table('designations')->where('id', $user->designation_id)->value('name');
+
+            $exists = DB::table('employee_separations')->where('employee_id', $user->id)->exists();
+
+            if ($exists) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'This employee already has a separation record.',
+                ]);
+            }
 
             DB::table('employee_separations')->insert([
                 'employee_id' => $user->id,
