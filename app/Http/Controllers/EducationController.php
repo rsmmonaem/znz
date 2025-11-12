@@ -1,14 +1,18 @@
 <?php
+
 namespace App\Http\Controllers;
+
 use App\EmployeeEducation;
 use App\WorkExperience;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
-class EducationController extends Controller{
+class EducationController extends Controller
+{
     use BasicController;
 
-    public function store(Request $request){
+    public function store(Request $request)
+    {
         $decodedData = json_decode($request->input('education_data'), true);
         EmployeeEducation::where('user_id', $decodedData[0]['user_id'])->delete();
         if (!empty($decodedData) && is_array($decodedData)) {
@@ -24,12 +28,13 @@ class EducationController extends Controller{
                     'passing_year' => isset($education['passing_year']) ? $education['passing_year'] : null,
                 ]);
             }
-            return response()->json(['status'=> 'success' ,'message' => 'Education data inserted successfully'], 200);
+            return response()->json(['status' => 'success', 'message' => 'Education data inserted successfully'], 200);
         }
         return response()->json(['message' => 'No education data provided'], 400);
     }
 
-    public function work_experience(Request $request){
+    public function work_experience(Request $request)
+    {
         $decodedData = json_decode($request->input('experience_data'), true);
 
         // Remove existing work experience data for the user
@@ -59,33 +64,49 @@ class EducationController extends Controller{
     }
 
 
-    public function educationLavelCreate() {
-        return view('employee.Education.educationlavel'); 
+    public function educationLavelCreate()
+    {
+        return view('employee.Education.educationlavel');
     }
 
-    public function educationLavelList() {
-      return DB::table('employee_education_lavel')->get(); 
+    public function educationLavelList()
+    {
+        return DB::table('employee_education_lavel')->get();
     }
 
-    public function educationLavelStore(Request $request) {
+    public function educationLavelStore(Request $request)
+    {
+
+        $level = DB::table('employee_education_lavel')->where('name', $request->name)->first();
+        if ($level) {
+            return response()->json(['status' => 'error', 'message' => 'Level already exists'], 400);
+        }
         DB::table('employee_education_lavel')->insert(['name' => $request->name]);
         return response()->json(['status' => 'success', 'message' => 'Data inserted successfully'], 200);
     }
 
-    public function EducationLavelDelete($id) {
+    public function EducationLavelDelete($id)
+    {
         DB::table('employee_education_lavel')->where('id', $id)->delete();
         return response()->json(['status' => 'success', 'message' => 'Data deleted successfully'], 200);
     }
 
-    public function ClassSubjectStore(Request $request) {
+    public function ClassSubjectStore(Request $request)
+    {
+        $subject = DB::table('employee_education_class_subject')->where('name', $request->name)->first();
+        if ($subject) {
+            return response()->json(['status' => 'error', 'message' => 'Subject already exists'], 400);
+        }
         DB::table('employee_education_class_subject')->insert(['name' => $request->name]);
         return response()->json(['status' => 'success', 'message' => 'Data inserted successfully'], 200);
     }
-    public function ClassSubjectDelete($id) {
+    public function ClassSubjectDelete($id)
+    {
         DB::table('employee_education_class_subject')->where('id', $id)->delete();
         return response()->json(['status' => 'success', 'message' => 'Data deleted successfully'], 200);
     }
-    public function ClassSubjectList(){
+    public function ClassSubjectList()
+    {
         return DB::table('employee_education_class_subject')->get();
     }
-}   
+}
