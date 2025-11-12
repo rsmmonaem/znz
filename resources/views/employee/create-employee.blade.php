@@ -539,8 +539,8 @@
                     nid: $('#nid').val(),
                     contact_number: $('#contact_number').val(),
                     date_of_birth: $('#date_of_birth').val(),
-                    nationality: $('#nationality').val(),
-                    blood_group: $('#blood_group').val(),
+                    nationality: $('[name="nationality"]').val(),
+                    blood_group: $('[name="blood_group"]').val(),
                     confirm_date: $('#confirm_date').val(),
                     // Present Address
                     pres_house: $('#pres_house').val(),
