@@ -134,6 +134,33 @@ class EducationController extends Controller
         }
 
         return response()->json(['message' => 'No training data provided'], 400);
-        
+
+    }
+
+    public function certification(Request $request)
+    {
+
+        $decodedData = json_decode($request->input('certification_data'), true);
+
+        // Remove existing certification data for the user
+        DB::table('employee_certifications')->where('user_id', $decodedData[0]['user_id'])->delete();
+
+        // Check if the decoded data is not empty and is an array
+        if (!empty($decodedData) && is_array($decodedData)) {
+            foreach ($decodedData as $certification) {
+                DB::table('employee_certifications')->insert([
+                    'user_id' => $certification['user_id'],
+                    'certification' => $certification['certification'],
+                    'organization' => $certification['organization'],
+                    'year' => $certification['year'],
+                    'start_date' => $certification['start_date'],
+                    'end_date' => $certification['end_date'],
+                ]);
+            }
+            return response()->json(['status' => 'success', 'message' => 'Certification data inserted successfully'], 200);
+        }
+
+        return response()->json(['message' => 'No certification data provided'], 400);
+
     }
 }

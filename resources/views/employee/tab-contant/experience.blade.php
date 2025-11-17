@@ -139,6 +139,72 @@
     <button type="button" class="btn btn-primary" id="save-training">Save Training</button>
 </div>
 
+{{-- /////////////////////////////////////// --}}
+{{-- Certification Part Start --}}
+{{-- /////////////////////////////////////// --}}
+
+<div class="container">
+    <h3>Certification Details</h3>
+    <form id="certificationForm">
+        @forelse ($training as $trainingitem)
+            <div class="certification-container">
+                <div class="form-group row">
+                    <div class="col-md-6">
+                        <label for="certificationName">Certification Name</label>
+                        <input type="text" class="form-control" name="certification[]" value="{{ $trainingitem->certification }}">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="organization">Name Of the Organization</label>
+                        <input type="text" class="form-control" name="organization[]" value="{{ $trainingitem->organization }}">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="year">Year</label>
+                        <input type="date" class="form-control" name="year[]" value="{{ $trainingitem->year }}">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="startDate">Start Date</label>
+                        <input type="date" class="form-control" name="start_date[]" value="{{ $trainingitem->start_date }}">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="endDate">End Date</label>
+                        <input type="date" class="form-control" name="end_date[]" value="{{ $trainingitem->end_date }}">
+                    </div>
+                </div>
+            </div>
+        @empty
+            <!-- Empty form structure when no work experience data is found -->
+            <div class="certification-container">
+                <div class="form-group row">
+                    <div class="col-md-6">
+                        <label for="certificationName">Certification Name</label>
+                        <input type="text" class="form-control" name="certification[]">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="organization">Name Of the Organization</label>
+                        <input type="text" class="form-control" name="organization[]">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="year">Year</label>
+                        <input type="number" name="year[]" class="form-control" placeholder="YYYY" min="1900" max="2100">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="startDate">Start Date</label>
+                        <input type="date" class="form-control" name="start_date[]">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="endDate">End Date</label>
+                        <input type="date" class="form-control" name="end_date[]">
+                    </div>
+                </div>
+            </div>
+        @endforelse
+
+    </form>
+    <button type="button" class="btn btn-default" id="add-certification">Add More</button>
+    <button type="button" class="btn btn-danger" id="remove-certification">Remove Last</button>
+    <button type="button" class="btn btn-primary" id="save-certification">Save Certification</button>
+</div>
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const addExperienceBtn = document.getElementById('add-work-experience');
@@ -271,6 +337,79 @@
                 data: {
                     _token: '{{ csrf_token() }}',
                     training_data: JSON.stringify(trainingData),
+                    // You can add additional data like user_id if needed
+                },
+                success: function(response) {
+                    if (response.status === 'success') {
+                        toastr.success(response.message);
+                    } else {
+                        toastr.error(response.message);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error(error);
+                }
+            });
+        });
+    });
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const addCertificationBtn = document.getElementById('add-certification');
+        const removeCertificationBtn = document.getElementById('remove-certification');
+        const certificationFormContainer = document.querySelector('.certification-container');
+        const saveCertificationBtn = document.getElementById('save-certification');
+
+        // Add new work experience form
+        addCertificationBtn.addEventListener('click', function() {
+            // Clone the experience form container without copying its data (deep = false)
+            const clonedCertificationContainer = certificationFormContainer.cloneNode(true);
+
+            // Clear the values in the form fields of the cloned container
+            const inputFields = clonedCertificationContainer.querySelectorAll('input');
+            inputFields.forEach(input => {
+                input.value = ''; // Reset the value of input fields
+            });
+
+            // Append the cloned, empty experience container to the parent form
+            document.querySelector('#certificationForm').appendChild(clonedCertificationContainer);
+        });
+
+        // Remove the last added work experience form
+        removeCertificationBtn.addEventListener('click', function() {
+            const allCertificationContainers = document.querySelectorAll('.certification-container');
+            if (allCertificationContainers.length > 1) { // Ensure at least one form container remains
+                allCertificationContainers[allCertificationContainers.length - 1].remove();
+            }
+        });
+
+        // Handle form data and save as JSON
+        saveCertificationBtn.addEventListener('click', function() {
+            const certificationData = [];
+
+            // Collect form data from all training containers
+            document.querySelectorAll('.certification-container').forEach(function(form) {
+                const formData = {
+                    certification: form.querySelector('input[name="certification[]"]').value,
+                    organization: form.querySelector('input[name="organization[]"]').value,
+                    year: form.querySelector('input[name="year[]"]').value,
+                    start_date: form.querySelector('input[name="start_date[]"]').value,
+                    end_date: form.querySelector('input[name="end_date[]"]').value,
+                    user_id: {{ $employee->id }}                    
+                };
+                certificationData.push(formData);
+            });
+
+            // Save work experience data as JSON
+            console.log(JSON.stringify(certificationData));
+            // Example of sending the data via AJAX
+            $.ajax({
+                url: "{{ url('/certification') }}",
+                method: "POST",
+                data: {
+                    _token: '{{ csrf_token() }}',
+                    certification_data: JSON.stringify(certificationData),
                     // You can add additional data like user_id if needed
                 },
                 success: function(response) {

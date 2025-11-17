@@ -213,6 +213,7 @@ Route::group(['middleware' => ['auth','license','account_valid']], function () {
 
 	Route::post('/work_experience', 'EducationController@work_experience');
 	Route::post('/training', 'EducationController@training');
+	Route::post('/certification', 'EducationController@certification');
 
 	Route::post('/employee/email/{id}',array('as' => 'employee.email', 'uses' => 'EmployeeController@email'));
 	Route::resource('/employee', 'EmployeeController',['except' => ['create', 'store']]);
