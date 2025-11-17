@@ -84,31 +84,16 @@
             <div class="training-container">
                 <div class="form-group row">
                     <div class="col-md-4">
-                        <label for="companyName">Company Name</label>
-                        <input type="text" class="form-control" name="company_name[]" value="{{ $item->company_name }}">
+                        <label for="trainingArea">Training Area</label>
+                        <input type="text" class="form-control" name="training_area[]" value="{{ $item->training_area }}">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="institute">Institute</label>
+                        <input type="text" class="form-control" name="institute[]" value="{{ $item->institute }}">
                     </div>
                     <div class="col-md-2">
-                        <label for="startDate">Start Date</label>
-                        <input type="date" class="form-control" name="start_date[]" value="{{ $item->start_date }}">
-                    </div>
-                    <div class="col-md-2">
-                        <label for="endDate">End Date</label>
-                        <input type="date" class="form-control" name="end_date[]" value="{{ $item->end_date }}">
-                    </div>
-                    <div class="col-md-4">
-                        <label for="department">Department</label>
-                        <input type="text" class="form-control" name="department[]" value="{{ $item->department }}">
-                    </div>
-                </div>
-                <div class="form-group row">
-                    <div class="col-md-4">
-                        <label for="role">Role</label>
-                        <input type="text" class="form-control" name="role[]" value="{{ $item->role }}">
-                    </div>
-                    <div class="col-md-4">
-                        <label for="experienceYears">Experience (Years)</label>
-                        <input type="text" class="form-control" name="experience_years[]"
-                            value="{{ $item->experience_years }}">
+                        <label for="timePeriod">Time Period</label>
+                        <input type="date" class="form-control" name="timePeriod[]" value="{{ $item->timePeriod }}">
                     </div>
                 </div>
             </div>
@@ -117,30 +102,16 @@
             <div class="training-container">
                 <div class="form-group row">
                     <div class="col-md-4">
-                        <label for="companyName">Company Name</label>
-                        <input type="text" class="form-control" name="company_name[]">
+                        <label for="trainingArea">Training Area</label>
+                        <input type="text" class="form-control" name="training_area[]">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="institute">Institute</label>
+                        <input type="text" class="form-control" name="institute[]">
                     </div>
                     <div class="col-md-2">
-                        <label for="startDate">Start Date</label>
-                        <input type="date" class="form-control" name="start_date[]">
-                    </div>
-                    <div class="col-md-2">
-                        <label for="endDate">End Date</label>
-                        <input type="date" class="form-control" name="end_date[]">
-                    </div>
-                    <div class="col-md-4">
-                        <label for="department">Department</label>
-                        <input type="text" class="form-control" name="department[]">
-                    </div>
-                </div>
-                <div class="form-group row">
-                    <div class="col-md-4">
-                        <label for="role">Role</label>
-                        <input type="text" class="form-control" name="role[]">
-                    </div>
-                    <div class="col-md-4">
-                        <label for="experienceYears">Experience (Years)</label>
-                        <input type="text" class="form-control" name="experience_years[]">
+                        <label for="timePeriod">Time Period</label>
+                        <input type="date" class="form-control" name="timePeriod[]">
                     </div>
                 </div>
             </div>
@@ -265,14 +236,10 @@
             // Collect form data from all training containers
             document.querySelectorAll('.training-container').forEach(function(form) {
                 const formData = {
-                    company_name: form.querySelector('input[name="company_name[]"]').value,
-                    start_date: form.querySelector('input[name="start_date[]"]').value,
-                    end_date: form.querySelector('input[name="end_date[]"]').value,
-                    department: form.querySelector('input[name="department[]"]').value,
-                    role: form.querySelector('input[name="role[]"]').value,
-                    experience_years: form.querySelector('input[name="experience_years[]"]')
-                        .value,
-                    user_id: {{ $employee->id }}
+                    training_area: form.querySelector('input[name="training_area[]"]').value,
+                    institute: form.querySelector('input[name="institute[]"]').value,
+                    timePeriod: form.querySelector('input[name="timePeriod[]"]').value,
+                    user_id: {{ $employee->id }}                    
                 };
                 trainingData.push(formData);
             });
