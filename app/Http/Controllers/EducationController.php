@@ -109,4 +109,31 @@ class EducationController extends Controller
     {
         return DB::table('employee_education_class_subject')->get();
     }
+
+    public function training(Request $request)
+    {
+
+        return response()->json(['status' => 'success', 'message' => 'Training data endpoint hit successfully'], 200);
+        // $decodedData = json_decode($request->input('training_data'), true);
+
+        // // Remove existing training data for the user
+        // DB::table('employee_trainings')->where('user_id', $decodedData[0]['user_id'])->delete();
+
+        // // Check if the decoded data is not empty and is an array
+        // if (!empty($decodedData) && is_array($decodedData)) {
+        //     foreach ($decodedData as $training) {
+        //         DB::table('employee_trainings')->insert([
+        //             'user_id' => $training['user_id'],
+        //             'training_name' => $training['training_name'],
+        //             'institute' => $training['institute'],
+        //             'start_date' => $training['start_date'],
+        //             'end_date' => $training['end_date'],
+        //             'details' => $training['details'],
+        //         ]);
+        //     }
+        //     return response()->json(['status' => 'success', 'message' => 'Training data inserted successfully'], 200);
+        // }
+
+        // return response()->json(['message' => 'No training data provided'], 400);
+    }
 }

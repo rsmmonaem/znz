@@ -73,6 +73,85 @@
     <button type="button" class="btn btn-primary" id="save-work-experience">Save Experience</button>
 </div>
 
+{{-- /////////////////////////////////////// --}}
+{{-- Traning Part Start --}}
+{{-- /////////////////////////////////////// --}}
+
+<div class="container">
+    <h3>Training Details</h3>
+    <form id="trainingForm">
+        @forelse ($experience as $item)
+            <div class="training-container">
+                <div class="form-group row">
+                    <div class="col-md-4">
+                        <label for="companyName">Company Name</label>
+                        <input type="text" class="form-control" name="company_name[]" value="{{ $item->company_name }}">
+                    </div>
+                    <div class="col-md-2">
+                        <label for="startDate">Start Date</label>
+                        <input type="date" class="form-control" name="start_date[]" value="{{ $item->start_date }}">
+                    </div>
+                    <div class="col-md-2">
+                        <label for="endDate">End Date</label>
+                        <input type="date" class="form-control" name="end_date[]" value="{{ $item->end_date }}">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="department">Department</label>
+                        <input type="text" class="form-control" name="department[]" value="{{ $item->department }}">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-md-4">
+                        <label for="role">Role</label>
+                        <input type="text" class="form-control" name="role[]" value="{{ $item->role }}">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="experienceYears">Experience (Years)</label>
+                        <input type="text" class="form-control" name="experience_years[]"
+                            value="{{ $item->experience_years }}">
+                    </div>
+                </div>
+            </div>
+        @empty
+            <!-- Empty form structure when no work experience data is found -->
+            <div class="training-container">
+                <div class="form-group row">
+                    <div class="col-md-4">
+                        <label for="companyName">Company Name</label>
+                        <input type="text" class="form-control" name="company_name[]">
+                    </div>
+                    <div class="col-md-2">
+                        <label for="startDate">Start Date</label>
+                        <input type="date" class="form-control" name="start_date[]">
+                    </div>
+                    <div class="col-md-2">
+                        <label for="endDate">End Date</label>
+                        <input type="date" class="form-control" name="end_date[]">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="department">Department</label>
+                        <input type="text" class="form-control" name="department[]">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-md-4">
+                        <label for="role">Role</label>
+                        <input type="text" class="form-control" name="role[]">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="experienceYears">Experience (Years)</label>
+                        <input type="text" class="form-control" name="experience_years[]">
+                    </div>
+                </div>
+            </div>
+        @endforelse
+
+    </form>
+    <button type="button" class="btn btn-default" id="add-training">Add More</button>
+    <button type="button" class="btn btn-danger" id="remove-training">Remove Last</button>
+    <button type="button" class="btn btn-primary" id="save-training">Save Training</button>
+</div>
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const addExperienceBtn = document.getElementById('add-work-experience');
@@ -132,6 +211,81 @@
                 data: {
                     _token: '{{ csrf_token() }}',
                     experience_data: JSON.stringify(workExperienceData),
+                    // You can add additional data like user_id if needed
+                },
+                success: function(response) {
+                    if (response.status === 'success') {
+                        toastr.success(response.message);
+                    } else {
+                        toastr.error(response.message);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error(error);
+                }
+            });
+        });
+    });
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const addTrainingBtn = document.getElementById('add-training');
+        const removeTrainingBtn = document.getElementById('remove-training');
+        const trainingFormContainer = document.querySelector('.training-container');
+        const saveTrainingBtn = document.getElementById('save-training');
+
+        // Add new work experience form
+        addTrainingBtn.addEventListener('click', function() {
+            // Clone the experience form container without copying its data (deep = false)
+            const clonedTrainingContainer = trainingFormContainer.cloneNode(true);
+
+            // Clear the values in the form fields of the cloned container
+            const inputFields = clonedTrainingContainer.querySelectorAll('input');
+            inputFields.forEach(input => {
+                input.value = ''; // Reset the value of input fields
+            });
+
+            // Append the cloned, empty experience container to the parent form
+            document.querySelector('#trainingForm').appendChild(clonedTrainingContainer);
+        });
+
+        // Remove the last added work experience form
+        removeTrainingBtn.addEventListener('click', function() {
+            const allTrainingContainers = document.querySelectorAll('.training-container');
+            if (allTrainingContainers.length > 1) { // Ensure at least one form container remains
+                allTrainingContainers[allTrainingContainers.length - 1].remove();
+            }
+        });
+
+        // Handle form data and save as JSON
+        saveTrainingBtn.addEventListener('click', function() {
+            const trainingData = [];
+
+            // Collect form data from all training containers
+            document.querySelectorAll('.training-container').forEach(function(form) {
+                const formData = {
+                    company_name: form.querySelector('input[name="company_name[]"]').value,
+                    start_date: form.querySelector('input[name="start_date[]"]').value,
+                    end_date: form.querySelector('input[name="end_date[]"]').value,
+                    department: form.querySelector('input[name="department[]"]').value,
+                    role: form.querySelector('input[name="role[]"]').value,
+                    experience_years: form.querySelector('input[name="experience_years[]"]')
+                        .value,
+                    user_id: {{ $employee->id }}
+                };
+                trainingData.push(formData);
+            });
+
+            // Save work experience data as JSON
+            console.log(JSON.stringify(trainingData));
+            // Example of sending the data via AJAX
+            $.ajax({
+                url: "{{ url('/training') }}",
+                method: "POST",
+                data: {
+                    _token: '{{ csrf_token() }}',
+                    training_data: JSON.stringify(trainingData),
                     // You can add additional data like user_id if needed
                 },
                 success: function(response) {
