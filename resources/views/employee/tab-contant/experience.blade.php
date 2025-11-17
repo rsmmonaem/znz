@@ -83,17 +83,25 @@
         @forelse ($experience as $item)
             <div class="training-container">
                 <div class="form-group row">
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         <label for="trainingArea">Training Area</label>
                         <input type="text" class="form-control" name="training_area[]" value="{{ $item->training_area }}">
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         <label for="institute">Institute</label>
                         <input type="text" class="form-control" name="institute[]" value="{{ $item->institute }}">
                     </div>
-                    <div class="col-md-2">
-                        <label for="timePeriod">Time Period</label>
-                        <input type="date" class="form-control" name="timePeriod[]" value="{{ $item->timePeriod }}">
+                    <div class="col-md-6">
+                        <label for="certificate">Certificate</label>
+                        <input type="text" class="form-control" name="certificate[]" value="{{ $item->certificate }}">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="startDate">Start Date</label>
+                        <input type="date" class="form-control" name="start_date[]" value="{{ $item->start_date }}">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="endDate">End Date</label>
+                        <input type="date" class="form-control" name="end_date[]" value="{{ $item->end_date }}">
                     </div>
                 </div>
             </div>
@@ -101,17 +109,25 @@
             <!-- Empty form structure when no work experience data is found -->
             <div class="training-container">
                 <div class="form-group row">
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         <label for="trainingArea">Training Area</label>
                         <input type="text" class="form-control" name="training_area[]">
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         <label for="institute">Institute</label>
                         <input type="text" class="form-control" name="institute[]">
                     </div>
-                    <div class="col-md-2">
-                        <label for="timePeriod">Time Period</label>
-                        <input type="date" class="form-control" name="timePeriod[]">
+                    <div class="col-md-6">
+                        <label for="certificate">Certificate</label>
+                        <input type="text" class="form-control" name="certificate[]">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="startDate">Start Date</label>
+                        <input type="date" class="form-control" name="start_date[]">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="endDate">End Date</label>
+                        <input type="date" class="form-control" name="end_date[]">
                     </div>
                 </div>
             </div>
@@ -238,7 +254,9 @@
                 const formData = {
                     training_area: form.querySelector('input[name="training_area[]"]').value,
                     institute: form.querySelector('input[name="institute[]"]').value,
-                    timePeriod: form.querySelector('input[name="timePeriod[]"]').value,
+                    certificate: form.querySelector('input[name="certificate[]"]').value,
+                    start_date: form.querySelector('input[name="start_date[]"]').value,
+                    end_date: form.querySelector('input[name="end_date[]"]').value,
                     user_id: {{ $employee->id }}                    
                 };
                 trainingData.push(formData);
