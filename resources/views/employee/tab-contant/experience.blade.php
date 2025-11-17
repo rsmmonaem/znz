@@ -80,28 +80,28 @@
 <div class="container">
     <h3>Training Details</h3>
     <form id="trainingForm">
-        @forelse ($experience as $item)
+        @forelse ($training as $trainingitem)
             <div class="training-container">
                 <div class="form-group row">
                     <div class="col-md-6">
                         <label for="trainingArea">Training Area</label>
-                        <input type="text" class="form-control" name="training_area[]" value="{{ $item->training_area }}">
+                        <input type="text" class="form-control" name="training_area[]" value="{{ $trainingitem->training_area }}">
                     </div>
                     <div class="col-md-6">
                         <label for="institute">Institute</label>
-                        <input type="text" class="form-control" name="institute[]" value="{{ $item->institute }}">
+                        <input type="text" class="form-control" name="institute[]" value="{{ $trainingitem->institute }}">
                     </div>
                     <div class="col-md-6">
                         <label for="certificate">Certificate</label>
-                        <input type="text" class="form-control" name="certificate[]" value="{{ $item->certificate }}">
+                        <input type="text" class="form-control" name="certificate[]" value="{{ $trainingitem->certificate }}">
                     </div>
                     <div class="col-md-3">
                         <label for="startDate">Start Date</label>
-                        <input type="date" class="form-control" name="start_date[]" value="{{ $item->start_date }}">
+                        <input type="date" class="form-control" name="start_date[]" value="{{ $trainingitem->start_date }}">
                     </div>
                     <div class="col-md-3">
                         <label for="endDate">End Date</label>
-                        <input type="date" class="form-control" name="end_date[]" value="{{ $item->end_date }}">
+                        <input type="date" class="form-control" name="end_date[]" value="{{ $trainingitem->end_date }}">
                     </div>
                 </div>
             </div>
