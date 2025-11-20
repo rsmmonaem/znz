@@ -1615,6 +1615,7 @@ Class ClockController extends Controller{
 		return $response;
 
 	}
+	
 
 	function getDatesBetweentwo($startDate, $endDate)
 	{

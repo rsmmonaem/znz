@@ -13,7 +13,7 @@
         .attendance-report {
             margin: 20px;
         }
-
+ 
         .form-group label {
             font-weight: bold;
         }
