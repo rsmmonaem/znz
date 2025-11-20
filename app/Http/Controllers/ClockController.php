@@ -1206,106 +1206,120 @@ Class ClockController extends Controller{
         return view('employee.update_attendance',compact('users','assets','user','date', 'clockUp'));
 	}
 
-	public function postUpdateAttendance(Request $request){
-		$data = User::leftJoin('profile', 'users.id', '=', 'profile.user_id')
-		->leftJoin('designations', 'users.designation_id', '=', 'designations.id')
-		->leftJoin('sections', 'profile.section_id', '=', 'sections.id')
-		->leftJoin('branchs', 'profile.branch_id', '=', 'branchs.id')
-		->leftJoin('departments', 'designations.department_id', '=', 'departments.id');
+    public function postUpdateAttendance(Request $request)
+    {
+        $query = User::leftJoin('profile', 'users.id', '=', 'profile.user_id')
+            ->leftJoin('designations', 'users.designation_id', '=', 'designations.id')
+            ->leftJoin('sections', 'profile.section_id', '=', 'sections.id')
+            ->leftJoin('branchs', 'profile.branch_id', '=', 'branchs.id')
+            ->leftJoin('departments', 'designations.department_id', '=', 'departments.id')
+			->where('users.status', 'active')
+            ->select('users.id');
+    
+        // ✅ Branch wise filter
+        if (!empty($request->branch_id)) {
+            $query->where('profile.branch_id', $request->branch_id);
+        }
+    
+        // ✅ Single employee
+        if (!empty($request->employee_id)) {
+            $query->where('users.id', $request->employee_id);
+        }
+    
+        // ✅ Multiple employees
+        if (!empty($request->employee_ids)) {
+            $query->whereIn('users.id', $request->employee_ids);
+        }
+    
+        $user_ids = $query->pluck('users.id')->toArray();
+    
+        if (empty($user_ids)) {
+            return response()->json(['error' => 'No employees found for the selected criteria.'], 400);
+        }
+    
+        $form_date = $request->input('form_date');
+        $to_date = $request->input('to_date');
+    
+        if (!$form_date || !$to_date) {
+            return response()->json(['error' => 'Both form_date and to_date are required.'], 400);
+        }
+    
+        try {
+            $start_date = Carbon::createFromFormat('Y-m-d', $form_date);
+            $end_date = Carbon::createFromFormat('Y-m-d', $to_date);
+    
+            if ($start_date->gt($end_date)) {
+                return response()->json(['error' => 'Start date must be before or equal to end date.'], 400);
+            }
+    
+            // ✅ Handle time parsing
+            $clock_in_raw = trim($request->input('clock_in'));
+            $clock_out_raw = trim($request->input('clock_out'));
+    
+            $clock_in_time = !empty($clock_in_raw) ? Carbon::parse($clock_in_raw)->format('H:i:s') : null;
+            $clock_out_time = !empty($clock_out_raw) ? Carbon::parse($clock_out_raw)->format('H:i:s') : null;
+    
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Invalid date or time format.'], 400);
+        }
+    
+        $inserted_records = [];
+        $skipped_records = [];
+    
+        foreach ($user_ids as $user_id) {
+            $user = User::with('profile')->find($user_id);
+            if (!$user || !$user->profile) continue;
+    
+            $employee_code = $user->profile->employee_code;
+            $current_date = clone $start_date;
+    
+            while ($current_date <= $end_date) {
+                $date_str = $current_date->format('Y-m-d');
+    
+                // Check if already exists (skip if exists)
+                $exists = Clock::where('user_id', $user_id)
+                    ->where('date', $date_str)
+                    ->exists();
+    
+                if ($exists) {
+                    $skipped_records[] = [
+                        'user_id' => $user_id,
+                        'date' => $date_str,
+                        'employee_code' => $employee_code,
+                    ];
+                } else {
+                    // ✅ Combine date + time
+                    $clock_in_datetime = $clock_in_time ? Carbon::parse("$date_str $clock_in_time")->format('Y-m-d H:i:s') : null;
+                    $clock_out_datetime = $clock_out_time ? Carbon::parse("$date_str $clock_out_time")->format('Y-m-d H:i:s') : null;
+    
+                    $clock = new Clock;
+                    $clock->user_id = $user_id;
+                    $clock->date = $date_str;
+                    $clock->clock_in = $clock_in_datetime;
+                    $clock->clock_out = $clock_out_datetime;
+                    $clock->save();
+    
+                    $inserted_records[] = [
+                        'id' => $clock->id,
+                        'date' => $date_str,
+                        'employee_code' => $employee_code,
+                    ];
+                }
+    
+                $current_date->addDay();
+            }
+        }
+    
+        return response()->json([
+            'status' => 'success',
+            'inserted_records' => $inserted_records,
+            'skipped_records' => $skipped_records,
+        ]);
+    }
 
-		if (!empty($request->employee_id)) {
-			$data->where('users.id', $request->employee_id);
-		}
+ 
 
-		if (!empty($request->employee_ids)) {
-			$data->whereIn('users.id', $request->employee_ids);
-		}
 
-		$data = $data->select('users.id');
-		$user_ids = $data->pluck('users.id')->toArray();
-
-		$dates = [];
-
-		$form_date = $request->input('form_date');
-		$to_date = $request->input('to_date');
-
-		if (!$form_date || !$to_date) {
-			return response()->json(['error' => 'Both form_date and to_date are required.'], 400);
-		}
-
-		try {
-			$start_date = Carbon::createFromFormat('Y-m-d', $form_date);
-			$end_date = Carbon::createFromFormat('Y-m-d', $to_date);
-
-			if ($start_date > $end_date) {
-				return response()->json(['error' => 'Start date must be before or equal to end date.'], 400);
-			}
-
-			$clock_in = Carbon::createFromFormat('h:i A', $request->input('clock_in'))->format('Y-m-d H:i:s');
-			$clock_out = Carbon::createFromFormat('h:i A', $request->input('clock_out'))->format('Y-m-d H:i:s');
-
-		} catch (\Exception $e) {
-			return response()->json(['error' => 'Invalid date or time format.'], 400);
-		}
-
-		while ($start_date <= $end_date) {
-			$dates[] = [
-				'date' => $start_date->format('Y-m-d'),
-				'clock_in' => $clock_in,
-				'clock_out' => $clock_out,
-			];
-			$start_date->addDay();
-		}
-
-		$updated_records = [];
-		$inserted_records = [];
-
-		foreach ($user_ids as $user_id) {
-			$user = User::with('profile')->find($user_id);
-
-			if (!$user || !$user->profile) {
-				continue;
-			}
-
-			$employee_code = $user->profile->employee_code;
-
-			foreach ($dates as $date) {
-				$clock = Clock::where('user_id', $user_id)
-					->where('date', $date['date'])
-					->first();
-
-				if ($clock) {
-					$clock->clock_in = $date['clock_in'];
-					$clock->clock_out = $date['clock_out'];
-					$clock->save();
-
-					$updated_records[] = [
-						'id' => $clock->id,
-						'date' => $date['date'],
-						'employee_code' => $employee_code,
-					];
-				} else {
-					$clock = new Clock;
-					$clock->clock_in = $date['clock_in'];
-					$clock->clock_out = $date['clock_out'];
-					$clock->user_id = $user_id;
-					$clock->date = $date['date'];
-					$clock->save();
-
-					$inserted_records[] = [
-						'id' => $clock->id,
-						'date' => $date['date'],
-						'employee_code' => $employee_code,
-					];
-				}
-			}
-		}
-
-		return response()->json([
-				'updated_records' => $updated_records,
-				'inserted_records' => $inserted_records,
-			]);
-	}
 
 	public function  postUpdateAttendanceIDs(Request $request) {
 		if (!empty($request->branch_id) || !empty($request->employee_id) || !empty($request->department_id) || !empty($request->designation_id) || !empty($request->section_id)) {
@@ -1357,6 +1371,7 @@ Class ClockController extends Controller{
 			return $getData;
 		}
 	}
+	
 	public function uploadAttendance(AttendanceUploadRequest $request){
 		
 		if(!Entrust::can('upload_attendance'))
@@ -1492,7 +1507,7 @@ Class ClockController extends Controller{
 	   )->select('users.first_name', 'users.id', 'profile.employee_code')->get();
 	   return view('attendance.report',compact('employee','branch','section','department','category','designation','shift'));
 	}
-
+ 
 	// Attendance Report POST method
 	public function attendanceReprtPOST(Request $request)
 	{
@@ -1626,6 +1641,7 @@ Class ClockController extends Controller{
 	
 		return $dates;
 	}
+	
 	// Attendance report generation for a single user
 	public function getAttendanceReport1($userId, $startDat, $endDat)
 	{
