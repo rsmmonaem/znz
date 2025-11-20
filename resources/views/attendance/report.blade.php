@@ -166,7 +166,7 @@
 @stop
 
 @section('javascript')
-<script>
+{{-- <script>
     $(document).ready(function() {
 
         $('#branch').on('change', function() {
@@ -379,7 +379,244 @@
         });
 
     });
+</script> --}}
+
+
+<script>
+$(document).ready(function() {
+
+    $('#branch').on('change', function() {
+        var branch_id = $(this).val();
+        $('#employeeId').val('').trigger('change');
+        HandleBranchWiseEmployees(branch_id, '#employeeId', true);
+    });
+
+    $('#getData').on('click', function() {
+
+        $('#getData').prop('disabled', true);
+        $('#getData').text('Please Wait...');
+
+        const formData = {
+            date: $('#date').val(),
+            status: $('input[name="status"]:checked').val(),
+            branch_id: $('#branch').val(),
+            department_id: $('#department').val(),
+            section_id: $('#section').val(),
+            category_id: $('#category').val(),
+            designation_id: $('#designation').val(),
+            employee_id: $('select[name="employeeId"]').val(),
+            startDate: $('#startDate').val(),
+            endDate: $('#endDate').val(),
+            shift_id: $('#shift_id').val()
+        };
+
+        $.ajax({
+            url: "{{ url('attendance-report') }}",
+            method: 'POST',
+            data: formData,
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+
+            success: function(response) {
+
+                $('#getData').prop('disabled', false);
+                $('#getData').text('Report');
+                toastr.success('Report Generated Successfully');
+
+                var newWindow = window.open('', '_blank', 'width=1200,height=800');
+
+                // 🔥 Only active employees
+                response.filtered_data = response.filtered_data.filter(
+                    item => item.employee_status === "active"
+                );
+
+                // BUILD HTML
+                var content = `
+                <html>
+                <head>
+                    <title>Monthly Attendance Report</title>
+                    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.5.2/css/bootstrap.min.css">
+                    <style>
+                        .center-item { text-align:center; }
+                        .display-flex {
+                            display:flex; justify-content:space-between;
+                            border:1px solid #ccc; padding:10px; margin-bottom:20px;
+                        }
+                        table { width:100%; border-collapse:collapse; }
+                        th, td { border:1px solid #ccc; padding:6px; text-align:center; font-size:12px; }
+                        @media print { @page { size:landscape; } }
+                        @media print { .btn-print-excel button { display:none; } }
+                    </style>
+                </head>
+                <body>
+                `;
+
+                // HEADER
+                content += `
+                    <div class="display-flex">
+                        <div class="left-item">
+                            <img src="{{ URL::to(config('constants.upload_path.logo') . config('config.logo')) }}"
+                                 width="150" style="margin-left:20px;">
+                        </div>
+                        <div class="center-item">
+                            <h4>{{ config('config.company_name') }}</h4>
+                            <p>Monthly Attendance Report</p>
+                            <p>Branch: ${response.branch_name}</p>
+                            <p>Date: <strong>${response.startDate} to ${response.toDate}</strong></p>
+                        </div>
+                    </div>
+                `;
+
+                // GROUP BY EMPLOYEE
+                let grouped = {};
+                response.filtered_data.forEach(att => {
+                    if (!grouped[att.employee_code]) {
+                        grouped[att.employee_code] = [];
+                    }
+                    grouped[att.employee_code].push(att);
+                });
+
+                // CHECK: Single employee selected or multi/all?
+                let selectedEmployees = formData.employee_id ?? [];
+                let isSingleEmployee = selectedEmployees.length === 1;
+
+                // -----------------------------
+                //  SINGLE EMPLOYEE MODE
+                // -----------------------------
+                if (isSingleEmployee) {
+
+                    let empCode = selectedEmployees[0];
+                    let empData = grouped[empCode];
+
+                    content += buildEmployeeTable(empData);
+
+                }
+
+                // -----------------------------
+                //  MULTIPLE / ALL EMPLOYEE MODE
+                // -----------------------------
+                else {
+                    for (const empCode in grouped) {
+                        let empData = grouped[empCode];
+                        content += `
+                            <div style="page-break-after: always;">
+                                ${buildEmployeeTable(empData)}
+                            </div>
+                        `;
+                    }
+                }
+
+                // PRINT + EXCEL
+                content += `
+                    <div class="center-item btn-print-excel">
+                        <button onclick="window.print()" class="btn btn-primary">Print</button>
+                        <button id="exportExcel" class="btn btn-success">Export to Excel</button>
+                    </div>
+                </body>
+                </html>
+                `;
+
+                newWindow.document.write(content);
+                newWindow.document.close();
+
+                // EXCEL EXPORT
+                newWindow.document.getElementById('exportExcel').addEventListener('click', function() {
+                    var tableHTML = newWindow.document.querySelector('table').outerHTML;
+                    var filename = 'attendance_report.xls';
+                    var uri = 'data:application/vnd.ms-excel;base64,';
+                    var template = `
+                    <html xmlns:o="urn:schemas-microsoft-com:office:office"
+                          xmlns:x="urn:schemas-microsoft-com:office:excel">
+                    <body>${tableHTML}</body></html>`;
+
+                    var base64 = s => window.btoa(unescape(encodeURIComponent(s)));
+                    var link = newWindow.document.createElement('a');
+                    link.href = uri + base64(template);
+                    link.download = filename;
+                    link.click();
+                });
+
+            },
+
+            error: function() {
+                $('#getData').prop('disabled', false);
+                $('#getData').text('Report');
+                toastr.error('Something went wrong.');
+            }
+
+        });
+    });
+
+});
+
+// ------------------------------
+// FUNCTION: Employee table HTML
+// ------------------------------
+function buildEmployeeTable(empData) {
+
+    let html = `
+    <h4 style="text-align:center;">
+        ${empData[0].name} (${empData[0].employee_code})
+    </h4>
+
+    <table class="table table-bordered report-table">
+        <thead>
+            <tr>
+                <th>SL</th>
+                <th>Date</th>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Department</th>
+                <th>Section</th>
+                <th>Category</th>
+                <th>Designation</th>
+                <th>Shift In</th>
+                <th>Shift Out</th>
+                <th>Shift Name</th>
+                <th>Punch In</th>
+                <th>Punch Out</th>
+                <th>Status</th>
+                <th>Late</th>
+                <th>OT</th>
+                <th>Extra</th>
+                <th>Remarks</th>
+            </tr>
+        </thead>
+        <tbody>
+    `;
+
+    empData.forEach((att, i) => {
+        html += `
+        <tr>
+            <td>${i + 1}</td>
+            <td>${att.date || ''}</td>
+            <td>${att.employee_code || ''}</td>
+            <td>${att.name || ''}</td>
+            <td>${att.department || ''}</td>
+            <td>${att.section || ''}</td>
+            <td>${att.category || ''}</td>
+            <td>${att.designation || ''}</td>
+            <td>${att.shift_in || ''}</td>
+            <td>${att.shift_out || ''}</td>
+            <td>${att.shift_name || ''}</td>
+            <td>${att.in_time || ''}</td>
+            <td>${att.out_time || ''}</td>
+            <td>${att.status || ''}</td>
+            <td>${att.lateTime || ''}</td>
+            <td>${att.overTime || ''}</td>
+            <td>${att.overTime || ''}</td>
+            <td>${att.remarks || ''}</td>
+        </tr>
+        `;
+    });
+
+    html += `</tbody></table>`;
+
+    return html;
+}
 </script>
+
 
 
 @stop
