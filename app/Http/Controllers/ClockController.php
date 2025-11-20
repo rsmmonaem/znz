@@ -1539,42 +1539,47 @@ class ClockController extends Controller
 			? (is_array($request->employee_id) ? $request->employee_id : explode(',', $request->employee_id))
 			: null;
 
-		// Branch data (header show-এর জন্য)
+		// Branch data (header জন্য)
 		$branch = null;
 		if ($request->branch_id) {
 			$branch = Branch::find($request->branch_id);
 		}
 
-		// Get only ACTIVE users
-		$userIds = User::leftJoin('profile', 'users.id', '=', 'profile.user_id')
-			->where('users.status', 'active')
+		// Step 1: Get active users only
+		$users = User::leftJoin('profile', 'users.id', '=', 'profile.user_id')
+			->where('users.status', 'active') // শুধুই active
 			->when(!empty($employeeIds), function ($query) use ($employeeIds) {
 				return $query->whereIn('profile.employee_code', $employeeIds);
 			})
-			->when(isset($request->branch_id) && !empty($request->branch_id), function ($query) use ($request) {
+			->when(!empty($request->branch_id), function ($query) use ($request) {
 				return $query->where('profile.branch_id', $request->branch_id);
 			})
-			->when(isset($request->department_id) && !empty($request->department_id), function ($query) use ($request) {
+			->when(!empty($request->department_id), function ($query) use ($request) {
 				return $query->where('profile.department_id', $request->department_id);
 			})
-			->pluck('users.id');
+			->select('users.id', 'users.status as employee_status')
+			->get();
 
-		// Collect all attendance records
+		// Step 2: Collect attendance data
 		$results = collect();
-
-		foreach ($userIds as $userId) {
+		foreach ($users as $user) {
 			$userReport = $this->getAttendanceReport1(
-				$userId,
+				$user->id,
 				$request->startDate,
 				$request->endDate
 			);
 
+			// Add employee_status to each record
+			$userReport = collect($userReport)->map(function ($row) use ($user) {
+				$row['employee_status'] = $user->employee_status;
+				return $row;
+			});
+
 			$results = $results->merge($userReport);
 		}
 
-		// Status Filter
+		// Step 3: Status filter switch
 		$status_filter = $request->input('status');
-
 		switch ($status_filter) {
 			case '1':
 				$status_to_filter = 'P';
@@ -1604,16 +1609,14 @@ class ClockController extends Controller
 				$status_to_filter = null;
 		}
 
-		// Apply Filter
+		// Step 4: Apply status filter
 		$filtered_data = $results->filter(function ($item) use ($status_to_filter) {
+			if ($item['employee_status'] !== 'active') return false; // active না হলে skip
 			if ($status_to_filter === null) return true;
 			return $item['status'] === $status_to_filter;
-		});
+		})->sortBy('employee_code')->values();
 
-		// Sort by employee_code (Page order fix)
-		$filtered_data = $filtered_data->sortBy('employee_code')->values();
-
-		// Totals calculation
+		// Step 5: Totals calculation
 		$totals = $filtered_data->groupBy('status')->map(function ($items, $status) {
 			return [
 				'status' => $status,
@@ -1621,7 +1624,7 @@ class ClockController extends Controller
 			];
 		})->values();
 
-		// Final Response (JS will read this)
+		// Final response
 		return [
 			'filtered_data'   => $filtered_data,
 			'filtered_totals' => $totals,
@@ -1630,6 +1633,7 @@ class ClockController extends Controller
 			'branch_name'     => $branch ? $branch->name : 'All Branches'
 		];
 	}
+
 
 
 

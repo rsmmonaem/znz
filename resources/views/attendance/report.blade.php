@@ -393,8 +393,7 @@ $(document).ready(function() {
 
     $('#getData').on('click', function() {
 
-        $('#getData').prop('disabled', true);
-        $('#getData').text('Please Wait...');
+        $('#getData').prop('disabled', true).text('Please Wait...');
 
         const formData = {
             date: $('#date').val(),
@@ -414,108 +413,67 @@ $(document).ready(function() {
             url: "{{ url('attendance-report') }}",
             method: 'POST',
             data: formData,
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
+            headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 
             success: function(response) {
 
-                $('#getData').prop('disabled', false);
-                $('#getData').text('Report');
+                $('#getData').prop('disabled', false).text('Report');
                 toastr.success('Report Generated Successfully');
 
                 var newWindow = window.open('', '_blank', 'width=1200,height=800');
 
-                // 🔥 Only active employees
-                response.filtered_data = response.filtered_data.filter(
-                    item => item.employee_status === "active"
-                );
-
                 // BUILD HTML
-                var content = `
-                <html>
-                <head>
+                var content = `<html><head>
                     <title>Monthly Attendance Report</title>
                     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.5.2/css/bootstrap.min.css">
                     <style>
                         .center-item { text-align:center; }
-                        .display-flex {
-                            display:flex; justify-content:space-between;
-                            border:1px solid #ccc; padding:10px; margin-bottom:20px;
-                        }
+                        .display-flex { display:flex; justify-content:space-between; border:1px solid #ccc; padding:10px; margin-bottom:20px; }
                         table { width:100%; border-collapse:collapse; }
                         th, td { border:1px solid #ccc; padding:6px; text-align:center; font-size:12px; }
                         @media print { @page { size:landscape; } }
                         @media print { .btn-print-excel button { display:none; } }
                     </style>
-                </head>
-                <body>
-                `;
+                    </head><body>`;
 
                 // HEADER
-                content += `
-                    <div class="display-flex">
-                        <div class="left-item">
-                            <img src="{{ URL::to(config('constants.upload_path.logo') . config('config.logo')) }}"
-                                 width="150" style="margin-left:20px;">
-                        </div>
-                        <div class="center-item">
-                            <h4>{{ config('config.company_name') }}</h4>
-                            <p>Monthly Attendance Report</p>
-                            <p>Branch: ${response.branch_name}</p>
-                            <p>Date: <strong>${response.startDate} to ${response.toDate}</strong></p>
-                        </div>
+                content += `<div class="display-flex">
+                    <div class="left-item">
+                        <img src="{{ URL::to(config('constants.upload_path.logo') . config('config.logo')) }}" width="150" style="margin-left:20px;">
                     </div>
-                `;
+                    <div class="center-item">
+                        <h4>{{ config('config.company_name') }}</h4>
+                        <p>Monthly Attendance Report</p>
+                        <p>Branch: ${response.branch_name}</p>
+                        <p>Date: <strong>${response.startDate} to ${response.toDate}</strong></p>
+                    </div>
+                </div>`;
 
                 // GROUP BY EMPLOYEE
                 let grouped = {};
                 response.filtered_data.forEach(att => {
-                    if (!grouped[att.employee_code]) {
-                        grouped[att.employee_code] = [];
-                    }
+                    if (!grouped[att.employee_code]) grouped[att.employee_code] = [];
                     grouped[att.employee_code].push(att);
                 });
 
-                // CHECK: Single employee selected or multi/all?
                 let selectedEmployees = formData.employee_id ?? [];
                 let isSingleEmployee = selectedEmployees.length === 1;
 
-                // -----------------------------
-                //  SINGLE EMPLOYEE MODE
-                // -----------------------------
                 if (isSingleEmployee) {
-
                     let empCode = selectedEmployees[0];
                     let empData = grouped[empCode];
-
                     content += buildEmployeeTable(empData);
-
-                }
-
-                // -----------------------------
-                //  MULTIPLE / ALL EMPLOYEE MODE
-                // -----------------------------
-                else {
+                } else {
                     for (const empCode in grouped) {
-                        let empData = grouped[empCode];
-                        content += `
-                            <div style="page-break-after: always;">
-                                ${buildEmployeeTable(empData)}
-                            </div>
-                        `;
+                        content += `<div style="page-break-after: always;">${buildEmployeeTable(grouped[empCode])}</div>`;
                     }
                 }
 
                 // PRINT + EXCEL
-                content += `
-                    <div class="center-item btn-print-excel">
-                        <button onclick="window.print()" class="btn btn-primary">Print</button>
-                        <button id="exportExcel" class="btn btn-success">Export to Excel</button>
-                    </div>
-                </body>
-                </html>
-                `;
+                content += `<div class="center-item btn-print-excel">
+                    <button onclick="window.print()" class="btn btn-primary">Print</button>
+                    <button id="exportExcel" class="btn btn-success">Export to Excel</button>
+                </div></body></html>`;
 
                 newWindow.document.write(content);
                 newWindow.document.close();
@@ -525,11 +483,9 @@ $(document).ready(function() {
                     var tableHTML = newWindow.document.querySelector('table').outerHTML;
                     var filename = 'attendance_report.xls';
                     var uri = 'data:application/vnd.ms-excel;base64,';
-                    var template = `
-                    <html xmlns:o="urn:schemas-microsoft-com:office:office"
-                          xmlns:x="urn:schemas-microsoft-com:office:excel">
-                    <body>${tableHTML}</body></html>`;
-
+                    var template = `<html xmlns:o="urn:schemas-microsoft-com:office:office"
+                                      xmlns:x="urn:schemas-microsoft-com:office:excel">
+                                    <body>${tableHTML}</body></html>`;
                     var base64 = s => window.btoa(unescape(encodeURIComponent(s)));
                     var link = newWindow.document.createElement('a');
                     link.href = uri + base64(template);
@@ -540,8 +496,7 @@ $(document).ready(function() {
             },
 
             error: function() {
-                $('#getData').prop('disabled', false);
-                $('#getData').text('Report');
+                $('#getData').prop('disabled', false).text('Report');
                 toastr.error('Something went wrong.');
             }
 
@@ -554,12 +509,7 @@ $(document).ready(function() {
 // FUNCTION: Employee table HTML
 // ------------------------------
 function buildEmployeeTable(empData) {
-
-    let html = `
-    <h4 style="text-align:center;">
-        ${empData[0].name} (${empData[0].employee_code})
-    </h4>
-
+    let html = `<h4 style="text-align:center;">${empData[0].name} (${empData[0].employee_code})</h4>
     <table class="table table-bordered report-table">
         <thead>
             <tr>
@@ -583,12 +533,10 @@ function buildEmployeeTable(empData) {
                 <th>Remarks</th>
             </tr>
         </thead>
-        <tbody>
-    `;
+        <tbody>`;
 
     empData.forEach((att, i) => {
-        html += `
-        <tr>
+        html += `<tr>
             <td>${i + 1}</td>
             <td>${att.date || ''}</td>
             <td>${att.employee_code || ''}</td>
@@ -607,14 +555,13 @@ function buildEmployeeTable(empData) {
             <td>${att.overTime || ''}</td>
             <td>${att.overTime || ''}</td>
             <td>${att.remarks || ''}</td>
-        </tr>
-        `;
+        </tr>`;
     });
 
     html += `</tbody></table>`;
-
     return html;
 }
+
 </script>
 
 
