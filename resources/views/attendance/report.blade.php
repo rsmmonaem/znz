@@ -166,272 +166,220 @@
 @stop
 
 @section('javascript')
-    <script>
-        $(document).ready(function() {
-            $('#branch').on('change', function() {
-                var branch_id = $(this).val();
-                $('#employeeId').val('').trigger('change');
-                HandleBranchWiseEmployees(branch_id, '#employeeId', true);
-            });
-            $('#getData').on('click', function() {
-                $('#getData').prop('disabled', true);
-                $('#getData').text('Please Wait...');
-                const date = $('#date').val();
-                const status = $('input[name="status"]:checked').val();
-                const branch_id = $('#branch').val();
-                const department_id = $('#department').val();
-                const section_id = $('#section').val();
-                const category_id = $('#category').val();
-                const designation_id = $('#designation').val();
-                const employee_id = $('select[name="employeeId"]').val();
-                const startDate = $('#startDate').val();
-                const $endDate = $('#endDate').val();
-                const shift_id = $('#shift_id').val();
-                // console.log(shift_id);
+<script>
+    $(document).ready(function() {
 
-                const formData = {
-                    date: date,
-                    status: status,
-                    branch_id: branch_id,
-                    department_id: department_id,
-                    section_id: section_id,
-                    category_id: category_id,
-                    designation_id: designation_id,
-                    employee_id: employee_id,
-                    startDate: startDate,
-                    endDate: $endDate,
-                    shift_id: shift_id
-                }
-                $.ajax({
-                    url: "{{ url('attendance-report') }}",
-                    method: 'POST',
-                    data: formData,
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-                    success: function(response) {
-                         $('#getData').prop('disabled', false);
-                         $('#getData').text('Report');
-                         toastr.success('Report Generated Successfully');
-                         var newWindow = window.open('', '_blank', 'width=1200,height=800');
+        $('#branch').on('change', function() {
+            var branch_id = $(this).val();
+            $('#employeeId').val('').trigger('change');
+            HandleBranchWiseEmployees(branch_id, '#employeeId', true);
+        });
 
-                        // Build the content for the new window
-                        var content = `
-                        <html>
-                            <head>
-                                <title>Monthly Attendance Report</title>
-                                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.5.2/css/bootstrap.min.css">
-                                <style>
-                                    .center-item {
-                                        margin-left: auto;
-                                        margin-right: auto;
-                                        text-align: center;
-                                    }
-                                    .display-flex {
-                                        display: flex;
-                                        justify-content: space-between;
-                                        align-items: center;
-                                        border: 1px solid #ccc;
-                                        padding: 10px;
-                                        margin: 0 0 20px 0;
-                                    }
-                                    table {
-                                        width: 100%;
-                                        border-collapse: collapse;
-                                    }
-                                    th, td {
-                                        border: 1px solid #ccc;
-                                        padding: 8px;
-                                        text-align: left;
-                                    }
-                                    .totals-row td {
-                                        font-weight: bold;
-                                    }
-                                    @media print {
-                                        @page {
-                                            size: landscape;
-                                        }
-                                    }
-                                    @media print {
-                                        .btn-print-excel button {
-                                            display: none !important;
-                                        }
-                                    }
-                                </style>
-                            </head>
-                            <body>
-                                <div class="display-flex" id="header-for">
-                                    <div class="left-item">
-                                        <img src="{{ URL::to(config('constants.upload_path.logo') . config('config.logo')) }}" width="150px" style="margin-left:20px;">
-                                    </div>
-                                    <div class="center-item">
-                                        <h4>{{ config('config.company_name') }}</h4>
-                                        <p>Monthly Attendance Report (Date)</p>
-                                        <p>Branch: ${response.branch_name}</p>
-                                        <p>Date: <strong id="date">${response.startDate} to ${response.toDate}</strong></p>
-                                    </div>
-                                </div>
-                                <table class="table table-bordered report-table">
-                                    <thead>
-                                        <tr>
-                                            <th>SL</th>
-                                            <th>Date</th>
-                                            <th>ID</th>
-                                            <th>Name</th>
-                                            <th>Department</th>
-                                            <th>Section</th>
-                                            <th>Category</th>
-                                            <th>Designation</th>
-                                            <th>Shift In</th>
-                                            <th>Shift Out</th>
-                                            <th>Shift Name</th>
-                                            <th>Punch In</th>
-                                            <th>Punch Out</th>
-                                            <th>Status</th>
-                                            <th>Late</th>
-                                            <th>OT</th>
-                                            <th>Extra Time</th>
-                                            <th>Remarks</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
+        $('#getData').on('click', function() {
+
+            $('#getData').prop('disabled', true);
+            $('#getData').text('Please Wait...');
+
+            const formData = {
+                date: $('#date').val(),
+                status: $('input[name="status"]:checked').val(),
+                branch_id: $('#branch').val(),
+                department_id: $('#department').val(),
+                section_id: $('#section').val(),
+                category_id: $('#category').val(),
+                designation_id: $('#designation').val(),
+                employee_id: $('select[name="employeeId"]').val(),
+                startDate: $('#startDate').val(),
+                endDate: $('#endDate').val(),
+                shift_id: $('#shift_id').val()
+            };
+
+            $.ajax({
+                url: "{{ url('attendance-report') }}",
+                method: 'POST',
+                data: formData,
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+
+                success: function(response) {
+
+                    $('#getData').prop('disabled', false);
+                    $('#getData').text('Report');
+                    toastr.success('Report Generated Successfully');
+
+                    var newWindow = window.open('', '_blank', 'width=1200,height=800');
+
+                    // -----------------------------------------
+                    // 🔥 Active Employee Filter (your requirement)
+                    // -----------------------------------------
+                    response.filtered_data = response.filtered_data.filter(
+                        item => item.employee_status === "active"
+                    );
+
+                    var content = `
+                    <html>
+                    <head>
+                        <title>Monthly Attendance Report</title>
+                        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.5.2/css/bootstrap.min.css">
+                        <style>
+                            .center-item { text-align:center; }
+                            .display-flex {
+                                display:flex; justify-content:space-between;
+                                border:1px solid #ccc; padding:10px; margin-bottom:20px;
+                            }
+                            table { width:100%; border-collapse:collapse; }
+                            th, td { border:1px solid #ccc; padding:6px; text-align:center; }
+                            .totals-row td { font-weight:bold; }
+                            @media print { @page { size:landscape; } }
+                            @media print { .btn-print-excel button { display:none; } }
+                        </style>
+                    </head>
+                    <body>
+                    `;
+
+                    content += `
+                        <div class="display-flex">
+                            <div class="left-item">
+                                <img src="{{ URL::to(config('constants.upload_path.logo') . config('config.logo')) }}"
+                                    width="150" style="margin-left:20px;">
+                            </div>
+                            <div class="center-item">
+                                <h4>{{ config('config.company_name') }}</h4>
+                                <p>Monthly Attendance Report</p>
+                                <p>Branch: ${response.branch_name}</p>
+                                <p>Date: <strong>${response.startDate} to ${response.toDate}</strong></p>
+                            </div>
+                        </div>
+                    `;
+
+                    // -----------------------------------------
+                    // 🔥 Group by employee_code
+                    // -----------------------------------------
+                    let grouped = {};
+                    response.filtered_data.forEach(att => {
+                        if (!grouped[att.employee_code]) {
+                            grouped[att.employee_code] = [];
+                        }
+                        grouped[att.employee_code].push(att);
+                    });
+
+                    // -----------------------------------------
+                    // 🔥 Loop: One employee = One Page
+                    // -----------------------------------------
+                    for (const empCode in grouped) {
+
+                        const empData = grouped[empCode];
+
+                        content += `
+                        <div style="page-break-after: always;">
+                            <h4 style="text-align:center;">
+                                ${empData[0].name} (${empCode})
+                            </h4>
+
+                            <table class="table table-bordered report-table">
+                                <thead>
+                                    <tr>
+                                        <th>SL</th>
+                                        <th>Date</th>
+                                        <th>ID</th>
+                                        <th>Name</th>
+                                        <th>Department</th>
+                                        <th>Section</th>
+                                        <th>Category</th>
+                                        <th>Designation</th>
+                                        <th>Shift In</th>
+                                        <th>Shift Out</th>
+                                        <th>Shift Name</th>
+                                        <th>Punch In</th>
+                                        <th>Punch Out</th>
+                                        <th>Status</th>
+                                        <th>Late</th>
+                                        <th>OT</th>
+                                        <th>Extra</th>
+                                        <th>Remarks</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
                         `;
-                        response.filtered_data.forEach((attendance, index) => {
+
+                        empData.forEach((att, index) => {
                             content += `
                             <tr>
                                 <td>${index + 1}</td>
-                                <td>${attendance.date || ''}</td>
-                                <td>${attendance.employee_code || ''}</td>
-                                <td>${attendance.name || ''}</td>
-                                <td>${attendance.department || ''}</td>
-                                <td>${attendance.section || ''}</td>
-                                <td>${attendance.category || ''}</td>
-                                <td>${attendance.designation || ''}</td>
-                                <td>${attendance.shift_in || ''}</td>
-                                <td>${attendance.shift_out || ''}</td>
-                                <td>${attendance.shift_name || ''}</td>
-                                <td>${attendance.in_time || ''}</td>
-                                <td>${attendance.out_time || ''}</td>
-                                <td>${attendance.status || ''}</td>
-                                <td>${attendance.lateTime || ''}</td>
-                                <td>${attendance.status != 'P' ? attendance.overTime : ''}</td>
-                                <td>${attendance.status == 'P' ? attendance.overTime : ''}</td>
-                                <td>${attendance.remarks || ''}</td>
+                                <td>${att.date || ''}</td>
+                                <td>${att.employee_code || ''}</td>
+                                <td>${att.name || ''}</td>
+                                <td>${att.department || ''}</td>
+                                <td>${att.section || ''}</td>
+                                <td>${att.category || ''}</td>
+                                <td>${att.designation || ''}</td>
+                                <td>${att.shift_in || ''}</td>
+                                <td>${att.shift_out || ''}</td>
+                                <td>${att.shift_name || ''}</td>
+                                <td>${att.in_time || ''}</td>
+                                <td>${att.out_time || ''}</td>
+                                <td>${att.status || ''}</td>
+                                <td>${att.lateTime || ''}</td>
+                                <td>${att.overTime || ''}</td>
+                                <td>${att.overTime || ''}</td>
+                                <td>${att.remarks || ''}</td>
                             </tr>
                             `;
                         });
 
-                        // Close the table and add the print button
                         content += `
-                                    </tbody>
-                                    <tfoot>`;
-                                        content += `
-                                        
-                                       <tr class="totals-row">
-    <td colspan="2" style="text-align:center;">
-        Total Present = ${response.filtered_totals.find(status => status.status === "P")?.count || 0}
-    </td>
-    <td colspan="2" style="text-align:center;">
-        Total Absent = ${response.filtered_totals.find(status => status.status === "Absent")?.count || 0}
-    </td>
-    <td colspan="2" style="text-align:center;">
-        Total SPHD = ${response.filtered_totals.find(status => status.status === "SPHD")?.count || 0}
-    </td>
-    <td colspan="2" style="text-align:center;">
-        Total WHD = ${response.filtered_totals.find(status => status.status === "WHD")?.count || 0}
-    </td>
-    <td colspan="2" style="text-align:center;">
-        Total Late = ${response.filtered_totals.find(status => status.status === "L")?.count || 0}
-    </td>
-    <td colspan="2" style="text-align:center;">
-        Total LWP = ${response.filtered_totals.find(status => status.status === "LWP")?.count || 0}
-    </td>
-    <td colspan="2" style="text-align:center;">
-        Total HLD = ${response.filtered_totals.find(status => status.status === "HLD")?.count || 0}
-    </td>
-    <td colspan="2" style="text-align:center;">
-        Total Leave = ${response.filtered_totals.find(status => status.status === "Leave")?.count || 0}
-    </td>
-</tr>
-                                    </tfoot>
-                                </table>
-                                <div class="display-flex">
-                                    <div class="left-item"></div>
-                                    <div class="center-item btn-print-excel">
-                                        <button onclick="window.print()" class="btn btn-primary">Print</button>
-                                        <button id="exportExcel" class="btn btn-success">Export to Excel</button>
-                                    </div>
-                                </div>
-                            </body>
-                        </html>
+                                </tbody>
+                            </table>
+                        </div>
                         `;
-
-                        // Write the content to the new window
-                        newWindow.document.write(content);
-                        newWindow.document.close();  // Close the document to apply the styles
-                        // Excel Export
-        newWindow.document.getElementById('exportExcel').addEventListener('click', function() {
-            var tableHTML = newWindow.document.querySelector('.report-table').outerHTML;
-            var filename = 'monthly_attendance.xls';
-            var uri = 'data:application/vnd.ms-excel;base64,';
-            var template = `
-            <html xmlns:o="urn:schemas-microsoft-com:office:office" 
-                xmlns:x="urn:schemas-microsoft-com:office:excel" 
-                xmlns="http://www.w3.org/TR/REC-html40">
-            <head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet>
-            <x:Name>Salary Slab</x:Name>
-            <x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet>
-            </x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]-->
-            </head><body>${tableHTML}</body></html>
-            `;
-            var base64 = function(s) { return window.btoa(unescape(encodeURIComponent(s))) };
-            var link = newWindow.document.createElement('a');
-            link.href = uri + base64(template);
-            link.download = filename;
-            link.click();
-        });
-
-
-                    }, error: function(xhr, status, error) {
-                         $('#getData').prop('disabled', false);
-                         $('#getData').text('Report');
-                         toastr.error('Something went wrong. Please try again.');
                     }
-                    
-                })
+
+                    // -----------------------------------------
+                    // PRINT + EXCEL BUTTON
+                    // -----------------------------------------
+                    content += `
+                        <div class="center-item btn-print-excel">
+                            <button onclick="window.print()" class="btn btn-primary">Print</button>
+                            <button id="exportExcel" class="btn btn-success">Export to Excel</button>
+                        </div>
+                    </body>
+                    </html>
+                    `;
+
+                    newWindow.document.write(content);
+                    newWindow.document.close();
+
+                    // Excel Export
+                    newWindow.document.getElementById('exportExcel').addEventListener('click', function() {
+                        var tableHTML = newWindow.document.querySelector('.report-table').outerHTML;
+                        var filename = 'monthly_attendance.xls';
+                        var uri = 'data:application/vnd.ms-excel;base64,';
+                        var template = `
+                        <html xmlns:o="urn:schemas-microsoft-com:office:office"
+                            xmlns:x="urn:schemas-microsoft-com:office:excel">
+                        <body>${tableHTML}</body></html>`;
+
+                        var base64 = s => window.btoa(unescape(encodeURIComponent(s)));
+                        var link = newWindow.document.createElement('a');
+                        link.href = uri + base64(template);
+                        link.download = filename;
+                        link.click();
+                    });
+
+                },
+
+                error: function() {
+                    $('#getData').prop('disabled', false);
+                    $('#getData').text('Report');
+                    toastr.error('Something went wrong.');
+                }
+
             });
         });
 
-        // Print Section
-        document.getElementById('print').addEventListener('click', function() {
-            const printFrame = document.createElement('iframe');
-            printFrame.style.position = 'absolute';
-            printFrame.style.width = '0';
-            printFrame.style.height = '0';
-            printFrame.style.padding = '20px';
-            printFrame.style.border = 'none';
-            document.getElementById('print').style.display = 'none';
-            document.body.appendChild(printFrame);
-            const printContents = document.querySelector('.table-container').innerHTML;
-            printFrame.contentDocument.write(`
-                    <html>
-                    <head>
-                        <title>Print Table</title>
-                        <style>
-                            /* Optional: Include styles for the printed content */
-                            body { font-family: Arial, sans-serif; }
-                            table { width: 100%; border-collapse: collapse; }
-                            th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
-                        </style>
-                    </head>
-                    <body>${printContents}</body>
-                    </html>
-                `);
-            document.getElementById('print').style.display = 'block';
-            printFrame.contentDocument.close();
-            printFrame.contentWindow.focus();
-            printFrame.contentWindow.print();
-            printFrame.onafterprint = () => document.body.removeChild(printFrame);
-        })
-    </script>
+    });
+</script>
+
+
 @stop

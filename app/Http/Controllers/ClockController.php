@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Branch;
@@ -31,59 +32,61 @@ use App\WHD;
 use Carbon\Carbon;
 use Validator;
 
-Class ClockController extends Controller{
-    use BasicController;
+class ClockController extends Controller
+{
+	use BasicController;
 
 	public function __construct()
-    {
-        $this->middleware('officeshift');
-    }
+	{
+		$this->middleware('officeshift');
+	}
 
-	public function in(Request $request){
-		if(!$request->has('api') && !Auth::check()){
-	        if($request->has('ajax_submit')){
-	            $response = ['message' => trans('messages.session_expire'), 'status' => 'error']; 
-	            return response()->json($response, 200, array('Access-Controll-Allow-Origin' => '*'));
-	        }
+	public function in(Request $request)
+	{
+		if (!$request->has('api') && !Auth::check()) {
+			if ($request->has('ajax_submit')) {
+				$response = ['message' => trans('messages.session_expire'), 'status' => 'error'];
+				return response()->json($response, 200, array('Access-Controll-Allow-Origin' => '*'));
+			}
 			return redirect('/');
 		}
 
-		$datetime = ($request->input('datetime')) ? : date('Y-m-d H:i:s');	
-		$time = date('H:i:s',strtotime($datetime));
-		$date = date('Y-m-d',strtotime($datetime));
-		$user_id = ($request->input('user_id')) ? : Auth::user()->id;
+		$datetime = ($request->input('datetime')) ?: date('Y-m-d H:i:s');
+		$time = date('H:i:s', strtotime($datetime));
+		$date = date('Y-m-d', strtotime($datetime));
+		$user_id = ($request->input('user_id')) ?: Auth::user()->id;
 
-       	$my_shift = Helper::getShift($date,$user_id);
+		$my_shift = Helper::getShift($date, $user_id);
 
-        if($my_shift->overnight && $time >= '00:00:00' && $time <= $my_shift->out_time){
-        	$date = date('Y-m-d',strtotime($date . ' -1 days'));
-        	$my_shift = Helper::getShift($date,$user_id);
-        }
+		if ($my_shift->overnight && $time >= '00:00:00' && $time <= $my_shift->out_time) {
+			$date = date('Y-m-d', strtotime($date . ' -1 days'));
+			$my_shift = Helper::getShift($date, $user_id);
+		}
 
-       	$in_date = $date;
-        $in_time = $my_shift->in_time;
-        $out_date = date('Y-m-d',strtotime($date . (($my_shift->overnight) ? ' +1 days' : '')));
-        $out_time = $out_date.' '.$my_shift->out_time;
+		$in_date = $date;
+		$in_time = $my_shift->in_time;
+		$out_date = date('Y-m-d', strtotime($date . (($my_shift->overnight) ? ' +1 days' : '')));
+		$out_time = $out_date . ' ' . $my_shift->out_time;
 
-		$clocks = Clock::where('user_id','=',$user_id)
-			->where('date','=',$date)
-			->where(function($query) use($datetime) {
-				$query->where('clock_out','=',null)
-				->orWhere('clock_out','>=',date('Y-m-d H:i:s',strtotime($datetime)));
+		$clocks = Clock::where('user_id', '=', $user_id)
+			->where('date', '=', $date)
+			->where(function ($query) use ($datetime) {
+				$query->where('clock_out', '=', null)
+					->orWhere('clock_out', '>=', date('Y-m-d H:i:s', strtotime($datetime)));
 			})->count();
 
-		if($clocks){
-	        if($request->has('ajax_submit')){
-	            $response = ['message' => trans('messages.invalid_clock_in'), 'status' => 'error']; 
-	            return response()->json($response, 200, array('Access-Controll-Allow-Origin' => '*'));
-	        } elseif($request->has('api'))
-	        	return response()->json(['type' => 'error','error_code' => '105']);
+		if ($clocks) {
+			if ($request->has('ajax_submit')) {
+				$response = ['message' => trans('messages.invalid_clock_in'), 'status' => 'error'];
+				return response()->json($response, 200, array('Access-Controll-Allow-Origin' => '*'));
+			} elseif ($request->has('api'))
+				return response()->json(['type' => 'error', 'error_code' => '105']);
 			return redirect()->back()->withErrors(trans('messages.invalid_clock_in'));
 		}
 
 		$clock = new Clock;
 		$clock->date = $date;
-		$clock->clock_in = date('Y-m-d H:i:s',strtotime($datetime));
+		$clock->clock_in = date('Y-m-d H:i:s', strtotime($datetime));
 		$clock->user_id = $user_id;
 		$clock->save();
 
@@ -91,158 +94,162 @@ Class ClockController extends Controller{
 		$data['module'] = 'clock';
 		$data['activity'] = 'activity_clock_in';
 		$data['user_id'] = $user_id;
-    	$data['ip'] = \Request::getClientIp();
-    	$activity = \App\Activity::create($data);
+		$data['ip'] = \Request::getClientIp();
+		$activity = \App\Activity::create($data);
 
-        if($request->has('ajax_submit')){
-        	$data = $this->lists();
+		if ($request->has('ajax_submit')) {
+			$data = $this->lists();
 
-        	$clock_button = '<button class="btn btn-success btn-md"><i class="fa fa-arrow-circle-right"></i> '.trans('messages.you_are_clock_in').'</button> '.
-        		Form::open(['route' => 'clock.out','role' => 'form', 'class'=>'form-inline','id' => 'clock-out-form','data-table-alter' => 'clock-table','data-clock-button' => 1]).
-					'<button type="submit" class="btn btn-danger clock-button">'.trans('messages.clock_out').'</button>'.
-					Form::close();
+			$clock_button = '<button class="btn btn-success btn-md"><i class="fa fa-arrow-circle-right"></i> ' . trans('messages.you_are_clock_in') . '</button> ' .
+				Form::open(['route' => 'clock.out', 'role' => 'form', 'class' => 'form-inline', 'id' => 'clock-out-form', 'data-table-alter' => 'clock-table', 'data-clock-button' => 1]) .
+				'<button type="submit" class="btn btn-danger clock-button">' . trans('messages.clock_out') . '</button>' .
+				Form::close();
 
-            $response = ['message' => trans('messages.clock_in_successful'), 'status' => 'success','data' => $data,'clock_button' => $clock_button]; 
-            return response()->json($response, 200, array('Access-Controll-Allow-Origin' => '*'));
-        } elseif($request->has('api'))
-	        	return response()->json(['type'=>'success']);
+			$response = ['message' => trans('messages.clock_in_successful'), 'status' => 'success', 'data' => $data, 'clock_button' => $clock_button];
+			return response()->json($response, 200, array('Access-Controll-Allow-Origin' => '*'));
+		} elseif ($request->has('api'))
+			return response()->json(['type' => 'success']);
 		return redirect()->back()->withSuccess(trans('messages.clock_in_successful'));
 	}
 
-	public function lists(){
-        $clocks = \App\Clock::whereUserId(Auth::user()->id)
-            ->where('date','=',date('Y-m-d'))
-            ->orderBy('clock_in')
-            ->get();
+	public function lists()
+	{
+		$clocks = \App\Clock::whereUserId(Auth::user()->id)
+			->where('date', '=', date('Y-m-d'))
+			->orderBy('clock_in')
+			->get();
 
-        $data = '';
-        foreach($clocks as $clock){
-        	$data .= '<tr>
-        			<td>'.showTime($clock->clock_in).'</td>
-        			<td>'.showTime($clock->clock_out).'</td>
+		$data = '';
+		foreach ($clocks as $clock) {
+			$data .= '<tr>
+        			<td>' . showTime($clock->clock_in) . '</td>
+        			<td>' . showTime($clock->clock_out) . '</td>
         			</tr>';
-        }
+		}
 
-        return $data;
+		return $data;
 	}
 
-	public function out(Request $request){
-		if(!$request->has('api') && !Auth::check()){
-	        if($request->has('ajax_submit')){
-	            $response = ['message' => trans('messages.session_expire'), 'status' => 'error']; 
-	            return response()->json($response, 200, array('Access-Controll-Allow-Origin' => '*'));
-	        }
+	public function out(Request $request)
+	{
+		if (!$request->has('api') && !Auth::check()) {
+			if ($request->has('ajax_submit')) {
+				$response = ['message' => trans('messages.session_expire'), 'status' => 'error'];
+				return response()->json($response, 200, array('Access-Controll-Allow-Origin' => '*'));
+			}
 			return redirect('/');
 		}
 
-		$datetime = ($request->input('datetime')) ? : date('Y-m-d H:i:s');	
-		$time = date('H:i:s',strtotime($datetime));
-		$date = date('Y-m-d',strtotime($datetime));
-		$user_id = ($request->input('user_id')) ? : Auth::user()->id;
+		$datetime = ($request->input('datetime')) ?: date('Y-m-d H:i:s');
+		$time = date('H:i:s', strtotime($datetime));
+		$date = date('Y-m-d', strtotime($datetime));
+		$user_id = ($request->input('user_id')) ?: Auth::user()->id;
 
-		$next_date = date('Y-m-d',strtotime($date.' +1 days'));
+		$next_date = date('Y-m-d', strtotime($date . ' +1 days'));
 
-       	$my_shift = Helper::getShift($date,$user_id);
-       	$my_next_date_shift = Helper::getShift($next_date,$user_id);
+		$my_shift = Helper::getShift($date, $user_id);
+		$my_next_date_shift = Helper::getShift($next_date, $user_id);
 
-        if($my_shift->overnight && $time >= '00:00:00' && $datetime < $next_date.' '.$my_next_date_shift->in_time){
-        	$date = date('Y-m-d',strtotime($date . ' -1 days'));
-        	$my_shift = Helper::getShift($date,$user_id);
-        }
+		if ($my_shift->overnight && $time >= '00:00:00' && $datetime < $next_date . ' ' . $my_next_date_shift->in_time) {
+			$date = date('Y-m-d', strtotime($date . ' -1 days'));
+			$my_shift = Helper::getShift($date, $user_id);
+		}
 
-		$clock = Clock::where('user_id','=',$user_id)
-			->where('date','=',$date)
-			->where('clock_out','=',null)
+		$clock = Clock::where('user_id', '=', $user_id)
+			->where('date', '=', $date)
+			->where('clock_out', '=', null)
 			->first();
 
-		if(!$clock){
-	        if($request->has('ajax_submit')){
-	            $response = ['message' => trans('messages.not_clocked_in'), 'status' => 'error']; 
-	            return response()->json($response, 200, array('Access-Controll-Allow-Origin' => '*'));
-	        } elseif($request->has('api'))
-	        	return response()->json(['type' => 'error','error_code' => '106']);
+		if (!$clock) {
+			if ($request->has('ajax_submit')) {
+				$response = ['message' => trans('messages.not_clocked_in'), 'status' => 'error'];
+				return response()->json($response, 200, array('Access-Controll-Allow-Origin' => '*'));
+			} elseif ($request->has('api'))
+				return response()->json(['type' => 'error', 'error_code' => '106']);
 			return redirect()->back()->withErrors(trans('messages.not_clocked_in'));
 		}
 
-		if($clock->clock_in > date('Y-m-d H:i:s',strtotime($datetime))){
-	        if($request->has('ajax_submit')){
-	            $response = ['message' => trans('messages.out_time_not_less_than_in_time'), 'status' => 'error']; 
-	            return response()->json($response, 200, array('Access-Controll-Allow-Origin' => '*'));
-	        } elseif($request->has('api'))
-	        	return response()->json(['type' => 'error','error_code' => '107']);
+		if ($clock->clock_in > date('Y-m-d H:i:s', strtotime($datetime))) {
+			if ($request->has('ajax_submit')) {
+				$response = ['message' => trans('messages.out_time_not_less_than_in_time'), 'status' => 'error'];
+				return response()->json($response, 200, array('Access-Controll-Allow-Origin' => '*'));
+			} elseif ($request->has('api'))
+				return response()->json(['type' => 'error', 'error_code' => '107']);
 			return redirect()->back()->withErrors(trans('messages.out_time_not_less_than_in_time'));
 		}
 
-		$clock->clock_out = date('Y-m-d H:i:s',strtotime($datetime));
+		$clock->clock_out = date('Y-m-d H:i:s', strtotime($datetime));
 		$clock->save();
 
 		$data = array();
 		$data['module'] = 'clock';
 		$data['activity'] = 'activity_clock_in';
 		$data['user_id'] = $user_id;
-    	$data['ip'] = \Request::getClientIp();
-    	$activity = \App\Activity::create($data);
+		$data['ip'] = \Request::getClientIp();
+		$activity = \App\Activity::create($data);
 
-        if($request->has('ajax_submit')){
-        	$data = $this->lists();
+		if ($request->has('ajax_submit')) {
+			$data = $this->lists();
 
-        	$clock_button = Form::open(['route' => 'clock.in','role' => 'form', 'class'=>'form-inline','id' => 'clock-in-form','data-table-alter' => 'clock-table','data-clock-button' => 1]).
-				'<button type="submit" class="btn btn-success clock-button">'.trans('messages.clock_in').'</button>'.
+			$clock_button = Form::open(['route' => 'clock.in', 'role' => 'form', 'class' => 'form-inline', 'id' => 'clock-in-form', 'data-table-alter' => 'clock-table', 'data-clock-button' => 1]) .
+				'<button type="submit" class="btn btn-success clock-button">' . trans('messages.clock_in') . '</button>' .
 				Form::close();
 
-            $response = ['message' => trans('messages.clock_out_successful'), 'status' => 'success','data' => $data,'clock_button' => $clock_button]; 
-            return response()->json($response, 200, array('Access-Controll-Allow-Origin' => '*'));
-        } elseif($request->has('api'))
-	        	return response()->json(['type' => 'success']);
+			$response = ['message' => trans('messages.clock_out_successful'), 'status' => 'success', 'data' => $data, 'clock_button' => $clock_button];
+			return response()->json($response, 200, array('Access-Controll-Allow-Origin' => '*'));
+		} elseif ($request->has('api'))
+			return response()->json(['type' => 'success']);
 		return redirect()->back()->withSuccess(trans('messages.clock_out_successful'));
 	}
 
-	public function edit(Clock $clock){
-		return view('employee.edit_clock',compact('clock'));
+	public function edit(Clock $clock)
+	{
+		return view('employee.edit_clock', compact('clock'));
 	}
 
-	public function update(ClockRequest $request, Clock $clock){
+	public function update(ClockRequest $request, Clock $clock)
+	{
 
-        $validation = Validator::make($request->all(),[
-            'clock_in' => 'required'
-        ]);
+		$validation = Validator::make($request->all(), [
+			'clock_in' => 'required'
+		]);
 
-        if($validation->fails()){
-            return redirect()->back()->withInput()->withErrors($validation->messages());
-        }
+		if ($validation->fails()) {
+			return redirect()->back()->withInput()->withErrors($validation->messages());
+		}
 
-		$clock_in = date('Y-m-d H:i',strtotime($request->input('clock_in')));
-		$clock_out = ($request->input('clock_out')) ? date('Y-m-d H:i',strtotime($request->input('clock_out'))) : null;
+		$clock_in = date('Y-m-d H:i', strtotime($request->input('clock_in')));
+		$clock_out = ($request->input('clock_out')) ? date('Y-m-d H:i', strtotime($request->input('clock_out'))) : null;
 
-		if($clock_out && $clock_out < $clock_in)
+		if ($clock_out && $clock_out < $clock_in)
 			return redirect()->back()->withErrors(trans('messages.out_time_not_less_than_in_time'));
 
-		$previous = Clock::where('id','!=',$clock->id)
-			->where('date','=',$clock->date)
+		$previous = Clock::where('id', '!=', $clock->id)
+			->where('date', '=', $clock->date)
 			->whereUserId($clock->user_id)
-			->where('clock_out','<=',$clock->clock_in)
-			->orderBy('clock_out','desc')
+			->where('clock_out', '<=', $clock->clock_in)
+			->orderBy('clock_out', 'desc')
 			->first();
 
 
-		$next = Clock::where('id','!=',$clock->id)
-			->where('date','=',$clock->date)
+		$next = Clock::where('id', '!=', $clock->id)
+			->where('date', '=', $clock->date)
 			->whereUserId($clock->user_id)
-			->where('clock_in','>=',$clock->clock_in)
-			->orderBy('clock_in','asc')
+			->where('clock_in', '>=', $clock->clock_in)
+			->orderBy('clock_in', 'asc')
 			->first();
 
-		if($previous && $clock_in < $previous->clock_out)
-			return redirect()->back()->withErrors(trans('messages.in_time_cannot_less_than').' '.showTime($previous->clock_out));
+		if ($previous && $clock_in < $previous->clock_out)
+			return redirect()->back()->withErrors(trans('messages.in_time_cannot_less_than') . ' ' . showTime($previous->clock_out));
 
-		if($next && $clock_in > $next->clock_in)
-			return redirect()->back()->withErrors(trans('messages.in_time_cannot_less_than').' '.showTime($next->clock_in));
+		if ($next && $clock_in > $next->clock_in)
+			return redirect()->back()->withErrors(trans('messages.in_time_cannot_less_than') . ' ' . showTime($next->clock_in));
 
-		if($next && $clock_out == null)
+		if ($next && $clock_out == null)
 			return redirect()->back()->withErrors(trans('messages.out_time_mandatory'));
-		
-		if($next && $clock_out && $clock_out > $next->clock_in)
-			return redirect()->back()->withErrors(trans('messages.out_time_cannot_greater_than').' '.showTime($next->clock_in));
+
+		if ($next && $clock_out && $clock_out > $next->clock_in)
+			return redirect()->back()->withErrors(trans('messages.out_time_cannot_greater_than') . ' ' . showTime($next->clock_in));
 
 		$clock->clock_in = $clock_in;
 		$clock->clock_out = $clock_out;
@@ -250,261 +257,266 @@ Class ClockController extends Controller{
 		return redirect()->back()->withSuccess(trans('messages.saved'));
 	}
 
-	public function clock(Request $request,$user_id,$date,$clock_id = null){
+	public function clock(Request $request, $user_id, $date, $clock_id = null)
+	{
 
-		if(config('config.auto_lock_attendance_days') && $date < date('Y-m-d',strtotime(date('Y-m-d') . ' -'.config('config.auto_lock_attendance_days').' days')) && !defaultRole())
+		if (config('config.auto_lock_attendance_days') && $date < date('Y-m-d', strtotime(date('Y-m-d') . ' -' . config('config.auto_lock_attendance_days') . ' days')) && !defaultRole())
 			return redirect()->back()->withErrors(trans('messages.attendance_locked'));
 
-		if($date > date('Y-m-d',strtotime(date('Y-m-d') . ' +'.config('config.enable_future_attendance').' days')) && !defaultRole())
+		if ($date > date('Y-m-d', strtotime(date('Y-m-d') . ' +' . config('config.enable_future_attendance') . ' days')) && !defaultRole())
 			return redirect()->back()->withErrors(trans('messages.future_attendance_disabled'));
 
-        $validation = Validator::make($request->all(),[
-            'clock_in' => 'required'
-        ]);
+		$validation = Validator::make($request->all(), [
+			'clock_in' => 'required'
+		]);
 
-        if($validation->fails()){
-	        if($request->has('ajax_submit')){
-	            $response = ['message' => $validation->messages()->first(), 'status' => 'error']; 
-	            return response()->json($response, 200, array('Access-Controll-Allow-Origin' => '*'));
-	        }
-            return redirect()->back()->withInput()->withErrors($validation->messages());
-        }
-
-        if($clock_id != null)
-        	$clock = Clock::find($clock_id);
-
-        if($clock_id != null && !$clock){
-	        if($request->has('ajax_submit')){
-	            $response = ['message' => trans('messages.invalid_link'), 'status' => 'error']; 
-	            return response()->json($response, 200, array('Access-Controll-Allow-Origin' => '*'));
-	        }
-            return redirect()->back()->withInput()->withErrors(trans('messages.invalid_link'));
-        }
-
-		$next_date = date('Y-m-d',strtotime($date.' +1 days'));
-
-        $shift = Helper::getShift($date,$user_id);
-       	$next_date_shift = Helper::getShift($next_date);
-
-		$clock_in = date('Y-m-d H:i',strtotime($request->input('clock_in')));
-		$clock_out = ($request->input('clock_out')) ? date('Y-m-d H:i',strtotime($request->input('clock_out'))) : null;
-
-		$query1 = Clock::whereUserId($user_id)->where('date','=',$date)->where('clock_in','<=',$clock_in)->where('clock_out','>=',$clock_in);
-		if($clock_out)
-		$query2 = Clock::whereUserId($user_id)->where('date','=',$date)->where('clock_in','<=',$clock_out)->where('clock_out','>=',$clock_out);
-
-		if($clock_id){
-			$query1->where('id','!=',$clock_id);
-			if($clock_out)
-			$query2->where('id','!=',$clock_id);
+		if ($validation->fails()) {
+			if ($request->has('ajax_submit')) {
+				$response = ['message' => $validation->messages()->first(), 'status' => 'error'];
+				return response()->json($response, 200, array('Access-Controll-Allow-Origin' => '*'));
+			}
+			return redirect()->back()->withInput()->withErrors($validation->messages());
 		}
- 
+
+		if ($clock_id != null)
+			$clock = Clock::find($clock_id);
+
+		if ($clock_id != null && !$clock) {
+			if ($request->has('ajax_submit')) {
+				$response = ['message' => trans('messages.invalid_link'), 'status' => 'error'];
+				return response()->json($response, 200, array('Access-Controll-Allow-Origin' => '*'));
+			}
+			return redirect()->back()->withInput()->withErrors(trans('messages.invalid_link'));
+		}
+
+		$next_date = date('Y-m-d', strtotime($date . ' +1 days'));
+
+		$shift = Helper::getShift($date, $user_id);
+		$next_date_shift = Helper::getShift($next_date);
+
+		$clock_in = date('Y-m-d H:i', strtotime($request->input('clock_in')));
+		$clock_out = ($request->input('clock_out')) ? date('Y-m-d H:i', strtotime($request->input('clock_out'))) : null;
+
+		$query1 = Clock::whereUserId($user_id)->where('date', '=', $date)->where('clock_in', '<=', $clock_in)->where('clock_out', '>=', $clock_in);
+		if ($clock_out)
+			$query2 = Clock::whereUserId($user_id)->where('date', '=', $date)->where('clock_in', '<=', $clock_out)->where('clock_out', '>=', $clock_out);
+
+		if ($clock_id) {
+			$query1->where('id', '!=', $clock_id);
+			if ($clock_out)
+				$query2->where('id', '!=', $clock_id);
+		}
+
 		$clock_in_count = $query1->count();
-		if($clock_out)
-		$clock_out_count = $query2->count();
+		if ($clock_out)
+			$clock_out_count = $query2->count();
 
-		if($clock_in < $date)
-	        $response = ['message' => trans('messages.clock_in_less_than_current_date'), 'status' => 'error']; 
-		elseif(!$shift->overnight && $clock_in >= $next_date)
-	        $response = ['message' => trans('messages.clock_in_greater_than_current_date'), 'status' => 'error']; 
-		elseif($shift->overnight && $clock_in >= $next_date.' '.$next_date_shift->in_time)
-	        $response = ['message' => trans('messages.clock_in_greater_than_current_date_overtime'), 'status' => 'error'];
-		elseif($clock_in_count > 0)
-	        $response = ['message' => trans('messages.clock_in_between_time'), 'status' => 'error']; 
-		elseif($clock_out && $clock_out_count)
-	        $response = ['message' => trans('messages.clock_out_between_time'), 'status' => 'error'];
-		elseif($clock_out && $clock_in > $clock_out)
-	        $response = ['message' => trans('messages.out_time_not_less_than_in_time'), 'status' => 'error'];
-    	elseif($clock_out && !$shift->overnight && $clock_out >= $next_date)
-	        $response = ['message' => trans('messages.clock_out_greater_than_current_date'), 'status' => 'error'];
-    	elseif($clock_out && $shift->overnight && $clock_out >= $next_date.' '.$next_date_shift->in_time)
-	        $response = ['message' => trans('messages.clock_out_greater_than_current_date_overtime'), 'status' => 'error'];
+		if ($clock_in < $date)
+			$response = ['message' => trans('messages.clock_in_less_than_current_date'), 'status' => 'error'];
+		elseif (!$shift->overnight && $clock_in >= $next_date)
+			$response = ['message' => trans('messages.clock_in_greater_than_current_date'), 'status' => 'error'];
+		elseif ($shift->overnight && $clock_in >= $next_date . ' ' . $next_date_shift->in_time)
+			$response = ['message' => trans('messages.clock_in_greater_than_current_date_overtime'), 'status' => 'error'];
+		elseif ($clock_in_count > 0)
+			$response = ['message' => trans('messages.clock_in_between_time'), 'status' => 'error'];
+		elseif ($clock_out && $clock_out_count)
+			$response = ['message' => trans('messages.clock_out_between_time'), 'status' => 'error'];
+		elseif ($clock_out && $clock_in > $clock_out)
+			$response = ['message' => trans('messages.out_time_not_less_than_in_time'), 'status' => 'error'];
+		elseif ($clock_out && !$shift->overnight && $clock_out >= $next_date)
+			$response = ['message' => trans('messages.clock_out_greater_than_current_date'), 'status' => 'error'];
+		elseif ($clock_out && $shift->overnight && $clock_out >= $next_date . ' ' . $next_date_shift->in_time)
+			$response = ['message' => trans('messages.clock_out_greater_than_current_date_overtime'), 'status' => 'error'];
 
-    	if(isset($response) && $response['status'] == 'error'){
-    		if($request->has('ajax_submit'))
-	            return response()->json($response, 200, array('Access-Controll-Allow-Origin' => '*'));
-	        else
-            	return redirect()->back()->withInput()->withErrors($response['message']);
-    	}
+		if (isset($response) && $response['status'] == 'error') {
+			if ($request->has('ajax_submit'))
+				return response()->json($response, 200, array('Access-Controll-Allow-Origin' => '*'));
+			else
+				return redirect()->back()->withInput()->withErrors($response['message']);
+		}
 
-    	if($clock_id == null){
-	        $clock = new Clock;
-	        $clock->date = $date;
-        	$clock->user_id = $user_id;
-    	}
+		if ($clock_id == null) {
+			$clock = new Clock;
+			$clock->date = $date;
+			$clock->user_id = $user_id;
+		}
 
-        $clock->clock_in = $clock_in;
-        $clock->clock_out = $clock_out;
-        $clock->save();
+		$clock->clock_in = $clock_in;
+		$clock->clock_out = $clock_out;
+		$clock->save();
 
-		if($request->has('ajax_submit')){
-			$clocks = Clock::where('date','=',$date)->whereUserId($user_id)->orderBy('clock_in')->get();
+		if ($request->has('ajax_submit')) {
+			$clocks = Clock::where('date', '=', $date)->whereUserId($user_id)->orderBy('clock_in')->get();
 			$data = '';
-			foreach($clocks as $clock){
+			foreach ($clocks as $clock) {
 				$data .= '<tr>
-					<td>'.showDateTime($clock->clock_in).'</td>
-					<td>'.showDateTime($clock->clock_out).'</td>
+					<td>' . showDateTime($clock->clock_in) . '</td>
+					<td>' . showDateTime($clock->clock_out) . '</td>
 					<td>
 						<div class="btn-group btn-group-xs">
-					  		<a href="#" data-href="/clock/'.$clock->id.'/edit" class="btn btn-xs btn-default" data-toggle="modal" data-target="#myModal"> <i class="fa fa-edit" data-toggle="tooltip" title="'.trans('messages.edit').'"></i> </a>'.
-					  			delete_form(['clock.destroy',$clock->id]).
-					  	'</div>
+					  		<a href="#" data-href="/clock/' . $clock->id . '/edit" class="btn btn-xs btn-default" data-toggle="modal" data-target="#myModal"> <i class="fa fa-edit" data-toggle="tooltip" title="' . trans('messages.edit') . '"></i> </a>' .
+					delete_form(['clock.destroy', $clock->id]) .
+					'</div>
 					</td>
 				</tr>';
 			}
-            $response = ['message' => trans('messages.saved'), 'status' => 'success','data' => $data]; 
-            return response()->json($response, 200, array('Access-Controll-Allow-Origin' => '*'));
-        }
+			$response = ['message' => trans('messages.saved'), 'status' => 'success', 'data' => $data];
+			return response()->json($response, 200, array('Access-Controll-Allow-Origin' => '*'));
+		}
 		return redirect()->back()->withSuccess(trans('messages.saved'));
 	}
 
-	public function attendance(){
+	public function attendance()
+	{
 
 		$date = date('Y-m-d');
 
-        $col_heads = array(
-        		trans('messages.status'),
-        		trans('messages.employee'),
-        		trans('messages.clock_in'),
-        		trans('messages.clock_out'),
-        		trans('messages.late'),
-        		trans('messages.early_leaving'),
-        		trans('messages.overtime'),
-        		trans('messages.total_work'),
-        		trans('messages.total_rest'),
-        		trans('messages.remarks'));
+		$col_heads = array(
+			trans('messages.status'),
+			trans('messages.employee'),
+			trans('messages.clock_in'),
+			trans('messages.clock_out'),
+			trans('messages.late'),
+			trans('messages.early_leaving'),
+			trans('messages.overtime'),
+			trans('messages.total_work'),
+			trans('messages.total_rest'),
+			trans('messages.remarks')
+		);
 
-        $menu = ['attendance','daily_attendance'];
-        $assets = ['graph'];
+		$menu = ['attendance', 'daily_attendance'];
+		$assets = ['graph'];
 
-        $table_info = array(
+		$table_info = array(
 			'source' => 'daily-attendance',
 			'title' => 'Daily Attendance',
 			'id' => 'daily_attendance_table',
 			'form' => 'daily_attendance'
 		);
 
-		return view('employee.attendance',compact('col_heads','date','menu','table_info','assets'));
+		return view('employee.attendance', compact('col_heads', 'date', 'menu', 'table_info', 'assets'));
 	}
 
-	public function postAttendance(Request $request){
-        $response = ['message' => trans('messages.request_submit'), 'status' => 'success']; 
-        return response()->json($response, 200, array('Access-Controll-Allow-Origin' => '*'));
+	public function postAttendance(Request $request)
+	{
+		$response = ['message' => trans('messages.request_submit'), 'status' => 'success'];
+		return response()->json($response, 200, array('Access-Controll-Allow-Origin' => '*'));
 	}
 
-	public function listDailyAttendance(Request $request){
+	public function listDailyAttendance(Request $request)
+	{
 
-		$date = ($request->input('date')) ? : date('Y-m-d');
+		$date = ($request->input('date')) ?: date('Y-m-d');
 
-		if(Entrust::can('manage_all_employee'))
+		if (Entrust::can('manage_all_employee'))
 			$users = User::all();
-		elseif(Entrust::can('manage_subordinate_employee')){
-			$child_designations = Helper::childDesignation(Auth::user()->designation_id,1);
-			$child_users = User::whereIn('designation_id',$child_designations)->pluck('id')->all();
+		elseif (Entrust::can('manage_subordinate_employee')) {
+			$child_designations = Helper::childDesignation(Auth::user()->designation_id, 1);
+			$child_users = User::whereIn('designation_id', $child_designations)->pluck('id')->all();
 			array_push($child_users, Auth::user()->id);
-			$users = User::whereIn('id',$child_users)->get();
-		} else 
+			$users = User::whereIn('id', $child_users)->get();
+		} else
 			$users = User::whereId(Auth::user()->id)->get();
 
-        $rows=array();
-        $cols_summary=array();
-        $raw_data = array();
-        $clocked_user = array();
+		$rows = array();
+		$cols_summary = array();
+		$raw_data = array();
+		$clocked_user = array();
 
-        $holiday = Holiday::where('date','=',$date)->count();
+		$holiday = Holiday::where('date', '=', $date)->count();
 
-        $total_late = 0;
-        $total_early = 0;
-        $total_overtime = 0;
-        $total_working = 0;
-        $total_rest = 0;
-		
-        $clocks = Clock::where('date','=',$date)->get();
+		$total_late = 0;
+		$total_early = 0;
+		$total_overtime = 0;
+		$total_working = 0;
+		$total_rest = 0;
 
-		$leaves = \App\Leave::whereStatus('approved')->where(function($query) use($date){
-			$query->where('from_date','>=',$date)
-			->orWhere('to_date','<=',$date)
-			->orWhere(function($query1) use($date){
-				$query1->where('from_date','<',$date)
-				->where('to_date','>',$date);
-			});
+		$clocks = Clock::where('date', '=', $date)->get();
+
+		$leaves = \App\Leave::whereStatus('approved')->where(function ($query) use ($date) {
+			$query->where('from_date', '>=', $date)
+				->orWhere('to_date', '<=', $date)
+				->orWhere(function ($query1) use ($date) {
+					$query1->where('from_date', '<', $date)
+						->where('to_date', '>', $date);
+				});
 		})->get();
 
 		$raw_data = array();
 
-        foreach($users as $user){
-        	$tag = '';
-        	$late = 0;
-        	$early = 0;
-        	$working = 0;
-        	$overtime = 0;
-        	$rest = 0;
-        	$my_shift = Helper::getShift($date,$user->id);
+		foreach ($users as $user) {
+			$tag = '';
+			$late = 0;
+			$early = 0;
+			$working = 0;
+			$overtime = 0;
+			$rest = 0;
+			$my_shift = Helper::getShift($date, $user->id);
 
-        	$user_leaves = $leaves->whereLoose('user_id',$user->id)->all();
+			$user_leaves = $leaves->whereLoose('user_id', $user->id)->all();
 
-	        $leave_approved = array();
-	        foreach($user_leaves as $user_leave){
-	            $leave_approved_dates = ($user_leave->approved_date) ? explode(',',$user_leave->approved_date) : [];
-	            foreach($leave_approved_dates as $leave_approved_date)
-	                $leave_approved[] = $leave_approved_date;
-	        }
+			$leave_approved = array();
+			foreach ($user_leaves as $user_leave) {
+				$leave_approved_dates = ($user_leave->approved_date) ? explode(',', $user_leave->approved_date) : [];
+				foreach ($leave_approved_dates as $leave_approved_date)
+					$leave_approved[] = $leave_approved_date;
+			}
 
-        	$my_shift->in_time = $date.' '.$my_shift->in_time;
-        	if($my_shift->overnight)
-        		$my_shift->out_time = date('Y-m-d',strtotime($date . ' +1 days')).' '.$my_shift->out_time;
-        	else
-        		$my_shift->out_time = $date.' '.$my_shift->out_time;
+			$my_shift->in_time = $date . ' ' . $my_shift->in_time;
+			if ($my_shift->overnight)
+				$my_shift->out_time = date('Y-m-d', strtotime($date . ' +1 days')) . ' ' . $my_shift->out_time;
+			else
+				$my_shift->out_time = $date . ' ' . $my_shift->out_time;
 
-        	$out = $clocks->whereLoose('date',$date)->whereLoose('user_id',$user->id)->sortBy('clock_in')->last();
-        	$in = $clocks->whereLoose('date',$date)->whereLoose('user_id',$user->id)->sortBy('clock_in')->first();
-			$records = $clocks->whereLoose('date',$date)->whereLoose('user_id',$user->id)->all();
+			$out = $clocks->whereLoose('date', $date)->whereLoose('user_id', $user->id)->sortBy('clock_in')->last();
+			$in = $clocks->whereLoose('date', $date)->whereLoose('user_id', $user->id)->sortBy('clock_in')->first();
+			$records = $clocks->whereLoose('date', $date)->whereLoose('user_id', $user->id)->all();
 
-			if(isset($in)){
+			if (isset($in)) {
 				$attendance = 'P';
-				$attendance_label = '<span class="badge badge-success">'.trans('messages.present').'</span>';
-			} elseif(count($leave_approved) && in_array($date,$leave_approved)){
+				$attendance_label = '<span class="badge badge-success">' . trans('messages.present') . '</span>';
+			} elseif (count($leave_approved) && in_array($date, $leave_approved)) {
 				$attendance = 'L';
-				$attendance_label = '<span class="badge badge-warning">'.trans('messages.leave').'</span>';
-			} elseif($holiday){
+				$attendance_label = '<span class="badge badge-warning">' . trans('messages.leave') . '</span>';
+			} elseif ($holiday) {
 				$attendance = 'H';
-				$attendance_label = '<span class="badge badge-info">'.trans('messages.holiday').'</span>';
-			} elseif(!$holiday && $date < date('Y-m-d')){
+				$attendance_label = '<span class="badge badge-info">' . trans('messages.holiday') . '</span>';
+			} elseif (!$holiday && $date < date('Y-m-d')) {
 				$attendance = 'A';
-				$attendance_label = '<span class="badge badge-danger">'.trans('messages.absent').'</span>';
+				$attendance_label = '<span class="badge badge-danger">' . trans('messages.absent') . '</span>';
 			} else {
 				$attendance = '';
 				$attendance_label = '';
 			}
-			
+
 			unset($leave_approved);
 
 			$late = (isset($in) && (strtotime($in->clock_in) > strtotime($my_shift->in_time)) && $my_shift->in_time != $my_shift->out_time) ? abs(strtotime($my_shift->in_time) - strtotime($in->clock_in)) : 0;
 
-			if($late)
+			if ($late)
 				$tag .= Helper::getAttendanceTag('late');
 
 			$total_late += $late;
 			$early = (isset($out) && $out->clock_out != null && (strtotime($out->clock_out) < strtotime($my_shift->out_time)) && $my_shift->in_time != $my_shift->out_time) ? abs(strtotime($my_shift->out_time) - strtotime($out->clock_out)) : 0;
 
-			if($early)
+			if ($early)
 				$tag .= Helper::getAttendanceTag('early');
 
 			$total_early += $early;
 
-			foreach($records as $record){
-				if($record->clock_in >= $my_shift->out_time && $record->clock_out != null)
+			foreach ($records as $record) {
+				if ($record->clock_in >= $my_shift->out_time && $record->clock_out != null)
 					$overtime += strtotime($record->clock_out) - strtotime($record->clock_in);
-				elseif($record->clock_in < $my_shift->out_time && $record->clock_out > $my_shift->out_time)
+				elseif ($record->clock_in < $my_shift->out_time && $record->clock_out > $my_shift->out_time)
 					$overtime += strtotime($record->clock_out) - strtotime($my_shift->out_time);
 			}
 
-			if($overtime)
+			if ($overtime)
 				$tag .= Helper::getAttendanceTag('overtime');
 
 			$total_overtime += $overtime;
 
-			foreach($records as $record)
+			foreach ($records as $record)
 				$working += ($record->clock_out != null) ? abs(strtotime($record->clock_out) - strtotime($record->clock_in)) : 0;
 			$total_working += $working;
 
@@ -513,18 +525,18 @@ Class ClockController extends Controller{
 			$total_rest += $rest;
 
 			$raw_data[] = array(
-					'name' => $user->full_name,
-					'late' => ($late) ? $late/60 : 0,
-					'late_tootltip' => $user->full_name_with_designation.' late for '.Helper::showDetailDuration($late),
-					'early' => ($early) ? $early/60 : 0,
-					'early_tootltip' => $user->full_name_with_designation.' left office before '.Helper::showDetailDuration($early),
-					'overtime' => ($overtime) ? $overtime/60 : 0,
-					'overtime_tootltip' => $user->full_name_with_designation.' worked overtime for '.Helper::showDetailDuration($overtime),
-					'working' => ($working) ? $working/60 : 0,
-					'working_tootltip' => $user->full_name_with_designation.' worked for '.Helper::showDetailDuration($working),
-					'rest' => ($rest) ? $rest/60 : 0,
-					'rest_tootltip' => $user->full_name_with_designation.' took rest for '.Helper::showDetailDuration($rest),
-				);
+				'name' => $user->full_name,
+				'late' => ($late) ? $late / 60 : 0,
+				'late_tootltip' => $user->full_name_with_designation . ' late for ' . Helper::showDetailDuration($late),
+				'early' => ($early) ? $early / 60 : 0,
+				'early_tootltip' => $user->full_name_with_designation . ' left office before ' . Helper::showDetailDuration($early),
+				'overtime' => ($overtime) ? $overtime / 60 : 0,
+				'overtime_tootltip' => $user->full_name_with_designation . ' worked overtime for ' . Helper::showDetailDuration($overtime),
+				'working' => ($working) ? $working / 60 : 0,
+				'working_tootltip' => $user->full_name_with_designation . ' worked for ' . Helper::showDetailDuration($working),
+				'rest' => ($rest) ? $rest / 60 : 0,
+				'rest_tootltip' => $user->full_name_with_designation . ' took rest for ' . Helper::showDetailDuration($rest),
+			);
 
 			$rows[] = array(
 				$attendance_label,
@@ -537,36 +549,36 @@ Class ClockController extends Controller{
 				Helper::showDuration($working),
 				Helper::showDuration($rest),
 				$tag
-				);
+			);
 
 			$cols_summary[$user->id] = $attendance;
 			unset($tag);
-        }
+		}
 
-        $graph_late = array();
-        $graph_early = array();
-        $graph_overtime = array();
-        $graph_working = array();
-        $graph_rest = array();
-        foreach($raw_data as $data){
-        	$graph_late[] = array($data['name'],$data['late'],$data['late_tootltip']);
-        	$graph_early[] = array($data['name'],$data['early'],$data['early_tootltip']);
-        	$graph_overtime[] = array($data['name'],$data['overtime'],$data['overtime_tootltip']);
-        	$graph_working[] = array($data['name'],$data['working'],$data['working_tootltip']);
-        	$graph_rest[] = array($data['name'],$data['rest'],$data['rest_tootltip']);
-        }
+		$graph_late = array();
+		$graph_early = array();
+		$graph_overtime = array();
+		$graph_working = array();
+		$graph_rest = array();
+		foreach ($raw_data as $data) {
+			$graph_late[] = array($data['name'], $data['late'], $data['late_tootltip']);
+			$graph_early[] = array($data['name'], $data['early'], $data['early_tootltip']);
+			$graph_overtime[] = array($data['name'], $data['overtime'], $data['overtime_tootltip']);
+			$graph_working[] = array($data['name'], $data['working'], $data['working_tootltip']);
+			$graph_rest[] = array($data['name'], $data['rest'], $data['rest_tootltip']);
+		}
 
-        $cols_summary = array_count_values($cols_summary);
+		$cols_summary = array_count_values($cols_summary);
 
-        $list['aaData'] = $rows;
+		$list['aaData'] = $rows;
 
-        $list['foot'] = '<tr>
+		$list['foot'] = '<tr>
 			<th colspan="4"></th>
-			<th>'.Helper::showDuration($total_late).'</th>
-			<th>'.Helper::showDuration($total_early).'</th>
-			<th>'.Helper::showDuration($total_overtime).'</th>
-			<th>'.Helper::showDuration($total_working).'</th>
-			<th>'.Helper::showDuration($total_rest).'</th>
+			<th>' . Helper::showDuration($total_late) . '</th>
+			<th>' . Helper::showDuration($total_early) . '</th>
+			<th>' . Helper::showDuration($total_overtime) . '</th>
+			<th>' . Helper::showDuration($total_working) . '</th>
+			<th>' . Helper::showDuration($total_rest) . '</th>
 			<th></th>
 		</tr>';
 
@@ -576,87 +588,91 @@ Class ClockController extends Controller{
 		$list['graph']['working'] = $graph_working;
 		$list['graph']['rest'] = $graph_rest;
 
-		$list['title']['late'] = 'Late Record for all employee on '.showDate($date);
-		$list['title']['early'] = 'Early Leaving Record for all employee on '.showDate($date);
-		$list['title']['overtime'] = 'Overtime Record for all employee on '.showDate($date);
-		$list['title']['working'] = 'Working Record for all employee on '.showDate($date);
-		$list['title']['rest'] = 'Rest Record for all employee on '.showDate($date);
+		$list['title']['late'] = 'Late Record for all employee on ' . showDate($date);
+		$list['title']['early'] = 'Early Leaving Record for all employee on ' . showDate($date);
+		$list['title']['overtime'] = 'Overtime Record for all employee on ' . showDate($date);
+		$list['title']['working'] = 'Working Record for all employee on ' . showDate($date);
+		$list['title']['rest'] = 'Rest Record for all employee on ' . showDate($date);
 
 		$list['summary'] = '<ul class="list-group">
 					  <li class="list-group-item">
-						<span class="badge badge-danger">'.(array_key_exists('A',$cols_summary) ? $cols_summary['A'] : '-').'</span>'.trans('messages.absent').
-					  '</li>
+						<span class="badge badge-danger">' . (array_key_exists('A', $cols_summary) ? $cols_summary['A'] : '-') . '</span>' . trans('messages.absent') .
+			'</li>
 					  <li class="list-group-item">
-						<span class="badge badge-info">'.(array_key_exists('H',$cols_summary) ? $cols_summary['H'] : '-').'</span>'.trans('messages.holiday').
-					  '</li>
+						<span class="badge badge-info">' . (array_key_exists('H', $cols_summary) ? $cols_summary['H'] : '-') . '</span>' . trans('messages.holiday') .
+			'</li>
 					  <li class="list-group-item">
-						<span class="badge badge-success">'.(array_key_exists('P',$cols_summary) ? $cols_summary['P'] : '-').'</span>'.trans('messages.present').
-					  '</li>
+						<span class="badge badge-success">' . (array_key_exists('P', $cols_summary) ? $cols_summary['P'] : '-') . '</span>' . trans('messages.present') .
+			'</li>
 					  <li class="list-group-item">
-						<span class="badge badge-warning">'.(array_key_exists('L',$cols_summary) ? $cols_summary['L'] : '-').'</span>'.trans('messages.leave').
-					  '</li>
+						<span class="badge badge-warning">' . (array_key_exists('L', $cols_summary) ? $cols_summary['L'] : '-') . '</span>' . trans('messages.leave') .
+			'</li>
 					</ul>';
 
-        return json_encode($list);
+		return json_encode($list);
 	}
 
-	public function dateWiseAttendance(){
+	public function dateWiseAttendance()
+	{
 
-		if(Entrust::can('manage_all_employee'))
-			$users = User::all()->pluck('full_name_with_designation','id')->all();
-		elseif(Entrust::can('manage_subordinate_employee')){
-			$child_designations = Helper::childDesignation(Auth::user()->designation_id,1);
-			$child_users = User::whereIn('designation_id',$child_designations)->pluck('id')->all();
+		if (Entrust::can('manage_all_employee'))
+			$users = User::all()->pluck('full_name_with_designation', 'id')->all();
+		elseif (Entrust::can('manage_subordinate_employee')) {
+			$child_designations = Helper::childDesignation(Auth::user()->designation_id, 1);
+			$child_users = User::whereIn('designation_id', $child_designations)->pluck('id')->all();
 			array_push($child_users, Auth::user()->id);
-			$users = User::whereIn('id',$child_users)->get()->pluck('full_name_with_designation','id')->all();
-		} else 
-			$users = User::whereId(Auth::user()->id)->get()->pluck('full_name_with_designation','id')->all();
+			$users = User::whereIn('id', $child_users)->get()->pluck('full_name_with_designation', 'id')->all();
+		} else
+			$users = User::whereId(Auth::user()->id)->get()->pluck('full_name_with_designation', 'id')->all();
 
-        $col_heads = array(
-				trans('messages.name'),
-        		trans('messages.status'),
-        		trans('messages.date'),
-        		trans('messages.clock_in'),
-        		trans('messages.clock_out'),
-        		trans('messages.late'),
-        		trans('messages.early_leaving'),
-        		trans('messages.overtime'),
-        		trans('messages.total_work'),
-        		trans('messages.total_rest'),
-        		trans('messages.remarks')
-        		);
-        $menu = ['attendance','date_wise_attendance'];
-        $assets = ['graph'];
-        $table_info = array(
+		$col_heads = array(
+			trans('messages.name'),
+			trans('messages.status'),
+			trans('messages.date'),
+			trans('messages.clock_in'),
+			trans('messages.clock_out'),
+			trans('messages.late'),
+			trans('messages.early_leaving'),
+			trans('messages.overtime'),
+			trans('messages.total_work'),
+			trans('messages.total_rest'),
+			trans('messages.remarks')
+		);
+		$menu = ['attendance', 'date_wise_attendance'];
+		$assets = ['graph'];
+		$table_info = array(
 			'source' => 'date-wise-attendance',
 			'title' => 'Date wise Attendance',
 			'id' => 'date_wise_attendance_table',
 			'form' => 'date_wise_attendance'
 		);
 
-		return view('employee.date_wise_attendance',compact('col_heads','users','menu','table_info','assets'));
+		return view('employee.date_wise_attendance', compact('col_heads', 'users', 'menu', 'table_info', 'assets'));
 	}
 
-	public function postDateWiseAttendance(DateWiseAttendanceRequest $request){
-        $response = ['message' => trans('messages.request_submit'), 'status' => 'success']; 
-        return response()->json($response, 200, array('Access-Controll-Allow-Origin' => '*'));
+	public function postDateWiseAttendance(DateWiseAttendanceRequest $request)
+	{
+		$response = ['message' => trans('messages.request_submit'), 'status' => 'success'];
+		return response()->json($response, 200, array('Access-Controll-Allow-Origin' => '*'));
 	}
 
-	public function listDateWiseAttendance(DateWiseAttendanceRequest $request){
+	public function listDateWiseAttendance(DateWiseAttendanceRequest $request)
+	{
 
-		$user_id = $request->input('user_id') ? : Auth::user()->id;
-		$from_date = $request->input('from_date') ? : date('Y-m-d');
-		$to_date = $request->input('to_date') ? : date('Y-m-d');
+		$user_id = $request->input('user_id') ?: Auth::user()->id;
+		$from_date = $request->input('from_date') ?: date('Y-m-d');
+		$to_date = $request->input('to_date') ?: date('Y-m-d');
 
-        $rows=array();
-        $ajax_data = '';
-        $cols_summary=array();
-        $raw_data = array();
+		$rows = array();
+		$ajax_data = '';
+		$cols_summary = array();
+		$raw_data = array();
 
 		$leave_approved = array();
 		$leave_pending = array();
 
-		function getLeaveCount($user_id,$from_date,$to_date,$type){
+		function getLeaveCount($user_id, $from_date, $to_date, $type)
+		{
 			return \App\Leave::whereUserId($user_id)->whereStatus($type)->where(function ($query) use ($from_date, $to_date) {
 				$query->whereBetween('from_date', array($from_date, $to_date))
 					->orWhereBetween('to_date', array($from_date, $to_date))
@@ -667,59 +683,59 @@ Class ClockController extends Controller{
 			})->get();
 		}
 
-		$leaves = getLeaveCount($user_id,$from_date,$to_date,'approved');
+		$leaves = getLeaveCount($user_id, $from_date, $to_date, 'approved');
 		$leavesWP = getLeaveCount($user_id, $from_date, $to_date, 'lwp');
-        foreach($leaves as $leave){
-            $leave_approved_dates = ($leave->approved_date) ? explode(',',$leave->approved_date) : [];
-            foreach($leave_approved_dates as $leave_approved_date)
-                $leave_approved[] = $leave_approved_date;
-        }
+		foreach ($leaves as $leave) {
+			$leave_approved_dates = ($leave->approved_date) ? explode(',', $leave->approved_date) : [];
+			foreach ($leave_approved_dates as $leave_approved_date)
+				$leave_approved[] = $leave_approved_date;
+		}
 
 		foreach ($leavesWP as $leave) {
 			$leave_approved_dates = ($leave->approved_date) ? explode(',', $leave->approved_date) : [];
 			foreach ($leave_approved_dates as $leave_approved_date)
-			   $leave_pending[] = $leave_approved_date;
+				$leave_pending[] = $leave_approved_date;
 		}
 
-        $user = User::find($user_id);
-        $clocked_user = array();
+		$user = User::find($user_id);
+		$clocked_user = array();
 
-        $clocks = Clock::where('date','>=',$from_date)->where('date','<=',$to_date)->get();
+		$clocks = Clock::where('date', '>=', $from_date)->where('date', '<=', $to_date)->get();
 
-        $holidays = Holiday::where('date','>=',$from_date)->where('date','<=',$to_date)->get();
+		$holidays = Holiday::where('date', '>=', $from_date)->where('date', '<=', $to_date)->get();
 
-        $total_late = 0;
-        $total_early = 0;
-        $total_overtime = 0;
-        $total_working = 0;
-        $total_rest = 0;
+		$total_late = 0;
+		$total_early = 0;
+		$total_overtime = 0;
+		$total_working = 0;
+		$total_rest = 0;
 
 
-        $date = $from_date;
-        $tag_count = array();
-        while($date <= $to_date){
-        	$tag = '';
-        	$late = 0;
-        	$early = 0;
-        	$working = 0;
-        	$overtime = 0;
-        	$rest = 0;
-        	
-        	$my_shift = Helper::getShift($date,$user->id);
-        	$my_shift->in_time = $date.' '.$my_shift->in_time;
-        	
-        	if($my_shift->overnight)
-        		$my_shift->out_time = date('Y-m-d',strtotime($date . ' +1 days')).' '.$my_shift->out_time;
-        	else
-        		$my_shift->out_time = $date.' '.$my_shift->out_time;
+		$date = $from_date;
+		$tag_count = array();
+		while ($date <= $to_date) {
+			$tag = '';
+			$late = 0;
+			$early = 0;
+			$working = 0;
+			$overtime = 0;
+			$rest = 0;
 
-        	$out = $clocks->whereLoose('date',$date)->whereLoose('user_id',$user->id)->sortBy('clock_in')->last();
-        	$in = $clocks->whereLoose('date',$date)->whereLoose('user_id',$user->id)->sortBy('clock_in')->first();
-			$records = $clocks->whereLoose('date',$date)->whereLoose('user_id',$user->id)->all();
+			$my_shift = Helper::getShift($date, $user->id);
+			$my_shift->in_time = $date . ' ' . $my_shift->in_time;
+
+			if ($my_shift->overnight)
+				$my_shift->out_time = date('Y-m-d', strtotime($date . ' +1 days')) . ' ' . $my_shift->out_time;
+			else
+				$my_shift->out_time = $date . ' ' . $my_shift->out_time;
+
+			$out = $clocks->whereLoose('date', $date)->whereLoose('user_id', $user->id)->sortBy('clock_in')->last();
+			$in = $clocks->whereLoose('date', $date)->whereLoose('user_id', $user->id)->sortBy('clock_in')->first();
+			$records = $clocks->whereLoose('date', $date)->whereLoose('user_id', $user->id)->all();
 
 			$late = (isset($in) && (strtotime($in->clock_in) > strtotime($my_shift->in_time)) && $my_shift->in_time != $my_shift->out_time) ? abs(strtotime($my_shift->in_time) - strtotime($in->clock_in)) : 0;
 
-			if($late){
+			if ($late) {
 				$tag_count[] = 'L';
 				$tag .= Helper::getAttendanceTag('late');
 			}
@@ -727,120 +743,120 @@ Class ClockController extends Controller{
 			$total_late += $late;
 			$early = (isset($out) && $out->clock_out != null && (strtotime($out->clock_out) < strtotime($my_shift->out_time)) && $my_shift->in_time != $my_shift->out_time) ? abs(strtotime($my_shift->out_time) - strtotime($out->clock_out)) : 0;
 
-			if($early){
+			if ($early) {
 				$tag_count[] = 'E';
 				$tag .= Helper::getAttendanceTag('early');
 			}
 
 			$total_early += $early;
-			
-			foreach($records as $record){
-				if($record->clock_in >= $my_shift->out_time && $record->clock_out != null)
+
+			foreach ($records as $record) {
+				if ($record->clock_in >= $my_shift->out_time && $record->clock_out != null)
 					$overtime += strtotime($record->clock_out) - strtotime($record->clock_in);
-				elseif($record->clock_in < $my_shift->out_time && $record->clock_out > $my_shift->out_time)
+				elseif ($record->clock_in < $my_shift->out_time && $record->clock_out > $my_shift->out_time)
 					$overtime += strtotime($record->clock_out) - strtotime($my_shift->out_time);
 			}
 
-			if($overtime){
+			if ($overtime) {
 				$tag_count[] = 'O';
 				$tag .= Helper::getAttendanceTag('overtime');
 			}
 
 			$total_overtime += $overtime;
 
-			foreach($records as $record)
+			foreach ($records as $record)
 				$working += ($record->clock_out != null) ? abs(strtotime($record->clock_out) - strtotime($record->clock_in)) : 0;
 			$total_working += $working;
 
 			$rest = (isset($in) && $out->clock_out != null) ? (abs(strtotime($out->clock_out) - strtotime($in->clock_in)) - $working) : 0;
 			$total_rest += $rest;
 
-			$holiday = $holidays->whereLoose('date',$date)->first();
+			$holiday = $holidays->whereLoose('date', $date)->first();
 
-			if(isset($in)){
+			if (isset($in)) {
 				$attendance = 'P';
-				$attendance_label = '<span class="badge badge-success">'.trans('messages.present').'</span>';
-			} elseif(count($leave_approved) && in_array($date,$leave_approved)){
+				$attendance_label = '<span class="badge badge-success">' . trans('messages.present') . '</span>';
+			} elseif (count($leave_approved) && in_array($date, $leave_approved)) {
 				$attendance = 'L';
-				$attendance_label = '<span class="badge badge-warning">'.trans('messages.leave_title').'</span>';
-			} elseif(count($leave_pending) && in_array($date,$leave_pending)){
+				$attendance_label = '<span class="badge badge-warning">' . trans('messages.leave_title') . '</span>';
+			} elseif (count($leave_pending) && in_array($date, $leave_pending)) {
 				$attendance = 'LWP';
 				$attendance_label = '<span class="badge badge-warning">' . 'LWP' . '</span>';
-			}elseif($holiday){
+			} elseif ($holiday) {
 				$attendance = 'H';
-				$attendance_label = '<span class="badge badge-info">'.trans('messages.holiday').'</span>';
-			} elseif(!$holiday && $date < date('Y-m-d')){
+				$attendance_label = '<span class="badge badge-info">' . trans('messages.holiday') . '</span>';
+			} elseif (!$holiday && $date < date('Y-m-d')) {
 				$attendance = 'A';
-				$attendance_label = '<span class="badge badge-danger">'.trans('messages.absent').'</span>';
+				$attendance_label = '<span class="badge badge-danger">' . trans('messages.absent') . '</span>';
 			} else {
 				$attendance = '';
 				$attendance_label = '';
 			}
 
 			$raw_data[] = array(
-					'date' => showDate($date),
-					'late' => ($late) ? $late/60 : 0,
-					'late_tootltip' => $user->full_name_with_designation.' late for '.Helper::showDetailDuration($late),
-					'early' => ($early) ? $early/60 : 0,
-					'early_tootltip' => $user->full_name_with_designation.' left office before '.Helper::showDetailDuration($early),
-					'overtime' => ($overtime) ? $overtime/60 : 0,
-					'overtime_tootltip' => $user->full_name_with_designation.' worked overtime for '.Helper::showDetailDuration($overtime),
-					'working' => ($working) ? $working/60 : 0,
-					'working_tootltip' => $user->full_name_with_designation.' worked for '.Helper::showDetailDuration($working),
-					'rest' => ($rest) ? $rest/60 : 0,
-					'rest_tootltip' => $user->full_name_with_designation.' took rest for '.Helper::showDetailDuration($rest),
-				);
+				'date' => showDate($date),
+				'late' => ($late) ? $late / 60 : 0,
+				'late_tootltip' => $user->full_name_with_designation . ' late for ' . Helper::showDetailDuration($late),
+				'early' => ($early) ? $early / 60 : 0,
+				'early_tootltip' => $user->full_name_with_designation . ' left office before ' . Helper::showDetailDuration($early),
+				'overtime' => ($overtime) ? $overtime / 60 : 0,
+				'overtime_tootltip' => $user->full_name_with_designation . ' worked overtime for ' . Helper::showDetailDuration($overtime),
+				'working' => ($working) ? $working / 60 : 0,
+				'working_tootltip' => $user->full_name_with_designation . ' worked for ' . Helper::showDetailDuration($working),
+				'rest' => ($rest) ? $rest / 60 : 0,
+				'rest_tootltip' => $user->full_name_with_designation . ' took rest for ' . Helper::showDetailDuration($rest),
+			);
 
 			$rows[] = array(
-				    
-					$user->full_name_with_designation,
-					$attendance_label,
-					showDate($date),
-					(isset($in)) ? showTime($in->clock_in) : '-',
-					(isset($out)) ? showTime($out->clock_out) : '-',
-					Helper::showDuration($late),
-					Helper::showDuration($early),
-					Helper::showDuration($overtime),
-					Helper::showDuration($working),
-					Helper::showDuration($rest),
-					$tag
-				);
+
+				$user->full_name_with_designation,
+				$attendance_label,
+				showDate($date),
+				(isset($in)) ? showTime($in->clock_in) : '-',
+				(isset($out)) ? showTime($out->clock_out) : '-',
+				Helper::showDuration($late),
+				Helper::showDuration($early),
+				Helper::showDuration($overtime),
+				Helper::showDuration($working),
+				Helper::showDuration($rest),
+				$tag
+			);
 
 			$cols_summary[$date] = $attendance;
-			$date = date('Y-m-d',strtotime($date . ' +1 days'));
-        }
+			$date = date('Y-m-d', strtotime($date . ' +1 days'));
+		}
 
-        $graph_late = array();
-        $graph_early = array();
-        $graph_overtime = array();
-        $graph_working = array();
-        $graph_rest = array();
-        foreach($raw_data as $data){
-        	$graph_late[] = array($data['date'],$data['late'],$data['late_tootltip']);
-        	$graph_early[] = array($data['date'],$data['early'],$data['early_tootltip']);
-        	$graph_overtime[] = array($data['date'],$data['overtime'],$data['overtime_tootltip']);
-        	$graph_working[] = array($data['date'],$data['working'],$data['working_tootltip']);
-        	$graph_rest[] = array($data['date'],$data['rest'],$data['rest_tootltip']);
-        }
+		$graph_late = array();
+		$graph_early = array();
+		$graph_overtime = array();
+		$graph_working = array();
+		$graph_rest = array();
+		foreach ($raw_data as $data) {
+			$graph_late[] = array($data['date'], $data['late'], $data['late_tootltip']);
+			$graph_early[] = array($data['date'], $data['early'], $data['early_tootltip']);
+			$graph_overtime[] = array($data['date'], $data['overtime'], $data['overtime_tootltip']);
+			$graph_working[] = array($data['date'], $data['working'], $data['working_tootltip']);
+			$graph_rest[] = array($data['date'], $data['rest'], $data['rest_tootltip']);
+		}
 
-		$list['title']['late'] = 'Late Record for '.$user->full_name_with_designation.' from '.showDate($from_date).' to '.showDate($to_date);
-		$list['title']['early'] = 'Early Leaving Record for '.$user->full_name_with_designation.' from '.showDate($from_date).' to '.showDate($to_date);
-		$list['title']['overtime'] = 'Overtime Record for '.$user->full_name_with_designation.' from '.showDate($from_date).' to '.showDate($to_date);
-		$list['title']['working'] = 'Working Record for '.$user->full_name_with_designation.' from '.showDate($from_date).' to '.showDate($to_date);
-		$list['title']['rest'] = 'Rest Record for '.$user->full_name_with_designation.' from '.showDate($from_date).' to '.showDate($to_date);
+		$list['title']['late'] = 'Late Record for ' . $user->full_name_with_designation . ' from ' . showDate($from_date) . ' to ' . showDate($to_date);
+		$list['title']['early'] = 'Early Leaving Record for ' . $user->full_name_with_designation . ' from ' . showDate($from_date) . ' to ' . showDate($to_date);
+		$list['title']['overtime'] = 'Overtime Record for ' . $user->full_name_with_designation . ' from ' . showDate($from_date) . ' to ' . showDate($to_date);
+		$list['title']['working'] = 'Working Record for ' . $user->full_name_with_designation . ' from ' . showDate($from_date) . ' to ' . showDate($to_date);
+		$list['title']['rest'] = 'Rest Record for ' . $user->full_name_with_designation . ' from ' . showDate($from_date) . ' to ' . showDate($to_date);
 
-        $ajax_data = '<tr><th>Late</th><td><span class="badge badge-danger">'.Helper::showDetailDuration($total_late).'</span></td></tr>
-				<tr><th>Early</th><td><span class="badge badge-warning">'.Helper::showDetailDuration($total_early).'</span></td></tr>
-				<tr><th>Overtime</th><td><span class="badge badge-success">'.Helper::showDetailDuration($total_overtime).'</span></td></tr>
-				<tr><th>Working</th><td><span class="badge badge-default">'.Helper::showDetailDuration($total_working).'</span></td></tr>
-				<tr><th>Rest</th><td><span class="badge badge-info">'.Helper::showDetailDuration($total_rest).'</span></td></tr>';
+		$ajax_data = '<tr><th>Late</th><td><span class="badge badge-danger">' . Helper::showDetailDuration($total_late) . '</span></td></tr>
+				<tr><th>Early</th><td><span class="badge badge-warning">' . Helper::showDetailDuration($total_early) . '</span></td></tr>
+				<tr><th>Overtime</th><td><span class="badge badge-success">' . Helper::showDetailDuration($total_overtime) . '</span></td></tr>
+				<tr><th>Working</th><td><span class="badge badge-default">' . Helper::showDetailDuration($total_working) . '</span></td></tr>
+				<tr><th>Rest</th><td><span class="badge badge-info">' . Helper::showDetailDuration($total_rest) . '</span></td></tr>';
 
-        if($request->has('attendance_statistics'))
-        	return $ajax_data;
-        elseif($request->has('ajax_submit')){
-        	$response = ['message' => trans('messages.request_submit'), 'status' => 'success','data' => $ajax_data]; 
-            return response()->json($response, 200, array('Access-Controll-Allow-Origin' => '*'));
-        }
+		if ($request->has('attendance_statistics'))
+			return $ajax_data;
+		elseif ($request->has('ajax_submit')) {
+			$response = ['message' => trans('messages.request_submit'), 'status' => 'success', 'data' => $ajax_data];
+			return response()->json($response, 200, array('Access-Controll-Allow-Origin' => '*'));
+		}
 
 		$list['graph']['late'] = $graph_late;
 		$list['graph']['early'] = $graph_early;
@@ -848,20 +864,20 @@ Class ClockController extends Controller{
 		$list['graph']['working'] = $graph_working;
 		$list['graph']['rest'] = $graph_rest;
 
-        $cols_summary = array_count_values($cols_summary);
-        $tag_summary = array_count_values($tag_count);
-        $list['aaData'] = $rows;
-        // $list['foot'] = '<tr>
-        // 				<th colspan="5"></th>
-        // 				<th>'.Helper::showDuration($total_late).'</th>
-        // 				<th>'.Helper::showDuration($total_early).'</th>
-        // 				<th>'.Helper::showDuration($total_overtime).'</th>
-        // 				<th>'.Helper::showDuration($total_working).'</th>
-        // 				<th>'.Helper::showDuration($total_rest).'</th>
-        // 				<th></th>
-        // 				</tr>';
-       	$list['foot'] =
-		'
+		$cols_summary = array_count_values($cols_summary);
+		$tag_summary = array_count_values($tag_count);
+		$list['aaData'] = $rows;
+		// $list['foot'] = '<tr>
+		// 				<th colspan="5"></th>
+		// 				<th>'.Helper::showDuration($total_late).'</th>
+		// 				<th>'.Helper::showDuration($total_early).'</th>
+		// 				<th>'.Helper::showDuration($total_overtime).'</th>
+		// 				<th>'.Helper::showDuration($total_working).'</th>
+		// 				<th>'.Helper::showDuration($total_rest).'</th>
+		// 				<th></th>
+		// 				</tr>';
+		$list['foot'] =
+			'
 <table class="table table-bordered" style="width:100%">
     <thead>
         <tr style="background-color: #f5f5f5">
@@ -873,9 +889,9 @@ Class ClockController extends Controller{
             <th class="text-center">' . trans('messages.late') . '</th>
             <th class="text-center">' . trans('messages.overtime') . '</th>
             <th class="text-center">' . trans('messages.early') . '</th>
-			<th class="text-center">' .'Late' . '</th>
-			<th class="text-center">' .'Working' . '</th>
-			<th class="text-center">' .'Early' . '</th>
+			<th class="text-center">' . 'Late' . '</th>
+			<th class="text-center">' . 'Working' . '</th>
+			<th class="text-center">' . 'Early' . '</th>
         </tr>
     </thead>
     <tbody style="text-center">
@@ -896,162 +912,164 @@ Class ClockController extends Controller{
 </table>
 ';
 
-        return json_encode($list);
+		return json_encode($list);
 	}
 
-	public function dateWiseSummaryAttendance(){
+	public function dateWiseSummaryAttendance()
+	{
 
-        $col_heads = array(
-        		trans('messages.employee'),
-        		trans('messages.late'),
-        		trans('messages.early_leaving'),
-        		trans('messages.overtime'),
-        		trans('messages.total_work'),
-        		trans('messages.total_rest'),
-        		trans('messages.present'),
-        		trans('messages.holiday'),
-        		trans('messages.leave'),
-        		trans('messages.absent'),
-        		trans('messages.late').' '.trans('messages.count'),
-        		trans('messages.overtime').' '.trans('messages.count'),
-        		trans('messages.early').' '.trans('messages.leaving').' '.trans('messages.count')
-        		);
-        $menu = ['attendance','date_wise_summary_attendance'];
-        $assets = ['graph'];
-        $table_info = array(
+		$col_heads = array(
+			trans('messages.employee'),
+			trans('messages.late'),
+			trans('messages.early_leaving'),
+			trans('messages.overtime'),
+			trans('messages.total_work'),
+			trans('messages.total_rest'),
+			trans('messages.present'),
+			trans('messages.holiday'),
+			trans('messages.leave'),
+			trans('messages.absent'),
+			trans('messages.late') . ' ' . trans('messages.count'),
+			trans('messages.overtime') . ' ' . trans('messages.count'),
+			trans('messages.early') . ' ' . trans('messages.leaving') . ' ' . trans('messages.count')
+		);
+		$menu = ['attendance', 'date_wise_summary_attendance'];
+		$assets = ['graph'];
+		$table_info = array(
 			'source' => 'date-wise-summary-attendance',
 			'title' => 'Date wise Summary Attendance',
 			'id' => 'date_wise_summary_attendance_table',
 			'form' => 'date_wise_summary_attendance'
 		);
 
-		return view('employee.date_wise_summary_attendance',compact('col_heads','assets','menu','table_info'));
+		return view('employee.date_wise_summary_attendance', compact('col_heads', 'assets', 'menu', 'table_info'));
 	}
 
-	public function postDateWiseSummaryAttendance(DateWiseSummaryAttendanceRequest $request){
-        $response = ['message' => trans('messages.request_submit'), 'status' => 'success']; 
-        return response()->json($response, 200, array('Access-Controll-Allow-Origin' => '*'));
+	public function postDateWiseSummaryAttendance(DateWiseSummaryAttendanceRequest $request)
+	{
+		$response = ['message' => trans('messages.request_submit'), 'status' => 'success'];
+		return response()->json($response, 200, array('Access-Controll-Allow-Origin' => '*'));
 	}
 
-	public function listDateWiseSummaryAttendance(Request $request){
+	public function listDateWiseSummaryAttendance(Request $request)
+	{
 
-		$from_date = $request->input('from_date') ? : date('Y-m-d');
-		$to_date = $request->input('to_date') ? : date('Y-m-d');
+		$from_date = $request->input('from_date') ?: date('Y-m-d');
+		$to_date = $request->input('to_date') ?: date('Y-m-d');
 
-        $rows=array();
-        $cols_summary=array();
-        $raw_data = array();
-        $raw_data2 = array();
+		$rows = array();
+		$cols_summary = array();
+		$raw_data = array();
+		$raw_data2 = array();
 
-		if(Entrust::can('manage_all_employee'))
+		if (Entrust::can('manage_all_employee'))
 			$users = User::all();
-		elseif(Entrust::can('manage_subordinate_employee')){
-			$child_designations = Helper::childDesignation(Auth::user()->designation_id,1);
-			$child_users = User::whereIn('designation_id',$child_designations)->pluck('id')->all();
+		elseif (Entrust::can('manage_subordinate_employee')) {
+			$child_designations = Helper::childDesignation(Auth::user()->designation_id, 1);
+			$child_users = User::whereIn('designation_id', $child_designations)->pluck('id')->all();
 			array_push($child_users, Auth::user()->id);
-			$users = User::whereIn('id',$child_users)->get();
-		} else 
+			$users = User::whereIn('id', $child_users)->get();
+		} else
 			$users = User::whereId(Auth::user()->id)->get();
 
-        $clocks = Clock::where('date','>=',$from_date)->where('date','<=',$to_date)->get();
-        $holidays = Holiday::where('date','>=',$from_date)->where('date','<=',$to_date)->get();
+		$clocks = Clock::where('date', '>=', $from_date)->where('date', '<=', $to_date)->get();
+		$holidays = Holiday::where('date', '>=', $from_date)->where('date', '<=', $to_date)->get();
 
-        foreach($users as $user)
-        {
+		foreach ($users as $user) {
 
 			$leave_approved = array();
 			$leaves = \App\Leave::whereUserId($user->id)->whereStatus('approved')->get();
-	        foreach($leaves as $leave){
-	            $leave_approved_dates = ($leave->approved_date) ? explode(',',$leave->approved_date) : [];
-	            foreach($leave_approved_dates as $leave_approved_date)
-	                $leave_approved[] = $leave_approved_date;
-	        }
+			foreach ($leaves as $leave) {
+				$leave_approved_dates = ($leave->approved_date) ? explode(',', $leave->approved_date) : [];
+				foreach ($leave_approved_dates as $leave_approved_date)
+					$leave_approved[] = $leave_approved_date;
+			}
 
-        	$tag_count = array();
-	        $total_late = 0;
-	        $total_early = 0;
-	        $total_overtime = 0;
-	        $total_working = 0;
-	        $total_rest = 0;
-	        $attendance = array();
+			$tag_count = array();
+			$total_late = 0;
+			$total_early = 0;
+			$total_overtime = 0;
+			$total_working = 0;
+			$total_rest = 0;
+			$attendance = array();
 
-	        $date = $from_date;
-        	while($date <= $to_date){
-	        	$working = 0;
-	        	$rest = 0;
-	        	$late = 0;
-	        	$early = 0;
-	        	$overtime = 0;
-	        	$my_shift = Helper::getShift($date,$user->id);
+			$date = $from_date;
+			while ($date <= $to_date) {
+				$working = 0;
+				$rest = 0;
+				$late = 0;
+				$early = 0;
+				$overtime = 0;
+				$my_shift = Helper::getShift($date, $user->id);
 
-	        	$my_shift->in_time = $date.' '.$my_shift->in_time;
-	        	if($my_shift->overnight)
-	        		$my_shift->out_time = date('Y-m-d',strtotime($date . ' +1 days')).' '.$my_shift->out_time;
-	        	else
-        			$my_shift->out_time = $date.' '.$my_shift->out_time;
+				$my_shift->in_time = $date . ' ' . $my_shift->in_time;
+				if ($my_shift->overnight)
+					$my_shift->out_time = date('Y-m-d', strtotime($date . ' +1 days')) . ' ' . $my_shift->out_time;
+				else
+					$my_shift->out_time = $date . ' ' . $my_shift->out_time;
 
-	        	$out = $clocks->whereLoose('date',$date)->whereLoose('user_id',$user->id)->sortBy('clock_in')->last();
-	        	$in = $clocks->whereLoose('date',$date)->whereLoose('user_id',$user->id)->sortBy('clock_in')->first();
-				$records = $clocks->whereLoose('date',$date)->whereLoose('user_id',$user->id)->all();
+				$out = $clocks->whereLoose('date', $date)->whereLoose('user_id', $user->id)->sortBy('clock_in')->last();
+				$in = $clocks->whereLoose('date', $date)->whereLoose('user_id', $user->id)->sortBy('clock_in')->first();
+				$records = $clocks->whereLoose('date', $date)->whereLoose('user_id', $user->id)->all();
 
 				$late = (isset($in) && (strtotime($in->clock_in) > strtotime($my_shift->in_time)) && $my_shift->in_time != $my_shift->out_time) ? abs(strtotime($my_shift->in_time) - strtotime($in->clock_in)) : 0;
 				$total_late += $late;
 
-				if($late)
+				if ($late)
 					$tag_count[] = 'L';
 
 				$early = (isset($out) && $out->clock_out != null && (strtotime($out->clock_out) < strtotime($my_shift->out_time)) && $my_shift->in_time != $my_shift->out_time) ? abs(strtotime($my_shift->out_time) - strtotime($out->clock_out)) : 0;
 				$total_early += $early;
 
-				if($early)
+				if ($early)
 					$tag_count[] = 'E';
 
-				foreach($records as $record){
-					if($record->clock_in >= $my_shift->out_time && $record->clock_out != null)
+				foreach ($records as $record) {
+					if ($record->clock_in >= $my_shift->out_time && $record->clock_out != null)
 						$overtime = strtotime($record->clock_out) - strtotime($record->clock_in);
-					elseif($record->clock_in < $my_shift->out_time && $record->clock_out > $my_shift->out_time)
+					elseif ($record->clock_in < $my_shift->out_time && $record->clock_out > $my_shift->out_time)
 						$overtime = strtotime($record->clock_out) - strtotime($my_shift->out_time);
 				}
 				$total_overtime += $overtime;
-				if($overtime)
+				if ($overtime)
 					$tag_count[] = 'O';
 
-				foreach($records as $record)
+				foreach ($records as $record)
 					$working += ($record->clock_out != null) ? abs(strtotime($record->clock_out) - strtotime($record->clock_in)) : 0;
 				$total_working += $working;
 
 				$rest = (isset($in) && $out->clock_out != null) ? (abs(strtotime($out->clock_out) - strtotime($in->clock_in)) - $working) : 0;
 				$total_rest += $rest;
 
-				$holiday = $holidays->whereLoose('date',$date)->first();
+				$holiday = $holidays->whereLoose('date', $date)->first();
 
-				if(isset($in))
+				if (isset($in))
 					$attendance[] = 'P';
-				elseif(count($leave_approved) && in_array($date,$leave_approved))
+				elseif (count($leave_approved) && in_array($date, $leave_approved))
 					$attendance[] = 'L';
-				elseif($holiday)
+				elseif ($holiday)
 					$attendance[] = 'H';
-				elseif(!$holiday && $date < date('Y-m-d'))
+				elseif (!$holiday && $date < date('Y-m-d'))
 					$attendance[] = 'A';
 				else
 					$attendance[] = '';
 
-				$date = date('Y-m-d',strtotime($date . ' +1 days'));
-        	}
+				$date = date('Y-m-d', strtotime($date . ' +1 days'));
+			}
 
 			$raw_data[] = array(
-					'name' => $user->full_name,
-					'late' => ($total_late) ? $total_late/60 : 0,
-					'late_tootltip' => $user->full_name_with_designation.' late for '.Helper::showDetailDuration($total_late),
-					'early' => ($total_early) ? $total_early/60 : 0,
-					'early_tootltip' => $user->full_name_with_designation.' left office before '.Helper::showDetailDuration($total_early),
-					'overtime' => ($total_overtime) ? $total_overtime/60 : 0,
-					'overtime_tootltip' => $user->full_name_with_designation.' worked overtime for '.Helper::showDetailDuration($total_overtime),
-					'working' => ($total_working) ? $total_working/60 : 0,
-					'working_tootltip' => $user->full_name_with_designation.' worked for '.Helper::showDetailDuration($total_working),
-					'rest' => ($total_rest) ? $total_rest/60 : 0,
-					'rest_tootltip' => $user->full_name_with_designation.' took rest for '.Helper::showDetailDuration($total_rest),
-				);
+				'name' => $user->full_name,
+				'late' => ($total_late) ? $total_late / 60 : 0,
+				'late_tootltip' => $user->full_name_with_designation . ' late for ' . Helper::showDetailDuration($total_late),
+				'early' => ($total_early) ? $total_early / 60 : 0,
+				'early_tootltip' => $user->full_name_with_designation . ' left office before ' . Helper::showDetailDuration($total_early),
+				'overtime' => ($total_overtime) ? $total_overtime / 60 : 0,
+				'overtime_tootltip' => $user->full_name_with_designation . ' worked overtime for ' . Helper::showDetailDuration($total_overtime),
+				'working' => ($total_working) ? $total_working / 60 : 0,
+				'working_tootltip' => $user->full_name_with_designation . ' worked for ' . Helper::showDetailDuration($total_working),
+				'rest' => ($total_rest) ? $total_rest / 60 : 0,
+				'rest_tootltip' => $user->full_name_with_designation . ' took rest for ' . Helper::showDetailDuration($total_rest),
+			);
 
 			$tag_count = array_count_values($tag_count);
 			$attendance = array_count_values($attendance);
@@ -1073,45 +1091,46 @@ Class ClockController extends Controller{
 				'late' => $count_late,
 				'overtime' => $count_overtime,
 				'early' => $count_early
-				);
+			);
 
-			$row = array($user->full_name_with_designation,
-					Helper::showDuration($total_late),
-					Helper::showDuration($total_early),
-					Helper::showDuration($total_overtime),
-					Helper::showDuration($total_working),
-					Helper::showDuration($total_rest),
-					$count_present,
-					$count_holiday,
-					$count_leave,
-					$count_absent,
-					$count_late,
-					$count_overtime,
-					$count_early,
-					);
-        	$rows[] = $row;
-        	unset($tag_count);
-        	unset($attendance);
+			$row = array(
+				$user->full_name_with_designation,
+				Helper::showDuration($total_late),
+				Helper::showDuration($total_early),
+				Helper::showDuration($total_overtime),
+				Helper::showDuration($total_working),
+				Helper::showDuration($total_rest),
+				$count_present,
+				$count_holiday,
+				$count_leave,
+				$count_absent,
+				$count_late,
+				$count_overtime,
+				$count_early,
+			);
+			$rows[] = $row;
+			unset($tag_count);
+			unset($attendance);
 		}
 
-        $graph_late = array();
-        $graph_early = array();
-        $graph_overtime = array();
-        $graph_working = array();
-        $graph_rest = array();
-        foreach($raw_data as $data){
-        	$graph_late[] = array($data['name'],$data['late'],$data['late_tootltip']);
-        	$graph_early[] = array($data['name'],$data['early'],$data['early_tootltip']);
-        	$graph_overtime[] = array($data['name'],$data['overtime'],$data['overtime_tootltip']);
-        	$graph_working[] = array($data['name'],$data['working'],$data['working_tootltip']);
-        	$graph_rest[] = array($data['name'],$data['rest'],$data['rest_tootltip']);
-        }
-        
-		$list['title']['late'] = 'Late Record for all employee from '.showDate($from_date).' to '.showDate($to_date);
-		$list['title']['early'] = 'Early Leaving Record for all employee from '.showDate($from_date).' to '.showDate($to_date);
-		$list['title']['overtime'] = 'Overtime Record for all employee from '.showDate($from_date).' to '.showDate($to_date);
-		$list['title']['working'] = 'Working Record for all employee from '.showDate($from_date).' to '.showDate($to_date);
-		$list['title']['rest'] = 'Rest Record for all employee from '.showDate($from_date).' to '.showDate($to_date);
+		$graph_late = array();
+		$graph_early = array();
+		$graph_overtime = array();
+		$graph_working = array();
+		$graph_rest = array();
+		foreach ($raw_data as $data) {
+			$graph_late[] = array($data['name'], $data['late'], $data['late_tootltip']);
+			$graph_early[] = array($data['name'], $data['early'], $data['early_tootltip']);
+			$graph_overtime[] = array($data['name'], $data['overtime'], $data['overtime_tootltip']);
+			$graph_working[] = array($data['name'], $data['working'], $data['working_tootltip']);
+			$graph_rest[] = array($data['name'], $data['rest'], $data['rest_tootltip']);
+		}
+
+		$list['title']['late'] = 'Late Record for all employee from ' . showDate($from_date) . ' to ' . showDate($to_date);
+		$list['title']['early'] = 'Early Leaving Record for all employee from ' . showDate($from_date) . ' to ' . showDate($to_date);
+		$list['title']['overtime'] = 'Overtime Record for all employee from ' . showDate($from_date) . ' to ' . showDate($to_date);
+		$list['title']['working'] = 'Working Record for all employee from ' . showDate($from_date) . ' to ' . showDate($to_date);
+		$list['title']['rest'] = 'Rest Record for all employee from ' . showDate($from_date) . ' to ' . showDate($to_date);
 
 		$list['graph']['late'] = $graph_late;
 		$list['graph']['early'] = $graph_early;
@@ -1119,80 +1138,81 @@ Class ClockController extends Controller{
 		$list['graph']['working'] = $graph_working;
 		$list['graph']['rest'] = $graph_rest;
 
-        $list['aaData'] = $rows;
-        return json_encode($list);
+		$list['aaData'] = $rows;
+		return json_encode($list);
 	}
 
-	public function updateAttendance(Request $request){
+	public function updateAttendance(Request $request)
+	{
 
-		$user_id = ($request->input('user_id')) ? : Auth::user()->id;
-		$date = ($request->input('date')) ? : date('Y-m-d');
+		$user_id = ($request->input('user_id')) ?: Auth::user()->id;
+		$date = ($request->input('date')) ?: date('Y-m-d');
 
-		if(config('config.auto_lock_attendance_days') && $date < date('Y-m-d',strtotime(date('Y-m-d') . ' -'.config('config.auto_lock_attendance_days').' days')) && !defaultRole())
+		if (config('config.auto_lock_attendance_days') && $date < date('Y-m-d', strtotime(date('Y-m-d') . ' -' . config('config.auto_lock_attendance_days') . ' days')) && !defaultRole())
 			return redirect()->back()->withErrors(trans('messages.attendance_locked'));
 
-		if($date > date('Y-m-d',strtotime(date('Y-m-d') . ' +'.config('config.enable_future_attendance').' days')) && !defaultRole())
+		if ($date > date('Y-m-d', strtotime(date('Y-m-d') . ' +' . config('config.enable_future_attendance') . ' days')) && !defaultRole())
 			return redirect()->back()->withErrors(trans('messages.future_attendance_disabled'));
 
 		$user = User::find($user_id);
 		$date_of_leaving = $user->Profile->date_of_leaving;
 		$date_of_joining = $user->Profile->date_of_joining;
 
-		if(!$date_of_joining)
+		if (!$date_of_joining)
 			return redirect('/dashboard')->withErrors(trans('messages.set_date_of_joining'));
 
-		if($date_of_joining > $date)
+		if ($date_of_joining > $date)
 			return redirect()->back()->withErrors(trans('messages.no_entry_before_date_of_joining'));
 
-		if($date_of_leaving && $date_of_leaving < $date)
+		if ($date_of_leaving && $date_of_leaving < $date)
 			return redirect()->back()->withErrors(trans('messages.inactive_employee'));
 
-		if(!Entrust::can('update_attendance'))
+		if (!Entrust::can('update_attendance'))
 			return redirect('/dashboard')->withErrors(trans('messages.permission_denied'));
 
-		if(Entrust::can('manage_all_employee'))
-			$users = User::all()->pluck('full_name_with_designation','id')->all();
-		elseif(Entrust::can('manage_subordinate_employee')){
-			$child_designations = Helper::childDesignation(Auth::user()->designation_id,1);
-			$child_users = User::whereIn('designation_id',$child_designations)->pluck('id')->all();
+		if (Entrust::can('manage_all_employee'))
+			$users = User::all()->pluck('full_name_with_designation', 'id')->all();
+		elseif (Entrust::can('manage_subordinate_employee')) {
+			$child_designations = Helper::childDesignation(Auth::user()->designation_id, 1);
+			$child_users = User::whereIn('designation_id', $child_designations)->pluck('id')->all();
 			// array_push($child_users, Auth::user()->id);
-			$users = User::whereIn('id',$child_users)->get()->pluck('full_name_with_designation','id')->all();
-		} else 
+			$users = User::whereIn('id', $child_users)->get()->pluck('full_name_with_designation', 'id')->all();
+		} else
 			$users = [];
 
-    	$my_shift = Helper::getShift($date,$user_id);
-    	$my_shift->in_time = $date.' '.$my_shift->in_time;
-    	if($my_shift->overnight)
-    		$my_shift->out_time = date('Y-m-d',strtotime($date . ' +1 days')).' '.$my_shift->out_time;
-    	else
-    		$my_shift->out_time = $date.' '.$my_shift->out_time;
+		$my_shift = Helper::getShift($date, $user_id);
+		$my_shift->in_time = $date . ' ' . $my_shift->in_time;
+		if ($my_shift->overnight)
+			$my_shift->out_time = date('Y-m-d', strtotime($date . ' +1 days')) . ' ' . $my_shift->out_time;
+		else
+			$my_shift->out_time = $date . ' ' . $my_shift->out_time;
 
-    	$holiday = \App\Holiday::where('date','=',$date)->first();
-    	$label = '<span class="badge badge-success">'.trans('messages.working').' '.trans('messages.day').'</span>';
-    	if($holiday)
-    		$label = '<span class="badge badge-info">'.trans('messages.holiday').': '.$holiday->description.'</span>';
+		$holiday = \App\Holiday::where('date', '=', $date)->first();
+		$label = '<span class="badge badge-success">' . trans('messages.working') . ' ' . trans('messages.day') . '</span>';
+		if ($holiday)
+			$label = '<span class="badge badge-info">' . trans('messages.holiday') . ': ' . $holiday->description . '</span>';
 
 
-		$leaves = \App\Leave::whereUserId($user_id)->whereStatus('approved')->where(function($query) use($date){
-			$query->where('from_date','>=',$date)
-			->orWhere('to_date','<=',$date)
-			->orWhere(function($query1) use($date){
-				$query1->where('from_date','<',$date)
-				->where('to_date','>',$date);
-			});
+		$leaves = \App\Leave::whereUserId($user_id)->whereStatus('approved')->where(function ($query) use ($date) {
+			$query->where('from_date', '>=', $date)
+				->orWhere('to_date', '<=', $date)
+				->orWhere(function ($query1) use ($date) {
+					$query1->where('from_date', '<', $date)
+						->where('to_date', '>', $date);
+				});
 		})->get();
-        $leave_approved = array();
-        foreach($leaves as $leave){
-            $leave_approved_dates = ($leave->approved_date) ? explode(',',$leave->approved_date) : [];
-            foreach($leave_approved_dates as $leave_approved_date)
-                $leave_approved[] = $leave_approved_date;
-        }
+		$leave_approved = array();
+		foreach ($leaves as $leave) {
+			$leave_approved_dates = ($leave->approved_date) ? explode(',', $leave->approved_date) : [];
+			foreach ($leave_approved_dates as $leave_approved_date)
+				$leave_approved[] = $leave_approved_date;
+		}
 
-    	if(in_array($date,$leave_approved))
-    		$label = '<span class="badge badge-danger">'.trans('messages.on').' '.trans('messages.leave').'</span>';
+		if (in_array($date, $leave_approved))
+			$label = '<span class="badge badge-danger">' . trans('messages.on') . ' ' . trans('messages.leave') . '</span>';
 
-        $assets = ['timepicker'];
-        $menu = ['attendance','update_attendance'];
+		$assets = ['timepicker'];
+		$menu = ['attendance', 'update_attendance'];
 		$clockUp = Clock::leftJoin('users', 'clocks.user_id', '=', 'users.id')
 			->select(
 				'clocks.*',
@@ -1203,125 +1223,125 @@ Class ClockController extends Controller{
 			->latest('clocks.id')
 			->paginate(15);
 		// return $clocks;
-        return view('employee.update_attendance',compact('users','assets','user','date', 'clockUp'));
+		return view('employee.update_attendance', compact('users', 'assets', 'user', 'date', 'clockUp'));
 	}
 
-    public function postUpdateAttendance(Request $request)
-    {
-        $query = User::leftJoin('profile', 'users.id', '=', 'profile.user_id')
-            ->leftJoin('designations', 'users.designation_id', '=', 'designations.id')
-            ->leftJoin('sections', 'profile.section_id', '=', 'sections.id')
-            ->leftJoin('branchs', 'profile.branch_id', '=', 'branchs.id')
-            ->leftJoin('departments', 'designations.department_id', '=', 'departments.id')
+	public function postUpdateAttendance(Request $request)
+	{
+		$query = User::leftJoin('profile', 'users.id', '=', 'profile.user_id')
+			->leftJoin('designations', 'users.designation_id', '=', 'designations.id')
+			->leftJoin('sections', 'profile.section_id', '=', 'sections.id')
+			->leftJoin('branchs', 'profile.branch_id', '=', 'branchs.id')
+			->leftJoin('departments', 'designations.department_id', '=', 'departments.id')
 			->where('users.status', 'active')
-            ->select('users.id');
-    
-        // ✅ Branch wise filter
-        if (!empty($request->branch_id)) {
-            $query->where('profile.branch_id', $request->branch_id);
-        }
-    
-        // ✅ Single employee
-        if (!empty($request->employee_id)) {
-            $query->where('users.id', $request->employee_id);
-        }
-    
-        // ✅ Multiple employees
-        if (!empty($request->employee_ids)) {
-            $query->whereIn('users.id', $request->employee_ids);
-        }
-    
-        $user_ids = $query->pluck('users.id')->toArray();
-    
-        if (empty($user_ids)) {
-            return response()->json(['error' => 'No employees found for the selected criteria.'], 400);
-        }
-    
-        $form_date = $request->input('form_date');
-        $to_date = $request->input('to_date');
-    
-        if (!$form_date || !$to_date) {
-            return response()->json(['error' => 'Both form_date and to_date are required.'], 400);
-        }
-    
-        try {
-            $start_date = Carbon::createFromFormat('Y-m-d', $form_date);
-            $end_date = Carbon::createFromFormat('Y-m-d', $to_date);
-    
-            if ($start_date->gt($end_date)) {
-                return response()->json(['error' => 'Start date must be before or equal to end date.'], 400);
-            }
-    
-            // ✅ Handle time parsing
-            $clock_in_raw = trim($request->input('clock_in'));
-            $clock_out_raw = trim($request->input('clock_out'));
-    
-            $clock_in_time = !empty($clock_in_raw) ? Carbon::parse($clock_in_raw)->format('H:i:s') : null;
-            $clock_out_time = !empty($clock_out_raw) ? Carbon::parse($clock_out_raw)->format('H:i:s') : null;
-    
-        } catch (\Exception $e) {
-            return response()->json(['error' => 'Invalid date or time format.'], 400);
-        }
-    
-        $inserted_records = [];
-        $skipped_records = [];
-    
-        foreach ($user_ids as $user_id) {
-            $user = User::with('profile')->find($user_id);
-            if (!$user || !$user->profile) continue;
-    
-            $employee_code = $user->profile->employee_code;
-            $current_date = clone $start_date;
-    
-            while ($current_date <= $end_date) {
-                $date_str = $current_date->format('Y-m-d');
-    
-                // Check if already exists (skip if exists)
-                $exists = Clock::where('user_id', $user_id)
-                    ->where('date', $date_str)
-                    ->exists();
-    
-                if ($exists) {
-                    $skipped_records[] = [
-                        'user_id' => $user_id,
-                        'date' => $date_str,
-                        'employee_code' => $employee_code,
-                    ];
-                } else {
-                    // ✅ Combine date + time
-                    $clock_in_datetime = $clock_in_time ? Carbon::parse("$date_str $clock_in_time")->format('Y-m-d H:i:s') : null;
-                    $clock_out_datetime = $clock_out_time ? Carbon::parse("$date_str $clock_out_time")->format('Y-m-d H:i:s') : null;
-    
-                    $clock = new Clock;
-                    $clock->user_id = $user_id;
-                    $clock->date = $date_str;
-                    $clock->clock_in = $clock_in_datetime;
-                    $clock->clock_out = $clock_out_datetime;
-                    $clock->save();
-    
-                    $inserted_records[] = [
-                        'id' => $clock->id,
-                        'date' => $date_str,
-                        'employee_code' => $employee_code,
-                    ];
-                }
-    
-                $current_date->addDay();
-            }
-        }
-    
-        return response()->json([
-            'status' => 'success',
-            'inserted_records' => $inserted_records,
-            'skipped_records' => $skipped_records,
-        ]);
-    }
+			->select('users.id');
 
- 
+		// ✅ Branch wise filter
+		if (!empty($request->branch_id)) {
+			$query->where('profile.branch_id', $request->branch_id);
+		}
+
+		// ✅ Single employee
+		if (!empty($request->employee_id)) {
+			$query->where('users.id', $request->employee_id);
+		}
+
+		// ✅ Multiple employees
+		if (!empty($request->employee_ids)) {
+			$query->whereIn('users.id', $request->employee_ids);
+		}
+
+		$user_ids = $query->pluck('users.id')->toArray();
+
+		if (empty($user_ids)) {
+			return response()->json(['error' => 'No employees found for the selected criteria.'], 400);
+		}
+
+		$form_date = $request->input('form_date');
+		$to_date = $request->input('to_date');
+
+		if (!$form_date || !$to_date) {
+			return response()->json(['error' => 'Both form_date and to_date are required.'], 400);
+		}
+
+		try {
+			$start_date = Carbon::createFromFormat('Y-m-d', $form_date);
+			$end_date = Carbon::createFromFormat('Y-m-d', $to_date);
+
+			if ($start_date->gt($end_date)) {
+				return response()->json(['error' => 'Start date must be before or equal to end date.'], 400);
+			}
+
+			// ✅ Handle time parsing
+			$clock_in_raw = trim($request->input('clock_in'));
+			$clock_out_raw = trim($request->input('clock_out'));
+
+			$clock_in_time = !empty($clock_in_raw) ? Carbon::parse($clock_in_raw)->format('H:i:s') : null;
+			$clock_out_time = !empty($clock_out_raw) ? Carbon::parse($clock_out_raw)->format('H:i:s') : null;
+		} catch (\Exception $e) {
+			return response()->json(['error' => 'Invalid date or time format.'], 400);
+		}
+
+		$inserted_records = [];
+		$skipped_records = [];
+
+		foreach ($user_ids as $user_id) {
+			$user = User::with('profile')->find($user_id);
+			if (!$user || !$user->profile) continue;
+
+			$employee_code = $user->profile->employee_code;
+			$current_date = clone $start_date;
+
+			while ($current_date <= $end_date) {
+				$date_str = $current_date->format('Y-m-d');
+
+				// Check if already exists (skip if exists)
+				$exists = Clock::where('user_id', $user_id)
+					->where('date', $date_str)
+					->exists();
+
+				if ($exists) {
+					$skipped_records[] = [
+						'user_id' => $user_id,
+						'date' => $date_str,
+						'employee_code' => $employee_code,
+					];
+				} else {
+					// ✅ Combine date + time
+					$clock_in_datetime = $clock_in_time ? Carbon::parse("$date_str $clock_in_time")->format('Y-m-d H:i:s') : null;
+					$clock_out_datetime = $clock_out_time ? Carbon::parse("$date_str $clock_out_time")->format('Y-m-d H:i:s') : null;
+
+					$clock = new Clock;
+					$clock->user_id = $user_id;
+					$clock->date = $date_str;
+					$clock->clock_in = $clock_in_datetime;
+					$clock->clock_out = $clock_out_datetime;
+					$clock->save();
+
+					$inserted_records[] = [
+						'id' => $clock->id,
+						'date' => $date_str,
+						'employee_code' => $employee_code,
+					];
+				}
+
+				$current_date->addDay();
+			}
+		}
+
+		return response()->json([
+			'status' => 'success',
+			'inserted_records' => $inserted_records,
+			'skipped_records' => $skipped_records,
+		]);
+	}
 
 
 
-	public function  postUpdateAttendanceIDs(Request $request) {
+
+
+	public function  postUpdateAttendanceIDs(Request $request)
+	{
 		if (!empty($request->branch_id) || !empty($request->employee_id) || !empty($request->department_id) || !empty($request->designation_id) || !empty($request->section_id)) {
 			$query = DB::table('clocks')
 				->leftJoin('users', 'clocks.user_id', '=', 'users.id')
@@ -1355,11 +1375,11 @@ Class ClockController extends Controller{
 			if (!empty($request->section_id)) {
 				$query->where('profile.section_id', $request->section_id);
 			}
-			if(!empty($request->form_date)){
-				$query->where('clocks.date','>=', $request->form_date);
+			if (!empty($request->form_date)) {
+				$query->where('clocks.date', '>=', $request->form_date);
 			}
-			if(!empty($request->to_date)){
-				$query->where('clocks.date','<=', $request->to_date);
+			if (!empty($request->to_date)) {
+				$query->where('clocks.date', '<=', $request->to_date);
 			}
 
 			// Finalize the query
@@ -1371,233 +1391,215 @@ Class ClockController extends Controller{
 			return $getData;
 		}
 	}
-	
-	public function uploadAttendance(AttendanceUploadRequest $request){
-		
-		if(!Entrust::can('upload_attendance'))
+
+	public function uploadAttendance(AttendanceUploadRequest $request)
+	{
+
+		if (!Entrust::can('upload_attendance'))
 			return redirect('/dashboard')->withErrors(trans('messages.permission_denied'));
 
 		$filename = uniqid();
 		$extension = $request->file('file')->getClientOriginalExtension();
-	 	$file = $request->file('file')->move('uploads/attendance',$filename.".".$extension);
-	 	$filename_extension = 'uploads/attendance/'.$filename.'.'.$extension;
-		$xls_datas = Excel::load($filename_extension, function($reader) { })->toArray();
-		if(count($xls_datas) > 0)
-		{
-			$employees = User::join('profile','profile.user_id','=','users.id')
+		$file = $request->file('file')->move('uploads/attendance', $filename . "." . $extension);
+		$filename_extension = 'uploads/attendance/' . $filename . '.' . $extension;
+		$xls_datas = Excel::load($filename_extension, function ($reader) {})->toArray();
+		if (count($xls_datas) > 0) {
+			$employees = User::join('profile', 'profile.user_id', '=', 'users.id')
 				->select(DB::raw('users.id AS user_id,employee_code'))
-				->pluck('user_id','employee_code')->all();
+				->pluck('user_id', 'employee_code')->all();
 
-		    $data = array();
-		    foreach($xls_datas as $xls_data)
-		    {
-		      $employee_code = $xls_data['employee_code'];
-		      $user_id = (isset($employees[$employee_code])) ? $employees[$employee_code] : NULL;
-		      $date = date('Y-m-d',strtotime($xls_data['date']));
-		      $clock_in = date('Y-m-d H:i',strtotime($xls_data['clock_in']));
-		      $clock_out = date('Y-m-d H:i',strtotime($xls_data['clock_out']));
-		      
-		      $clock = Clock::where('user_id','=',$user_id)
-		      	->where('date','=',$date)
-		      	->where(function ($query) use($clock_in) {
-		      		$query->where('clock_out','=',null)
-		      		->orWhere('clock_out','>=',$clock_in);
-		      		})->count();
+			$data = array();
+			foreach ($xls_datas as $xls_data) {
+				$employee_code = $xls_data['employee_code'];
+				$user_id = (isset($employees[$employee_code])) ? $employees[$employee_code] : NULL;
+				$date = date('Y-m-d', strtotime($xls_data['date']));
+				$clock_in = date('Y-m-d H:i', strtotime($xls_data['clock_in']));
+				$clock_out = date('Y-m-d H:i', strtotime($xls_data['clock_out']));
 
-		      if($user_id != null && !$clock && strtotime($clock_in) < strtotime($clock_out))
-		      $data[] = array(
-		      		'user_id' => $user_id,
-		      		'date' => $date,
-		      		'clock_in' => $clock_in,
-		      		'clock_out' => $clock_out,
-		      		'created_at' => date('Y-m-d H:i:s'),
-		      		'updated_at' => date('Y-m-d H:i:s')
-		      		);
-		    }
-		    if(count($data))
-		    	Clock::insert($data);
+				$clock = Clock::where('user_id', '=', $user_id)
+					->where('date', '=', $date)
+					->where(function ($query) use ($clock_in) {
+						$query->where('clock_out', '=', null)
+							->orWhere('clock_out', '>=', $clock_in);
+					})->count();
+
+				if ($user_id != null && !$clock && strtotime($clock_in) < strtotime($clock_out))
+					$data[] = array(
+						'user_id' => $user_id,
+						'date' => $date,
+						'clock_in' => $clock_in,
+						'clock_out' => $clock_out,
+						'created_at' => date('Y-m-d H:i:s'),
+						'updated_at' => date('Y-m-d H:i:s')
+					);
+			}
+			if (count($data))
+				Clock::insert($data);
 		}
 		if (File::exists($filename_extension))
 			File::delete($filename_extension);
 
-		return redirect('/dashboard')->withSuccess(count($data).' '.trans('messages.attendance_upload').' '.trans('messages.out_of').' '.count($xls_datas).' '.trans('messages.attendance'));
+		return redirect('/dashboard')->withSuccess(count($data) . ' ' . trans('messages.attendance_upload') . ' ' . trans('messages.out_of') . ' ' . count($xls_datas) . ' ' . trans('messages.attendance'));
 	}
 
-	public function shift(Request $request){
+	public function shift(Request $request)
+	{
 
-        $col_heads = array(
-        		trans('messages.employee'),
-        		trans('messages.shift_name'),
-        		trans('messages.clock_in'),
-        		trans('messages.clock_out')
-				);
+		$col_heads = array(
+			trans('messages.employee'),
+			trans('messages.shift_name'),
+			trans('messages.clock_in'),
+			trans('messages.clock_out')
+		);
 
-        $date = ($request->input('date')) ? : date('Y-m-d');
+		$date = ($request->input('date')) ?: date('Y-m-d');
 
-        $menu = ['attendance','shift_detail'];
-        $table_info = array(
+		$menu = ['attendance', 'shift_detail'];
+		$table_info = array(
 			'source' => 'shift-detail',
 			'title' => 'Shift Detail',
 			'id' => 'shift_detail_table',
 			'form' => 'shift_detail'
 		);
 
-		return view('employee.shift_detail',compact('col_heads','date','menu','table_info'));
+		return view('employee.shift_detail', compact('col_heads', 'date', 'menu', 'table_info'));
 	}
 
-	public function postShift(Request $request){
-        $response = ['message' => trans('messages.request_submit'), 'status' => 'success']; 
-        return response()->json($response, 200, array('Access-Controll-Allow-Origin' => '*'));
+	public function postShift(Request $request)
+	{
+		$response = ['message' => trans('messages.request_submit'), 'status' => 'success'];
+		return response()->json($response, 200, array('Access-Controll-Allow-Origin' => '*'));
 	}
 
-	public function shiftDetailList(Request $request){
+	public function shiftDetailList(Request $request)
+	{
 
-        $date = ($request->input('date')) ? : date('Y-m-d');
-		if(Entrust::can('manage_all_employee'))
+		$date = ($request->input('date')) ?: date('Y-m-d');
+		if (Entrust::can('manage_all_employee'))
 			$users = \App\User::all();
-		elseif(Entrust::can('manage_subordinate_employee')){
-			$child_designations = Helper::childDesignation(Auth::user()->designation_id,1);
-			$child_users = User::whereIn('designation_id',$child_designations)->pluck('id')->all();
+		elseif (Entrust::can('manage_subordinate_employee')) {
+			$child_designations = Helper::childDesignation(Auth::user()->designation_id, 1);
+			$child_users = User::whereIn('designation_id', $child_designations)->pluck('id')->all();
 			array_push($child_users, Auth::user()->id);
-        	$users = \App\User::whereIn('id',$child_users)->get();
+			$users = \App\User::whereIn('id', $child_users)->get();
 		} else
 			$users = \App\User::whereId(Auth::user()->id)->get();
 
 		$rows = array();
 
-        foreach($users as $user){
-        	$my_shift = Helper::getShift($date,$user->id);
-        	$rows[] = array(
-        			$user->full_name_with_designation,
-        			$my_shift->OfficeShift->name,
-        			($my_shift->in_time != $my_shift->out_time) ? showTime($my_shift->in_time) : '-',
-        			($my_shift->in_time != $my_shift->out_time) ? showTime($my_shift->out_time) : '-'
-        			);
-        }
-        $list['aaData'] = $rows;
-        return json_encode($list);
+		foreach ($users as $user) {
+			$my_shift = Helper::getShift($date, $user->id);
+			$rows[] = array(
+				$user->full_name_with_designation,
+				$my_shift->OfficeShift->name,
+				($my_shift->in_time != $my_shift->out_time) ? showTime($my_shift->in_time) : '-',
+				($my_shift->in_time != $my_shift->out_time) ? showTime($my_shift->out_time) : '-'
+			);
+		}
+		$list['aaData'] = $rows;
+		return json_encode($list);
 	}
 
-	public function destroy(Clock $clock,Request $request){
-        $clock->delete();
+	public function destroy(Clock $clock, Request $request)
+	{
+		$clock->delete();
 
-        if($request->has('ajax_submit')){
-            $response = ['message' => trans('messages.attendance').' '.trans('messages.deleted'), 'status' => 'success']; 
-            return response()->json($response, 200, array('Access-Controll-Allow-Origin' => '*'));
-        }
-        return redirect()->back()->withSuccess(trans('messages.deleted'));
+		if ($request->has('ajax_submit')) {
+			$response = ['message' => trans('messages.attendance') . ' ' . trans('messages.deleted'), 'status' => 'success'];
+			return response()->json($response, 200, array('Access-Controll-Allow-Origin' => '*'));
+		}
+		return redirect()->back()->withSuccess(trans('messages.deleted'));
 	}
 
 	// Helper function to get the dates between two dates
-	
-	public function attendanceReprt(Request $request){
 
-		
-	   $branch = Branch::all();
-	   $section = Section::all();
-	   $department = Department::all();
-       $category = ['staff', 'owner'];
-	   $designation = Designation::all();
-	   $shift = OfficeShift::all();
-	   $employee = User::leftJoin(
-		   'profile',
-		   'users.id',
-		   '=',
-		   'profile.user_id'
-	   )->select('users.first_name', 'users.id', 'profile.employee_code')->get();
-	   return view('attendance.report',compact('employee','branch','section','department','category','designation','shift'));
+	public function attendanceReprt(Request $request)
+	{
+
+
+		$branch = Branch::all();
+		$section = Section::all();
+		$department = Department::all();
+		$category = ['staff', 'owner'];
+		$designation = Designation::all();
+		$shift = OfficeShift::all();
+		$employee = User::leftJoin(
+			'profile',
+			'users.id',
+			'=',
+			'profile.user_id'
+		)->select('users.first_name', 'users.id', 'profile.employee_code')->get();
+		return view('attendance.report', compact('employee', 'branch', 'section', 'department', 'category', 'designation', 'shift'));
 	}
- 
-	// Attendance Report POST method
+
 	public function attendanceReprtPOST(Request $request)
 	{
 		$employeeIds = $request->employee_id
 			? (is_array($request->employee_id) ? $request->employee_id : explode(',', $request->employee_id))
 			: null;
+
 		$branch = null;
 		if ($request->branch_id) {
 			$branch = Branch::find($request->branch_id);
 		}
-		// Fetch user IDs based on the provided filters
-		$userIds = User::leftJoin('profile', 'users.id',
-			'=',
-			'profile.user_id'
-		)
-		->leftJoin('designations', 'users.designation_id', '=', 'designations.id')
-		->leftJoin('departments', 'designations.department_id', '=', 'departments.id')
-		->leftJoin('sections', 'profile.section_id', '=', 'sections.id')
-		->LeftJoin('user_shifts', 'users.id', '=', 'user_shifts.id')
-		->when(!empty($employeeIds), function ($query) use ($employeeIds) {
-			return $query->whereIn('profile.employee_code', $employeeIds);
-		})
-		->when(isset($request->branch_id) && !empty($request->branch_id), function ($query) use ($request) {
-			return $query->where('profile.branch_id', $request->branch_id);
-		})
-		->when(isset($request->section_id) && !empty($request->section_id), function ($query) use ($request) {
-			return $query->where('profile.section_id', $request->section_id);
-		})
-		->when(isset($request->department_id) && !empty($request->department_id), function ($query) use ($request) {
-			return $query->where('departments.id', $request->department_id);
-		})
-		->when(isset($request->designation_id) && !empty($request->designation_id), function ($query) use ($request) {
-			return $query->where('designations.id', $request->designation_id);
-		})
-		->when(isset($request->category_id) && !empty($request->category_id), function ($query) use ($request) {
-			return $query->where('profile.category', $request->category_id);
-		})
-		->when(isset($request->shift_id) && !empty($request->shift_id), function ($query) use ($request) {
-			return $query->where('user_shifts.office_shift_id', $request->shift_id);
-		})
-		->pluck('users.id');
-			
+
+		$userIds = User::leftJoin('profile', 'users.id', '=', 'profile.user_id')
+			->where('users.status', 'active')
+			->when(!empty($employeeIds), function ($query) use ($employeeIds) {
+				return $query->whereIn('profile.employee_code', $employeeIds);
+			})
+			->when(isset($request->branch_id) && !empty($request->branch_id), function ($query) use ($request) {
+				return $query->where('profile.branch_id', $request->branch_id);
+			})
+			->pluck('users.id');
+
 		$results = collect();
+
 		foreach ($userIds as $userId) {
 			$userReport = $this->getAttendanceReport1($userId, $request->startDate, $request->endDate);
 			$results = $results->merge($userReport);
 		}
 
+		// Status Filter
 		$status_filter = $request->input('status');
+
 		switch ($status_filter) {
-			case '1': // Present
+			case '1':
 				$status_to_filter = 'P';
 				break;
-			case '2': // Overtime
+			case '2':
 				$status_to_filter = 'L';
 				break;
-			case '3': // Absent
+			case '3':
 				$status_to_filter = 'Absent';
 				break;
-			case '4': // WHD
+			case '4':
 				$status_to_filter = 'WHD';
 				break;
-			case '5': // LWP
+			case '5':
 				$status_to_filter = 'LWP';
 				break;
-			case '6': // Leave
+			case '6':
 				$status_to_filter = 'Leave';
 				break;
-			case '7': 
+			case '7':
 				$status_to_filter = 'HLD';
 				break;
-			case '8': 
+			case '8':
 				$status_to_filter = 'SPHD';
 				break;
-			default: // All statuses
+			default:
 				$status_to_filter = null;
-				break;
 		}
-		$filtered_data = $results->filter(function ($item) use ($status_to_filter) {
-			// If no filter is applied, show all statuses
-			if ($status_to_filter === null) {
-				return true;
-			}
 
+		$filtered_data = $results->filter(function ($item) use ($status_to_filter) {
+			if ($status_to_filter === null) return true;
 			return $item['status'] === $status_to_filter;
 		});
 
-		$filtered_data = $filtered_data->values();
+		// Important: employee_code wise sorted (page order fix)
+		$filtered_data = $filtered_data->sortBy('employee_code')->values();
 
-		// Calculate totals for all data
 		$totals = $filtered_data->groupBy('status')->map(function ($items, $status) {
 			return [
 				'status' => $status,
@@ -1605,17 +1607,16 @@ Class ClockController extends Controller{
 			];
 		})->values();
 
-		$response = [
-			'filtered_data' => $filtered_data,  
+		return [
+			'filtered_data'  => $filtered_data,
 			'filtered_totals' => $totals,
-			'startDate' => $request->startDate,
-			'toDate' => $request->endDate,
-			'branch_name'     => $branch ? $branch->name : 'All Branches'
+			'startDate'      => $request->startDate,
+			'toDate'         => $request->endDate,
+			'branch_name'    => $branch ? $branch->name : 'All Branches'
 		];
-		return $response;
-
 	}
-	
+
+
 
 	function getDatesBetweentwo($startDate, $endDate)
 	{
@@ -1634,24 +1635,24 @@ Class ClockController extends Controller{
 		$start = Carbon::parse($startDate);
 		$end = Carbon::parse($endDate);
 		$dates = [];
-	
+
 		while ($start->lte($end)) { // ✅ Include end date
 			$dates[] = $start->format('Y-m-d');
 			$start->addDay();
 		}
-	
+
 		return $dates;
 	}
-	
+
 	// Attendance report generation for a single user
 	public function getAttendanceReport1($userId, $startDat, $endDat)
 	{
-	    $startDate = Carbon::parse($startDat);
+		$startDate = Carbon::parse($startDat);
 		$endDate = Carbon::parse($endDat);
 		$weeklyHolidays = WHD::whereBetween('date', [$startDate, $endDate])
-		->where('user_id', $userId)
-		->pluck('date')
-		->toArray();
+			->where('user_id', $userId)
+			->pluck('date')
+			->toArray();
 
 		// return $weeklyHolidays;
 		// Fetch user profile details
@@ -1682,12 +1683,12 @@ Class ClockController extends Controller{
 		$shiftTime = UserShift::where('user_id', '=', $userId)
 			->LeftJoin('office_shifts', 'user_shifts.office_shift_id', '=', 'office_shifts.id')
 			->LeftJoin('office_shift_details', 'user_shifts.office_shift_id', '=', 'office_shift_details.office_shift_id')
-			->select('user_shifts.user_id', 'office_shifts.name','office_shift_details.in_time', 'office_shift_details.out_time','office_shifts.id as shift_id')
+			->select('user_shifts.user_id', 'office_shifts.name', 'office_shift_details.in_time', 'office_shift_details.out_time', 'office_shifts.id as shift_id')
 			->first();
 
 		// Fetch attendance data (clock-in, clock-out)
 		$attendances = Clock::leftJoin('users', 'clocks.user_id', '=', 'users.id')
-		->whereBetween('date', [$startDate, $endDate])
+			->whereBetween('date', [$startDate, $endDate])
 			->where('clocks.user_id', '=', $userId)
 			->select('clocks.date', 'clocks.clock_in', 'clocks.clock_out', 'users.id as user_id', 'users.first_name')
 			->get()
@@ -1695,7 +1696,7 @@ Class ClockController extends Controller{
 
 		// Fetch leave data
 		$leaves = Leave::leftJoin('users', 'leaves.user_id', '=', 'users.id')
-		->where('leaves.user_id', '=', $userId)
+			->where('leaves.user_id', '=', $userId)
 			->where(function ($query) use ($startDate, $endDate) {
 				$query->whereBetween('from_date', [$startDate, $endDate])
 					->orWhere(function ($subQuery) use ($startDate, $endDate) {
@@ -1707,9 +1708,9 @@ Class ClockController extends Controller{
 			->get();
 
 
-			
-        // Holydays
-		 $holidays = Holiday::whereBetween('date', [$startDate, $endDate])
+
+		// Holydays
+		$holidays = Holiday::whereBetween('date', [$startDate, $endDate])
 			->pluck('date') // Extract only the date column
 			->toArray();
 		//  return $holidays;
@@ -1719,7 +1720,7 @@ Class ClockController extends Controller{
 			$fromDate = Carbon::parse($leave->from_date);
 			$toDate = Carbon::parse($leave->to_date);
 			$datesBetween = $this->getDatesBetweentwoDateRefine($fromDate, $toDate);
-		
+
 			foreach ($datesBetween as $date) {
 				// Properly label based on leave status
 				if ($leave->status === 'lwp') {
@@ -1729,12 +1730,12 @@ Class ClockController extends Controller{
 				}
 			}
 		}
-		
+
 
 		$spacialHolidays = SpacialHoliday::whereBetween('date', [$startDate, $endDate])
-		->where('user_id', $userId)
-		->pluck('date') // Extract only the date column
-		->toArray();
+			->where('user_id', $userId)
+			->pluck('date') // Extract only the date column
+			->toArray();
 		// Map the data to the calendar range
 		$result = $dateRange->map(function ($date) use ($attendances, $leaveDays, $holidays, $weeklyHolidays, $shiftTime, $Profiles, $spacialHolidays) {
 
@@ -1751,32 +1752,31 @@ Class ClockController extends Controller{
 
 			if (in_array($date, $weeklyHolidays)) {
 				$status = 'WHD'; // Weekly holiday takes top priority
-			
+
 			} elseif ($leaveDays->has($date)) {
 				$leaveStatus = $leaveDays->get($date);
-			
+
 				if ($leaveStatus === 'LWP') {
 					$status = 'LWP'; // Leave Without Pay
 				} else {
 					$status = $leaveStatus; // Could be CL, SL, EL, etc.
 				}
-			
 			} elseif (in_array($date, $holidays)) {
 				$status = 'HLD'; // Regular holiday
-			
+
 			} elseif (in_array($date, $spacialHolidays)) {
 				$status = 'SPHD'; // Special holiday
-			
+
 			} elseif ($attendance && $attendance->count() > 0) {
 				$earliestClockIn = Carbon::parse($attendance->min('clock_in'))->format('H:i:s');
 				$latestClockOut = Carbon::parse($attendance->max('clock_out'))->format('H:i:s');
-			
+
 				if ($shiftTime) {
 					$inTime = Carbon::parse($shiftTime->in_time);
 					$outTime = Carbon::parse($shiftTime->out_time);
 					$clockIn = Carbon::parse($earliestClockIn);
 					$clockOut = Carbon::parse($latestClockOut);
-			
+
 					if ($clockIn->eq($inTime) && $clockOut->eq($outTime)) {
 						$status = 'P'; // Present (Perfect)
 					} elseif ($clockIn->gt($inTime)) {
@@ -1789,14 +1789,13 @@ Class ClockController extends Controller{
 				} else {
 					$status = 'P'; // Present with no shift defined
 				}
-			
 			} else {
 				$status = 'A'; // Absent
 			}
-			
 
 
-			if($attendance && $attendance->count() > 0){
+
+			if ($attendance && $attendance->count() > 0) {
 				$earliestClockIn = Carbon::parse($attendance->min('clock_in'))->format('H:i:s');
 				$latestClockOut = Carbon::parse($attendance->max('clock_out'))->format('H:i:s');
 				if ($shiftTime) {
@@ -1807,8 +1806,7 @@ Class ClockController extends Controller{
 					if ($clockIn->eq($inTime) && $clockOut->eq($outTime)) {
 					} elseif ($clockIn->gt($inTime)) { // Late entry
 						$lateMinutes = $inTime->diffInMinutes($clockIn);
-					} 
-					elseif ($clockOut->gt($outTime)) {
+					} elseif ($clockOut->gt($outTime)) {
 						$overtimeHours = $clockOut->diffInMinutes($outTime);
 					} else {
 						$overtimeHours = $clockOut->diffInMinutes($outTime);
@@ -1838,13 +1836,14 @@ Class ClockController extends Controller{
 
 			];
 		});
-		
+
 		// Return the result as a JSON response
 		return $result;
 	}
-    // End Function
+	// End Function
 
-	public function dailyattendanceReprt(Request $request) {
+	public function dailyattendanceReprt(Request $request)
+	{
 		$branch = Branch::all();
 		$section = Section::all();
 		$department = Department::all();
@@ -1859,10 +1858,10 @@ Class ClockController extends Controller{
 			'profile.user_id'
 		)->get();
 		return view('attendance.daily-report', compact('employee', 'branch', 'section', 'department', 'category', 'designation', 'shift'));
-
 	}
 
-	public function dailyattendanceReprtPOST(Request $request) {
+	public function dailyattendanceReprtPOST(Request $request)
+	{
 		// Fetch user IDs based on the provided filters
 		$branch = null;
 		if ($request->branch_id) {
@@ -1902,7 +1901,7 @@ Class ClockController extends Controller{
 			->pluck('users.id');
 
 		$results = collect();
-		 $endDtate = $request->startDate;
+		$endDtate = $request->startDate;
 		foreach ($userIds as $userId) {
 			$userReport = $this->getAttendanceReport1($userId, $request->startDate, $endDtate);
 			$results = $results->merge($userReport);
@@ -1966,4 +1965,3 @@ Class ClockController extends Controller{
 		return $response;
 	}
 }
-?>
