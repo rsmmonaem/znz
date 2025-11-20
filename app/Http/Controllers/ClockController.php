@@ -1534,15 +1534,18 @@ class ClockController extends Controller
 
 	public function attendanceReprtPOST(Request $request)
 	{
+		// Employee ID handle (single or multiple)
 		$employeeIds = $request->employee_id
 			? (is_array($request->employee_id) ? $request->employee_id : explode(',', $request->employee_id))
 			: null;
 
+		// Branch data (header show-এর জন্য)
 		$branch = null;
 		if ($request->branch_id) {
 			$branch = Branch::find($request->branch_id);
 		}
 
+		// Get only ACTIVE users
 		$userIds = User::leftJoin('profile', 'users.id', '=', 'profile.user_id')
 			->where('users.status', 'active')
 			->when(!empty($employeeIds), function ($query) use ($employeeIds) {
@@ -1551,12 +1554,21 @@ class ClockController extends Controller
 			->when(isset($request->branch_id) && !empty($request->branch_id), function ($query) use ($request) {
 				return $query->where('profile.branch_id', $request->branch_id);
 			})
+			->when(isset($request->department_id) && !empty($request->department_id), function ($query) use ($request) {
+				return $query->where('profile.department_id', $request->department_id);
+			})
 			->pluck('users.id');
 
+		// Collect all attendance records
 		$results = collect();
 
 		foreach ($userIds as $userId) {
-			$userReport = $this->getAttendanceReport1($userId, $request->startDate, $request->endDate);
+			$userReport = $this->getAttendanceReport1(
+				$userId,
+				$request->startDate,
+				$request->endDate
+			);
+
 			$results = $results->merge($userReport);
 		}
 
@@ -1592,29 +1604,33 @@ class ClockController extends Controller
 				$status_to_filter = null;
 		}
 
+		// Apply Filter
 		$filtered_data = $results->filter(function ($item) use ($status_to_filter) {
 			if ($status_to_filter === null) return true;
 			return $item['status'] === $status_to_filter;
 		});
 
-		// Important: employee_code wise sorted (page order fix)
+		// Sort by employee_code (Page order fix)
 		$filtered_data = $filtered_data->sortBy('employee_code')->values();
 
+		// Totals calculation
 		$totals = $filtered_data->groupBy('status')->map(function ($items, $status) {
 			return [
 				'status' => $status,
-				'count' => $items->count(),
+				'count'  => $items->count(),
 			];
 		})->values();
 
+		// Final Response (JS will read this)
 		return [
-			'filtered_data'  => $filtered_data,
+			'filtered_data'   => $filtered_data,
 			'filtered_totals' => $totals,
-			'startDate'      => $request->startDate,
-			'toDate'         => $request->endDate,
-			'branch_name'    => $branch ? $branch->name : 'All Branches'
+			'startDate'       => $request->startDate,
+			'toDate'          => $request->endDate,
+			'branch_name'     => $branch ? $branch->name : 'All Branches'
 		];
 	}
+
 
 
 
