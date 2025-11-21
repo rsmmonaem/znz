@@ -33,85 +33,51 @@ class SalaryProcessController extends Controller
 
     public function SalaryProcessView(Request $request)
     {
-
         DB::beginTransaction();
         try {
-            // Define the base query for user data
+            // Base query for active employees only
             $data = User::leftJoin('profile', 'users.id', '=', 'profile.user_id')
                 ->leftJoin('designations', 'users.designation_id', '=', 'designations.id')
                 ->leftJoin('sections', 'profile.section_id', '=', 'sections.id')
                 ->leftJoin('branchs', 'profile.branch_id', '=', 'branchs.id')
-                ->leftJoin('departments', 'designations.department_id', '=', 'departments.id');
+                ->leftJoin('departments', 'designations.department_id', '=', 'departments.id')
+                ->where('users.status', 'active');
 
-            // Apply filters if present
-            if ($request->branch || $request->department || $request->section) {
-                $data->whereNotIn('users.id', function ($query) {
-                    $query->select('employee_id')->from('employee_separations')
-                        ->where('effective_date', '>', Carbon::now());
-                });
-            }
             if ($request->branch) {
-                $data->where('profile.branch_id', '=', $request->branch);
+                $data->where('profile.branch_id', $request->branch);
             }
             if ($request->department) {
-                $data->where('designations.department_id', '=', $request->department);
-            }
-            if ($request->employeeId) {
-                $data->where('users.id', '=', $request->employeeId);
+                $data->where('designations.department_id', $request->department);
             }
             if ($request->section) {
-                $data->where('profile.section_id', '=', $request->section);
+                $data->where('profile.section_id', $request->section);
+            }
+            if ($request->employeeId) {
+                $data->where('users.id', $request->employeeId);
             }
 
-            // Get the employee IDs
             $user_ids = $data->pluck('users.id');
             $processedEmployeeIds = [];
 
-            // $startDate = Carbon::parse($request->formDate);
-            // $endDate = Carbon::parse($request->toDate);
-            // $TotalDays = $startDate->diffInDays($endDate) + 1;
-            // return $TotalDays;
-            // Handle salary processing for each user
             foreach ($user_ids as $user_id) {
-                // Check if salary already exists for the employee in the given date range
-                // $exists = DB::table('employee_salary_details')
-                //     ->where('employee_id', $user_id)
-                //     ->where('form_date', $request->formDate)
-                //     ->where('to_date', $request->toDate)
-                //     ->exists();
-
-                // if ($exists) {
-                //     continue; // Skip if already processed
-                // }
-
-
-                // Handle special case for branch ID 7
-                if ($request->branch == env('BRANCH_ID')) {
-                    // Call the SalaryProcess method to process salary for each user
-                    $processedId = $this->SalaryProcessByBranch($user_id, $request->formDate, $request->toDate, $request->remarks);
-                    if ($processedId !== null) {
-                        $processedEmployeeIds[] = $processedId;  // Collect successfully processed employee IDs
-                    }
-                } else {
-                    // Call appropriate salary process method
-                    $processedId = $this->SalaryProcess($user_id, $request->formDate, $request->toDate, $request->remarks, $request->branch);
-                    if ($processedId !== null) {
-                        $processedEmployeeIds[] = $processedId;  // Collect successfully processed employee IDs
-                    }
+                $processedId = $this->SalaryProcess($user_id, $request->formDate, $request->toDate, $request->remarks, $request->branch);
+                if ($processedId !== null) {
+                    $processedEmployeeIds[] = $processedId;
                 }
             }
+
             DB::commit();
-            // Return response with processed employee IDs
+
             return response()->json([
                 'status' => 'success',
                 'processed_employee_ids' => $processedEmployeeIds,
-                'message' => 'Salary processed successfully.',
+                'message' => 'Salary processed successfully.'
             ]);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             DB::rollBack();
             return response()->json([
                 'status' => 'error',
-                'message' => 'Failed to process salary: ' . $e->getMessage(),
+                'message' => 'Failed to process salary: ' . $e->getMessage()
             ]);
         }
     }
@@ -472,7 +438,11 @@ class SalaryProcessController extends Controller
         $FinalBankPercentage = 0;
         $FinalCashPercentage = 0;
 
-      
+        if (!$BankAmount) {
+            return null;
+        }
+
+
 
         if ($BankAmount->cash_amount > 0 && $BankAmount->bank_amount > 0) {
             if ($BankAmount) {

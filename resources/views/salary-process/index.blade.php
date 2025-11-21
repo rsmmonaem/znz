@@ -175,7 +175,7 @@
                     remarks: $('#remarks').val(),
                 }
                // Check if any required field is empty
-                if (FormData.employeeId === '' && FormData.formDate === '' && FormData.toDate === '' && FormData.section === '' && FormData.department === '' && FormData.branch === '') {
+                if (FormData.formDate === '' && FormData.toDate === '' && FormData.section === '' && FormData.department === '' && FormData.branch === '') {
                     toastr.error('Please select fields');
                     $icon.removeClass('rotate');
                 } else {
