@@ -238,7 +238,12 @@ $(document).ready(function () {
                 <title>Salary Table</title>
                 <style>
                     table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-                    th, td { border: 1px solid #ddd; padding: 6px 8px; text-align: left; font-size: 12px; }
+                    th, td {
+                        border: 1px solid #ddd;
+                        padding: 4px 6px;
+                        text-align: left;
+                        font-size: 11px;
+                    }
                     th { background-color: #fff; }
                     .totals-row { font-weight: bold; background-color: #fff; }
                     .page-break { page-break-before: always; }
