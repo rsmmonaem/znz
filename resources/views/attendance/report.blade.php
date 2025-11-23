@@ -249,13 +249,11 @@ $(document).ready(function() {
 
         return `
         <div style="page-break-after:always; padding:10px; border:1px solid #000;">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <img src="${logoUrl}" style="width:150px;">
-                <div style="text-align:center;">
-                    <h3>Attendance Report</h3>
-                    <p><b>Branch:</b> ${branch_name}</p>
-                    <p><b>Date:</b> ${startDate} to ${toDate}</p>
-                </div>
+            <div style="text-align:center; margin-bottom:10px;">
+                <img src="${logoUrl}" style="width:150px; display:block; margin:0 auto;">
+                <h3 style="margin:5px 0;">Attendance Report</h3>
+                <p><b>Branch:</b> ${branch_name}</p>
+                <p><b>Date:</b> ${startDate} to ${toDate}</p>
             </div>
 
             <div style="display:flex; justify-content:space-between; margin-top:10px;">
@@ -343,6 +341,13 @@ $(document).ready(function() {
             $.each(response.filtered_data, function(i,row){
                 if(!grouped[row.employee_code]) grouped[row.employee_code]=[];
                 grouped[row.employee_code].push(row);
+            });
+            
+            // Sort each employee block by date
+            Object.keys(grouped).forEach(function(key){
+                grouped[key].sort(function(a,b){
+                    return new Date(a.date) - new Date(b.date);
+                });
             });
 
             var finalHTML='';

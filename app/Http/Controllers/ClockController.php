@@ -1580,41 +1580,38 @@ class ClockController extends Controller
 
 		// Step 3: Status filter switch
 		$status_filter = $request->input('status');
-		switch ($status_filter) {
-			case '1':
-				$status_to_filter = 'P';
-				break;
-			case '2':
-				$status_to_filter = 'L';
-				break;
-			case '3':
-				$status_to_filter = 'Absent';
-				break;
-			case '4':
-				$status_to_filter = 'WHD';
-				break;
-			case '5':
-				$status_to_filter = 'LWP';
-				break;
-			case '6':
-				$status_to_filter = 'Leave';
-				break;
-			case '7':
-				$status_to_filter = 'HLD';
-				break;
-			case '8':
-				$status_to_filter = 'SPHD';
-				break;
-			default:
-				$status_to_filter = null;
-		}
+        switch ($status_filter) {
+            case '1': $status_to_filter = ['P','Present']; break;
+            case '2': $status_to_filter = ['L','Late']; break;
+            case '3': $status_to_filter = ['A','Absent']; break;
+            case '4': $status_to_filter = ['WHD']; break;
+            case '5': $status_to_filter = ['LWP']; break;
+        
+            // Leave means → CL, SL, ML, EL, Leave
+            case '6': 
+                $status_to_filter = ['Leave','CL','SL','EL','ML']; 
+                break;
+        
+            case '7': $status_to_filter = ['H','Holiday','HLD']; break;
+            case '8': $status_to_filter = ['SPHD']; break;
+        
+            default: $status_to_filter = null;
+        }
 
 		// Step 4: Apply status filter
 		$filtered_data = $results->filter(function ($item) use ($status_to_filter) {
-			if ($item['employee_status'] !== 'active') return false; // active না হলে skip
-			if ($status_to_filter === null) return true;
-			return $item['status'] === $status_to_filter;
-		})->sortBy('employee_code')->values();
+ 
+            if ($item['employee_status'] !== 'active') return false;
+        
+            if ($status_to_filter === null) return true;
+        
+            return in_array($item['status'], $status_to_filter);
+        
+        })
+        ->sortBy(function($x){
+            return $x['employee_code'] . '_' . $x['date']; 
+        })
+        ->values();
 
 		// Step 5: Totals calculation
 		$totals = $filtered_data->groupBy('status')->map(function ($items, $status) {
