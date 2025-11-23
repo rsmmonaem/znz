@@ -181,6 +181,7 @@ class SalarySummary extends Controller
     }
 
 
+
     public function SalaryTransferGlancePost(Request $request)
     {
         $branchData = Branch::where('id', $request->branch)->first();
