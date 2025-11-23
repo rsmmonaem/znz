@@ -180,7 +180,9 @@ class SalarySummary extends Controller
         return view('salary_summary.salary-transfer-glace', compact('group', 'category', 'branch', 'designation', 'department', 'section'));
     }
 
-    public function SalaryTransferGlancePost(Request $request){
+
+    public function SalaryTransferGlancePost(Request $request)
+    {
 
         $branchData = Branch::where('id', $request->branch)->first();
 
@@ -217,15 +219,40 @@ class SalarySummary extends Controller
                 'employee_salary_details.bankamount',
                 'employee_salary_details.cashamount'
             )
-            ->when($request->branch, fn($q)=>$q->where('branchs.id',$request->branch))
-            ->when($request->department, fn($q)=>$q->where('designations.department_id',$request->department))
-            ->when($request->designation, fn($q)=>$q->where('users.designation_id',$request->designation))
-            ->when($request->section, fn($q)=>$q->where('profile.section_id',$request->section))
-            ->when($request->employee, fn($q)=>$q->where('profile.user_id',$request->employee))
-            ->when($request->month, fn($q)=>$q->whereRaw('MONTH(employee_salary_details.to_date)=?',[$request->month]))
-            ->when($request->financialYear, fn($q)=>$q->whereRaw('YEAR(employee_salary_details.to_date)=?',[$request->financialYear]))
-            ->when($request->category, fn($q)=>$q->where('category.name',$request->category))
-            ->orderBy('esd_id','DESC')
+
+            ->when($request->branch, function ($q) use ($request) {
+                return $q->where('branchs.id', $request->branch);
+            })
+
+            ->when($request->department, function ($q) use ($request) {
+                return $q->where('designations.department_id', $request->department);
+            })
+
+            ->when($request->designation, function ($q) use ($request) {
+                return $q->where('users.designation_id', $request->designation);
+            })
+
+            ->when($request->section, function ($q) use ($request) {
+                return $q->where('profile.section_id', $request->section);
+            })
+
+            ->when($request->employee, function ($q) use ($request) {
+                return $q->where('profile.user_id', $request->employee);
+            })
+
+            ->when($request->month, function ($q) use ($request) {
+                return $q->whereRaw('MONTH(employee_salary_details.to_date) = ?', [$request->month]);
+            })
+
+            ->when($request->financialYear, function ($q) use ($request) {
+                return $q->whereRaw('YEAR(employee_salary_details.to_date) = ?', [$request->financialYear]);
+            })
+
+            ->when($request->category, function ($q) use ($request) {
+                return $q->where('category.name', $request->category);
+            })
+
+            ->orderBy('esd_id', 'DESC')
             ->get();
 
         return response()->json([
@@ -235,8 +262,6 @@ class SalarySummary extends Controller
             'month' => Carbon::create()->month($request->month)->format('F'),
         ]);
     }
-
-
 
 
 
