@@ -312,8 +312,8 @@
                     let cashPercentage = 30; // Remaining 30% to cash
 
                     // Calculate distributed amounts
-                    let salaryBankAmount = (totalSalary * bankPercentage) / 100;
-                    let salaryCashAmount = (totalSalary * cashPercentage) / 100;
+                    let salaryBankAmount = item.salary_bank_amount;
+                    let salaryCashAmount = item.salary_cash_amount;
 
                     // Display distributed amounts
                     row += '<td>' + (salaryBankAmount.toFixed(2) || 'N/A') + '</td>';

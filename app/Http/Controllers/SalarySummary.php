@@ -212,8 +212,8 @@ class SalarySummary extends Controller
                 'employee_salary_details.net_salary as net_salary',
                 'employee_salary_details.ot_amount as ot_amount',
                 'employee_salary_details.gross_salary as gross_salary',
-                'latest_salary_bank.bank_amount as salary_bank_amount',
-                'latest_salary_bank.cash_amount as salary_cash_amount'
+                'employee_salary_details.bankamount as salary_bank_amount',
+                'employee_salary_details.cashamount as salary_cash_amount'
                 )
             ->when($request->branch, function ($query) use ($request) {
                 return $query->where('branchs.id', $request->branch);
