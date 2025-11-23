@@ -1165,7 +1165,7 @@ class SalaryProcessController extends Controller
             })
             ->whereIn('employee_salary_details.id', $uniqueLatestIds)
             ->whereIn('users.id', $user_ids)
-            ->orderBy('profile.employee_code', 'asc')
+            ->orderByRaw('CAST(profile.employee_code AS UNSIGNED) ASC')
             ->select(
                 'employee_salary_details.id',
                 'users.id as user_id',
