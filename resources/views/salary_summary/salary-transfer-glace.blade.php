@@ -188,166 +188,135 @@
 
 
             function ShowData(data) {
-                // Create a new window
                 const newWindow = window.open('', '_blank', 'width=900,height=600');
-                // HTML structure for the new window
+
+                let totalBank = 0;
+                let totalCash = 0;
+
                 let payslipsHtml = `
                 <html>
-                    <head>
-                        <title>Salary Bank Statement</title>
-                        <style>
-                            body {
-                                font-family: Arial, sans-serif;
-                                padding: 20px;
-                            }
-                            .header {
-                                display: flex;
-                                align-items: center; 
-                                justify-content: space-between; 
-                                border-bottom: 1px solid #333;
-                                height: 90px;
-                                margin-bottom: 20px;
-                            }
+                <head>
+                    <title>Salary Transfer</title>
+                    <style>
+                        body { font-family: Arial; padding: 20px; }
+                        table { width: 100%; border-collapse: collapse; }
+                        th, td { border: 1px solid #000; padding: 5px; text-align: center; }
+                        th { background: #f2f2f2; }
+                        #controls { margin-bottom: 15px; }
+                    </style>
+                </head>
+                <body>
 
-                            .logo {
-                                flex-shrink: 0; 
-                            }
+                    <div id="controls">
+                        <button onclick="window.print()" id="printButton" 
+                            style="padding:6px 12px;background:#3498db;color:#fff;border:none;border-radius:4px;cursor:pointer;">
+                            Print
+                        </button>
 
-                            .logo img {
-                                max-width: auto;
-                                height: 100%;
-                            }
-                            .company-details {
-                                flex-grow: 1; 
-                                text-align: center; 
-                            }
+                        <button onclick="downloadExcel()" id="excelButton" 
+                            style="padding:6px 12px;background:#27ae60;color:#fff;border:none;border-radius:4px;cursor:pointer;">
+                            Excel Download
+                        </button>
+                    </div>
 
-                            .title {
-                                text-align: center;
-                                margin: 0px 0;
-                                font-size: 1.2rem;
-                            }
-                            table {
-                                width: 100%;
-                                border-collapse: collapse;
-                                margin-bottom: 20px;
-                            }
-                            th, td {
-                                border: 1px solid #000;
-                                padding: 8px;
-                                text-align: center;
-                            }
-                            th {
-                                background-color: #f2f2f2;
-                                font-weight: bold;
-                            }
-                            .bold {
-                                font-weight: bold;
-                            }
-                            .text-right {
-                                text-align: right;
-                            }
-                        </style>
-                    </head>
-                    <body>
-                        <div class="header">
-                                    <div class="logo">
-                                        <img src="{{ URL::to(config('constants.upload_path.logo') . config('config.logo')) }}" alt="Logo">
-                                    </div>
-                                    <div class="company-details">
-                                    <h1 class="title">${data.branch.name}</h1>
-                                    <h2 class="title">${data.branch.description}</h2>
-                                    <h3 class="title">Employee Salary Transfer at a Glance</h3>
-                                    <h4 class="title">For the Month of ${data.month} ${data.financialYear}</h4>
-                                    </div>
-                                </div>       
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>SL</th>
-                                    <th>Branch</th>
-                                    <th>ID</th>
-                                    <th>Name</th>
-                                    <th>Desig</th>
-                                    <th>Dept</th>
-                                    <th>Section</th>
-                                    <th>Gross</th>
-                                    <th>Total Payable</th>
-                                    <th>Total Deduction</th>
-                                    <th>Net Payable</th>
-                                    <th>Bank Transfer</th>
-                                    <th>Cash Payment</th>
-                                </tr>
-                            </thead>
-                            <tbody>`;
-                  let totalAmount = 0;
-                   // Loop through the payslips data and add rows             
-                  $.each(data.data, function(index, item) {
-                    var row = '<tr>';
-                    row += '<td>' + (index + 1) + '</td>'; // Adding index to display SL No
-                    row += '<td>' + item.branch_name + '</td>';
-                    row += '<td>' + item.employee_code + '</td>';
-                    row += '<td>' + item.first_name + '</td>';
-                    // row += '<td>' + (item.latest_bank_name || 'N/A') + '</td>';
-                    row += '<td>' + (item.designation_name || 'N/A') + '</td>';
-                    row += '<td>' + (item.department_name || 'N/A') + '</td>';
-                    // row += '<td>' + (item.salary_bank_effective_date ? item.salary_bank_effective_date : 'N/A') + '</td>';
-                    row += '<td>' + (item.section_name || 'N/A') + '</td>';
-                    row += '<td>' + (item.gross_salary || 'N/A') + '</td>';
-                    row += '<td>' + (item.net_salary || 'N/A') + '</td>';
-                    row += '<td>' + (
+                    <h2 style="text-align:center;margin-top:-10px;">Employee Salary Transfer at a Glance</h2>
+                    <h4 style="text-align:center;">For the Month of ${data.month} ${data.financialYear}</h4>
+
+                    <table id="salaryTable">
+                        <thead>
+                            <tr>
+                                <th>SL</th>
+                                <th>Branch</th>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Desig</th>
+                                <th>Dept</th>
+                                <th>Section</th>
+                                <th>Gross</th>
+                                <th>Total Payable</th>
+                                <th>Total Deduction</th>
+                                <th>Net Payable</th>
+                                <th>Bank Transfer</th>
+                                <th>Cash Payment</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+
+                $.each(data.data, function(index, item) {
+
+                    let totalDeduction =
                         (parseFloat(item.advance_salary) || 0) +
                         (parseFloat(item.provident_fund) || 0) +
-                        (parseFloat(item.tax_amount) || 0)
-                    ) + '</td>';
-                    row += '<td>' + (parseFloat(item.net_salary) + parseFloat(item.arrear_amount) - parseFloat(item.advance_salary) + parseFloat(item.provident_fund) + parseFloat(item.tax_amount) || 'N/A') + '</td>';
-                   // Calculate total salary before distribution
-                    let totalSalary = parseFloat(item.net_salary) + parseFloat(item.arrear_amount) - parseFloat(item.advance_salary) + parseFloat(item.provident_fund) + parseFloat(item.tax_amount);
+                        (parseFloat(item.tax_amount) || 0);
 
-                    // Ensure totalSalary is valid, otherwise set to 0
-                    totalSalary = isNaN(totalSalary) ? 0 : totalSalary;
+                    let netPayable =
+                        (parseFloat(item.net_salary) || 0) +
+                        (parseFloat(item.arrear_amount) || 0) -
+                        (parseFloat(item.advance_salary) || 0) +
+                        (parseFloat(item.provident_fund) || 0) +
+                        (parseFloat(item.tax_amount) || 0);
 
-                    // Define percentages for bank and cash distribution
-                    let bankPercentage = 70; // For example, 70% to bank
-                    let cashPercentage = 30; // Remaining 30% to cash
+                    // Running totals
+                    totalBank += parseFloat(item.salary_bank_amount) || 0;
+                    totalCash += parseFloat(item.salary_cash_amount) || 0;
 
-                    // Calculate distributed amounts
-                    let salaryBankAmount = item.salary_bank_amount;
-                    let salaryCashAmount = item.salary_cash_amount;
-
-                    // Display distributed amounts
-                    row += '<td>' + (salaryBankAmount.toFixed(2) || 'N/A') + '</td>';
-                    row += '<td>' + (salaryCashAmount.toFixed(2) || 'N/A') + '</td>';
-                    row += '</tr>';
-                    payslipsHtml += row; // Append row to the HTML string
-                    // if (item.salary_bank_amount) {
-                    //     totalAmount += parseFloat(item.salary_bank_amount);
-                    // }
+                    payslipsHtml += `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${item.branch_name}</td>
+                        <td>${item.employee_code}</td>
+                        <td>${item.first_name}</td>
+                        <td>${item.designation_name}</td>
+                        <td>${item.department_name}</td>
+                        <td>${item.section_name}</td>
+                        <td>${item.gross_salary}</td>
+                        <td>${item.net_salary}</td>
+                        <td>${totalDeduction.toFixed(2)}</td>
+                        <td>${netPayable.toFixed(2)}</td>
+                        <td>${item.salary_bank_amount.toFixed(2)}</td>
+                        <td>${item.salary_cash_amount.toFixed(2)}</td>
+                    </tr>`;
                 });
-                
-                 // Close the table and HTML tags
+
                 payslipsHtml += `
-                            </tbody>
-                        </table>
-                        <div class="display-flex">
-                            <div class="center-item">
-                                <button onclick="window.print()" class="btn btn-primary" id="printButton">Print</button>
-                            </div>
-                        </div>
-                        <style>
-                            @media print {
-                                #printButton {
-                                    display: none;
-                                }
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th colspan="11" style="text-align:right">Totals:</th>
+                                <th>${totalBank.toFixed(2)}</th>
+                                <th>${totalCash.toFixed(2)}</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+
+                    <script>
+                        function downloadExcel() {
+                            var table = document.getElementById("salaryTable").outerHTML;
+                            var dataType = "application/vnd.ms-excel";
+                            var fileName = "salary_transfer.xls";
+
+                            var link = document.createElement("a");
+                            link.href = "data:" + dataType + ", " + encodeURIComponent(table);
+                            link.download = fileName;
+                            link.click();
+                        }
+                    <\/script>
+
+                    <style>
+                        @media print {
+                            #printButton, #excelButton {
+                                display: none;
                             }
-                        </style>
-                    </body>
+                        }
+                    </style>
+                </body>
                 </html>`;
 
-                // Write the payslips content to the new window
                 newWindow.document.write(payslipsHtml);
                 newWindow.document.close();
             }
+
         });
     </script>
 @stop
