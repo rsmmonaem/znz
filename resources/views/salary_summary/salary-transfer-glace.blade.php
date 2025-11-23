@@ -148,175 +148,147 @@
 @stop
 
 @section('javascript')
-    <script>
-        $(document).ready(function() {
-            $('#branch').change(function() {
-                var branchId = $(this).val();
-                $('#employee').val('').trigger('change');
-                HandleBranchWiseEmployees(branchId, '#employee');
-            });
 
-            $('#GetReport').click(function() {
-                $('#GetReport').attr('disabled', 'disabled');
-                $('#GetReport').html('Please wait...');
-                const FormData = {
-                    branch: $('#branch').val(),
-                    department: $('#department').val(),
-                    section: $('#section').val(),
-                    designation: $('#designation').val(),
-                    employee: $('#employee').val(),
-                    reportType: $('#reportType').val(),
-                    financialYear: $('#financialYear').val(),
-                    month: $('#month').val(),
-                    category: $('#category').val()
-                };
+<script>
+$(document).ready(function() {
 
-                $.ajax({
-                    url: '/salary-transfer-glance',
-                    type: 'POST',
-                    data: FormData,
-                    success: function(response) {
-                        $('#GetReport').removeAttr('disabled');
-                        $('#GetReport').html('Report');
-                        ShowData(response);
-                    }
-                }).fail(function() {
-                    $('#GetReport').removeAttr('disabled');
-                    $('#GetReport').html('Report');
-                });
-            })
+    $('#branch').change(function() {
+        var branchId = $(this).val();
+        $('#employee').val('').trigger('change');
+        HandleBranchWiseEmployees(branchId, '#employee');
+    });
 
+    $('#GetReport').click(function() {
+        $('#GetReport').attr('disabled', 'disabled').html('Please wait...');
 
-            function ShowData(data) {
-                const newWindow = window.open('', '_blank', 'width=900,height=600');
+        var FormDataObj = {
+            branch: $('#branch').val(),
+            department: $('#department').val(),
+            section: $('#section').val(),
+            designation: $('#designation').val(),
+            employee: $('#employee').val(),
+            reportType: $('#reportType').val(),
+            financialYear: $('#financialYear').val(),
+            month: $('#month').val(),
+            category: $('#category').val(),
+            _token: $('input[name=_token]').val()
+        };
 
-                let totalBank = 0;
-                let totalCash = 0;
-
-                let payslipsHtml = `
-                <html>
-                <head>
-                    <title>Salary Transfer</title>
-                    <style>
-                        body { font-family: Arial; padding: 20px; }
-                        table { width: 100%; border-collapse: collapse; }
-                        th, td { border: 1px solid #000; padding: 5px; text-align: center; }
-                        th { background: #f2f2f2; }
-                        #controls { margin-bottom: 15px; }
-                    </style>
-                </head>
-                <body>
-
-                    <div id="controls">
-                        <button onclick="window.print()" id="printButton" 
-                            style="padding:6px 12px;background:#3498db;color:#fff;border:none;border-radius:4px;cursor:pointer;">
-                            Print
-                        </button>
-
-                        <button onclick="downloadExcel()" id="excelButton" 
-                            style="padding:6px 12px;background:#27ae60;color:#fff;border:none;border-radius:4px;cursor:pointer;">
-                            Excel Download
-                        </button>
-                    </div>
-
-                    <h2 style="text-align:center;margin-top:-10px;">Employee Salary Transfer at a Glance</h2>
-                    <h4 style="text-align:center;">For the Month of ${data.month} ${data.financialYear}</h4>
-
-                    <table id="salaryTable">
-                        <thead>
-                            <tr>
-                                <th>SL</th>
-                                <th>Branch</th>
-                                <th>ID</th>
-                                <th>Name</th>
-                                <th>Desig</th>
-                                <th>Dept</th>
-                                <th>Section</th>
-                                <th>Gross</th>
-                                <th>Total Payable</th>
-                                <th>Total Deduction</th>
-                                <th>Net Payable</th>
-                                <th>Bank Transfer</th>
-                                <th>Cash Payment</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                `;
-
-                $.each(data.data, function(index, item) {
-
-                    let totalDeduction =
-                        (parseFloat(item.advance_salary) || 0) +
-                        (parseFloat(item.provident_fund) || 0) +
-                        (parseFloat(item.tax_amount) || 0);
-
-                    let netPayable =
-                        (parseFloat(item.net_salary) || 0) +
-                        (parseFloat(item.arrear_amount) || 0) -
-                        (parseFloat(item.advance_salary) || 0) +
-                        (parseFloat(item.provident_fund) || 0) +
-                        (parseFloat(item.tax_amount) || 0);
-
-                    // Running totals
-                    totalBank += parseFloat(item.salary_bank_amount) || 0;
-                    totalCash += parseFloat(item.salary_cash_amount) || 0;
-
-                    payslipsHtml += `
-                    <tr>
-                        <td>${index + 1}</td>
-                        <td>${item.branch_name}</td>
-                        <td>${item.employee_code}</td>
-                        <td>${item.first_name}</td>
-                        <td>${item.designation_name}</td>
-                        <td>${item.department_name}</td>
-                        <td>${item.section_name}</td>
-                        <td>${item.gross_salary}</td>
-                        <td>${item.net_salary}</td>
-                        <td>${totalDeduction.toFixed(2)}</td>
-                        <td>${netPayable.toFixed(2)}</td>
-                        <td>${item.salary_bank_amount.toFixed(2)}</td>
-                        <td>${item.salary_cash_amount.toFixed(2)}</td>
-                    </tr>`;
-                });
-
-                payslipsHtml += `
-                        </tbody>
-                        <tfoot>
-                            <tr>
-                                <th colspan="11" style="text-align:right">Totals:</th>
-                                <th>${totalBank.toFixed(2)}</th>
-                                <th>${totalCash.toFixed(2)}</th>
-                            </tr>
-                        </tfoot>
-                    </table>
-
-                    <script>
-                        function downloadExcel() {
-                            var table = document.getElementById("salaryTable").outerHTML;
-                            var dataType = "application/vnd.ms-excel";
-                            var fileName = "salary_transfer.xls";
-
-                            var link = document.createElement("a");
-                            link.href = "data:" + dataType + ", " + encodeURIComponent(table);
-                            link.download = fileName;
-                            link.click();
-                        }
-                    <\/script>
-
-                    <style>
-                        @media print {
-                            #printButton, #excelButton {
-                                display: none;
-                            }
-                        }
-                    </style>
-                </body>
-                </html>`;
-
-                newWindow.document.write(payslipsHtml);
-                newWindow.document.close();
+        $.ajax({
+            url: '/salary-transfer-glance',
+            type: 'POST',
+            data: FormDataObj,
+            success: function(response) {
+                $('#GetReport').removeAttr('disabled').html('Report');
+                ShowData(response);
             }
-
+        }).fail(function() {
+            $('#GetReport').removeAttr('disabled').html('Report');
         });
-    </script>
+    });
+
+    function safeNumber(v) {
+        return (v === null || v === undefined || v === "" || isNaN(v)) ? 0 : parseFloat(v);
+    }
+
+    function ShowData(data) {
+        var newWindow = window.open('', '_blank', 'width=900,height=600');
+
+        var totalBank = 0;
+        var totalCash = 0;
+        var totalNet = 0;
+        var totalDeductionAll = 0;
+        var totalNetPayable = 0;
+
+        var html = '';
+        html += '<html><head><title>Salary Transfer</title>';
+        html += '<style>';
+        html += 'body{font-family:Arial;padding:20px;}';
+        html += 'table{width:100%;border-collapse:collapse;}';
+        html += 'th,td{border:1px solid #000;padding:5px;text-align:center;}';
+        html += 'th{background:#f2f2f2;}';
+        html += '</style>';
+        html += '<style>@media print{@page {size: landscape;}#printButton,#excelButton{display:none;}table,th,td{font-size:10px;padding:3px;}}</style>';
+        html += '</head><body>';
+
+        html += '<div id="controls">';
+        html += '<button onclick="window.print()" id="printButton" style="padding:6px 12px;background:#3498db;color:#fff;border:none;border-radius:4px;cursor:pointer;">Print</button> ';
+        html += '<button onclick="downloadExcel()" id="excelButton" style="padding:6px 12px;background:#27ae60;color:#fff;border:none;border-radius:4px;cursor:pointer;">Excel Download</button>';
+        html += '</div>';
+
+        html += '<h2 style="text-align:center;margin-top:-10px;">Employee Salary Transfer at a Glance</h2>';
+        html += '<h4 style="text-align:center;">For the Month of ' + data.month + ' ' + data.financialYear + '</h4>';
+
+        html += '<table id="salaryTable">';
+        html += '<thead><tr>';
+        html += '<th>SL</th><th>Branch</th><th>ID</th><th>Name</th><th>Desig</th><th>Dept</th><th>Section</th>';
+        html += '<th>Gross</th><th>Total Payable</th><th>Total Deduction</th><th>Net Payable</th><th>Bank Transfer</th><th>Cash Payment</th>';
+        html += '</tr></thead><tbody>';
+
+        $.each(data.data, function(i, item) {
+            var adv  = safeNumber(item.advance_salary);
+            var pf   = safeNumber(item.provident_fund);
+            var tax  = safeNumber(item.tax_amount);
+            var net  = safeNumber(item.net_salary);
+            var arr  = safeNumber(item.arrear_amount);
+
+            var totalDeduction = adv + pf + tax;
+            var netPayable = net + arr - totalDeduction;
+
+            var bank = safeNumber(item.bankamount);
+            var cash = safeNumber(item.cashamount);
+
+            totalBank += bank;
+            totalCash += cash;
+            totalNet += net;
+            totalDeductionAll += totalDeduction;
+            totalNetPayable += netPayable;
+
+            html += '<tr>';
+            html += '<td>' + (i + 1) + '</td>';
+            html += '<td>' + item.branch_name + '</td>';
+            html += '<td>' + item.employee_code + '</td>';
+            html += '<td>' + item.first_name + '</td>';
+            html += '<td>' + item.designation_name + '</td>';
+            html += '<td>' + item.department_name + '</td>';
+            html += '<td>' + item.section_name + '</td>';
+            html += '<td>' + safeNumber(item.gross_salary).toFixed(2) + '</td>';
+            html += '<td>' + net.toFixed(2) + '</td>';
+            html += '<td>' + totalDeduction.toFixed(2) + '</td>';
+            html += '<td>' + netPayable.toFixed(2) + '</td>';
+            html += '<td>' + bank.toFixed(2) + '</td>';
+            html += '<td>' + cash.toFixed(2) + '</td>';
+            html += '</tr>';
+        });
+
+        html += '</tbody><tfoot>';
+        html += '<tr><th colspan="8" style="text-align:right">Totals:</th>';
+        html += '<th>' + totalNet.toFixed(2) + '</th>';
+        html += '<th>' + totalDeductionAll.toFixed(2) + '</th>';
+        html += '<th>' + totalNetPayable.toFixed(2) + '</th>';
+        html += '<th>' + totalBank.toFixed(2) + '</th>';
+        html += '<th>' + totalCash.toFixed(2) + '</th></tr>';
+        html += '</tfoot></table>';
+
+        html += '<script>';
+        html += 'function downloadExcel(){';
+        html += 'var table=document.getElementById("salaryTable").outerHTML;';
+        html += 'var a=document.createElement("a");';
+        html += 'a.href="data:application/vnd.ms-excel,"+encodeURIComponent(table);';
+        html += 'a.download="salary_transfer.xls";';
+        html += 'a.click();';
+        html += '}';
+        html += '<\/script>';
+
+        html += '<style>@media print{#printButton,#excelButton{display:none;}}</style>';
+        html += '</body></html>';
+
+        newWindow.document.write(html);
+        newWindow.document.close();
+    }
+
+});
+</script>
+
+
 @stop
