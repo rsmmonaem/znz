@@ -1183,7 +1183,7 @@ class SalaryProcessController extends Controller
                 'employee_salary_details.arrear_amount',
                 'bank_accounts.account_number', // Only the latest bank account
                 'employee_salary_details.remarks',
-                DB::raw('DATEDIFF(employee_salary_details.to_date, employee_salary_details.form_date) + 1 as date_difference'), // Calculate date difference
+                DB::raw('DAY(LAST_DAY(employee_salary_details.form_date)) as date_difference'), // Calculate date difference
                 'employee_salary_details.total_absents_fee',
                 'employee_salary_details.created_at',
                 'employee_salary_details.ot_amount',
