@@ -25,32 +25,141 @@ class SalarySummary extends Controller
         return view('salary_summary.salary-summary', compact('group', 'branch', 'designation', 'department', 'section'));
     }
 
+    // public function salarySummaryPost(Request $request)
+    // {
+    //     $branchDetails = Branch::where('id', $request->branch)->first();
+
+    //     // Latest record per employee per month from employee_salary_details
+    //     $latestSalarySubquery = "(SELECT esd1.*
+    //         FROM employee_salary_details esd1
+    //         INNER JOIN (
+    //             SELECT employee_id, YEAR(to_date) as year, MONTH(to_date) as month, MAX(id) as last_id
+    //             FROM employee_salary_details
+    //             GROUP BY employee_id, YEAR(to_date), MONTH(to_date)
+    //         ) esd2
+    //         ON esd1.id = esd2.last_id
+    //     ) as latest_salary";
+
+    //     // Latest record per employee per month from employee_salary_payment_details
+    //     $latestPaymentSubquery = "(SELECT espd1.*
+    //         FROM employee_salary_payment_details espd1
+    //         INNER JOIN (
+    //             SELECT EmployeeID, YEAR(ToDate) as year, MONTH(ToDate) as month, MAX(id) as last_id
+    //             FROM employee_salary_payment_details
+    //             GROUP BY EmployeeID, YEAR(ToDate), MONTH(ToDate)
+    //         ) espd2
+    //         ON espd1.id = espd2.last_id
+    //     ) as latest_payment";
+
+    //     $data = Branch::leftJoin('profile', 'branchs.id', '=', 'profile.branch_id')
+    //         ->leftJoin('users', 'profile.user_id', '=', 'users.id')
+    //         ->leftJoin('sections', 'profile.section_id', '=', 'sections.id')
+    //         ->leftJoin('designations', 'users.designation_id', '=', 'designations.id')
+    //         ->leftJoin('departments', 'designations.department_id', '=', 'departments.id')
+    //         ->leftJoin('employee_separations', 'profile.user_id', '=', 'employee_separations.employee_id')
+    //         // Join latest salary
+    //         ->leftJoin(DB::raw($latestSalarySubquery), 'profile.user_id', '=', 'latest_salary.employee_id')
+    //         // Join latest payment for TotalPayable
+    //         ->leftJoin(DB::raw($latestPaymentSubquery), 'profile.user_id', '=', 'latest_payment.EmployeeID')
+    //         ->select(
+    //             'branchs.name as branch_name',
+    //             DB::raw('COUNT(DISTINCT profile.id) as active_manpower'),
+    //             DB::raw("COUNT(DISTINCT CASE 
+    //                 WHEN employee_separations.effective_date <= '" . Carbon::now() . "' 
+    //                 THEN employee_separations.id 
+    //             END) as separated_manpower"),
+    //             DB::raw('SUM(latest_salary.net_salary) as net_salary'),
+    //             DB::raw('SUM(latest_salary.advance_salary) as advance_salary'),
+    //             DB::raw('SUM(latest_salary.total_absents_fee) as attendance_deduction'),
+    //             DB::raw('SUM(latest_salary.tax_amount) as tax_amount'),
+    //             DB::raw('SUM(latest_salary.arrear_amount) as arrear_amount'),
+    //             DB::raw('SUM(CASE WHEN branchs.id = 7 THEN latest_salary.ot_amount ELSE 0 END) as ot_amount'),
+    //             DB::raw('SUM(latest_salary.provident_fund) as provident_fund'),
+    //             DB::raw('SUM(latest_payment.TotalPayable) as net_payable') // TotalPayable from latest_payment
+    //         )
+    //         ->when($request->branch, function ($query) use ($request) {
+    //             return $query->where('branchs.id', $request->branch);
+    //         })
+    //         ->when($request->department, function ($query) use ($request) {
+    //             return $query->where('designations.department_id', $request->department);
+    //         })
+    //         ->when($request->designation, function ($query) use ($request) {
+    //             return $query->where('users.designation_id', $request->designation);
+    //         })
+    //         ->when($request->section, function ($query) use ($request) {
+    //             return $query->where('profile.section_id', $request->section);
+    //         })
+    //         ->when($request->employee, function ($query) use ($request) {
+    //             return $query->where('profile.user_id', $request->employee);
+    //         })
+    //         ->when($request->financialYear, function ($query) use ($request) {
+    //             $year = $request->financialYear;
+    //             return $query->whereRaw('YEAR(latest_salary.to_date) = ?', [$year])
+    //                          ->whereRaw('YEAR(latest_payment.ToDate) = ?', [$year]);
+    //         })
+    //         ->when($request->month, function ($query) use ($request) {
+    //             $month = $request->month;
+    //             return $query->whereRaw('MONTH(latest_salary.to_date) = ?', [$month])
+    //                          ->whereRaw('MONTH(latest_payment.ToDate) = ?', [$month]);
+    //         })
+    //         ->groupBy('branchs.id', 'branchs.name')
+    //         ->get();
+
+
+
+    //     return response()->json([
+    //         'data' => $data,
+    //         'branch' => $branchDetails,
+    //     ]);
+    // }
+
     public function salarySummaryPost(Request $request)
     {
         $branchDetails = Branch::where('id', $request->branch)->first();
+
+        // Latest record per employee per month from employee_salary_details
+        $latestSalarySubquery = "(SELECT esd1.*
+            FROM employee_salary_details esd1
+            INNER JOIN (
+                SELECT employee_id, YEAR(to_date) as year, MONTH(to_date) as month, MAX(id) as last_id
+                FROM employee_salary_details
+                GROUP BY employee_id, YEAR(to_date), MONTH(to_date)
+            ) esd2
+            ON esd1.id = esd2.last_id
+        ) as latest_salary";
+
         $data = Branch::leftJoin('profile', 'branchs.id', '=', 'profile.branch_id')
             ->leftJoin('users', 'profile.user_id', '=', 'users.id')
             ->leftJoin('sections', 'profile.section_id', '=', 'sections.id')
             ->leftJoin('designations', 'users.designation_id', '=', 'designations.id')
-            ->LeftJoin('departments', 'designations.department_id', '=', 'departments.id')
+            ->leftJoin('departments', 'designations.department_id', '=', 'departments.id')
             ->leftJoin('employee_separations', 'profile.user_id', '=', 'employee_separations.employee_id')
-            ->leftJoin('employee_salary_details', 'profile.user_id', '=', 'employee_salary_details.employee_id')
+            // Join latest salary only
+            ->leftJoin(DB::raw($latestSalarySubquery), 'profile.user_id', '=', 'latest_salary.employee_id')
             ->select(
                 'branchs.name as branch_name',
                 DB::raw('COUNT(DISTINCT profile.id) as active_manpower'),
                 DB::raw("COUNT(DISTINCT CASE 
-                WHEN employee_separations.effective_date <= '" . Carbon::now() . "' 
-                THEN employee_separations.id 
+                    WHEN employee_separations.effective_date <= '" . Carbon::now() . "' 
+                    THEN employee_separations.id 
                 END) as separated_manpower"),
-                DB::raw('SUM(employee_salary_details.net_salary) as net_salary'),
-                DB::raw('SUM(employee_salary_details.advance_salary) as advance_salary'),
-                DB::raw('SUM(employee_salary_details.total_absents_fee) as attendance_deduction'),
-                DB::raw('SUM(employee_salary_details.tax_amount) as tax_amount'),
-                DB::raw('SUM(employee_salary_details.arrear_amount) as arrear_amount'),
-                DB::raw('SUM(CASE WHEN branchs.id = 7 THEN employee_salary_details.ot_amount ELSE 0 END) as ot_amount'),
-                DB::raw('SUM(employee_salary_details.tax_amount) as tax_amount'),
-                DB::raw('SUM(employee_salary_details.provident_fund) as provident_fund'),
-                DB::raw('SUM(net_salary + arrear_amount + ot_amount - tax_amount - provident_fund - advance_salary) as net_payable')
+                DB::raw('SUM(latest_salary.net_salary) as net_salary'),
+                DB::raw('SUM(latest_salary.advance_salary) as advance_salary'),
+                DB::raw('SUM(latest_salary.total_absents_fee) as attendance_deduction'),
+                DB::raw('SUM(latest_salary.tax_amount) as tax_amount'),
+                DB::raw('SUM(latest_salary.arrear_amount) as arrear_amount'),
+                DB::raw('SUM(CASE WHEN branchs.id = 7 THEN latest_salary.ot_amount ELSE 0 END) as ot_amount'),
+                DB::raw('SUM(latest_salary.provident_fund) as provident_fund'),
+                // net_payable calculated directly from latest_salary
+                DB::raw('(SUM(
+                    COALESCE(latest_salary.net_salary,0) +
+                    COALESCE(latest_salary.arrear_amount,0) +
+                    COALESCE(latest_salary.ot_amount,0) +
+                    COALESCE(latest_salary.holiday_amount,0) -
+                    COALESCE(latest_salary.advance_salary,0) -
+                    COALESCE(latest_salary.provident_fund,0) -
+                    COALESCE(latest_salary.tax_amount,0)
+                )) as net_payable')
             )
             ->when($request->branch, function ($query) use ($request) {
                 return $query->where('branchs.id', $request->branch);
@@ -68,22 +177,22 @@ class SalarySummary extends Controller
                 return $query->where('profile.user_id', $request->employee);
             })
             ->when($request->financialYear, function ($query) use ($request) {
-                // Parse the financialYear as a Carbon instance and get the year
                 $year = $request->financialYear;
-                return $query->whereRaw('YEAR(employee_salary_details.to_date) = ?', [$year]);
+                return $query->whereRaw('YEAR(latest_salary.to_date) = ?', [$year]);
             })
             ->when($request->month, function ($query) use ($request) {
-                // Parse the month and get the month number
                 $month = $request->month;
-                return $query->whereRaw('MONTH(employee_salary_details.to_date) = ?', [$month]);
+                return $query->whereRaw('MONTH(latest_salary.to_date) = ?', [$month]);
             })
             ->groupBy('branchs.id', 'branchs.name')
             ->get();
+
         return response()->json([
             'data' => $data,
             'branch' => $branchDetails,
         ]);
     }
+
 
 
     public function SalaryBankStatement(Request $request)
@@ -170,7 +279,8 @@ class SalarySummary extends Controller
         ]);
     }
 
-    public function SalaryTransferGlance(Request $request){
+    public function SalaryTransferGlance(Request $request)
+    {
         $group = DB::table('com_group')->get();
         $branch = Branch::all();
         $designation = Designation::all();
@@ -185,7 +295,7 @@ class SalarySummary extends Controller
     public function SalaryTransferGlancePost(Request $request)
     {
         $branchData = Branch::where('id', $request->branch)->first();
-    
+
         $data = DB::table('employee_salary_details as esd')
             ->leftJoin('users', 'esd.employee_id', '=', 'users.id')
             ->leftJoin('profile', 'users.id', '=', 'profile.user_id')
@@ -200,7 +310,9 @@ class SalarySummary extends Controller
                             AND status = 0 
                             AND id IN (SELECT MAX(id) FROM salary_bank GROUP BY user_id)
                          ) as latest_salary_bank'),
-                'profile.user_id', '=', 'latest_salary_bank.user_id'
+                'profile.user_id',
+                '=',
+                'latest_salary_bank.user_id'
             )
             ->select(
                 'esd.id as esd_id',
@@ -222,10 +334,10 @@ class SalarySummary extends Controller
                 'esd.cashamount'
             )
             // ---------------- Latest salary per employee ---------------- //
-            ->whereIn('esd.id', function($query){
+            ->whereIn('esd.id', function ($query) {
                 $query->select(DB::raw('MAX(id)'))
-                      ->from('employee_salary_details')
-                      ->groupBy('employee_id');
+                    ->from('employee_salary_details')
+                    ->groupBy('employee_id');
             })
             // ---------------- Filters ---------------- //
             ->when($request->branch, function ($q) use ($request) {
@@ -254,7 +366,7 @@ class SalarySummary extends Controller
             })
             ->orderBy('esd_id', 'DESC')
             ->get();
-    
+
         return response()->json([
             'data'          => $data,
             'branch'        => $branchData,
@@ -262,8 +374,4 @@ class SalarySummary extends Controller
             'month'         => Carbon::create()->month($request->month)->format('F'),
         ]);
     }
-
-
-
-
 }

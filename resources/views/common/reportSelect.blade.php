@@ -16,7 +16,7 @@
 
 
     <option value="{{ url('salary-slip') }}" {{ Request::is('salary-slip') ? 'selected' : '' }}>Salary Slip Panel</option>
-    <option value="{{ url('slary-shit-report') }}" {{ Request::is('slary-shit-report') ? 'selected' : '' }}>Salary Report</option>
+    <option value="{{ url('slary-shit-report') }}" {{ Request::is('slary-shit-report') ? 'selected' : '' }}>Salary Sheet Report</option>
     <option value="{{ url('letter-noc') }}" {{ Request::is('letter-noc') ? 'selected' : '' }}>NOC Letter</option>
     <option value="{{ url('letter-jec') }}" {{ Request::is('letter-jec') ? 'selected' : '' }} >JEC Letter</option>
     <option value="{{ url('letter-increment') }}" {{ Request::is('letter-increment') ? 'selected' : '' }}>Increment Letter</option>
