@@ -240,7 +240,7 @@ class SalarySummary extends Controller
                 $year = $request->financialYear;
                 return $query->whereRaw('YEAR(employee_salary_details.to_date) = ?', [$year]);
             })
-        ->orderBy('employee_salary_details.id', 'ASC')
+        ->orderBy('employee_salary_details.id', 'DESC')
         ->get();
         return response()->json([
             'data' => $data,
