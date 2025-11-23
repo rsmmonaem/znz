@@ -31,6 +31,22 @@ class SalaryProcessController extends Controller
         return view('salary-process.index', compact('group', 'branch', 'department', 'section', 'employee', 'designation'));
     }
 
+    public function payslipView($id)
+    {
+        $data = EmployeeSalaryDetails::with('employee')->findOrFail($id);
+        return view('salary.payslip', compact('data'));
+    }
+
+    public function payslipPdf($id)
+    {
+        $data = EmployeeSalaryDetails::with('employee')->findOrFail($id);
+
+        $pdf = \PDF::loadView('salary.payslip-pdf', compact('data'));
+        $pdf->setPaper('A4', 'portrait');
+
+        return $pdf->download('payslip-' . $data->employee->name . '.pdf');
+    }
+
     public function SalaryProcessView(Request $request)
     {
         DB::beginTransaction();

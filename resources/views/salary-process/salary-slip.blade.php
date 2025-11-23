@@ -486,9 +486,16 @@
                                 .text-center {
                                     text-align: center;
                                 }
+                                
+                                @media print { body { margin: 0; } .payslip { page-break-after: always; } #controls {display:none !important;} } 
+                                #controls{ padding:10px; text-align:center; border-bottom:1px solid #ddd; margin-bottom:20px; } 
+                                button { padding:8px 12px; margin:0 5px; font-size:14px; cursor:pointer; }
                             </style>
                         </head>
                         <body>
+                        <div id="controls"> 
+                    <button id="print-btn">🖨️ Print</button>
+                </div>
                 `;
             
                 // Loop through employee salary data to generate payslips content
@@ -691,7 +698,20 @@
                 payslipsHtml += '</body></html>';
 
                 // Write the payslips content to the new window
+                // Write the payslips content to the new window
                 newWindow.document.write(payslipsHtml);
+                
+                // Close the document so it renders
+                newWindow.document.close();
+                newWindow.onload = function() {
+                    const printBtn = newWindow.document.getElementById('print-btn');
+                    if (printBtn) {
+                        printBtn.addEventListener('click', function() {
+                            newWindow.focus();   // make sure the new window is active
+                            newWindow.print();   // trigger print
+                        });
+                    }
+                };
 
                 // Optionally, you can print the payslip in the new window after loading
                 // newWindow.document.close();
