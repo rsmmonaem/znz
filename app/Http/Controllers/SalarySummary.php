@@ -252,7 +252,7 @@ class SalarySummary extends Controller
             ->when($request->category, function ($q) use ($request) {
                 return $q->where('category.name', $request->category);
             })
-            ->orderBy('esd_id', 'DESC')
+            ->orderBy('profile.employee_code', 'DESC')
             ->get();
     
         return response()->json([
