@@ -79,28 +79,28 @@ class whdController extends Controller{
 
     public function store(Request $request)
     {
-        // Laravel 5.2 Validation
-        $validator = Validator::make($request->all(), [
-            'branch_id' => 'required',
-            'fromdate' => 'required|date',
-            'todate' => 'required|date',
-            'days' => 'required|array|min:1',
-        ]);
+        // // Laravel 5.2 Validation
+        // $validator = Validator::make($request->all(), [
+        //     'branch_id' => 'required',
+        //     'fromdate' => 'required|date',
+        //     'todate' => 'required|date',
+        //     'days' => 'required|array|min:1',
+        // ]);
 
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'errors' => $validator->errors()
-            ], 422);
-        }
+        // if ($validator->fails()) {
+        //     return response()->json([
+        //         'success' => false,
+        //         'errors' => $validator->errors()
+        //     ], 422);
+        // }
 
-        // Manual check for after_or_equal
-        if (strtotime($request->todate) < strtotime($request->fromdate)) {
-            return response()->json([
-                'success' => false,
-                'errors' => ['todate' => ['To Date must be after or equal From Date.']]
-            ], 422);
-        }
+        // // Manual check for after_or_equal
+        // if (strtotime($request->todate) < strtotime($request->fromdate)) {
+        //     return response()->json([
+        //         'success' => false,
+        //         'errors' => ['todate' => ['To Date must be after or equal From Date.']]
+        //     ], 422);
+        // }
 
         // convert days into lowercase for easier match
         $selectedDays = array_map('strtolower', $request->days);
