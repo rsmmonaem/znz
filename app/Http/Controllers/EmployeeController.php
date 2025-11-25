@@ -655,6 +655,7 @@ class EmployeeController extends Controller{
             ->leftJoin('branchs', 'profile.branch_id', '=', 'branchs.id')
             ->leftJoin('sections', 'profile.section_id', '=', 'sections.id')
             ->leftJoin('grades', 'profile.grade_id', '=', 'grades.id')
+            ->where('users.status', 'active')
             ->select(
                 'users.id',
                 'profile.employee_code',
