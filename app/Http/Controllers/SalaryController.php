@@ -528,122 +528,146 @@ Class SalaryController extends Controller{
         return response()->json($employee);
     }
 
-    // Get Salary Report 
-    public function SalaryReportPOST(Request $request) {
-        // Step 1: Get filtered user IDs
+
+    public function SalaryReportPOST(Request $request)
+    {
         $userIds = User::leftJoin('profile', 'users.id', '=', 'profile.user_id')
             ->leftJoin('designations', 'users.designation_id', '=', 'designations.id')
             ->leftJoin('departments', 'designations.department_id', '=', 'departments.id')
             ->leftJoin('sections', 'profile.section_id', '=', 'sections.id')
             ->leftJoin('grades', 'profile.grade_id', '=', 'grades.id')
             ->where('users.status', 'active')
-            ->when(!empty($request->employeeId), function ($query) use ($request) {
-                return $query->where('users.id', $request->employeeId);
+            ->when($request->employeeId, function($q) use ($request) {
+                return $q->where('users.id', $request->employeeId);
             })
-            ->when(!empty($request->branch), function ($query) use ($request) {
-                return $query->where('profile.branch_id', $request->branch);
+            ->when($request->branch, function($q) use ($request) {
+                return $q->where('profile.branch_id', $request->branch);
             })
-            ->when(!empty($request->section), function ($query) use ($request) {
-                return $query->where('profile.section_id', $request->section);
+            ->when($request->section, function($q) use ($request) {
+                return $q->where('profile.section_id', $request->section);
             })
-            ->when(!empty($request->department), function ($query) use ($request) {
-                return $query->where('departments.id', $request->department);
+            ->when($request->department, function($q) use ($request) {
+                return $q->where('departments.id', $request->department);
             })
-            ->when(!empty($request->designation), function ($query) use ($request) {
-                return $query->where('designations.id', $request->designation);
+            ->when($request->designation, function($q) use ($request) {
+                return $q->where('designations.id', $request->designation);
             })
-            ->when(!empty($request->category), function ($query) use ($request) {
-                return $query->where('profile.category', $request->category);
+            ->when($request->category, function($q) use ($request) {
+                return $q->where('profile.category', $request->category);
             })
             ->select(
                 'users.id',
                 'profile.employee_code',
                 'users.first_name',
                 'profile.category',
-                'sections.name as section',
                 'profile.date_of_joining',
+                'sections.name as section',
                 'grades.name as grade',
                 'departments.name as departments',
                 'designations.name as designation'
             )
-            ->orderByRaw('CAST(profile.employee_code AS UNSIGNED) ASC')
-            ->get('users.id');
-
-        // Fetch earning salary types only once
-        $earning_salary_types = \App\SalaryType::where('salary_type', '=', 'earning')->get();
-
-        $data = []; // Initialize an array for storing all users' data
-
+            ->orderByRaw('CAST(profile.employee_code AS UNSIGNED)')
+            ->get();
+    
+        $earning_salary_types = \App\SalaryType::where('salary_type', 'earning')->get();
+        $data = [];
+    
         foreach ($userIds as $user) {
-            // Get the latest contract for the current user
-            $latest_contract = \App\Contract::whereUserId($user->id)
-            ->latest('id') // Ensure it fetches the latest contract by ID
+            // default values
+            $gross = 0;
+            $bank_amount = 0;
+            $cash_amount = 0;
+            $remarks = null;
+            $account_number = null;
+            $entry_date = null;
+            $effective_date = null;
+            $salary_group = [];
+    
+            // last contract
+            $latest_contract = \App\Contract::where('user_id', $user->id)
+                ->orderBy('id', 'DESC')
                 ->first();
-
-            // Check if a contract exists before proceeding
+    
             if ($latest_contract) {
-                // Fetch the salaries associated with the latest contract
-                $contract_salaries = \App\Salary::where('contract_id', $latest_contract->id)
-                ->latest('id')
-                ->get();
-
-                // Get the latest salary slab
-                $slab_data = DB::table('salary_slab')
+                $contract_salaries = \App\Salary::where('contract_id', $latest_contract->id)->get();
+    
+                $slab = DB::table('salary_slab')
                     ->where('user_id', $user->id)
-                    ->latest('id')
+                    ->orderBy('id', 'DESC')
                     ->first();
-
-                // Get the latest salary bank data
+    
+                if ($slab) {
+                    $gross = isset($slab->gross) ? $slab->gross : 0;
+                    $entry_date = isset($slab->entrydate) ? date('Y-m-d', strtotime($slab->entrydate)) : null;
+                    $effective_date = isset($slab->effactive_date) ? date('Y-m-d', strtotime($slab->effactive_date)) : null;
+                }
+    
                 $salary_bank = DB::table('salary_bank')
                     ->where('user_id', $user->id)
-                    ->latest('id')
+                    ->orderBy('id', 'DESC')
                     ->first();
-
-                // Get the latest bank account details
-                $bank_accounts = DB::table('bank_accounts')
-                ->where('user_id', $user->id)
-                ->latest('id')
-                ->first();
-                
-                $contractData = [
-                    'user_info' => [
-                        'first_name' => $user->first_name,
-                        'departments' => $user->departments,
-                        'designation' => $user->designation,
-                        'section' => $user->section,
-                        'date_of_joining'=> $user->date_of_joining,
-                        'grades'=> $user->grade,
-                        'account_number' => $bank_accounts ? $bank_accounts->account_number : null,
-                        'employee_code' => $user->profile->employee_code,
-                        'entry_date' => isset($slab_data->entrydate) ? date('Y-m-d', strtotime($slab_data->entrydate)) : null,
-                        'effective_date' => isset($slab_data->effactive_date) ? date('Y-m-d', strtotime($slab_data->effactive_date)) : null,
-                        'gross' => isset($slab_data->gross) ? $slab_data->gross : null,
-                        'bank_amount' => $salary_bank ? $salary_bank->bank_amount : null,
-                        'cash_amount' => $salary_bank ? $salary_bank->cash_amount : null,
-                        'remarks' => $salary_bank ? $salary_bank->remarks : null,
-                    ],
-                    'salaries' => [],
-                ];
-                // Assuming $earning_salary_types is already defined elsewhere in your code
-                foreach ($earning_salary_types as $earning_salary_type) {
-                    // Filter the salary group to get the correct salary type
-                    $salary = $contract_salaries->filter(function ($salary) use ($earning_salary_type) {
-                        return $salary->salary_type_id == $earning_salary_type->id;
-                    })->first();
-
-                    // Default amount to 0 if no matching salary is found
-                    $amount = $salary ? floor($salary->amount) : 0;
-
-                    $contractData['salaries'][] = [
-                            'salary_type' => $earning_salary_type->head,
-                            'amount' => $amount,
-                        ];
+    
+                if ($salary_bank) {
+                    $bank_amount = isset($salary_bank->bank_amount) ? $salary_bank->bank_amount : 0;
+                    $cash_amount = isset($salary_bank->cash_amount) ? $salary_bank->cash_amount : 0;
+                    $remarks = isset($salary_bank->remarks) ? $salary_bank->remarks : null;
                 }
-                $data[] = $contractData; // Add contract data to the main data array
+    
+                $acc = DB::table('bank_accounts')
+                    ->where('user_id', $user->id)
+                    ->orderBy('id', 'DESC')
+                    ->first();
+    
+                if ($acc) {
+                    $account_number = isset($acc->account_number) ? $acc->account_number : null;
+                }
+    
+                foreach ($earning_salary_types as $type) {
+                    $row = $contract_salaries->first(function($s) use ($type) {
+                        return isset($s->salary_type_id) && $s->salary_type_id == $type->id;
+                    });
+    
+                    $amount = ($row && isset($row->amount)) ? floatval($row->amount) : 0;
+    
+                    $salary_group[] = [
+                        'salary_type' => isset($type->head) ? $type->head : 'Unknown',
+                        'amount' => floor($amount)
+                    ];
+                }
+            } else {
+                // no contract → all 0
+                foreach ($earning_salary_types as $type) {
+                    $salary_group[] = [
+                        'salary_type' => isset($type->head) ? $type->head : 'Unknown',
+                        'amount' => 0
+                    ];
+                }
             }
+    
+            $data[] = [
+                'user_info' => [
+                    'first_name' => isset($user->first_name) ? $user->first_name : '',
+                    'employee_code' => isset($user->employee_code) ? $user->employee_code : '',
+                    'departments' => isset($user->departments) ? $user->departments : '',
+                    'designation' => isset($user->designation) ? $user->designation : '',
+                    'section' => isset($user->section) ? $user->section : '',
+                    'date_of_joining' => isset($user->date_of_joining) ? $user->date_of_joining : null,
+                    'grade' => isset($user->grade) ? $user->grade : '',
+                    'gross' => $gross,
+                    'account_number' => $account_number,
+                    'bank_amount' => $bank_amount,
+                    'cash_amount' => $cash_amount,
+                    'entry_date' => $entry_date,
+                    'effective_date' => $effective_date,
+                    'remarks' => $remarks
+                ],
+                'salaries' => $salary_group
+            ];
         }
+    
         return response()->json($data);
     }
+
 
     public function SalaryCertificate(Request $request)
     {
