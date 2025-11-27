@@ -82,11 +82,11 @@
                 </div>
                 <div class="form-group">
                  <label>In Time</label>
-                 <input class="timepicker form-control" id="clock_in" type="text">
+                 <input class="form-control" id="clock_in" type="text">
                 </div>
                 <div class="form-group">
                  <label>Out Time</label>
-                 <input class="timepicker form-control" id="clock_out" type="text">
+                 <input class="form-control" id="clock_out" type="text">
                 </div>
                 <div class="form-group">
                     <button type="button" class="btn btn-primary" id="save-attendance">{!! trans('messages.submit') !!}</button>
