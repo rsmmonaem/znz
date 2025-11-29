@@ -73,7 +73,7 @@
                             </div>
                             <div class="form-group">
                                 <label for="employeeId">Employee ID <span class="text-danger">*</span></label>
-                                <select id="employeeId" class="form-control select2me">
+                                <select id="employeeId" class="form-control select2me" disabled>
                                     <option value="{{ $user->employee_code }}" selected>{{ $user->employee_code }} - {{ $user->first_name }}</option>
                                 </select>
                                 <input type="hidden" id="userId" value="{{ $user->id }}">
@@ -243,14 +243,7 @@ $(document).ready(function() {
         e.preventDefault();
         $('#updateData').attr('disabled', true).text('Updating...');
 
-        if (!$('#branch').val()) {
-            $('#updateData').attr('disabled', false).text('Update');
-            return toastr.error('Please select a branch.');
-        }
-        if (!$('#employeeId').val()) {
-            $('#updateData').attr('disabled', false).text('Update');
-            return toastr.error('Please select an employee.');
-        }
+
         if (!$('#effectiveDate').val()) {
             $('#updateData').attr('disabled', false).text('Update');
             return toastr.error('Please select an effective date.');
