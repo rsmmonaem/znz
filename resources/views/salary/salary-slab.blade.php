@@ -323,6 +323,9 @@ function getData(id = null) {
                 });
 
                 row += `<td>
+                    <a href="/salary-slab-edit/${item.user_info.slab_id}" class="btn btn-sm btn-primary edit-salary-slab" data-id="${item.user_info.slab_id}">
+                        <i class="fa fa-edit"></i> Edit
+                    </a>
                     <button type="button" class="btn btn-sm btn-danger delete-salary-slab" data-id="${item.user_info.slab_id}">
                         <i class="fa fa-trash"></i> Delete
                     </button>

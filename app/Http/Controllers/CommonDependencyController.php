@@ -20,4 +20,15 @@ class CommonDependencyController extends Controller{
         return $this->Helpers->GetBranchSeparatedEmployees($request->branch_id);
     }
 
+    public function getUserByEmployeeCode(Request $request)
+    {
+        $employee_code = $request->employee_code;
+        $user = \App\User::leftJoin('profile', 'users.id', '=', 'profile.user_id')
+            ->where('profile.employee_code', $employee_code)
+            ->select('users.id', 'users.first_name', 'profile.employee_code')
+            ->first();
+        
+        return response()->json($user);
+    }
+
 }

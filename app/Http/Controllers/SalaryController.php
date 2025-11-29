@@ -357,6 +357,154 @@ Class SalaryController extends Controller{
                 'error' => $e->getMessage(),
             ], 500);
         }
+    }
+
+    public function salarySlabEdit($id)
+    {
+        $slab = DB::table('salary_slab')->where('id', $id)->first();
+        
+        if (!$slab) {
+            return redirect('/salary-slab')->withErrors('Salary slab not found.');
+        }
+
+        $user = User::leftJoin('profile', 'users.id', '=', 'profile.user_id')
+            ->leftJoin('designations', 'users.designation_id', '=', 'designations.id')
+            ->leftJoin('branchs', 'profile.branch_id', '=', 'branchs.id')
+            ->select(
+                'users.id',
+                'users.first_name',
+                'profile.employee_code',
+                'profile.date_of_joining',
+                'profile.branch_id',
+                'designations.name as designation',
+                'profile.category',
+                'branchs.name as branch_name'
+            )
+            ->where('users.id', $slab->user_id)
+            ->first();
+
+        if (!$user) {
+            return redirect('/salary-slab')->withErrors('Employee not found.');
+        }
+
+        // Get latest contract salaries for the employee
+        $latest_contract = Contract::where('user_id', $user->id)->latest('id')->first();
+        $salaries = [];
+        
+        if ($latest_contract) {
+            $contract_salaries = Salary::where('contract_id', $latest_contract->id)->get();
+            $earning_salary_types = SalaryType::where('salary_type', '=', 'earning')->get();
+            
+            foreach ($earning_salary_types as $type) {
+                $salary = $contract_salaries->where('salary_type_id', $type->id)->first();
+                $salaries[$type->head] = $salary ? floor($salary->amount) : 0;
+            }
+        }
+
+        $group = DB::table('com_group')->get();
+        $branch = Branch::all();
+
+        return view('salary.edit-salary-slab', compact('slab', 'user', 'salaries', 'group', 'branch'));
+    }
+
+    public function salarySlabUpdate(Request $request)
+    {
+        DB::beginTransaction();
+        try {
+            $slab_id = $request->slab_id;
+            $slab = DB::table('salary_slab')->where('id', $slab_id)->first();
+
+            if (!$slab) {
+                return response()->json(['message' => 'Salary slab not found.', 'status' => 'error'], 404);
+            }
+
+            // Get employee_id from employee_code if provided, otherwise use existing
+            $employee_id = $slab->user_id;
+            if ($request->employeeId) {
+                $employee_id = $request->employeeId;
+            } elseif ($request->employeeCode) {
+                $profile = DB::table('profile')->where('employee_code', $request->employeeCode)->first();
+                if ($profile) {
+                    $employee_id = $profile->user_id;
+                }
+            }
+
+            $gross = $request->gross;
+
+            // Get percentage values (same as create)
+            $basic = 50;
+            $house_rent = 28;
+            $medical = 9;
+            $conveyance = 8;
+            $others = 5;
+
+            // Calculate amounts (matching CreateSlab method - note: medical and conveyance are swapped in calculation)
+            $totalBasic = $gross * $basic / 100;
+            $totalHouseRent = $gross * $house_rent / 100;
+            $totalMedical = $gross * $conveyance / 100;
+            $totalConveyance = $gross * $medical / 100;
+            $totalOthers = $gross * $others / 100;
+
+            // Get latest contract
+            $contact = Contract::where('user_id', $employee_id)->latest()->first();
+
+            if (!$contact) {
+                return response()->json(['message' => 'Contract not found for this employee.', 'status' => 'error'], 404);
+            }
+
+            // Update salary amounts
+            $salary_type_ids = ['1', '2', '12', '8', '13'];
+            $salaryAmount = [
+                'basic' => $totalBasic,
+                'house_rent' => $totalHouseRent,
+                'medical' => $totalMedical,
+                'conveyance' => $totalConveyance,
+                'others' => $totalOthers
+            ];
+
+            $salary_mapping = array_combine($salary_type_ids, array_values($salaryAmount));
+
+            // Update salary records
+            foreach ($salary_type_ids as $type_id) {
+                $amount = isset($salary_mapping[$type_id]) ? $salary_mapping[$type_id] : 0;
+                $salary = Salary::where('contract_id', $contact->id)
+                    ->where('salary_type_id', $type_id)
+                    ->first();
+                
+                if ($salary) {
+                    $salary->amount = $amount ?: 0;
+                    $salary->save();
+                } else {
+                    $salary = new Salary();
+                    $salary->contract_id = $contact->id;
+                    $salary->salary_type_id = $type_id;
+                    $salary->amount = $amount ?: 0;
+                    $salary->user_id = $employee_id;
+                    $salary->save();
+                }
+            }
+
+            // Update salary slab
+            $updateData = [
+                'gross' => $gross,
+                'effactive_date' => $request->effectiveDate,
+            ];
+            
+            // Update user_id if employee changed
+            if ($employee_id != $slab->user_id) {
+                $updateData['user_id'] = $employee_id;
+            }
+            
+            DB::table('salary_slab')->where('id', $slab_id)->update($updateData);
+
+            $this->logActivity(['module' => 'salary', 'activity' => 'activity_updated', 'secondary_id' => $employee_id]);
+            DB::commit();
+            
+            return response()->json(['message' => 'Salary slab updated successfully.', 'status' => 'success', 'data' => $employee_id]);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json(['message' => $e->getMessage(), 'status' => 'error'], 500);
+        }
     } 
 
     // public function getSalaryData(){

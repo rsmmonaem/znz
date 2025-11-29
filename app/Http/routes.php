@@ -35,6 +35,7 @@ Route::post('/job-application', array('as' => 'job-application.store','uses' => 
 // Common Dependency Routes 
 Route::post('branch-employees', 'CommonDependencyController@branchEmployees');
 Route::post('branch-separated-employees', 'CommonDependencyController@branchSeparatedEmployees');
+Route::post('get-user-by-employee-code', 'CommonDependencyController@getUserByEmployeeCode');
 
 // End Common Dependency Routes
 Route::post('/clock/in', array('as' => 'clock.in', 'uses' => 'ClockController@in'));
@@ -488,6 +489,8 @@ Route::group(['middleware' => ['auth','license','account_valid']], function () {
 	Route::get('/salary-slab', 'SalaryController@salary');
 	Route::post('/salary-slab-create', 'SalaryController@CreateSlab');
 	Route::get('/slary-slab-list', 'SalaryController@SalarySlabList');
+	Route::get('/salary-slab-edit/{id}', 'SalaryController@salarySlabEdit');
+	Route::post('/salary-slab-update', 'SalaryController@salarySlabUpdate');
 	Route::delete('/salary-slab-delete/{id}', 'SalaryController@salaryslabdestroy')->name('salary.slab.delete');
 
 	Route::get('salary-advance', 'SalaryAdvanceController@index');
