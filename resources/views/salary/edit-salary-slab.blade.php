@@ -64,7 +64,7 @@
                         <form id="salaryForm">
                             <div class="form-group">
                                 <label for="branch">Branch <span class="text-danger">*</span></label>
-                                <select id="branch" class="form-control">
+                                <select id="branch" class="form-control" disabled>
                                     <option value="">Select</option>
                                     @foreach ($branch as $b)
                                         <option value="{{ $b->id }}" {{ $user->branch_id == $b->id ? 'selected' : '' }}>{{ $b->name }}</option>
