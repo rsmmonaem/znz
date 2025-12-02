@@ -669,6 +669,8 @@ class EmployeeController extends Controller{
                 'profile.job_nature',
                 'profile.contact_number',
                 'profile.gender',
+                'profile.nid',
+                'profile.birth',
                 'branchs.name as branch_name',
                 'sections.name as section_name',
                 'grades.name as grade_name'

@@ -272,6 +272,8 @@ response.forEach((item, index) => {
             <td>${item.gender || ''}</td>
             <td>${item.grade_name || ''}</td>
             <td>${item.job_nature || ''}</td>
+            <td>${item.nid || ''}</td>
+            <td>${item.birth || ''}</td>
         </tr>
     `;
 });
@@ -355,6 +357,8 @@ response.forEach((item, index) => {
                                     <th>Gender</th>
                                     <th>Grade</th>
                                     <th>Job Nature</th>
+                                    <th>NID</th>
+                                    <th>Birth Certificate</th>
                                 </tr>
                             </thead>
                             <tbody>
