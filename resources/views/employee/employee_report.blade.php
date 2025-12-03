@@ -277,7 +277,7 @@
                         <td>${item.pres_house || ''}</td>
                         <td>${item.pres_district || ''}</td>
                         <td>${item.pres_post || ''}</td>
-                        <td>${item.thana || ''}</td>
+                        <td>${item.pres_thana || ''}</td>
                     </tr>
                 `;
             });

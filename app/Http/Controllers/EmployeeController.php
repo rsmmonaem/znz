@@ -674,7 +674,7 @@ class EmployeeController extends Controller{
                 'profile.pres_house',
                 'profile.pres_district',
                 'profile.pres_post',
-                'profile.thana',
+                'profile.pres_thana',
                 'branchs.name as branch_name',
                 'sections.name as section_name',
                 'grades.name as grade_name'
