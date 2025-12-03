@@ -274,6 +274,10 @@
                         <td>${item.job_nature || ''}</td>
                         <td>${item.nid || ''}</td>
                         <td>${item.birth || ''}</td>
+                        <td>${item.pres_house || ''}</td>
+                        <td>${item.pres_district || ''}</td>
+                        <td>${item.pres_post || ''}</td>
+                        <td>${item.thana || ''}</td>
                     </tr>
                 `;
             });
@@ -368,6 +372,10 @@
                                     <th>Job Nature</th>
                                     <th>NID</th>
                                     <th>Birth Certificate</th>
+                                    <th>House</th>
+                                    <th>District</th>
+                                    <th>Post</th>
+                                    <th>Thana</th>
                                 </tr>
                             </thead>
                             <tbody>
