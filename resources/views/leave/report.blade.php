@@ -277,6 +277,7 @@ $('#getData').on('click', function(e) {
         success: function(response) {
             // Open a new window
             var newWindow = window.open('', '_blank', 'width=1200,height=800');
+            console.log(response);
 
             // Build the content for the new window
             var content = `
