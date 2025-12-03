@@ -253,30 +253,30 @@
 
             // Generate report table rows dynamically
             let tableRows = '';
-response.sort((a, b) => a.employee_code.localeCompare(b.employee_code, undefined, { numeric: true }));
+            response.sort((a, b) => a.employee_code.localeCompare(b.employee_code, undefined, { numeric: true }));
 
-response.forEach((item, index) => {
-    tableRows += `
-        <tr>
-            <td>${index + 1}</td>
-            <td>${item.employee_code}</td>
-            <td>${item.first_name || ''}</td>
-            <td>${item.designation_name || ''}</td>
-            <td>${item.department_name || ''}</td>
-            <td>${item.section_name || ''}</td>
-            <td>${item.date_of_joining || ''}</td>
-            <td>${item.date_of_birth || ''}</td>
-            <td>${item.blood_group || ''}</td>
-            <td>${item.category || ''}</td>
-            <td>${item.contact_number || ''}</td>
-            <td>${item.gender || ''}</td>
-            <td>${item.grade_name || ''}</td>
-            <td>${item.job_nature || ''}</td>
-            <td>${item.nid || ''}</td>
-            <td>${item.birth || ''}</td>
-        </tr>
-    `;
-});
+            response.forEach((item, index) => {
+                tableRows += `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${item.employee_code}</td>
+                        <td>${item.first_name || ''}</td>
+                        <td>${item.designation_name || ''}</td>
+                        <td>${item.department_name || ''}</td>
+                        <td>${item.section_name || ''}</td>
+                        <td>${item.date_of_joining || ''}</td>
+                        <td>${item.date_of_birth || ''}</td>
+                        <td>${item.blood_group || ''}</td>
+                        <td>${item.category || ''}</td>
+                        <td>${item.contact_number || ''}</td>
+                        <td>${item.gender || ''}</td>
+                        <td>${item.grade_name || ''}</td>
+                        <td>${item.job_nature || ''}</td>
+                        <td>${item.nid || ''}</td>
+                        <td>${item.birth || ''}</td>
+                    </tr>
+                `;
+            });
 
 
             // Open a new window and inject HTML content
@@ -293,6 +293,7 @@ response.forEach((item, index) => {
                             font-family: Arial, sans-serif;
                             margin: 20px;
                         }
+                    
                         .display-flex {
                             display: flex;
                             justify-content: space-between;
@@ -301,26 +302,33 @@ response.forEach((item, index) => {
                             padding: 10px;
                             margin-bottom: 20px;
                         }
+                    
                         .center-item {
                             text-align: center;
                             margin: auto;
                         }
+                    
                         table {
                             width: 100%;
                             border-collapse: collapse;
                             margin-bottom: 20px;
                         }
+                    
                         th, td {
                             border: 1px solid #ccc;
                             padding: 8px;
                             text-align: left;
+                            text-transform: none; /* No automatic capitalization */
                         }
+                    
                         th {
                             background-color: #f4f4f4;
                         }
+                    
                         h3 {
                             text-align: center;
                         }
+                    
                         @media print {
                             @page {
                                 size: landscape;
@@ -338,6 +346,7 @@ response.forEach((item, index) => {
                                 <h3>{{ config('config.company_name') }}</h3>
                                 <p>Address : {{ config('config.address_1') }}</p>
                                 <p>Empoyee Report</p>
+                                <p>Branch : ${branch ? $('select[name="branch"] option:selected').text() : 'All Branches'}</p>
                             </div>
                         </div>
                         <table class="table table-bordered table-striped report-table">
@@ -378,6 +387,18 @@ response.forEach((item, index) => {
 
             newWindow.document.write(reportHTML);
             newWindow.document.close();
+            
+            function capitalizeFirstLetter(str) {
+                return str.replace(/\\b\\w/g, function(char) { return char.toUpperCase(); });
+            }
+
+            const rows = document.querySelectorAll('table tbody tr');
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                cells.forEach(cell => {
+                    cell.textContent = capitalizeFirstLetter(cell.textContent.trim());
+                });
+            });
 
         // Excel Export
         newWindow.document.getElementById('exportExcel').addEventListener('click', function() {
