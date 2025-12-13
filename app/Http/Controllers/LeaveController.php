@@ -765,70 +765,92 @@ Class LeaveController extends Controller{
 
 	public function LeaveReportPOST(Request $request){
 
-		$user = User::leftJoin('profile', 'users.id', '=', 'profile.user_id')
-		->leftJoin('designations', 'users.designation_id', '=', 'designations.id')
-		->leftJoin('departments', 'designations.department_id', '=', 'departments.id')
-		->leftJoin('sections', 'profile.section_id', '=', 'sections.id')
-		->when($request->employeeID, function ($query) use ($request) {
-			return $query->where('profile.employee_code', '=', $request->employeeID);
-		})
-		->when($request->branch, function ($query) use ($request) {
-			return $query->where('profile.branch_id', '=', $request->branch);
-		})
-		->when($request->section, function ($query) use ($request) {
-			return $query->where('profile.section_id', '=', $request->section);
-		})
-		->when($request->department, function ($query) use ($request) {
-			return $query->where('departments.id', '=', $request->department);
-		})
-		->when($request->designation, function ($query) use ($request) {
-			return $query->where('designations.id', '=', $request->designation);
-		})
-		->select('users.id', 'profile.employee_code as employee_id', 'designations.name as designation_name', 'departments.name as department_name', 'users.first_name', 'sections.name as section_name')
-		->get();
+		$userQuery = User::leftJoin('profile', 'users.id', '=', 'profile.user_id')
+			->leftJoin('designations', 'users.designation_id', '=', 'designations.id')
+			->leftJoin('departments', 'designations.department_id', '=', 'departments.id')
+			->leftJoin('sections', 'profile.section_id', '=', 'sections.id');
+
+		if ($request->employeeID) {
+			$userQuery->where('profile.employee_code', $request->employeeID);
+		}
+
+		if ($request->branch) {
+			$userQuery->where('profile.branch_id', $request->branch);
+		}
+
+		if ($request->section) {
+			$userQuery->where('profile.section_id', $request->section);
+		}
+
+		if ($request->department) {
+			$userQuery->where('departments.id', $request->department);
+		}
+
+		if ($request->designation) {
+			$userQuery->where('designations.id', $request->designation);
+		}
+
+		$user = $userQuery->select(
+			'users.id',
+			'profile.employee_code as employee_id',
+			'designations.name as designation_name',
+			'departments.name as department_name',
+			'users.first_name',
+			'sections.name as section_name'
+		)->get();
 
 		if ($user->isEmpty()) {
 			return response()->json(['error' => 'No users found'], 404);
 		}
 
-		$data = Leave::whereIn('user_id', $user->pluck('id'))
-			->leftJoin('leave_types', 'leaves.leave_type_id', '=', 'leave_types.id')
-			->when($request->status, function ($query) use ($request) {
-				return $query->where('leaves.status', '=', $request->status);
-			})
-			->where('from_date', '>=', $request->fromDate)
-			->where('to_date', '<=', $request->toDate)
-			->select('leaves.*', 'leave_types.name as leave_type_name')
-			->get();
+		// ================= LEAVE QUERY ==================
+
+		$leaveQuery = Leave::whereIn('user_id', $user->pluck('id'))
+			->leftJoin('leave_types', 'leaves.leave_type_id', '=', 'leave_types.id');
+
+		if ($request->status) {
+			$leaveQuery->where('leaves.status', $request->status);
+		}
+
+		// ✅ Correct date overlap logic
+		$leaveQuery->where(function ($q) use ($request) {
+			$q->whereBetween('leaves.from_date', [$request->fromDate, $request->toDate])
+			->orWhereBetween('leaves.to_date', [$request->fromDate, $request->toDate]);
+		});
+
+		$data = $leaveQuery->select(
+			'leaves.*',
+			'leave_types.name as leave_type_name'
+		)->get();
 
 		if ($data->isEmpty()) {
-			
 			return response()->json(['error' => 'No leave records found'], 404);
 		}
 
+		// ================= MERGE ==================
+
 		$mergedLeaveRecords = $data->map(function ($leave) use ($user) {
-			$currentUser = $user->Where('id', $leave->user_id)->first();
-			if (!$currentUser) {
-				return $leave->toArray();
-			}
-			return array_merge($currentUser->toArray(), $leave->toArray());
+			$currentUser = $user->where('id', $leave->user_id)->first();
+			return array_merge(
+				$currentUser ? $currentUser->toArray() : [],
+				$leave->toArray()
+			);
 		});
 
-		// return response()->json($mergedLeaveRecords);
+		// ================= BRANCH ==================
+
 		$branch = null;
-		if ($request->branch_id) {
-			$branch = Branch::find($request->branch_id);
+		if ($request->branch) {
+			$branch = Branch::find($request->branch);
 		}
-		$finalData = [
-			'data' => $mergedLeaveRecords,
-			'fromDate' => $request->fromDate,
-			'toDate' => $request->toDate,
-			'reportType' => $request->reportType,
-			'branch_name'     => $branch ? $branch->name : 'All Branches',
-		];
 
-		return response()->json($finalData);
-
+		return response()->json([
+			'data'        => $mergedLeaveRecords,
+			'fromDate'    => $request->fromDate,
+			'toDate'      => $request->toDate,
+			'reportType'  => $request->reportType,
+			'branch_name' => $branch ? $branch->name : 'All Branches',
+		]);
 	}
 
 
