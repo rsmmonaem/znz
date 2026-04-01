@@ -2008,21 +2008,24 @@ class ClockController extends Controller
 			}
 
 			if (count($row) >= 3) {
-				$user_id = trim($row[0]);
+				$employee_code = trim($row[0]);
 				$date = trim($row[1]);
 				$clock_in = trim($row[2]);
 				$clock_out = isset($row[3]) ? trim($row[3]) : null;
 
-				if (!empty($user_id) && !empty($date) && !empty($clock_in)) {
-					$clock = new Clock;
-					$clock->user_id = $user_id;
-					$clock->date = date('Y-m-d', strtotime($date));
-					$clock->clock_in = date('Y-m-d H:i:s', strtotime($clock_in));
-					if (!empty($clock_out)) {
-						$clock->clock_out = date('Y-m-d H:i:s', strtotime($clock_out));
+				if (!empty($employee_code) && !empty($date) && !empty($clock_in)) {
+					$profile = \App\Profile::where('employee_code', $employee_code)->first();
+					if ($profile) {
+						$clock = new Clock;
+						$clock->user_id = $profile->user_id;
+						$clock->date = date('Y-m-d', strtotime($date));
+						$clock->clock_in = date('Y-m-d H:i:s', strtotime($clock_in));
+						if (!empty($clock_out)) {
+							$clock->clock_out = date('Y-m-d H:i:s', strtotime($clock_out));
+						}
+						$clock->save();
+						$inserted++;
 					}
-					$clock->save();
-					$inserted++;
 				}
 			}
 		}

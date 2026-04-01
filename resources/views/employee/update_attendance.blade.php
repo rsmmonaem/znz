@@ -100,10 +100,11 @@
                 <div class="form-group">
                     <label>Select CSV File</label>
                     <input type="file" name="csv_file" class="form-control" accept=".csv" required>
-                    <p class="help-block" style="font-size: 11px;">Format: user_id, date, clock_in, clock_out<br>Example: 23, 2025-11-01, 2025-11-01 09:00:00, 2025-11-01 19:30:00</p>
+                    <p class="help-block" style="font-size: 11px;">Format: employee_code, date, clock_in, clock_out<br>Example: 163, 2025-11-01, 2025-11-01 09:00:00, 2025-11-01 19:30:00</p>
                 </div>
                 <div class="form-group">
                     <button type="submit" class="btn btn-primary" id="import-attendance">Import Data</button>
+                    <a href="{{ asset('sample_clocks.csv') }}" class="btn btn-default" download>Download Sample CSV</a>
                 </div>
                 {!! Form::close() !!}
             </div>
