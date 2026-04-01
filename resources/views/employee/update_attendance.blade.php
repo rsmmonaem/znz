@@ -93,6 +93,20 @@
                 </div>
                 {!! Form::close() !!}
             </div>
+
+            <div class="box-info">
+                <h2><strong>CSV Bulk Import</strong></h2>
+                {!! Form::open(['route' => 'clock.bulk-import', 'role' => 'form', 'class' => 'bulk-import-form', 'id' => 'bulk-import-form', 'files' => true]) !!}
+                <div class="form-group">
+                    <label>Select CSV File</label>
+                    <input type="file" name="csv_file" class="form-control" accept=".csv" required>
+                    <p class="help-block" style="font-size: 11px;">Format: user_id, date, clock_in, clock_out<br>Example: 23, 2025-11-01, 2025-11-01 09:00:00, 2025-11-01 19:30:00</p>
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary" id="import-attendance">Import Data</button>
+                </div>
+                {!! Form::close() !!}
+            </div>
         </div>
         <div class="col-sm-8">
             <div class="box-info">

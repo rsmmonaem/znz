@@ -1981,4 +1981,53 @@ class ClockController extends Controller
 		];
 		return $response;
 	}
+
+	public function bulkImport(Request $request)
+	{
+		$validation = Validator::make($request->all(), [
+			'csv_file' => 'required'
+		]);
+
+		if ($validation->fails()) {
+			return redirect()->back()->withErrors($validation->messages());
+		}
+
+		$file = $request->file('csv_file');
+		if (!$file) {
+			return redirect()->back()->withErrors('Please upload a valid CSV file.');
+		}
+
+		$handle = fopen($file->getPathname(), "r");
+		$header = true;
+
+		$inserted = 0;
+		while (($row = fgetcsv($handle, 1000, ",")) !== FALSE) {
+			if ($header) {
+				$header = false;
+				continue; // skip the header row
+			}
+
+			if (count($row) >= 3) {
+				$user_id = trim($row[0]);
+				$date = trim($row[1]);
+				$clock_in = trim($row[2]);
+				$clock_out = isset($row[3]) ? trim($row[3]) : null;
+
+				if (!empty($user_id) && !empty($date) && !empty($clock_in)) {
+					$clock = new Clock;
+					$clock->user_id = $user_id;
+					$clock->date = date('Y-m-d', strtotime($date));
+					$clock->clock_in = date('Y-m-d H:i:s', strtotime($clock_in));
+					if (!empty($clock_out)) {
+						$clock->clock_out = date('Y-m-d H:i:s', strtotime($clock_out));
+					}
+					$clock->save();
+					$inserted++;
+				}
+			}
+		}
+		fclose($handle);
+
+		return redirect()->back()->withSuccess('Successfully imported ' . $inserted . ' records.');
+	}
 }
