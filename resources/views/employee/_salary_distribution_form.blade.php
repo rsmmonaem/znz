@@ -1,19 +1,4 @@
 <div class="row">
-    <div class="col-sm-6">
-        <div class="form-group flex-form-group">
-            {!! Form::label('bank_account_count', 'From how many bank accounts?') !!}
-            {!! Form::input('number', 'bank_account_count', '', ['class' => 'form-control', 'placeholder' => 'e.g. 2', 'min' => 1]) !!}
-        </div>
-    </div>
-    <div class="col-sm-6">
-        <div class="form-group flex-form-group">
-            {!! Form::label('amount', trans('messages.amount')) !!}
-            {!! Form::input('text', 'amount', '', ['class' => 'form-control', 'placeholder' => trans('messages.amount')]) !!}
-        </div>
-    </div>
-</div>
-<hr>
-<div class="row">
     <div class="col-sm-12">
         <div class="table-responsive">
             <table class="table table-bordered" id="salary-distribution-table">
@@ -56,15 +41,21 @@
 
 <script>
     $(document).ready(function() {
-        // Add row functionality
-        $('#add-distribution-row').click(function() {
-            var newRow = $('#distribution-rows tr:first').clone();
-            newRow.find('input').val('');
-            $('#distribution-rows').append(newRow);
+        // Add row functionality - Use delegation to ensure it works even if DOM changes
+        $(document).on('click', '#add-distribution-row', function(e) {
+            e.preventDefault();
+            var $tableBody = $('#distribution-rows');
+            var $lastRow = $tableBody.find('tr:last');
+            var $newRow = $lastRow.clone();
+            
+            // Clear inputs in the new row
+            $newRow.find('input').val('');
+            $tableBody.append($newRow);
         });
 
         // Remove row functionality
-        $(document).on('click', '.remove-row', function() {
+        $(document).on('click', '.remove-row', function(e) {
+            e.preventDefault();
             if ($('#distribution-rows tr').length > 1) {
                 $(this).closest('tr').remove();
             } else {
