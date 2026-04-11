@@ -60,6 +60,8 @@
 							!!}</a></li>
 					<li><a href="#bank-account" data-toggle="tab"><i class="fa fa-laptop"></i> {!!
 							trans('messages.account') !!}</a></li>
+					<li><a href="#salary-distribution" data-toggle="tab"><i class="fa fa-share-alt"></i> Salary
+							Distribution</a></li>
 					<li><a href="#contract" data-toggle="tab"><i class="fa fa-pencil"></i> {!!
 							trans('messages.contract') !!}</a></li>
 					@if(count($employee->Contract))
@@ -812,6 +814,16 @@
 									</tbody>
 								</table>
 							</div>
+						</div>
+					</div>
+					<div class="tab-pane animated fadeInRight" id="salary-distribution">
+						<div class="user-profile-content-wm">
+							<h2>Salary Distribution</h2>
+							{!! Form::model($employee,['method' => 'POST','route' => ['salary-distribution.store',$employee->id]
+							,'class' => 'salary-distribution-form','id' => 'salary-distribution-form']) !!}
+							@include('employee._salary_distribution_form')
+							{!! Form::submit(trans('messages.save'),['class' => 'btn btn-primary pull-right']) !!}
+							{!! Form::close() !!}
 						</div>
 					</div>
 					<div class="tab-pane animated fadeInRight" id="contract">
