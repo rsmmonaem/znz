@@ -322,6 +322,24 @@ class EmployeeController extends Controller{
             }
         }
 
+        if($request->input('type') == 'salary_distribution'){
+            $bank_account_names = $request->input('bank_account_name');
+            $amounts = $request->input('distribution_amount');
+            $distribution_data = [];
+            
+            if(is_array($bank_account_names)){
+                foreach($bank_account_names as $key => $name){
+                    if(!empty($name)){
+                        $distribution_data[] = [
+                            'bank_account_name' => $name,
+                            'amount' => $amounts[$key] ?? 0
+                        ];
+                    }
+                }
+            }
+            $request->merge(['salary_distribution' => $distribution_data]);
+        }
+
         $profile = $employee->Profile ?: new Profile;
         $employee->profile()->save($profile);
         $photo = $profile->photo;

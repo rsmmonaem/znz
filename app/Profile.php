@@ -20,8 +20,10 @@ class Profile extends Eloquent {
 							'blogger_link',
 							'linkedin_link',
 							'googleplus_link',
-							'user_id'
+							'user_id',
+							'salary_distribution'
 						];
+	protected $casts = ['salary_distribution' => 'array'];
 	protected $primaryKey = 'id';
 	protected $table = 'profile';
 
