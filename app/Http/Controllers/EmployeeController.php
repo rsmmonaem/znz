@@ -332,7 +332,7 @@ class EmployeeController extends Controller{
                     if(!empty($name)){
                         $distribution_data[] = [
                             'bank_account_name' => $name,
-                            'amount' => $amounts[$key] ?? 0
+                            'amount' => isset($amounts[$key]) ? $amounts[$key] : 0
                         ];
                     }
                 }
