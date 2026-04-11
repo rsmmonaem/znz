@@ -819,11 +819,11 @@
 					<div class="tab-pane animated fadeInRight" id="salary-distribution">
 						<div class="user-profile-content-wm">
 							<h2>Salary Distribution</h2>
-							{!! Form::model($employee,['method' => 'POST','route' => ['salary-distribution.store',$employee->id]
-							,'class' => 'salary-distribution-form','id' => 'salary-distribution-form']) !!}
+							<!-- {!! Form::model($employee,['method' => 'POST','route' => ['salary-distribution.store',$employee->id]
+							,'class' => 'salary-distribution-form','id' => 'salary-distribution-form']) !!} -->
 							@include('employee._salary_distribution_form')
-							{!! Form::submit(trans('messages.save'),['class' => 'btn btn-primary pull-right']) !!}
-							{!! Form::close() !!}
+							<!-- {!! Form::submit(trans('messages.save'),['class' => 'btn btn-primary pull-right']) !!}
+							{!! Form::close() !!} -->
 						</div>
 					</div>
 					<div class="tab-pane animated fadeInRight" id="contract">
