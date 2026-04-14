@@ -655,15 +655,30 @@ class SalaryController extends Controller
     public function bankedit($id)
     {
         $bankPart = DB::table('salary_bank')->where('id', $id)->first();
-        return view('salary.edit-bank-part', compact('bankPart'));
+        $companyBanks = DB::table('company_banks')->where('status', 1)->get();
+        return view('salary.edit-bank-part', compact('bankPart', 'companyBanks'));
     }
 
 
 
     public function UpdateBankPart(Request $request)
     {
+        $distributions = (is_array($request->distributions)) ? $request->distributions : [];
+        $totalBankAmount = 0;
+        $bankIds = [];
+        $bankAmounts = [];
+        
+        foreach ($distributions as $dist) {
+            $amt = (float)$dist['amount'];
+            $totalBankAmount += $amt;
+            $bankIds[] = $dist['bank_id'];
+            $bankAmounts[] = $amt;
+        }
+
         DB::table('salary_bank')->where('id', $request->id)->update([
-            'bank_amount' => $request->bank_amount,
+            'company_bank_id' => json_encode($bankIds),
+            'bank_amounts' => json_encode($bankAmounts),
+            'bank_amount' => $totalBankAmount,
             'cash_amount' => $request->cash_amount,
             'remarks' => $request->remarks,
             'effective_date' => $request->effective_date
