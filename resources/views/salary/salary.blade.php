@@ -259,9 +259,7 @@ $(document).ready(function(){
         }
     });
 
-    $(document).on('input', '.dist-amount', function(){
-        calculateRemaining();
-    });
+
 
     function calculateRemaining() {
         let totalDistributed = 0;
@@ -291,7 +289,14 @@ $(document).ready(function(){
         self.attr('disabled', true).text('Saving...');
         
         const distributions = [];
-        let hasError = false;
+        const employeeId = $('#employeeId').val();
+        const entryDate = $('#entryDate').val();
+        const effectiveDate = $('#effectiveDate').val();
+        const gross = $('#gross').val();
+
+        if(!employeeId) return validate('Please select employee');
+        if(!entryDate) return validate('Please select entry date');
+        if(!effectiveDate) return validate('Please select effective date');
 
         $('#distribution-tbody tr').each(function(){
             const bankId = $(this).find('.dist-bank').val();
@@ -304,11 +309,6 @@ $(document).ready(function(){
             }
         });
 
-        const gross = $('#gross').val();
-
-        if(!employeeId) return validate('Please select employee');
-        if(!entryDate) return validate('Please select entry date');
-        if(!effectiveDate) return validate('Please select effective date');
         if(distributions.length === 0) return validate('Please add at least one bank distribution');
         if(hasError) return validate('Please complete all distribution rows');
 
