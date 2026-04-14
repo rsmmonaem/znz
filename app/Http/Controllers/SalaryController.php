@@ -544,7 +544,7 @@ class SalaryController extends Controller
     public function Salary_BankPartPost(Request $request)
     {
         $gross = $request->gross;
-        $distributions = $request->distributions; // Array of {bank_id, amount}
+        $distributions = (is_array($request->distributions)) ? $request->distributions : []; // Array of {bank_id, amount}
         $effectiveDate = $request->effectiveDate;
         $employeeId = $request->employeeId;
         $entryDate = $request->entryDate;
