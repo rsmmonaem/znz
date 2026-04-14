@@ -338,17 +338,19 @@
                 var bankId = $(this).find('.dist-bank').val();
                 var amount = $(this).find('.dist-amount').val();
                 
-                if (bankId && amount) {
+                // Explicitly check for content to avoid issues with zero/falsy values
+                var hasBank = (bankId !== "" && bankId !== null);
+                var hasAmount = (amount !== "" && amount !== null);
+
+                if (hasBank && hasAmount) {
                     distributions.push({ bank_id: bankId, amount: amount });
-                } else if (bankId || amount) {
+                } else if (hasBank || hasAmount) {
+                    // Only flag as error if one is filled and the other isn't
                     hasError = true;
                 }
             });
 
-            if (distributions.length === 0) {
-                // If no bank distribution, the entire amount is cash
-                // We'll proceed with an empty array and the backend will handle it
-            }
+            // If we allow 0 banks, and nothing was collected but no partial errors either, it's fine.
             if (hasError) return validate('Please complete all distribution rows');
 
             const totalDistributed = distributions.reduce((sum, d) => sum + parseFloat(d.amount), 0);
