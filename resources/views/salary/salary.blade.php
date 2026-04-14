@@ -141,12 +141,14 @@
                                     
                                     <div style="margin-top: 15px; background: #f9f9f9; padding: 10px; border-radius: 4px;">
                                         <div class="row">
-                                            <div class="col-xs-6 text-right"><strong>Total Bank:</strong></div>
-                                            <div class="col-xs-6"><span id="total-bank-display">0</span></div>
+                                            <div class="col-xs-6 text-right"><strong>Total Distributed:</strong></div>
+                                            <div class="col-xs-6">
+                                                <span id="dist-total-display">0</span>
+                                            </div>
                                         </div>
-                                        <div class="row">
+                                        <div class="row" style="border-top: 1px solid #ccc; margin-top: 5px; padding-top: 5px; font-weight: bold;">
                                             <div class="col-xs-6 text-right"><strong>Cash Remainder:</strong></div>
-                                            <div class="col-xs-6"><span id="remaining-cash-display">0</span></div>
+                                            <div class="col-xs-6"><span id="cash-remainder-display">0</span></div>
                                         </div>
                                     </div>
                                 </div>
@@ -236,8 +238,18 @@ $(document).ready(function(){
     $('#add-dist-row').on('click', function(){
         const $tbody = $('#distribution-tbody');
         const $newRow = $tbody.find('tr:first').clone();
+        
+        // Clean up Select2 if it was cloned
+        $newRow.find('.select2-container').remove();
+        $newRow.find('select').show().removeClass('select2-hidden-accessible');
+        
+        // Reset values
         $newRow.find('input, select').val('');
+        
         $tbody.append($newRow);
+        
+        // Re-initialize Select2 on the new dropdown
+        $newRow.find('select').select2();
     });
 
     $(document).on('click', '.remove-dist-row', function(){
@@ -252,14 +264,27 @@ $(document).ready(function(){
     });
 
     function calculateRemaining() {
-        let totalDist = 0;
+        let totalDistributed = 0;
         $('.dist-amount').each(function(){
-            totalDist += parseFloat($(this).val()) || 0;
+            totalDistributed += parseFloat($(this).val()) || 0;
         });
+        
         const gross = parseFloat($('#gross').val()) || 0;
-        $('#total-bank-display').text(totalDist.toLocaleString());
-        $('#remaining-cash-display').text((gross - totalDist).toLocaleString());
+        const remainder = gross - totalDistributed;
+        
+        $('#dist-total-display').text(totalDistributed.toLocaleString());
+        $('#cash-remainder-display').text(remainder.toLocaleString());
+        
+        if (remainder < 0) {
+            $('#cash-remainder-display').parent().addClass('text-danger');
+        } else {
+            $('#cash-remainder-display').parent().removeClass('text-danger');
+        }
     }
+
+    $(document).on('input', '.dist-amount', function(){
+        calculateRemaining();
+    });
 
     $('#saveData').on('click', function(){
         const self = $(this);
@@ -279,9 +304,6 @@ $(document).ready(function(){
             }
         });
 
-        const employeeId = $('#employeeId').val();
-        const entryDate = $('#entryDate').val();
-        const effectiveDate = $('#effectiveDate').val();
         const gross = $('#gross').val();
 
         if(!employeeId) return validate('Please select employee');
@@ -289,6 +311,12 @@ $(document).ready(function(){
         if(!effectiveDate) return validate('Please select effective date');
         if(distributions.length === 0) return validate('Please add at least one bank distribution');
         if(hasError) return validate('Please complete all distribution rows');
+
+        const totalDistributed = distributions.reduce((sum, d) => sum + parseFloat(d.amount), 0);
+        
+        if (totalDistributed > parseFloat(gross)) {
+            return validate('Total distributed bank amount (' + totalDistributed + ') cannot exceed Gross Salary (' + gross + ')');
+        }
 
         const FormData = {
             employeeId: employeeId,

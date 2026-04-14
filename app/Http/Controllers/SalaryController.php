@@ -553,11 +553,11 @@ Class SalaryController extends Controller{
             $totalBankAmount += (float)$dist['amount'];
         }
 
-        if ($totalBankAmount > $gross) {
-            return response()->json(['message' => 'Total bank amount exceeds gross salary.', 'status' => 'error']);
+        if ($totalBankAmount > (float)$gross) {
+            return response()->json(['message' => 'Total distributed bank amount ('. $totalBankAmount .') exceeds Gross Salary ('. $gross .')', 'status' => 'error']);
         }
 
-        $cashAmount = $gross - $totalBankAmount;
+        $cashAmount = (float)$gross - $totalBankAmount;
 
         DB::beginTransaction();
         try {
