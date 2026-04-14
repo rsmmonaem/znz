@@ -627,7 +627,8 @@ class SalaryController extends Controller
 
                 $displayStr = "";
                 if (is_array($bankIds) && count($bankIds) > 0) {
-                    $banks = DB::table('company_banks')->whereIn('id', $bankIds)->get()->keyBy('id');
+                    $banksArray = DB::table('company_banks')->whereIn('id', $bankIds)->get();
+                    $banks = collect($banksArray)->keyBy('id');
                     $parts = [];
                     foreach ($bankIds as $index => $id) {
                         $name = isset($banks[$id]) ? $banks[$id]->bank_name : 'Unknown';
