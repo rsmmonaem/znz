@@ -608,7 +608,8 @@ class SalaryController extends Controller
         $employeeId = $request->employeeId;
         $data = DB::table('salary_bank')
             ->join('users', 'users.id', '=', 'salary_bank.user_id')
-            ->select('salary_bank.*', 'users.employee_code')
+            ->join('profile', 'users.id', '=', 'profile.user_id')
+            ->select('salary_bank.*', 'profile.employee_code')
             ->when($employeeId, function ($query, $employeeId) {
                 return $query->where('salary_bank.user_id', $employeeId);
             })
