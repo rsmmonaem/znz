@@ -159,7 +159,7 @@ class SalaryProcessController extends Controller
 
 
         //Spacial Holidays
-        $spacial_holidays =  DB::table('spacial_holidays')
+        $spacial_holidays = DB::table('spacial_holidays')
             ->where('user_id', $employeeId)
             ->whereBetween('date', [$formDate, $toDate])
             ->count(DB::raw('DISTINCT date'));
@@ -187,7 +187,7 @@ class SalaryProcessController extends Controller
             ->count('from_date');
 
         $host = 'localhost';
-        $db   = 'betikrom_znz';
+        $db = 'betikrom_znz';
         $user = 'betikrom_znz';
         $pass = 'betikrom_znz';
 
@@ -204,7 +204,7 @@ class SalaryProcessController extends Controller
         }
 
         // Escape variables
-        $employeeId = (int)$employeeId;
+        $employeeId = (int) $employeeId;
         $formDate = $conn->real_escape_string($formDate);
         $toDate = $conn->real_escape_string($toDate);
 
@@ -366,7 +366,7 @@ class SalaryProcessController extends Controller
         $deductionsData = collect($deductionsData);
         $deductionsData = $deductionsData->unique('salary_type_id');
 
-        $yearNumber  = (int)date('Y', strtotime($toDate));
+        $yearNumber = (int) date('Y', strtotime($toDate));
 
 
 
@@ -377,7 +377,7 @@ class SalaryProcessController extends Controller
             ->select('salary_advance.grossValue', 'salary_advance.grossOption', 'salary_advance_months.month', 'salary_advance_months.amount')
             ->get();
 
-        $monthNumber = (int)date('m', strtotime($toDate));
+        $monthNumber = (int) date('m', strtotime($toDate));
         $advanceAmount = 0;
 
         foreach ($advanceSalary as $record) {
@@ -397,7 +397,7 @@ class SalaryProcessController extends Controller
         $totalWorkedDays = $getTotalPresent - $fridayClockCount;
         $totalAbsents = $TotalDays - $totalWorkedDays;
 
-        $perdaysAmount =  $salaryslab ? $salaryslab->gross / $TotalDays : 0;
+        $perdaysAmount = $salaryslab ? $salaryslab->gross / $TotalDays : 0;
 
         $GrossAmountSalaryPerDays = $perdaysAmount * $totalWorkedDays;
 
@@ -405,7 +405,8 @@ class SalaryProcessController extends Controller
         $holidayAmount = $perdaysAmount * $fridayClockCount;
 
         $TotalFridaysAmount = $perdaysAmount * $totalFridays;
-        $GrossSalaryAmountAfterAdvance = $GrossAmountSalaryPerDays;;
+        $GrossSalaryAmountAfterAdvance = $GrossAmountSalaryPerDays;
+        ;
         if (count($deductionsData->where('salary_type_id', 5)) === 0) {
             $ProvidentFund = 0;
         } else {
@@ -428,7 +429,7 @@ class SalaryProcessController extends Controller
             11 => 'november',
             12 => 'december',
         ];
-        $monthNumber = (int)date('m', strtotime($toDate));
+        $monthNumber = (int) date('m', strtotime($toDate));
         // Get the column name for the provided month number
         $monthColumn = isset($monthColumns[$monthNumber]) ? $monthColumns[$monthNumber] : null;
 
@@ -461,11 +462,10 @@ class SalaryProcessController extends Controller
             ->get();
 
         $totalBankAllocated = $BankDistributions->sum('bank_amount');
-        
+
         // Use the first record as a representative for gross/cash calculations 
         // (they are identical across the set in our new save logic)
         $BankAmount = $latestRecord;
-        $BankAmount->bank_amount = $totalBankAllocated;
 
 
 
@@ -495,8 +495,8 @@ class SalaryProcessController extends Controller
             $bankAdvance = $advanceAmount * (70 / 100); // 70% of advance goes to bank
             $cashAdvance = $advanceAmount * (30 / 100); // 30% of advance goes to cash
 
-            $BankAmountValues =  $bankSlab - $bankDeduction - $bankAdvance - $amount; // Deduct attendance and advance from bank amount
-            $CashAmountValues =  $cashSlab - $cashDeduction - $cashAdvance; // Deduct attendance and advance from cash amount
+            $BankAmountValues = $bankSlab - $bankDeduction - $bankAdvance - $amount; // Deduct attendance and advance from bank amount
+            $CashAmountValues = $cashSlab - $cashDeduction - $cashAdvance; // Deduct attendance and advance from cash amount
 
         } elseif ($BankAmount->cash_amount > 0 && $BankAmount->bank_amount == 0) {
 
@@ -587,7 +587,7 @@ class SalaryProcessController extends Controller
             'holiday_amount' => $holidayAmount,
             'EmployeeID' => $employeeId,
             'BankPay' => max(0, $BankAmountValues), // Corrected bank amount
-            'CashPay' =>  $CashAmountValues + $holidayAmount, // Corrected cash amount
+            'CashPay' => $CashAmountValues + $holidayAmount, // Corrected cash amount
             'Gross' => $salaryslab ? $salaryslab->gross : 0,
             'TotalPayable' => ($netSalaryWIthoutTax - $amount) + $holidayAmount,
             'TotalDeduction' => $TotalDiductionAmount + $amount + $advanceAmount + $ProvidentFund,
@@ -700,7 +700,7 @@ class SalaryProcessController extends Controller
             ->where('salary_advance.effectiveDate', '<', $formDate)
             ->select('salary_advance.grossValue', 'salary_advance.grossOption', 'salary_advance_months.month', 'salary_advance_months.amount')
             ->get();
-        $monthNumber = (int)date('m', strtotime($toDate));
+        $monthNumber = (int) date('m', strtotime($toDate));
         $advanceAmount = 0;
         foreach ($advanceSalary as $record) {
             if (
@@ -770,7 +770,7 @@ class SalaryProcessController extends Controller
 
         $totalWorkedDays = $getTotalPresent + $holidays + $leave + $totalFridays + $spacial_holidays;
         $totalAbsents = $TotalDays - $totalWorkedDays;
-        $perdaysAmount =  $salaryslab ? $salaryslab->gross / $TotalDays : 0;
+        $perdaysAmount = $salaryslab ? $salaryslab->gross / $TotalDays : 0;
         $GrossAmountSalaryPerDays = $perdaysAmount * $totalWorkedDays;
         $TotalDiductionAmount = $perdaysAmount * $totalAbsents;
 
@@ -808,7 +808,7 @@ class SalaryProcessController extends Controller
             11 => 'november',
             12 => 'december',
         ];
-        $monthNumber = (int)date('m', strtotime($toDate));
+        $monthNumber = (int) date('m', strtotime($toDate));
         // Get the column name for the provided month number
         $monthColumn = isset($monthColumns[$monthNumber]) ? $monthColumns[$monthNumber] : null;
 
@@ -882,7 +882,9 @@ class SalaryProcessController extends Controller
         return $employeeId;
     }
 
-    public function indexSalaryShit() {}
+    public function indexSalaryShit()
+    {
+    }
     public function SalaryShit()
     {
         $group = DB::table('com_group')->get();
@@ -1055,7 +1057,7 @@ class SalaryProcessController extends Controller
         }
     }
 
-    public function  SalarySlip()
+    public function SalarySlip()
     {
         $group = DB::table('com_group')->get();
         $branch = Branch::all();

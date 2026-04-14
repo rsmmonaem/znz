@@ -544,7 +544,7 @@ class SalaryController extends Controller
     public function Salary_BankPartPost(Request $request)
     {
         $gross = $request->gross;
-        $distributions = (is_array($request->distributions)) ? $request->distributions : []; // Array of {bank_id, amount}
+        $distributions = (is_array($request->distributions)) ? $request->distributions : [];
         $effectiveDate = $request->effectiveDate;
         $employeeId = $request->employeeId;
         $entryDate = $request->entryDate;
@@ -554,86 +554,90 @@ class SalaryController extends Controller
             return response()->json(['message' => 'Gross Amount does not exist for this employee.', 'status' => 'error']);
         }
 
-
         $totalBankAmount = 0;
+        $bankIds = [];
+        $bankAmounts = [];
+        
         foreach ($distributions as $dist) {
-            $totalBankAmount += (float) $dist['amount'];
+            $amt = (float)$dist['amount'];
+            $totalBankAmount += $amt;
+            $bankIds[] = $dist['bank_id'];
+            $bankAmounts[] = $amt;
         }
 
-        if ($totalBankAmount > (float) $gross) {
+        if ($totalBankAmount > (float)$gross) {
             return response()->json(['message' => 'Total distributed bank amount (' . $totalBankAmount . ') exceeds Gross Salary (' . $gross . ')', 'status' => 'error']);
         }
 
-        $cashAmount = (float) $gross - $totalBankAmount;
+        $cashAmount = (float)$gross - $totalBankAmount;
 
         DB::beginTransaction();
         try {
-            // Option: Clear existing distributions for the same effective date if needed? 
-            // Or just append. Usually in this ERP, it's append or replace based on effective_date.
-            // Let's replace for the same effective date to avoid duplicates.
-            DB::table('salary_bank')->where('user_id', $employeeId)->where('effective_date', $effectiveDate)->delete();
+            // Replace for the same effective date/user to ensure one row per session
+            DB::table('salary_bank')
+                ->where('user_id', $employeeId)
+                ->where('effective_date', $effectiveDate)
+                ->delete();
 
-            if (empty($distributions)) {
-                // If no bank distributions, save one row with the full cash amount
-                DB::table('salary_bank')->insert([
-                    'user_id' => $employeeId,
-                    'effective_date' => $effectiveDate,
-                    'company_bank_id' => null,
-                    'bank_amount' => 0,
-                    'cash_amount' => $cashAmount,
-                    'status' => false,
-                    'remarks' => $remarks,
-                    'entry_date' => $entryDate,
-                    'gross' => $gross,
-                    'created_at' => date('Y-m-d H:i:s'),
-                    'updated_at' => date('Y-m-d H:i:s')
-                ]);
-            } else {
-                foreach ($distributions as $dist) {
-                    DB::table('salary_bank')->insert([
-                        'user_id' => $employeeId,
-                        'effective_date' => $effectiveDate,
-                        'company_bank_id' => $dist['bank_id'],
-                        'bank_amount' => $dist['amount'],
-                        'cash_amount' => $cashAmount,
-                        'status' => false,
-                        'remarks' => $remarks,
-                        'entry_date' => $entryDate,
-                        'gross' => $gross,
-                        'created_at' => date('Y-m-d H:i:s'),
-                        'updated_at' => date('Y-m-d H:i:s')
-                    ]);
-                }
-            }
+            // Insert a single row with JSON data
+            DB::table('salary_bank')->insert([
+                'user_id' => $employeeId,
+                'effective_date' => $effectiveDate,
+                'company_bank_id' => json_encode($bankIds),
+                'bank_amounts' => json_encode($bankAmounts),
+                'bank_amount' => $totalBankAmount,
+                'cash_amount' => $cashAmount,
+                'status' => false,
+                'remarks' => $remarks,
+                'entry_date' => $entryDate,
+                'gross' => $gross,
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d H:i:s')
+            ]);
 
             DB::commit();
-            $this->logActivity(['module' => 'salary', 'activity' => 'activity_added', 'secondary_id' => $employeeId]);
-            return response()->json(['status' => 'success', 'message' => 'Data saved successfully.']);
+            return response()->json(['message' => 'Salary Bank distribution saved successfully.', 'status' => 'success']);
         } catch (\Exception $e) {
-            DB::rollBack();
-            return response()->json(['status' => 'error', 'message' => $e->getMessage()]);
+            DB::rollback();
+            return response()->json(['message' => 'Internal server error: ' . $e->getMessage(), 'status' => 'error']);
         }
     }
 
     public function GetBankPart(Request $request)
     {
-        $query = DB::table('salary_bank')
-            ->join('users', 'salary_bank.user_id', '=', 'users.id')
-            ->join('profile', 'users.id', '=', 'profile.user_id')
-            ->leftJoin('company_banks', 'salary_bank.company_bank_id', '=', 'company_banks.id')
-            ->select(
-                'salary_bank.*',
-                'users.first_name',
-                'profile.employee_code',
-                'company_banks.bank_name as company_bank_name'
-            );
+        $employeeId = $request->employeeId;
+        $data = DB::table('salary_bank')
+            ->join('users', 'users.id', '=', 'salary_bank.user_id')
+            ->select('salary_bank.*', 'users.employee_code')
+            ->when($employeeId, function ($query, $employeeId) {
+                return $query->where('salary_bank.user_id', $employeeId);
+            })
+            ->orderBy('id', 'desc')
+            ->get();
 
-        // If an employeeId is provided, filter
-        if ($request->has('employeeId') && $request->employeeId != '') {
-            $query->where('salary_bank.user_id', $request->employeeId);
+        // Process distributions for display
+        foreach ($data as $item) {
+            $bankIds = json_decode($item->company_bank_id, true);
+            $bankAmounts = json_decode($item->bank_amounts, true);
+            
+            $displayStr = "";
+            if (is_array($bankIds) && count($bankIds) > 0) {
+                $banks = DB::table('company_banks')->whereIn('id', $bankIds)->get()->keyBy('id');
+                $parts = [];
+                foreach ($bankIds as $index => $id) {
+                    $name = isset($banks[$id]) ? $banks[$id]->bank_name : 'Unknown';
+                    $amt = isset($bankAmounts[$index]) ? $bankAmounts[$index] : 0;
+                    $parts[] = "$name: $amt";
+                }
+                $displayStr = implode(', ', $parts);
+            } else if (!is_array($bankIds) && $item->bank_amount > 0) {
+                 // Fallback for legacy data
+                 $displayStr = $item->bank_amount;
+            } else {
+                $displayStr = "0 (Cash Only)";
+            }
+            $item->company_bank_name = $displayStr;
         }
-
-        $data = $query->get();
 
         return response()->json($data);
     }
