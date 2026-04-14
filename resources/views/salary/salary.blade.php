@@ -334,23 +334,28 @@
             if (!entryDate) return validate('Please select entry date');
             if (!effectiveDate) return validate('Please select effective date');
 
-            $('.dist-row').each(function () {
-                var bankId = $(this).find('.dist-bank').val();
-                var amount = $(this).find('.dist-amount').val();
+            $('#distribution-tbody .dist-row').each(function () {
+                var $row = $(this);
+                // Use a more specific selector to avoid any ambiguity
+                var bankId = $row.find('select.dist-bank').val();
+                var amount = $row.find('input.dist-amount').val();
                 
-                // Explicitly check for content to avoid issues with zero/falsy values
-                var hasBank = (bankId !== "" && bankId !== null);
-                var hasAmount = (amount !== "" && amount !== null);
+                var hasBank = (bankId !== "" && bankId !== null && bankId !== undefined);
+                var hasAmount = (amount !== "" && amount !== null && amount !== undefined);
+
+                // Completely ignore empty rows
+                if (!hasBank && !hasAmount) {
+                    return true; // continue
+                }
 
                 if (hasBank && hasAmount) {
                     distributions.push({ bank_id: bankId, amount: amount });
-                } else if (hasBank || hasAmount) {
-                    // Only flag as error if one is filled and the other isn't
+                } else {
+                    // Row is partially filled (e.g. Bank selected but no Amount, or vice-versa)
                     hasError = true;
                 }
             });
 
-            // If we allow 0 banks, and nothing was collected but no partial errors either, it's fine.
             if (hasError) return validate('Please complete all distribution rows');
 
             const totalDistributed = distributions.reduce((sum, d) => sum + parseFloat(d.amount), 0);
