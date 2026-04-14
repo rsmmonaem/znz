@@ -104,13 +104,53 @@
                                     <input type="date" class="form-control" id="effectiveDate">
                                 </div>
                                 <div class="form-group">
-                                    <label>Bank Amount <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" id="bankAmount">
-                                </div>
-                                <div class="form-group">
                                     <label>Remarks</label>
                                     <input type="text" class="form-control" id="remarks">
                                 </div>
+
+                                <div class="distribution-section" style="margin-top: 20px; border-top: 1px solid #eee; pt-10">
+                                    <h4>Bank Distributions</h4>
+                                    <table class="table table-condensed" id="distribution-table">
+                                        <thead>
+                                            <tr>
+                                                <th style="width: 60%;">Bank</th>
+                                                <th style="width: 30%;">Amount</th>
+                                                <th style="width: 10%;"></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="distribution-tbody">
+                                            <tr class="dist-row">
+                                                <td>
+                                                    <select class="form-control dist-bank">
+                                                        <option value="">Select Bank</option>
+                                                        @foreach($companyBanks as $bank)
+                                                            <option value="{{ $bank->id }}">{{ $bank->bank_name }} ({{ $bank->account_number }})</option>
+                                                        @endforeach
+                                                    </select>
+                                                </td>
+                                                <td>
+                                                    <input type="number" class="form-control dist-amount" placeholder="Amount">
+                                                </td>
+                                                <td>
+                                                    <button type="button" class="btn btn-danger btn-xs remove-dist-row"><i class="fa fa-times"></i></button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <button type="button" class="btn btn-info btn-xs" id="add-dist-row"><i class="fa fa-plus"></i> Add Bank</button>
+                                    
+                                    <div style="margin-top: 15px; background: #f9f9f9; padding: 10px; border-radius: 4px;">
+                                        <div class="row">
+                                            <div class="col-xs-6 text-right"><strong>Total Bank:</strong></div>
+                                            <div class="col-xs-6"><span id="total-bank-display">0</span></div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-xs-6 text-right"><strong>Cash Remainder:</strong></div>
+                                            <div class="col-xs-6"><span id="remaining-cash-display">0</span></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                             </div>
                         </div>
 
@@ -192,21 +232,72 @@ $(document).ready(function(){
         LoadBankPart(employeeId);
     });
 
-    $('#saveData').on('click', function(){
-        $(this).attr('disabled', true).text('Saving...');
-        const FormData = {
-            employeeId: $('#employeeId').val(),
-            entryDate: $('#entryDate').val(),
-            effectiveDate: $('#effectiveDate').val(),
-            gross: $('#gross').val(),
-            bankAmount: $('#bankAmount').val(),
-            remarks: $('#remarks').val(),
-        };
+    // Add/Remove Rows
+    $('#add-dist-row').on('click', function(){
+        const $tbody = $('#distribution-tbody');
+        const $newRow = $tbody.find('tr:first').clone();
+        $newRow.find('input, select').val('');
+        $tbody.append($newRow);
+    });
 
-        if(FormData.employeeId=='') return validate('Please select employee');
-        if(FormData.entryDate=='') return validate('Please select entry date');
-        if(FormData.effectiveDate=='') return validate('Please select effective date');
-        if(FormData.bankAmount=='') return validate('Please enter bank amount');
+    $(document).on('click', '.remove-dist-row', function(){
+        if($('#distribution-tbody tr').length > 1) {
+            $(this).closest('tr').remove();
+            calculateRemaining();
+        }
+    });
+
+    $(document).on('input', '.dist-amount', function(){
+        calculateRemaining();
+    });
+
+    function calculateRemaining() {
+        let totalDist = 0;
+        $('.dist-amount').each(function(){
+            totalDist += parseFloat($(this).val()) || 0;
+        });
+        const gross = parseFloat($('#gross').val()) || 0;
+        $('#total-bank-display').text(totalDist.toLocaleString());
+        $('#remaining-cash-display').text((gross - totalDist).toLocaleString());
+    }
+
+    $('#saveData').on('click', function(){
+        const self = $(this);
+        self.attr('disabled', true).text('Saving...');
+        
+        const distributions = [];
+        let hasError = false;
+
+        $('#distribution-tbody tr').each(function(){
+            const bankId = $(this).find('.dist-bank').val();
+            const amount = $(this).find('.dist-amount').val();
+            
+            if(bankId && amount) {
+                distributions.push({ bank_id: bankId, amount: amount });
+            } else if (bankId || amount) {
+                hasError = true;
+            }
+        });
+
+        const employeeId = $('#employeeId').val();
+        const entryDate = $('#entryDate').val();
+        const effectiveDate = $('#effectiveDate').val();
+        const gross = $('#gross').val();
+
+        if(!employeeId) return validate('Please select employee');
+        if(!entryDate) return validate('Please select entry date');
+        if(!effectiveDate) return validate('Please select effective date');
+        if(distributions.length === 0) return validate('Please add at least one bank distribution');
+        if(hasError) return validate('Please complete all distribution rows');
+
+        const FormData = {
+            employeeId: employeeId,
+            entryDate: entryDate,
+            effectiveDate: effectiveDate,
+            gross: gross,
+            remarks: $('#remarks').val(),
+            distributions: distributions
+        };
 
         $.ajax({
             url:'/salary-bank-part-create',
@@ -214,17 +305,25 @@ $(document).ready(function(){
             headers:{'X-CSRF-TOKEN':'{{ csrf_token() }}'},
             data:FormData,
             success:function(res){
-                LoadBankPart(FormData.employeeId);
-                toastr.success(res.message || 'Data saved successfully.');
-
-                // Reset all inputs except Entry Date
-                $('#bankForm').find('input[type="text"], input[type="date"], select').not('#entryDate').val('');
-                $('#entryDate').val('{{ date('Y-m-d') }}');
-                $('#saveData').attr('disabled', false).text('Save');
+                if(res.status == 'success') {
+                    LoadBankPart(FormData.employeeId);
+                    toastr.success(res.message);
+                    
+                    // Reset distributions
+                    $('#distribution-tbody').find('tr:not(:first)').remove();
+                    $('#distribution-tbody').find('input, select').val('');
+                    calculateRemaining();
+                    
+                    // Reset other fields
+                    $('#effectiveDate, #remarks').val('');
+                } else {
+                    toastr.error(res.message || 'Error occurred');
+                }
+                self.attr('disabled', false).text('Save');
             },
-            error:function(){
-                $('#saveData').attr('disabled', false).text('Save');
-                toastr.error('Data save failed.');
+            error:function(xhr){
+                self.attr('disabled', false).text('Save');
+                toastr.error(xhr.responseJSON?.message || 'Data save failed.');
             }
         });
     });
@@ -259,7 +358,7 @@ $(document).ready(function(){
                         dt.row.add([
                             item.employee_code,
                             item.effective_date,
-                            item.bank_amount,
+                            `${item.bank_amount} (${item.company_bank_name || 'N/A'})`,
                             item.cash_amount,
                             `<input type="checkbox" data-id="${item.id}" class="status" ${item.status==1?'checked':''}>`,
                             item.status==0?'false':'true',

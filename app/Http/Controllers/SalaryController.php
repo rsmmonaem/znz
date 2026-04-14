@@ -521,6 +521,7 @@ Class SalaryController extends Controller{
         $branch = Branch::all();
         $department = Department::all();
         $section = Section::all();
+        $companyBanks = DB::table('company_banks')->where('status', 1)->get();
         $employee = User::LeftJoin('profile', 'users.id', '=', 'profile.user_id')
         ->select(
             'users.id', 
@@ -528,41 +529,66 @@ Class SalaryController extends Controller{
             'users.first_name'
         )
         ->get();
-        return view('salary.salary', compact('group', 'branch', 'department', 'section', 'employee'));
+        return view('salary.salary', compact('group', 'branch', 'department', 'section', 'employee', 'companyBanks'));
     }
 
-    public function  Salary_BankPartPost(Request $request) {
+    public function Salary_BankPartPost(Request $request) {
         $gross = $request->gross;
-        $bankAmount = $request->bankAmount;
+        $distributions = $request->distributions; // Array of {bank_id, amount}
         $effectiveDate = $request->effectiveDate;
         $employeeId = $request->employeeId;
         $entryDate = $request->entryDate;
         $remarks = $request->remarks;
-        $cashAmout = $gross - $bankAmount;
 
-        if(!$gross) {
-            return response()->json(['message' => 'Gross Amount does not exists for this employee.', 'status' => 'error'], 200, array('Access-Controll-Allow-Origin' => '*'));
+        if (!$gross) {
+            return response()->json(['message' => 'Gross Amount does not exist for this employee.', 'status' => 'error']);
         }
 
-        $data = [
-            'user_id' => $employeeId,
-            'effective_date' => $effectiveDate,
-            'bank_amount' => $bankAmount,
-            'cash_amount' => $cashAmout,
-            'status' => false,
-            'remarks' => $remarks,
-            'entry_date' => $entryDate,
-            'gross' => $gross
-        ];
-        $bankAmount = BankAccount::where('user_id', $employeeId)->first();
-        // return $bankAmount;
-        if(!$bankAmount) {
-            return response()->json(['message' => 'Bank account does not exists for this employee.', 'status' => 'error'], 200, array('Access-Controll-Allow-Origin' => '*'));
+        if (empty($distributions)) {
+            return response()->json(['message' => 'Please provide at least one bank distribution.', 'status' => 'error']);
         }
-        DB::table('salary_bank')->insert($data);
-        // return $request->all();
-        $this->logActivity(['module' => 'salary', 'activity' => 'activity_added', 'secondary_id' => $employeeId]);
-        return response()->json(['success']);
+
+        $totalBankAmount = 0;
+        foreach ($distributions as $dist) {
+            $totalBankAmount += (float)$dist['amount'];
+        }
+
+        if ($totalBankAmount > $gross) {
+            return response()->json(['message' => 'Total bank amount exceeds gross salary.', 'status' => 'error']);
+        }
+
+        $cashAmount = $gross - $totalBankAmount;
+
+        DB::beginTransaction();
+        try {
+            // Option: Clear existing distributions for the same effective date if needed? 
+            // Or just append. Usually in this ERP, it's append or replace based on effective_date.
+            // Let's replace for the same effective date to avoid duplicates.
+            DB::table('salary_bank')->where('user_id', $employeeId)->where('effective_date', $effectiveDate)->delete();
+
+            foreach ($distributions as $dist) {
+                DB::table('salary_bank')->insert([
+                    'user_id' => $employeeId,
+                    'effective_date' => $effectiveDate,
+                    'company_bank_id' => $dist['bank_id'],
+                    'bank_amount' => $dist['amount'],
+                    'cash_amount' => $cashAmount,
+                    'status' => false,
+                    'remarks' => $remarks,
+                    'entry_date' => $entryDate,
+                    'gross' => $gross,
+                    'created_at' => date('Y-m-d H:i:s'),
+                    'updated_at' => date('Y-m-d H:i:s')
+                ]);
+            }
+
+            DB::commit();
+            $this->logActivity(['module' => 'salary', 'activity' => 'activity_added', 'secondary_id' => $employeeId]);
+            return response()->json(['status' => 'success', 'message' => 'Data saved successfully.']);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['status' => 'error', 'message' => $e->getMessage()]);
+        }
     }
 
     public function GetBankPart(Request $request)
@@ -570,10 +596,12 @@ Class SalaryController extends Controller{
         $query = DB::table('salary_bank')
             ->join('users', 'salary_bank.user_id', '=', 'users.id')
             ->join('profile', 'users.id', '=', 'profile.user_id')
+            ->leftJoin('company_banks', 'salary_bank.company_bank_id', '=', 'company_banks.id')
             ->select(
                 'salary_bank.*',
                 'users.first_name',
-                'profile.employee_code'
+                'profile.employee_code',
+                'company_banks.bank_name as company_bank_name'
             );
 
         // If an employeeId is provided, filter

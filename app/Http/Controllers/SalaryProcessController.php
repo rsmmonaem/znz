@@ -444,19 +444,28 @@ class SalaryProcessController extends Controller
         $netSalary = $GrossSalaryAmountAfterProvidentFund - $amount;
         $netSalaryWIthoutTax = $GrossSalaryAmountAfterProvidentFund;
 
-        // Fetch the latest salary bank allocation
-        $BankAmount = DB::table('salary_bank')
+        // Fetch the latest salary bank allocation set
+        $latestRecord = DB::table('salary_bank')
             ->where('user_id', $employeeId)
-            // ->where('effective_date', '<=', $formDate)
             ->latest('created_at')
             ->first();
 
-        $FinalBankPercentage = 0;
-        $FinalCashPercentage = 0;
-
-        if (!$BankAmount) {
+        if (!$latestRecord) {
             return null;
         }
+
+        // Get all distributions from the same allocation set (same effective_date and user_id)
+        $BankDistributions = DB::table('salary_bank')
+            ->where('user_id', $employeeId)
+            ->where('effective_date', $latestRecord->effective_date)
+            ->get();
+
+        $totalBankAllocated = $BankDistributions->sum('bank_amount');
+        
+        // Use the first record as a representative for gross/cash calculations 
+        // (they are identical across the set in our new save logic)
+        $BankAmount = $latestRecord;
+        $BankAmount->bank_amount = $totalBankAllocated;
 
 
 

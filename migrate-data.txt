@@ -143,3 +143,9 @@ CREATE TABLE `company_banks` (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+-- Add the company_bank_id column to link distributions to specific banks
+ALTER TABLE `salary_bank` 
+ADD COLUMN `company_bank_id` INT(11) NULL AFTER `user_id`,
+ADD INDEX (`company_bank_id`);
