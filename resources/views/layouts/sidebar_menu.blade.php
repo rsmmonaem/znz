@@ -211,6 +211,9 @@
 										   <li {!! (in_array('cost-unit-wise-challan-list',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/cost-unit-wise-challan-list') !!}"><i class="fa fa-angle-right"></i>Cost Unit Wise Challan List</a></li>
 										@endif
 										{{--  --}}
+										@if(Entrust::can('company_bank_show')) 
+										   <li {!! (in_array('company-bank',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/company-bank') !!}"><i class="fa fa-angle-right"></i> Company Bank </a></li>
+										@endif
 										@if(Entrust::can('tax_bank_show')) 
 										   <li {!! (in_array('tax-bank-show',$menu)) ? 'class="active"' : '' !!} class="no-sort"><a href="{!! URL::to('/tax-bank-show') !!}"><i class="fa fa-angle-right"></i> Tax Bank </a></li>
 										@endif

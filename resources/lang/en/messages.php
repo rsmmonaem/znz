@@ -112,6 +112,8 @@
   'comment' => 'Comment',
   'company_hierarchy' => 'Company Hierarchy',
   'company_name' => 'Company Name',
+  'company_bank' => 'Company Bank',
+  'company_bank_info' => 'Company Bank Information',
   'compose' => 'Compose',
   'configuration' => 'Configuration',
   'configuration_updated' => 'Configuration updated.',

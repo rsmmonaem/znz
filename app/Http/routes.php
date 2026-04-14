@@ -307,6 +307,9 @@ Route::group(['middleware' => ['auth','license','account_valid']], function () {
 	Route::get('tax-bank-show', 'TaxbankController@showPage');
 	Route::resource('tax-bank', 'TaxbankController');
 	
+	Route::post('/company-bank-status', 'CompanyBankController@updateStatus');
+	Route::resource('/company-bank', 'CompanyBankController');
+	
 	// Tax Bank Branch
 	Route::get('tax-bank-branch-show', 'TaxbankbranchController@showPage');
 	Route::resource('tax-bank-branch', 'TaxbankbranchController');
