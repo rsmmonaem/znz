@@ -607,15 +607,17 @@ class SalaryController extends Controller
     {
         try {
             $employeeId = $request->employeeId;
-            $data = DB::table('salary_bank')
+            $query = DB::table('salary_bank')
                 ->join('users', 'users.id', '=', 'salary_bank.user_id')
                 ->join('profile', 'users.id', '=', 'profile.user_id')
                 ->select('salary_bank.*', 'profile.employee_code')
-                ->when($employeeId, function ($query, $employeeId) {
-                    return $query->where('salary_bank.user_id', $employeeId);
-                })
-                ->orderBy('salary_bank.id', 'desc')
-                ->get();
+                ->orderBy('salary_bank.id', 'desc');
+
+            if ($employeeId) {
+                $query->where('salary_bank.user_id', $employeeId);
+            }
+
+            $data = $query->get();
 
             // Process distributions for display
             foreach ($data as $item) {
