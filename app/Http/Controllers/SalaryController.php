@@ -18,241 +18,248 @@ use Illuminate\Support\Facades\DB;
 use Validator;
 use Response;
 
-Class SalaryController extends Controller{
+class SalaryController extends Controller
+{
     use BasicController;
 
-    public function lists(Request $request){
+    public function lists(Request $request)
+    {
         $data = '';
 
         $employee = \App\User::find($request->input('employee_id'));
 
-        if(!$employee)
+        if (!$employee)
             return $data;
 
         $contracts = \App\Contract::whereUserId($employee->id)->pluck('id')->all();
-        $contract_salaries = \App\Salary::whereIn('contract_id',$contracts)->groupBy('contract_id')->get();
-        $salaries = \App\Salary::whereIn('contract_id',$contracts)->get();
-        $earning_salary_types = SalaryType::where('salary_type','=','earning')->get();
-        $deduction_salary_types = SalaryType::where('salary_type','=','deduction')->get();
+        $contract_salaries = \App\Salary::whereIn('contract_id', $contracts)->groupBy('contract_id')->get();
+        $salaries = \App\Salary::whereIn('contract_id', $contracts)->get();
+        $earning_salary_types = SalaryType::where('salary_type', '=', 'earning')->get();
+        $deduction_salary_types = SalaryType::where('salary_type', '=', 'deduction')->get();
 
-		foreach($contract_salaries as $contract_salary){
-			$data .= '<tr>
-				<td>'.$contract_salary->Contract->full_contract_detail.'</td>';
-				foreach($earning_salary_types as $earning_salary_type){
-				$data .= '<td>'.
-					(($salaries->whereLoose('contract_id',$contract_salary->contract_id)->whereLoose('salary_type_id',$earning_salary_type->id)->first()) ? currency($salaries->whereLoose('contract_id',$contract_salary->contract_id)->whereLoose('salary_type_id',$earning_salary_type->id)->first()->amount) : 0).'</td>';
-				}
-				foreach($deduction_salary_types as $deduction_salary_type){
-				$data .= '<td>'.
-					(($salaries->whereLoose('contract_id',$contract_salary->contract_id)->whereLoose('salary_type_id',$deduction_salary_type->id)->first()) ? currency($salaries->whereLoose('contract_id',$contract_salary->contract_id)->whereLoose('salary_type_id',$deduction_salary_type->id)->first()->amount) : 0).'</td>';
-				}
-				$data .= '<td>
+        foreach ($contract_salaries as $contract_salary) {
+            $data .= '<tr>
+				<td>' . $contract_salary->Contract->full_contract_detail . '</td>';
+            foreach ($earning_salary_types as $earning_salary_type) {
+                $data .= '<td>' .
+                    (($salaries->whereLoose('contract_id', $contract_salary->contract_id)->whereLoose('salary_type_id', $earning_salary_type->id)->first()) ? currency($salaries->whereLoose('contract_id', $contract_salary->contract_id)->whereLoose('salary_type_id', $earning_salary_type->id)->first()->amount) : 0) . '</td>';
+            }
+            foreach ($deduction_salary_types as $deduction_salary_type) {
+                $data .= '<td>' .
+                    (($salaries->whereLoose('contract_id', $contract_salary->contract_id)->whereLoose('salary_type_id', $deduction_salary_type->id)->first()) ? currency($salaries->whereLoose('contract_id', $contract_salary->contract_id)->whereLoose('salary_type_id', $deduction_salary_type->id)->first()->amount) : 0) . '</td>';
+            }
+            $data .= '<td>
 						<div class="btn-group btn-group-xs">
-							<a href="#" data-href="/salary/'.$contract_salary->contract_id.'/edit" class="btn btn-xs btn-default" data-toggle="modal" data-target="#myModal"><i class="fa fa-edit" data-toggle="tooltip" title="'.trans('messages.edit').'"></i></a>'.
-							delete_form(['salary.destroy',$contract_salary->contract_id]).
-						'</div>
+							<a href="#" data-href="/salary/' . $contract_salary->contract_id . '/edit" class="btn btn-xs btn-default" data-toggle="modal" data-target="#myModal"><i class="fa fa-edit" data-toggle="tooltip" title="' . trans('messages.edit') . '"></i></a>' .
+                delete_form(['salary.destroy', $contract_salary->contract_id]) .
+                '</div>
 					</td>
 				</tr>';
-		}
+        }
 
-		return $data;
+        return $data;
 
     }
 
-	public function store(Request $request,$id){
+    public function store(Request $request, $id)
+    {
         return $request->all();
         $employee = \App\User::find($id);
 
-        if(!$employee){
-            if($request->has('ajax_submit')){
-                $response = ['message' => trans('messages.invalid_link'), 'status' => 'error']; 
+        if (!$employee) {
+            if ($request->has('ajax_submit')) {
+                $response = ['message' => trans('messages.invalid_link'), 'status' => 'error'];
                 return response()->json($response, 200, array('Access-Controll-Allow-Origin' => '*'));
             }
             return redirect('/employee')->withErrors(trans('messages.invalid_link'));
         }
 
-		if(!$this->employeeAccessible($employee)){
-            if($request->has('ajax_submit')){
-                $response = ['message' => trans('messages.permission_denied'), 'status' => 'error']; 
+        if (!$this->employeeAccessible($employee)) {
+            if ($request->has('ajax_submit')) {
+                $response = ['message' => trans('messages.permission_denied'), 'status' => 'error'];
                 return response()->json($response, 200, array('Access-Controll-Allow-Origin' => '*'));
             }
-			return redirect('/dashboard')->withErrors(trans('messages.permission_denied'));
-		}
+            return redirect('/dashboard')->withErrors(trans('messages.permission_denied'));
+        }
 
-        $validation = Validator::make($request->all(),[
+        $validation = Validator::make($request->all(), [
             'salary_contract_id' => 'required|unique:salary,contract_id'
         ]);
 
-        if($validation->fails()){
-            if($request->has('ajax_submit')){
-                $response = ['message' => $validation->messages()->first(), 'status' => 'error']; 
+        if ($validation->fails()) {
+            if ($request->has('ajax_submit')) {
+                $response = ['message' => $validation->messages()->first(), 'status' => 'error'];
                 return response()->json($response, 200, array('Access-Controll-Allow-Origin' => '*'));
             }
             return redirect()->back()->withInput()->withErrors($validation->messages()->first());
         }
 
-		$salary_types = SalaryType::all();
+        $salary_types = SalaryType::all();
 
-		foreach($salary_types as $salary_type){
-			$salary = new Salary;
-			$salary->contract_id = $request->input('salary_contract_id');
-			$salary->salary_type_id = $salary_type->id;
-			$salary->amount = ($request->input($salary_type->id)) ? : 0;
-			$salary->save();
-		}
-        $this->logActivity(['module' => 'salary','activity' => 'activity_added','secondary_id' => $employee->id]);
+        foreach ($salary_types as $salary_type) {
+            $salary = new Salary;
+            $salary->contract_id = $request->input('salary_contract_id');
+            $salary->salary_type_id = $salary_type->id;
+            $salary->amount = ($request->input($salary_type->id)) ?: 0;
+            $salary->save();
+        }
+        $this->logActivity(['module' => 'salary', 'activity' => 'activity_added', 'secondary_id' => $employee->id]);
 
-        if($request->has('ajax_submit')){
-            $response = ['message' => trans('messages.employee').' '.trans('messages.salary').' '.trans('messages.added'), 'status' => 'success']; 
+        if ($request->has('ajax_submit')) {
+            $response = ['message' => trans('messages.employee') . ' ' . trans('messages.salary') . ' ' . trans('messages.added'), 'status' => 'success'];
             return response()->json($response, 200, array('Access-Controll-Allow-Origin' => '*'));
         }
-		return redirect('/employee/'.$id.'/#salary')->withSuccess(trans('messages.employee').' '.trans('messages.salary').' '.trans('messages.added'));
-	}
+        return redirect('/employee/' . $id . '/#salary')->withSuccess(trans('messages.employee') . ' ' . trans('messages.salary') . ' ' . trans('messages.added'));
+    }
 
-	public function edit($id){
-		$contract = \App\Contract::find($id);
+    public function edit($id)
+    {
+        $contract = \App\Contract::find($id);
 
-        if(!$contract)
-            return view('common.error',['message' => trans('messages.invalid_link')]);
+        if (!$contract)
+            return view('common.error', ['message' => trans('messages.invalid_link')]);
 
-		$employee = $contract->User;
+        $employee = $contract->User;
 
-		if(!$this->employeeAccessible($employee))
-            return view('common.error',['message' => trans('messages.permission_denied')]);
+        if (!$this->employeeAccessible($employee))
+            return view('common.error', ['message' => trans('messages.permission_denied')]);
 
-		$salaries = Salary::whereContractId($id)->get()->pluck('amount','salary_type_id')->all();
+        $salaries = Salary::whereContractId($id)->get()->pluck('amount', 'salary_type_id')->all();
 
-        $earning_salary_types = SalaryType::where('salary_type','=','earning')->get();
-        $deduction_salary_types = SalaryType::where('salary_type','=','deduction')->get();
-		return view('employee.edit_salary',compact('salaries','contract','earning_salary_types','deduction_salary_types'));
-	}
+        $earning_salary_types = SalaryType::where('salary_type', '=', 'earning')->get();
+        $deduction_salary_types = SalaryType::where('salary_type', '=', 'deduction')->get();
+        return view('employee.edit_salary', compact('salaries', 'contract', 'earning_salary_types', 'deduction_salary_types'));
+    }
 
-	public function update(Request $request, $id){
-		$contract = \App\Contract::find($id);
+    public function update(Request $request, $id)
+    {
+        $contract = \App\Contract::find($id);
 
-        if(!$contract){
-            if($request->has('ajax_submit')){
-                $response = ['message' => trans('messages.invalid_link'), 'status' => 'error']; 
+        if (!$contract) {
+            if ($request->has('ajax_submit')) {
+                $response = ['message' => trans('messages.invalid_link'), 'status' => 'error'];
                 return response()->json($response, 200, array('Access-Controll-Allow-Origin' => '*'));
             }
             return redirect('/employee')->withErrors(trans('messages.invalid_link'));
         }
 
-		$employee = $contract->User;
+        $employee = $contract->User;
 
-		if(!$this->employeeAccessible($employee)){
-            if($request->has('ajax_submit')){
-                $response = ['message' => trans('messages.permission_denied'), 'status' => 'error']; 
+        if (!$this->employeeAccessible($employee)) {
+            if ($request->has('ajax_submit')) {
+                $response = ['message' => trans('messages.permission_denied'), 'status' => 'error'];
                 return response()->json($response, 200, array('Access-Controll-Allow-Origin' => '*'));
             }
-			return redirect('/dashboard')->withErrors(trans('messages.permission_denied'));
-		}
+            return redirect('/dashboard')->withErrors(trans('messages.permission_denied'));
+        }
 
-		$salary_types = SalaryType::all();
+        $salary_types = SalaryType::all();
 
-		foreach($salary_types as $salary_type){
-			$salary = Salary::firstOrNew(array('contract_id' => $id, 'salary_type_id' => $salary_type->id));
-			$salary->contract_id = $id;
-			$salary->amount = ($request->input($salary_type->id)) ? : 0;
-			$salary->save();
-		}
+        foreach ($salary_types as $salary_type) {
+            $salary = Salary::firstOrNew(array('contract_id' => $id, 'salary_type_id' => $salary_type->id));
+            $salary->contract_id = $id;
+            $salary->amount = ($request->input($salary_type->id)) ?: 0;
+            $salary->save();
+        }
 
-        $this->logActivity(['module' => 'salary','activity' => 'activity_updated','secondary_id' => $employee->id]);
+        $this->logActivity(['module' => 'salary', 'activity' => 'activity_updated', 'secondary_id' => $employee->id]);
 
-        if($request->has('ajax_submit')){
-            $response = ['message' => trans('messages.employee').' '.trans('messages.salary').' '.trans('messages.updated'), 'status' => 'success']; 
+        if ($request->has('ajax_submit')) {
+            $response = ['message' => trans('messages.employee') . ' ' . trans('messages.salary') . ' ' . trans('messages.updated'), 'status' => 'success'];
             return response()->json($response, 200, array('Access-Controll-Allow-Origin' => '*'));
         }
-		return redirect('/employee/'.$employee->id.'/#salary')->withSuccess(trans('messages.employee').' '.trans('messages.salary').' '.trans('messages.updated'));
-	}
+        return redirect('/employee/' . $employee->id . '/#salary')->withSuccess(trans('messages.employee') . ' ' . trans('messages.salary') . ' ' . trans('messages.updated'));
+    }
 
-	public function destroy($id,Request $request){
-		$contract = \App\Contract::find($id);
+    public function destroy($id, Request $request)
+    {
+        $contract = \App\Contract::find($id);
 
-        if(!$contract){
-            if($request->has('ajax_submit')){
-                $response = ['message' => trans('messages.invalid_link'), 'status' => 'error']; 
+        if (!$contract) {
+            if ($request->has('ajax_submit')) {
+                $response = ['message' => trans('messages.invalid_link'), 'status' => 'error'];
                 return response()->json($response, 200, array('Access-Controll-Allow-Origin' => '*'));
             }
             return redirect('/employee')->withErrors(trans('messages.invalid_link'));
         }
 
-		$employee = $contract->User;
+        $employee = $contract->User;
 
-		if(!$this->employeeAccessible($employee)){
-            if($request->has('ajax_submit')){
-                $response = ['message' => trans('messages.permission_denied'), 'status' => 'error']; 
+        if (!$this->employeeAccessible($employee)) {
+            if ($request->has('ajax_submit')) {
+                $response = ['message' => trans('messages.permission_denied'), 'status' => 'error'];
                 return response()->json($response, 200, array('Access-Controll-Allow-Origin' => '*'));
             }
-			return redirect('/dashboard')->withErrors(trans('messages.permission_denied'));
-		}
+            return redirect('/dashboard')->withErrors(trans('messages.permission_denied'));
+        }
 
-		\App\Salary::whereContractId($id)->delete();
-        $this->logActivity(['module' => 'salary','activity' => 'activity_deleted','secondary_id' => $employee->id]);
-        
-        if($request->has('ajax_submit')){
-            $response = ['message' => trans('messages.employee').' '.trans('messages.employee').' '.trans('messages.deleted'), 'status' => 'success']; 
+        \App\Salary::whereContractId($id)->delete();
+        $this->logActivity(['module' => 'salary', 'activity' => 'activity_deleted', 'secondary_id' => $employee->id]);
+
+        if ($request->has('ajax_submit')) {
+            $response = ['message' => trans('messages.employee') . ' ' . trans('messages.employee') . ' ' . trans('messages.deleted'), 'status' => 'success'];
             return response()->json($response, 200, array('Access-Controll-Allow-Origin' => '*'));
         }
-		return redirect('/employee/'.$employee->id.'/#salary')->withSuccess(trans('messages.employee').' '.trans('messages.salary').' '.trans('messages.deleted'));
-	}
-    
-    public function salary(){
-       $employee = User::LeftJoin('profile', 'users.id', '=', 'profile.user_id')
-       ->select('users.id', 'profile.employee_code','users.first_name')
-       ->get();
-       $group = DB::table('com_group')->get();
-       $branch = Branch::all();
+        return redirect('/employee/' . $employee->id . '/#salary')->withSuccess(trans('messages.employee') . ' ' . trans('messages.salary') . ' ' . trans('messages.deleted'));
+    }
 
-       return view('salary.salary-slab',compact('employee','group','branch'));
+    public function salary()
+    {
+        $employee = User::LeftJoin('profile', 'users.id', '=', 'profile.user_id')
+            ->select('users.id', 'profile.employee_code', 'users.first_name')
+            ->get();
+        $group = DB::table('com_group')->get();
+        $branch = Branch::all();
+
+        return view('salary.salary-slab', compact('employee', 'group', 'branch'));
     }
 
     public function SalarySlabList(Request $request)
     {
-        
+
         $users = \App\User::with('profile')->where(['users.id' => $request->query('id')])->get();
 
-        
+
         $earning_salary_types = \App\SalaryType::where('salary_type', '=', 'earning')->get();
 
-        $data = []; 
+        $data = [];
 
         foreach ($users as $user) {
-            
+
             $latest_contract = \App\Contract::whereUserId($user->id)
-                ->latest('id') 
+                ->latest('id')
                 ->first();
 
-            
-            if ($latest_contract) {
-                
-                $contract_salaries = \App\Salary::where('contract_id', $latest_contract->id)
-                ->latest('id') 
-                ->get();
 
-                
+            if ($latest_contract) {
+
+                $contract_salaries = \App\Salary::where('contract_id', $latest_contract->id)
+                    ->latest('id')
+                    ->get();
+
+
                 $slab_data = DB::table('salary_slab')
                     ->where('user_id', $user->id)
-                    ->latest('id') 
+                    ->latest('id')
                     ->first();
 
                 $contractData = [
-                        'user_info' => [
-                            'first_name' => $user->first_name,
-                            'employee_code' => $user->profile->employee_code,
-                            'entry_date' => isset($slab_data->entrydate) ? date('Y-m-d', strtotime($slab_data->entrydate)) : null,
-                            'effective_date' => isset($slab_data->effactive_date) ? date('Y-m-d', strtotime($slab_data->effactive_date)) : null,
-                            'gross' => isset($slab_data->gross) ? $slab_data->gross : null,
-                            'slab_id' => isset($slab_data->id) ? $slab_data->id : null
-                        ],
-                        'contract_details' => [
-                            'from_date' => $latest_contract->from_date,
-                        ],
-                        'salaries' => [],
-                    ];
+                    'user_info' => [
+                        'first_name' => $user->first_name,
+                        'employee_code' => $user->profile->employee_code,
+                        'entry_date' => isset($slab_data->entrydate) ? date('Y-m-d', strtotime($slab_data->entrydate)) : null,
+                        'effective_date' => isset($slab_data->effactive_date) ? date('Y-m-d', strtotime($slab_data->effactive_date)) : null,
+                        'gross' => isset($slab_data->gross) ? $slab_data->gross : null,
+                        'slab_id' => isset($slab_data->id) ? $slab_data->id : null
+                    ],
+                    'contract_details' => [
+                        'from_date' => $latest_contract->from_date,
+                    ],
+                    'salaries' => [],
+                ];
 
                 foreach ($earning_salary_types as $earning_salary_type) {
-                    
+
                     $salary = $contract_salaries->filter(function ($salary) use ($earning_salary_type) {
                         return $salary->salary_type_id == $earning_salary_type->id;
                     })->first();
@@ -265,17 +272,18 @@ Class SalaryController extends Controller{
                     ];
                 }
 
-                $data[] = $contractData; 
+                $data[] = $contractData;
             }
         }
 
         return response()->json($data);
     }
 
-    public function CreateSlab(Request $request){
+    public function CreateSlab(Request $request)
+    {
         DB::beginTransaction();
-        try{
-            $employee_id  = $request->employeeId;
+        try {
+            $employee_id = $request->employeeId;
             // return $employee_id;
             $contact = Contract::where('user_id', $employee_id)->latest()->first();
 
@@ -334,7 +342,7 @@ Class SalaryController extends Controller{
             $this->logActivity(['module' => 'salary', 'activity' => 'activity_added', 'secondary_id' => $employee_id]);
             DB::commit();
             return response()->json(['success', 'data' => $employee_id]);
-        }catch(Exception $e){
+        } catch (Exception $e) {
             DB::rollBack();
             return response()->json(['message' => $e->getMessage(), 'status' => 'error', 'data' => $employee_id], 200, array('Access-Controll-Allow-Origin' => '*'));
         }
@@ -347,7 +355,7 @@ Class SalaryController extends Controller{
             if (!$slab) {
                 return response()->json(['message' => 'Salary slab not found.'], 404);
             }
-    
+
             DB::table('salary_slab')->where('id', $id)->delete();
             return response()->json(['message' => 'Salary slab deleted successfully.'], 200);
 
@@ -362,7 +370,7 @@ Class SalaryController extends Controller{
     public function salarySlabEdit($id)
     {
         $slab = DB::table('salary_slab')->where('id', $id)->first();
-        
+
         if (!$slab) {
             return redirect('/salary-slab')->withErrors('Salary slab not found.');
         }
@@ -390,11 +398,11 @@ Class SalaryController extends Controller{
         // Get latest contract salaries for the employee
         $latest_contract = Contract::where('user_id', $user->id)->latest('id')->first();
         $salaries = [];
-        
+
         if ($latest_contract) {
             $contract_salaries = Salary::where('contract_id', $latest_contract->id)->get();
             $earning_salary_types = SalaryType::where('salary_type', '=', 'earning')->get();
-            
+
             foreach ($earning_salary_types as $type) {
                 $salary = $contract_salaries->where('salary_type_id', $type->id)->first();
                 $salaries[$type->head] = $salary ? floor($salary->amount) : 0;
@@ -470,7 +478,7 @@ Class SalaryController extends Controller{
                 $salary = Salary::where('contract_id', $contact->id)
                     ->where('salary_type_id', $type_id)
                     ->first();
-                
+
                 if ($salary) {
                     $salary->amount = $amount ?: 0;
                     $salary->save();
@@ -489,23 +497,23 @@ Class SalaryController extends Controller{
                 'gross' => $gross,
                 'effactive_date' => $request->effectiveDate,
             ];
-            
+
             // Update user_id if employee changed
             if ($employee_id != $slab->user_id) {
                 $updateData['user_id'] = $employee_id;
             }
-            
+
             DB::table('salary_slab')->where('id', $slab_id)->update($updateData);
 
             $this->logActivity(['module' => 'salary', 'activity' => 'activity_updated', 'secondary_id' => $employee_id]);
             DB::commit();
-            
+
             return response()->json(['message' => 'Salary slab updated successfully.', 'status' => 'success', 'data' => $employee_id]);
         } catch (Exception $e) {
             DB::rollBack();
             return response()->json(['message' => $e->getMessage(), 'status' => 'error'], 500);
         }
-    } 
+    }
 
     // public function getSalaryData(){
     //     Salary::LeftJoin('contacts', 'salary.contract_id' ,'=', 'contacts.id')
@@ -516,23 +524,25 @@ Class SalaryController extends Controller{
     //     ->get();
     // }
 
-    public function Salary_BankPart() {
+    public function Salary_BankPart()
+    {
         $group = DB::table('com_group')->get();
         $branch = Branch::all();
         $department = Department::all();
         $section = Section::all();
         $companyBanks = DB::table('company_banks')->where('status', 1)->get();
         $employee = User::LeftJoin('profile', 'users.id', '=', 'profile.user_id')
-        ->select(
-            'users.id', 
-            'profile.employee_code', 
-            'users.first_name'
-        )
-        ->get();
+            ->select(
+                'users.id',
+                'profile.employee_code',
+                'users.first_name'
+            )
+            ->get();
         return view('salary.salary', compact('group', 'branch', 'department', 'section', 'employee', 'companyBanks'));
     }
 
-    public function Salary_BankPartPost(Request $request) {
+    public function Salary_BankPartPost(Request $request)
+    {
         $gross = $request->gross;
         $distributions = $request->distributions; // Array of {bank_id, amount}
         $effectiveDate = $request->effectiveDate;
@@ -544,20 +554,17 @@ Class SalaryController extends Controller{
             return response()->json(['message' => 'Gross Amount does not exist for this employee.', 'status' => 'error']);
         }
 
-        if (empty($distributions)) {
-            return response()->json(['message' => 'Please provide at least one bank distribution.', 'status' => 'error']);
-        }
 
         $totalBankAmount = 0;
         foreach ($distributions as $dist) {
-            $totalBankAmount += (float)$dist['amount'];
+            $totalBankAmount += (float) $dist['amount'];
         }
 
-        if ($totalBankAmount > (float)$gross) {
-            return response()->json(['message' => 'Total distributed bank amount ('. $totalBankAmount .') exceeds Gross Salary ('. $gross .')', 'status' => 'error']);
+        if ($totalBankAmount > (float) $gross) {
+            return response()->json(['message' => 'Total distributed bank amount (' . $totalBankAmount . ') exceeds Gross Salary (' . $gross . ')', 'status' => 'error']);
         }
 
-        $cashAmount = (float)$gross - $totalBankAmount;
+        $cashAmount = (float) $gross - $totalBankAmount;
 
         DB::beginTransaction();
         try {
@@ -566,12 +573,13 @@ Class SalaryController extends Controller{
             // Let's replace for the same effective date to avoid duplicates.
             DB::table('salary_bank')->where('user_id', $employeeId)->where('effective_date', $effectiveDate)->delete();
 
-            foreach ($distributions as $dist) {
+            if (empty($distributions)) {
+                // If no bank distributions, save one row with the full cash amount
                 DB::table('salary_bank')->insert([
                     'user_id' => $employeeId,
                     'effective_date' => $effectiveDate,
-                    'company_bank_id' => $dist['bank_id'],
-                    'bank_amount' => $dist['amount'],
+                    'company_bank_id' => null,
+                    'bank_amount' => 0,
                     'cash_amount' => $cashAmount,
                     'status' => false,
                     'remarks' => $remarks,
@@ -580,6 +588,22 @@ Class SalaryController extends Controller{
                     'created_at' => date('Y-m-d H:i:s'),
                     'updated_at' => date('Y-m-d H:i:s')
                 ]);
+            } else {
+                foreach ($distributions as $dist) {
+                    DB::table('salary_bank')->insert([
+                        'user_id' => $employeeId,
+                        'effective_date' => $effectiveDate,
+                        'company_bank_id' => $dist['bank_id'],
+                        'bank_amount' => $dist['amount'],
+                        'cash_amount' => $cashAmount,
+                        'status' => false,
+                        'remarks' => $remarks,
+                        'entry_date' => $entryDate,
+                        'gross' => $gross,
+                        'created_at' => date('Y-m-d H:i:s'),
+                        'updated_at' => date('Y-m-d H:i:s')
+                    ]);
+                }
             }
 
             DB::commit();
@@ -605,7 +629,7 @@ Class SalaryController extends Controller{
             );
 
         // If an employeeId is provided, filter
-        if($request->has('employeeId') && $request->employeeId != '') {
+        if ($request->has('employeeId') && $request->employeeId != '') {
             $query->where('salary_bank.user_id', $request->employeeId);
         }
 
@@ -615,7 +639,8 @@ Class SalaryController extends Controller{
     }
 
 
-    public function bankedit($id) {
+    public function bankedit($id)
+    {
         $bankPart = DB::table('salary_bank')->where('id', $id)->first();
         return view('salary.edit-bank-part', compact('bankPart'));
     }
@@ -623,30 +648,32 @@ Class SalaryController extends Controller{
 
 
     public function UpdateBankPart(Request $request)
-{
-    DB::table('salary_bank')->where('id', $request->id)->update([
-        'bank_amount'     => $request->bank_amount,
-        'cash_amount'     => $request->cash_amount,
-        'remarks'         => $request->remarks,
-        'effective_date'  => $request->effective_date
-    ]);
+    {
+        DB::table('salary_bank')->where('id', $request->id)->update([
+            'bank_amount' => $request->bank_amount,
+            'cash_amount' => $request->cash_amount,
+            'remarks' => $request->remarks,
+            'effective_date' => $request->effective_date
+        ]);
 
-    return response()->json([
-        'status' => 'success',
-        'message' => 'Updated successfully'
-    ]);
-}
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Updated successfully'
+        ]);
+    }
 
 
-    public function DeleteBankPart($id) {
+    public function DeleteBankPart($id)
+    {
         DB::table('salary_bank')->where('id', $id)->delete();
         return response()->json(['message' => 'Deleted Successfully']);
     }
 
-    
-    
-    
-    public function updateStatus(Request $request) {
+
+
+
+    public function updateStatus(Request $request)
+    {
         $oldData = DB::table('salary_bank')->where('id', $request->id)->first();
         $data = [
             'status' => $request->status,
@@ -655,7 +682,7 @@ Class SalaryController extends Controller{
         if ($request->status == 0) {
             $data['cash_amount'] = $oldData->cash_amount - $oldData->old_bank;
             $data['bank_amount'] = $oldData->old_bank;
-        }else if($request->status == 1){
+        } else if ($request->status == 1) {
             $data['cash_amount'] = $oldData->cash_amount + $oldData->bank_amount;
             $data['old_bank'] = $oldData->bank_amount;
             $data['bank_amount'] = 0;
@@ -665,41 +692,43 @@ Class SalaryController extends Controller{
 
         return response()->json(['message' => 'Status Update Successfully']);
     }
-     public function salaryReport() {
+    public function salaryReport()
+    {
         $group = DB::table('com_group')->get();
         $branch = Branch::all();
         $department = Department::all();
         $designation = Designation::all();
         $section = Section::all();
         $employee = User::LeftJoin('profile', 'users.id', '=', 'profile.user_id')
-        ->select(
-            'users.id', 
-            'profile.employee_code', 
-            'users.first_name'
-        )
-        ->get();
+            ->select(
+                'users.id',
+                'profile.employee_code',
+                'users.first_name'
+            )
+            ->get();
         $category = DB::table('category')->get();
-        return view('salary.salaryReport',compact('group','branch','department','section','employee','designation', 'category'));
+        return view('salary.salaryReport', compact('group', 'branch', 'department', 'section', 'employee', 'designation', 'category'));
     }
 
     // Get User Infor with Gross Salary
-    public function getGrossSalary(Request $request) {
+    public function getGrossSalary(Request $request)
+    {
         $employee = User::leftjoin('profile', 'users.id', '=', 'profile.user_id')
-        ->leftjoin('salary_slab', 'users.id', '=', 'salary_slab.user_id')
-        ->leftjoin('designations', 'users.designation_id', '=', 'designations.id')
-        ->select(
-            'users.id',
-            'profile.employee_code',
-            'users.first_name',
-            'salary_slab.gross',
-            'salary_slab.entrydate',
-            'salary_slab.effactive_date',
-            'profile.category',
-            'designations.name as designation'
-        )
-        ->where('users.id', $request->employeeId)
-        ->orderby('salary_slab.id','desc')
-        ->first();
+            ->leftjoin('salary_slab', 'users.id', '=', 'salary_slab.user_id')
+            ->leftjoin('designations', 'users.designation_id', '=', 'designations.id')
+            ->select(
+                'users.id',
+                'profile.employee_code',
+                'users.first_name',
+                'salary_slab.gross',
+                'salary_slab.entrydate',
+                'salary_slab.effactive_date',
+                'profile.category',
+                'designations.name as designation'
+            )
+            ->where('users.id', $request->employeeId)
+            ->orderby('salary_slab.id', 'desc')
+            ->first();
         // return $employee;
         return response()->json($employee);
     }
@@ -713,22 +742,22 @@ Class SalaryController extends Controller{
             ->leftJoin('sections', 'profile.section_id', '=', 'sections.id')
             ->leftJoin('grades', 'profile.grade_id', '=', 'grades.id')
             ->where('users.status', 'active')
-            ->when($request->employeeId, function($q) use ($request) {
+            ->when($request->employeeId, function ($q) use ($request) {
                 return $q->where('users.id', $request->employeeId);
             })
-            ->when($request->branch, function($q) use ($request) {
+            ->when($request->branch, function ($q) use ($request) {
                 return $q->where('profile.branch_id', $request->branch);
             })
-            ->when($request->section, function($q) use ($request) {
+            ->when($request->section, function ($q) use ($request) {
                 return $q->where('profile.section_id', $request->section);
             })
-            ->when($request->department, function($q) use ($request) {
+            ->when($request->department, function ($q) use ($request) {
                 return $q->where('departments.id', $request->department);
             })
-            ->when($request->designation, function($q) use ($request) {
+            ->when($request->designation, function ($q) use ($request) {
                 return $q->where('designations.id', $request->designation);
             })
-            ->when($request->category, function($q) use ($request) {
+            ->when($request->category, function ($q) use ($request) {
                 return $q->where('profile.category', $request->category);
             })
             ->select(
@@ -744,10 +773,10 @@ Class SalaryController extends Controller{
             )
             ->orderByRaw('CAST(profile.employee_code AS UNSIGNED)')
             ->get();
-    
+
         $earning_salary_types = \App\SalaryType::where('salary_type', 'earning')->get();
         $data = [];
-    
+
         foreach ($userIds as $user) {
             // default values
             $gross = 0;
@@ -758,53 +787,53 @@ Class SalaryController extends Controller{
             $entry_date = null;
             $effective_date = null;
             $salary_group = [];
-    
+
             // last contract
             $latest_contract = \App\Contract::where('user_id', $user->id)
                 ->orderBy('id', 'DESC')
                 ->first();
-    
+
             if ($latest_contract) {
                 $contract_salaries = \App\Salary::where('contract_id', $latest_contract->id)->get();
-    
+
                 $slab = DB::table('salary_slab')
                     ->where('user_id', $user->id)
                     ->orderBy('id', 'DESC')
                     ->first();
-    
+
                 if ($slab) {
                     $gross = isset($slab->gross) ? $slab->gross : 0;
                     $entry_date = isset($slab->entrydate) ? date('Y-m-d', strtotime($slab->entrydate)) : null;
                     $effective_date = isset($slab->effactive_date) ? date('Y-m-d', strtotime($slab->effactive_date)) : null;
                 }
-    
+
                 $salary_bank = DB::table('salary_bank')
                     ->where('user_id', $user->id)
                     ->orderBy('id', 'DESC')
                     ->first();
-    
+
                 if ($salary_bank) {
                     $bank_amount = isset($salary_bank->bank_amount) ? $salary_bank->bank_amount : 0;
                     $cash_amount = isset($salary_bank->cash_amount) ? $salary_bank->cash_amount : 0;
                     $remarks = isset($salary_bank->remarks) ? $salary_bank->remarks : null;
                 }
-    
+
                 $acc = DB::table('bank_accounts')
                     ->where('user_id', $user->id)
                     ->orderBy('id', 'DESC')
                     ->first();
-    
+
                 if ($acc) {
                     $account_number = isset($acc->account_number) ? $acc->account_number : null;
                 }
-    
+
                 foreach ($earning_salary_types as $type) {
-                    $row = $contract_salaries->first(function($s) use ($type) {
+                    $row = $contract_salaries->first(function ($s) use ($type) {
                         return isset($s->salary_type_id) && $s->salary_type_id == $type->id;
                     });
-    
+
                     $amount = ($row && isset($row->amount)) ? floatval($row->amount) : 0;
-    
+
                     $salary_group[] = [
                         'salary_type' => isset($type->head) ? $type->head : 'Unknown',
                         'amount' => floor($amount)
@@ -819,7 +848,7 @@ Class SalaryController extends Controller{
                     ];
                 }
             }
-    
+
             $data[] = [
                 'user_info' => [
                     'first_name' => isset($user->first_name) ? $user->first_name : '',
@@ -840,7 +869,7 @@ Class SalaryController extends Controller{
                 'salaries' => $salary_group
             ];
         }
-    
+
         return response()->json($data);
     }
 
@@ -894,23 +923,23 @@ Class SalaryController extends Controller{
         }
 
         // ----- breakdown from gross -----
-        $gross      = (float) $salary->gross_salary;
-        $basic      = $gross * 0.50;
-        $house      = $gross * 0.28;
-        $medical    = $gross * 0.09;
+        $gross = (float) $salary->gross_salary;
+        $basic = $gross * 0.50;
+        $house = $gross * 0.28;
+        $medical = $gross * 0.09;
         $conveyance = $gross * 0.08;
-        $others     = $gross * 0.05;
+        $others = $gross * 0.05;
 
         $data = [
-            'employee'   => $employee,
-            'basic'      => number_format($basic, 2),
-            'house'      => number_format($house, 2),
-            'medical'    => number_format($medical, 2),
+            'employee' => $employee,
+            'basic' => number_format($basic, 2),
+            'house' => number_format($house, 2),
+            'medical' => number_format($medical, 2),
             'conveyance' => number_format($conveyance, 2),
-            'others'     => number_format($others, 2),
-            'gross'      => number_format($gross, 2),
-            'tax'        => number_format((float) $salary->tax_amount, 2),
-            'net'        => number_format((float) $salary->net_salary, 2),
+            'others' => number_format($others, 2),
+            'gross' => number_format($gross, 2),
+            'tax' => number_format((float) $salary->tax_amount, 2),
+            'net' => number_format((float) $salary->net_salary, 2),
         ];
 
         return response()->json($data);
