@@ -425,7 +425,7 @@
                 data: { employeeId: employeeId },
                 success: function (res) {
                     dt.clear();
-                    if (res.length == 0) {
+                    if (!Array.isArray(res) || res.length == 0) {
                         dt.row.add(['No data found', '', '', '', '', '', '']).draw();
                     } else {
                         res.forEach(function (item) {
@@ -443,7 +443,12 @@
                         dt.draw();
                     }
                 },
-                error: function () { console.log('error'); }
+                error: function (xhr) {
+                    dt.clear();
+                    var msg = xhr.responseJSON ? xhr.responseJSON.error : 'Failed to load data';
+                    dt.row.add([msg, '', '', '', '', '', '']).draw();
+                    console.error('GetBankPart error:', msg);
+                }
             });
         }
 

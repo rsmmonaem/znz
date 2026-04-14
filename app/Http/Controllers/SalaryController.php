@@ -605,42 +605,47 @@ class SalaryController extends Controller
 
     public function GetBankPart(Request $request)
     {
-        $employeeId = $request->employeeId;
-        $data = DB::table('salary_bank')
-            ->join('users', 'users.id', '=', 'salary_bank.user_id')
-            ->join('profile', 'users.id', '=', 'profile.user_id')
-            ->select('salary_bank.*', 'profile.employee_code')
-            ->when($employeeId, function ($query, $employeeId) {
-                return $query->where('salary_bank.user_id', $employeeId);
-            })
-            ->orderBy('id', 'desc')
-            ->get();
+        try {
+            $employeeId = $request->employeeId;
+            $data = DB::table('salary_bank')
+                ->join('users', 'users.id', '=', 'salary_bank.user_id')
+                ->join('profile', 'users.id', '=', 'profile.user_id')
+                ->select('salary_bank.*', 'profile.employee_code')
+                ->when($employeeId, function ($query, $employeeId) {
+                    return $query->where('salary_bank.user_id', $employeeId);
+                })
+                ->orderBy('salary_bank.id', 'desc')
+                ->get();
 
-        // Process distributions for display
-        foreach ($data as $item) {
-            $bankIds = json_decode($item->company_bank_id, true);
-            $bankAmounts = json_decode($item->bank_amounts, true);
-            
-            $displayStr = "";
-            if (is_array($bankIds) && count($bankIds) > 0) {
-                $banks = DB::table('company_banks')->whereIn('id', $bankIds)->get()->keyBy('id');
-                $parts = [];
-                foreach ($bankIds as $index => $id) {
-                    $name = isset($banks[$id]) ? $banks[$id]->bank_name : 'Unknown';
-                    $amt = isset($bankAmounts[$index]) ? $bankAmounts[$index] : 0;
-                    $parts[] = "$name: $amt";
+            // Process distributions for display
+            foreach ($data as $item) {
+                $bankIds = json_decode($item->company_bank_id, true);
+                // bank_amounts column may not exist on older records
+                $bankAmounts = isset($item->bank_amounts) ? json_decode($item->bank_amounts, true) : [];
+
+                $displayStr = "";
+                if (is_array($bankIds) && count($bankIds) > 0) {
+                    $banks = DB::table('company_banks')->whereIn('id', $bankIds)->get()->keyBy('id');
+                    $parts = [];
+                    foreach ($bankIds as $index => $id) {
+                        $name = isset($banks[$id]) ? $banks[$id]->bank_name : 'Unknown';
+                        $amt = isset($bankAmounts[$index]) ? $bankAmounts[$index] : 0;
+                        $parts[] = "$name: $amt";
+                    }
+                    $displayStr = implode(', ', $parts);
+                } else if ($item->bank_amount > 0) {
+                    // Legacy data: plain bank amount with no JSON
+                    $displayStr = (string)$item->bank_amount;
+                } else {
+                    $displayStr = "0 (Cash Only)";
                 }
-                $displayStr = implode(', ', $parts);
-            } else if (!is_array($bankIds) && $item->bank_amount > 0) {
-                 // Fallback for legacy data
-                 $displayStr = $item->bank_amount;
-            } else {
-                $displayStr = "0 (Cash Only)";
+                $item->company_bank_name = $displayStr;
             }
-            $item->company_bank_name = $displayStr;
-        }
 
-        return response()->json($data);
+            return response()->json($data);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 
 
