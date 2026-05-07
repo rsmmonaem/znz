@@ -134,7 +134,7 @@ class DashboardController extends Controller
                 'number' => $number.'<sup>'.daySuffix($number).'</sup>'.' '.trans('messages.birthday'),
                 'id' => $all_birthday->User->id,
                 'name' => $all_birthday->User->full_name,
-                'designation' => $all_birthday->User->Designation->full_designation
+                'designation' => ($all_birthday->User->Designation) ? $all_birthday->User->Designation->full_designation : ''
             );
         }
 
