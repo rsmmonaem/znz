@@ -12,7 +12,7 @@ class IdCardChecklistController extends Controller
         $branches = DB::table('branchs')->select('id', 'name')->get();
 
         // If no branch selected, show empty list initially
-        if (!$request->has('branch_id')) {
+        if (empty($request->input('branch_id'))) {
             $id_card_checklist = collect();
         } else {
             // Base query with joins
@@ -35,10 +35,14 @@ class IdCardChecklistController extends Controller
 
             $id_card_checklist = $query->orderBy('id_card.id', 'desc')->paginate(20);
         }
-    }
 
-    public function getBranchEmployees($branchId)
+        return view('IDCardCheck.id_card_checklist', compact('branches', 'id_card_checklist'));
+    }
+   
+
+    public function getBranchEmployees(Request $request)
     {
+        $branchId = $request->input('branch_id');
         $employees = Helpers::GetBranchEmployeesIndependent($branchId);
         return response()->json($employees);
     }
