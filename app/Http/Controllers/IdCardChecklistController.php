@@ -12,7 +12,7 @@ class IdCardChecklistController extends Controller
         $branches = DB::table('branchs')->select('id', 'name')->get();
 
         // If no branch selected, show empty list initially
-        if (!$request->filled('branch_id')) {
+        if (!$request->has('branch_id')) {
             $id_card_checklist = collect();
         } else {
             // Base query with joins
