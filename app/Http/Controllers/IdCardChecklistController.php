@@ -18,7 +18,8 @@ class IdCardChecklistController extends Controller
        ->orderby('id_card.id', 'desc')
         ->paginate(20);
         // return $id_card_checklist;
-        return view('IDCardCheck.id_card_checklist', compact('id_card_checklist'));
+        $branches = DB::table('branchs')->select('id', 'name')->get();
+        return view('IDCardCheck.id_card_checklist', compact('id_card_checklist', 'branches'));
     }
     public function ChnageStatus(Request $request)
     {

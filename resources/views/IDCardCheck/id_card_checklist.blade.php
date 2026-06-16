@@ -21,6 +21,25 @@
                             <p>Date: {{ date('d-m-Y') }}</p>
                         </div>
 
+                                                <!-- Filters -->
+                        <div class="row" style="margin-bottom: 20px;">
+                            <div class="col-md-4">
+                                <label>Filter by Branch:</label>
+                                <select id="branchFilter" class="form-control">
+                                    <option value="">All Branches</option>
+                                    @foreach($branches as $branch)
+                                        <option value="{{ $branch->id }}">{{ $branch->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label>Filter by Employee:</label>
+                                <select id="employeeFilter" class="form-control" disabled>
+                                    <option value="">All Employees</option>
+                                </select>
+                            </div>
+                        </div>
+
                         <!-- Table -->
                         <table class="table table-bordered">
                             <thead>
