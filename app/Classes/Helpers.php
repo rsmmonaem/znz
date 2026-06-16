@@ -1,7 +1,7 @@
 <?php
 namespace App\Classes;
 
-use Illuminate\Support\Facades\DB;
+use App\Leave;
 use App\Profile;
 use App\User;
 use Carbon\Carbon;
@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\DB;
 class Helpers{
     public static function GetBranchEmployees($branch_id){
         $employees = User::leftJoin('profile', 'users.id', '=', 'profile.user_id')
-        ->select('users.id', DB::raw("CONCAT(users.first_name, ' ', users.last_name) as employee_name"), 'profile.employee_code')
+        ->select('users.first_name as employee_name', 'users.id','profile.employee_code')
         ->where('profile.branch_id', $branch_id)
         ->where('users.status', 'active')
         ->orderByRaw('CAST(profile.employee_code AS UNSIGNED) ASC')
@@ -18,6 +18,7 @@ class Helpers{
         return $employees;
     }
 
+    
     public static function GetBranchSeparatedEmployees($branch_id)
     {
         $employees = User::leftJoin('profile', 'users.id', '=', 'profile.user_id')

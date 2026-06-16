@@ -12,7 +12,7 @@ class CommonDependencyController extends Controller{
     }
 
     public function branchEmployees(Request $request){
-        return response()->json($this->Helpers->GetBranchEmployees($request->branch_id));
+        return $this->Helpers->GetBranchEmployees($request->branch_id);
     }
 
     public function branchSeparatedEmployees(Request $request)
