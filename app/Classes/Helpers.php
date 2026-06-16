@@ -18,7 +18,6 @@ class Helpers{
         return $employees;
     }
 
-    
     public static function GetBranchSeparatedEmployees($branch_id)
     {
         $employees = User::leftJoin('profile', 'users.id', '=', 'profile.user_id')

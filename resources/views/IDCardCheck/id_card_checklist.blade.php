@@ -16,23 +16,9 @@
                 </div>
                 <div class="panel-body">
                     <div class="container">
-                        <!-- Filters -->
-                        <div class="row" style="margin-bottom: 20px;">
-                            <div class="col-md-4">
-                                <label>Filter by Branch:</label>
-                                <select id="branchFilter" class="form-control">
-                                    <option value="">All Branches</option>
-                                    @foreach($branches as $branch)
-                                        <option value="{{ $branch->id }}">{{ $branch->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="col-md-4">
-                                <label>Filter by Employee:</label>
-                                <select id="employeeFilter" class="form-control" disabled>
-                                    <option value="">All Employees</option>
-                                </select>
-                            </div>
+                        <!-- Header -->
+                        <div class="header">
+                            <p>Date: {{ date('d-m-Y') }}</p>
                         </div>
 
                         <!-- Table -->
@@ -95,76 +81,24 @@
 @section('javascript')
     <script type="text/javascript">
         $(document).ready(function() {
-                        // Load employees when branch changes
-            $('#branchFilter').on('change', function() {
-                var branchId = $(this).val();
-                // Reset employee filter
-                $('#employeeFilter').empty().append('<option value="">All Employees</option>').prop('disabled', true);
-                if (branchId) {
-                    $.ajax({
-                        url: '/branch-employees',
-                        type: 'POST',
-                        dataType: 'json',
-                        data: {
-                            _token: '{{ csrf_token() }}',
-                            branch_id: branchId
-                        },
-                        success: function(response) {
-                            console.log('Branch employees response:', response);
-                            // Normalize response to array of employees
-                            var employees = Array.isArray(response) ? response : (response.data || []);
-                            console.log('Parsed employees:', employees);
-                            $.each(employees, function(index, employee) {
-                                $('#employeeFilter').append('<option value="' + employee.id + '">' + employee.employee_name + '</option>');
-                            });
-                            $('#employeeFilter').prop('disabled', false);
-                        },
-                        error: function() {
-                            console.error('Failed to load employees');
-                        }
-                    });
-                }
-                filterTable();
-            });
-
-            // Filter when employee selection changes or branch changes
-            $('#employeeFilter').on('change', function() {
-                filterTable();
-            });
-
-            function filterTable() {
-                var selectedBranch = $('#branchFilter').val().toLowerCase();
-                var selectedEmployee = $('#employeeFilter').val().toLowerCase();
-                $('table.table tbody tr').each(function() {
-                    var rowBranch = $(this).find('td:nth-child(2)').text().toLowerCase();
-                    var rowEmployee = $(this).find('td:nth-child(4)').text().toLowerCase();
-                    var branchMatch = !selectedBranch || rowBranch.includes(selectedBranch);
-                    var employeeMatch = !selectedEmployee || rowEmployee.includes(selectedEmployee);
-                    $(this).toggle(branchMatch && employeeMatch);
-                });
-            }
-
             $('#close').on('click', function() {
                 window.location.reload();
             });
-
             $('#save').on('click', function(e) {
                 e.preventDefault();
                 $(this).attr('disabled', true);
                 $(this).text('Saving...');
                 var data = [];
 
-                // Iterate through all checkboxes (both checked and unchecked)
-                $('input[name="check"]').each(function() {
+                // Iterate through all checkboxes
+                $('input[name="check"]:checked').each(function() {
                     var id = $(this).data('id');
-                    var status = $(this).is(':checked') ? 1 : 0; // 1 if checked, 0 otherwise
+                    var status = 1; // Since it's checked, set the status to 1
                     data.push({
                         id: id,
                         status: status
                     });
                 });
-
-
 
                 // If there are no checked boxes, do not send data
                 if (data.length > 0) {
