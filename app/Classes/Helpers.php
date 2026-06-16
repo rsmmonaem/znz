@@ -30,34 +30,6 @@ class Helpers{
         return $employees;
     }
 
-    /**
-     * Independent method to fetch employees for a branch without affecting existing logic.
-     */
-    public static function GetBranchEmployeesIndependent(int $branchId)
-    {
-        return DB::table('users')
-            ->join('profile', 'users.id', '=', 'profile.user_id')
-            ->select(
-                'users.id',
-                DB::raw("CONCAT(users.first_name, ' ', users.last_name) AS employee_name"),
-                'profile.employee_code'
-            )
-            ->where('profile.branch_id', $branchId)
-            ->where('users.status', 'active')
-            ->orderByRaw('CAST(profile.employee_code AS UNSIGNED) ASC')
-            ->get();
-    }
-    {
-        $employees = User::leftJoin('profile', 'users.id', '=', 'profile.user_id')
-            ->select('users.first_name as employee_name', 'users.id', 'profile.employee_code')
-            ->where('profile.branch_id', $branch_id)
-            ->where('users.status', 'Separated')
-            ->orderByRaw('CAST(profile.employee_code AS UNSIGNED) ASC')
-            ->get();
-
-        return $employees;
-    }
-
     public function GetUserLeaves($id, $financialYear, $leave_type_id){
         $date_of_joining = Profile::where('user_id', $id)->select('date_of_joining')->first();
         $date_of_joining = $date_of_joining->date_of_joining;

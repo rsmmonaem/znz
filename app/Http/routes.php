@@ -33,8 +33,7 @@ Route::get('/test','DashboardController@test');
 Route::post('/job-application', array('as' => 'job-application.store','uses' => 'JobApplicationController@store'));
 
 // Common Dependency Routes 
-Route::post('branch-employees', 'IdCardChecklistController@getBranchEmployees');
-Route::post('branch-employees-new', 'CommonDependencyController@branchEmployeesNew');
+Route::post('branch-employees', 'CommonDependencyController@branchEmployees');
 Route::post('branch-separated-employees', 'CommonDependencyController@branchSeparatedEmployees');
 Route::post('get-user-by-employee-code', 'CommonDependencyController@getUserByEmployeeCode');
 
