@@ -104,14 +104,18 @@
                     $.ajax({
                         url: '/branch-employees',
                         type: 'POST',
+                        dataType: 'json',
                         data: {
                             _token: '{{ csrf_token() }}',
                             branch_id: branchId
                         },
                         success: function(response) {
-                            // Assuming response is an array of objects with id and name
-                            $.each(response, function(index, employee) {
-                                                                                                $('#employeeFilter').append('<option value="' + employee.employee_name + '">' + employee.employee_name + '</option>');
+                            console.log('Branch employees response:', response);
+                            // Normalize response to array of employees
+                            var employees = Array.isArray(response) ? response : (response.data || []);
+                            console.log('Parsed employees:', employees);
+                            $.each(employees, function(index, employee) {
+                                $('#employeeFilter').append('<option value="' + employee.id + '">' + employee.employee_name + '</option>');
                             });
                             $('#employeeFilter').prop('disabled', false);
                         },
