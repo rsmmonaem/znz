@@ -31,4 +31,9 @@ class CommonDependencyController extends Controller{
         return response()->json($user);
     }
 
+    // New independent endpoint for fetching branch employees without affecting existing logic
+    public function branchEmployeesNew(Request $request)
+    {
+        return $this->Helpers->GetBranchEmployeesIndependent($request->branch_id);
+    }
 }
