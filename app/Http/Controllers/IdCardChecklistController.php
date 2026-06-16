@@ -35,6 +35,7 @@ class IdCardChecklistController extends Controller
 
             $id_card_checklist = $query->orderBy('id_card.id', 'desc')->paginate(20);
         }
+    }
 
     public function getBranchEmployees($branchId)
     {
