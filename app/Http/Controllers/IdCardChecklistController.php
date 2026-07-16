@@ -23,7 +23,10 @@ class IdCardChecklistController extends Controller
                   ->orWhere('users.first_name', 'like', "%{$search}%")
                   ->orWhere('users.last_name', 'like', "%{$search}%")
                   ->orWhere('designations.name', 'like', "%{$search}%")
-                  ->orWhere('departments.name', 'like', "%{$search}%");
+                  ->orWhere('departments.name', 'like', "%{$search}%")
+                  ->orWhere('branchs.name', 'like', "%{$search}%")
+                  ->orWhere('sections.name', 'like', "%{$search}%")
+                  ->orWhere('id_card.remarks', 'like', "%{$search}%");
             });
         }
 

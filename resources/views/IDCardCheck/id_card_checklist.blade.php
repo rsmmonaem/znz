@@ -20,7 +20,7 @@
                         <div class="header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                             <p style="margin: 0;">Date: {{ date('d-m-Y') }}</p>
                             <div class="form-inline" id="search-form">
-                                <input type="text" id="search-input" class="form-control" placeholder="Search by ID or Name" value="{{ Request::get('search') }}">
+                                <input type="text" id="search-input" class="form-control" placeholder="Search anything (ID, Name, Branch, etc.)" value="{{ Request::get('search') }}">
                                 <button type="button" id="search-btn" class="btn btn-primary">Search</button>
                             </div>
                         </div>
