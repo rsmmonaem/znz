@@ -42,6 +42,6 @@ class IdCardChecklistController extends Controller
                 'updated_at' => date('Y-m-d H:i:s')]);
             }
         }
-        return response()->json(['status' => 'success', 'message' => 'Received: ' . json_encode($data)]);
+        return response()->json(['status' => 'success', 'message' => 'Status change successfully.']);
     }
 }
