@@ -30,14 +30,11 @@ class IdCardChecklistController extends Controller
     }
     public function ChnageStatus(Request $request)
     {
-        // return $request->all();
         $data = $request->input('data');
-        \Log::info('Received data:', ['data' => $data]);
         
         if($data) {
             foreach ($data as $d) {
                 $remarks = $d['status'] == 1 ? 'ID Card Provided' : '';
-                \Log::info('Updating id_card:', ['id' => $d['id'], 'status' => $d['status'], 'remarks' => $remarks]);
                 DB::table('id_card')
                 ->where('id', $d['id']) 
                 ->update(['status' => $d['status'],
@@ -45,6 +42,6 @@ class IdCardChecklistController extends Controller
                 'updated_at' => date('Y-m-d H:i:s')]);
             }
         }
-        return response()->json(['status' => 'success', 'message' => 'Status change successfully.']);
+        return response()->json(['status' => 'success', 'message' => 'Received: ' . json_encode($data)]);
     }
 }
