@@ -22,6 +22,7 @@
                             <div class="form-inline" id="search-form">
                                 <input type="text" id="search-input" class="form-control" placeholder="Search anything (ID, Name, Branch, etc.)" value="{{ Request::get('search') }}">
                                 <button type="button" id="search-btn" class="btn btn-primary">Search</button>
+                                <button type="button" id="reset-btn" class="btn btn-default" style="margin-left: 5px;">Reset</button>
                             </div>
                         </div>
 
@@ -91,6 +92,9 @@
             $('#search-btn').on('click', function() {
                 var searchValue = $('#search-input').val();
                 window.location.href = "{{ url('/id-card-checklist') }}?search=" + encodeURIComponent(searchValue);
+            });
+            $('#reset-btn').on('click', function() {
+                window.location.href = "{{ url('/id-card-checklist') }}";
             });
             $('#search-input').on('keypress', function(e) {
                 if(e.which == 13) {
