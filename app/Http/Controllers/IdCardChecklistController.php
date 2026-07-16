@@ -16,8 +16,8 @@ class IdCardChecklistController extends Controller
         ->leftJoin('sections', 'profile.section_id', '=', 'sections.id')
         ->select('id_card.*', 'profile.employee_code','sections.name as section_name','branchs.name as branch_name','users.first_name', 'designations.name', 'departments.name as department_name');
         
-        if ($request->has('search') && $request->input('search') != '') {
-            $search = $request->input('search');
+        $search = \Request::get('search');
+        if (!empty($search)) {
             $query->where(function($q) use ($search) {
                 $q->where('profile.employee_code', 'like', "%{$search}%")
                   ->orWhere('users.first_name', 'like', "%{$search}%")
