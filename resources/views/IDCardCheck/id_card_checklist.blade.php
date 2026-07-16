@@ -19,10 +19,10 @@
                         <!-- Header -->
                         <div class="header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                             <p style="margin: 0;">Date: {{ date('d-m-Y') }}</p>
-                            <form method="GET" action="{{ url('/id-card-checklist') }}" class="form-inline">
-                                <input type="text" name="search" class="form-control" placeholder="Search by ID or Name" value="{{ Request::get('search') }}">
-                                <button type="submit" class="btn btn-primary">Search</button>
-                            </form>
+                            <div class="form-inline" id="search-form">
+                                <input type="text" id="search-input" class="form-control" placeholder="Search by ID or Name" value="{{ Request::get('search') }}">
+                                <button type="button" id="search-btn" class="btn btn-primary">Search</button>
+                            </div>
                         </div>
 
                         <!-- Table -->
@@ -88,6 +88,16 @@
             $('#close').on('click', function() {
                 window.location.reload();
             });
+            $('#search-btn').on('click', function() {
+                var searchValue = $('#search-input').val();
+                window.location.href = "{{ url('/id-card-checklist') }}?search=" + encodeURIComponent(searchValue);
+            });
+            $('#search-input').on('keypress', function(e) {
+                if(e.which == 13) {
+                    $('#search-btn').click();
+                }
+            });
+
             $('#save').on('click', function(e) {
                 e.preventDefault();
                 $(this).attr('disabled', true);
