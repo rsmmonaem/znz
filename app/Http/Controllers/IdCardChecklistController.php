@@ -25,10 +25,12 @@ class IdCardChecklistController extends Controller
                   ->orWhere('designations.name', 'like', "%{$search}%")
                   ->orWhere('departments.name', 'like', "%{$search}%");
             });
+            
+            // Force debug to see what SQL is generated
+            dd($query->toSql(), $query->getBindings());
         }
 
         $id_card_checklist = $query->orderby('id_card.id', 'desc')->paginate(20);
-        // return $id_card_checklist;
         return view('IDCardCheck.id_card_checklist', compact('id_card_checklist'));
     }
     public function ChnageStatus(Request $request)
