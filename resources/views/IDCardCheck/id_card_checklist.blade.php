@@ -20,7 +20,7 @@
                         <div class="header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                             <p style="margin: 0;">Date: {{ date('d-m-Y') }}</p>
                             <form method="GET" action="{{ url('/id-card-checklist') }}" class="form-inline">
-                                <input type="text" name="search" class="form-control" placeholder="Search by ID or Name" value="{{ request('search') }}">
+                                <input type="text" name="search" class="form-control" placeholder="Search by ID or Name" value="{{ Request::get('search') }}">
                                 <button type="submit" class="btn btn-primary">Search</button>
                             </form>
                         </div>
