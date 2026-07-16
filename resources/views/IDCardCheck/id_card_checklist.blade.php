@@ -127,7 +127,14 @@
                                 $('#save').text('Save');
                             } else {
                                 toastr.error(response.message);
+                                $('#save').attr('disabled', false);
+                                $('#save').text('Save');
                             }
+                        },
+                        error: function(xhr) {
+                            toastr.error("Error: " + xhr.status + " " + xhr.statusText);
+                            $('#save').attr('disabled', false);
+                            $('#save').text('Save');
                         }
                     });
                 } else {

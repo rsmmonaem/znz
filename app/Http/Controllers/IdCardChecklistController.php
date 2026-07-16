@@ -32,9 +32,12 @@ class IdCardChecklistController extends Controller
     {
         // return $request->all();
         $data = $request->input('data');
+        \Log::info('Received data:', ['data' => $data]);
+        
         if($data) {
             foreach ($data as $d) {
                 $remarks = $d['status'] == 1 ? 'ID Card Provided' : '';
+                \Log::info('Updating id_card:', ['id' => $d['id'], 'status' => $d['status'], 'remarks' => $remarks]);
                 DB::table('id_card')
                 ->where('id', $d['id']) 
                 ->update(['status' => $d['status'],
