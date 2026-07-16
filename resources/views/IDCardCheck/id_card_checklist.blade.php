@@ -17,8 +17,12 @@
                 <div class="panel-body">
                     <div class="container">
                         <!-- Header -->
-                        <div class="header">
-                            <p>Date: {{ date('d-m-Y') }}</p>
+                        <div class="header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                            <p style="margin: 0;">Date: {{ date('d-m-Y') }}</p>
+                            <form method="GET" action="{{ url('/id-card-checklist') }}" class="form-inline">
+                                <input type="text" name="search" class="form-control" placeholder="Search by ID or Name" value="{{ request('search') }}">
+                                <button type="submit" class="btn btn-primary">Search</button>
+                            </form>
                         </div>
 
                         <!-- Table -->
@@ -59,7 +63,7 @@
                         </table>
 
                         <div class="pagination" style="display: flex; justify-content: end;">
-                            {{ $id_card_checklist->links() }}
+                            {{ $id_card_checklist->appends(request()->query())->links() }}
                         </div>
                         <!-- Buttons -->
                         <div class="text-center">
@@ -91,9 +95,9 @@
                 var data = [];
 
                 // Iterate through all checkboxes
-                $('input[name="check"]:checked').each(function() {
+                $('input[name="check"]').each(function() {
                     var id = $(this).data('id');
-                    var status = 1; // Since it's checked, set the status to 1
+                    var status = $(this).is(':checked') ? 1 : 0;
                     data.push({
                         id: id,
                         status: status
@@ -112,8 +116,12 @@
                         success: function(response) {
                             if (response.status == 'success') {
                                 toastr.success(response.message);
-                                 $('input[name="check"]:checked').each(function() {
-                                    $(this).closest('tr').find('.remarks').text('ID Card Provided');
+                                 $('input[name="check"]').each(function() {
+                                    if ($(this).is(':checked')) {
+                                        $(this).closest('tr').find('.remarks').text('ID Card Provided');
+                                    } else {
+                                        $(this).closest('tr').find('.remarks').text('');
+                                    }
                                 });
                                 $('#save').attr('disabled', false);
                                 $('#save').text('Save');
@@ -123,7 +131,7 @@
                         }
                     });
                 } else {
-                    toastr.warning("No checked rows to save.");
+                    toastr.warning("No rows found to save.");
                 }
             });
         });
