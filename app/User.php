@@ -50,6 +50,11 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
         return $this->belongsToMany('App\Role','role_user');
     }
 
+    public function permitted_branches()
+    {
+        return $this->belongsToMany('App\Branch', 'user_branches', 'user_id', 'branch_id');
+    }
+
     public function designation()
     {
         return $this->belongsTo('App\Designation'); 

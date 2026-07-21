@@ -1287,7 +1287,8 @@ class ClockController extends Controller
 
 		foreach ($user_ids as $user_id) {
 			$user = User::with('profile')->find($user_id);
-			if (!$user || !$user->profile) continue;
+			if (!$user || !$user->profile)
+				continue;
 
 			$employee_code = $user->profile->employee_code;
 			$current_date = clone $start_date;
@@ -1340,7 +1341,7 @@ class ClockController extends Controller
 
 
 
-	public function  postUpdateAttendanceIDs(Request $request)
+	public function postUpdateAttendanceIDs(Request $request)
 	{
 		if (!empty($request->branch_id) || !empty($request->employee_id) || !empty($request->department_id) || !empty($request->designation_id) || !empty($request->section_id)) {
 			$query = DB::table('clocks')
@@ -1580,54 +1581,71 @@ class ClockController extends Controller
 
 		// Step 3: Status filter switch
 		$status_filter = $request->input('status');
-        switch ($status_filter) {
-            case '1': $status_to_filter = ['P','Present']; break;
-            case '2': $status_to_filter = ['L','Late']; break;
-            case '3': $status_to_filter = ['A','Absent']; break;
-            case '4': $status_to_filter = ['WHD']; break;
-            case '5': $status_to_filter = ['LWP']; break;
-        
-            // Leave means → CL, SL, ML, EL, Leave
-            case '6': 
-                $status_to_filter = ['Leave','CL','SL','EL','ML']; 
-                break;
-        
-            case '7': $status_to_filter = ['H','Holiday','HLD']; break;
-            case '8': $status_to_filter = ['SPHD']; break;
-        
-            default: $status_to_filter = null;
-        }
+		switch ($status_filter) {
+			case '1':
+				$status_to_filter = ['P', 'Present'];
+				break;
+			case '2':
+				$status_to_filter = ['L', 'Late'];
+				break;
+			case '3':
+				$status_to_filter = ['A', 'Absent'];
+				break;
+			case '4':
+				$status_to_filter = ['WHD'];
+				break;
+			case '5':
+				$status_to_filter = ['LWP'];
+				break;
+
+			// Leave means → CL, SL, ML, EL, Leave
+			case '6':
+				$status_to_filter = ['Leave', 'CL', 'SL', 'EL', 'ML'];
+				break;
+
+			case '7':
+				$status_to_filter = ['H', 'Holiday', 'HLD'];
+				break;
+			case '8':
+				$status_to_filter = ['SPHD'];
+				break;
+
+			default:
+				$status_to_filter = null;
+		}
 
 		// Step 4: Apply status filter
 		$filtered_data = $results->filter(function ($item) use ($status_to_filter) {
- 
-            if ($item['employee_status'] !== 'active') return false;
-        
-            if ($status_to_filter === null) return true;
-        
-            return in_array($item['status'], $status_to_filter);
-        
-        })
-        ->sortBy(function($x){
-            return $x['employee_code'] . '_' . $x['date']; 
-        })
-        ->values();
+
+			if ($item['employee_status'] !== 'active')
+				return false;
+
+			if ($status_to_filter === null)
+				return true;
+
+			return in_array($item['status'], $status_to_filter);
+
+		})
+			->sortBy(function ($x) {
+				return $x['employee_code'] . '_' . $x['date'];
+			})
+			->values();
 
 		// Step 5: Totals calculation
 		$totals = $filtered_data->groupBy('status')->map(function ($items, $status) {
 			return [
 				'status' => $status,
-				'count'  => $items->count(),
+				'count' => $items->count(),
 			];
 		})->values();
 
 		// Final response
 		return [
-			'filtered_data'   => $filtered_data,
+			'filtered_data' => $filtered_data,
 			'filtered_totals' => $totals,
-			'startDate'       => $request->startDate,
-			'toDate'          => $request->endDate,
-			'branch_name'     => $branch ? $branch->name : 'All Branches'
+			'startDate' => $request->startDate,
+			'toDate' => $request->endDate,
+			'branch_name' => $branch ? $branch->name : 'All Branches'
 		];
 	}
 
@@ -1977,7 +1995,7 @@ class ClockController extends Controller
 			'filtered_totals' => $totals,
 			'startDate' => $request->startDate,
 			'toDate' => $request->endDate,
-			'branch_name'     => $branch ? $branch->name : 'All Branches'
+			'branch_name' => $branch ? $branch->name : 'All Branches'
 		];
 		return $response;
 	}

@@ -91,6 +91,8 @@ class WMLabMiddleware
 
         config(['app.debug' => (config('config.error_display')) ? true : false]);
 
+        $setup_info = isset($setup_info) ? $setup_info : [];
+        $menus = isset($menus) ? $menus : [];
         $token = csrf_token();
         $custom_field_values = array();
         $page_title = config('config.application_name');

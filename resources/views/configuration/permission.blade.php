@@ -42,6 +42,16 @@
 							</select>
 						</div>
 
+						{{-- Branch --}}
+						<div class="form-group">
+							<label for="branch_id">Select Branch(es) <button type="button" class="btn btn-xs btn-default" id="select_all_branches">Select All</button> <button type="button" class="btn btn-xs btn-default" id="deselect_all_branches">Deselect All</button></label>
+							<select name="branch_id[]" id="branch_id" class="form-control" multiple>
+								@foreach($branches as $branch)
+									<option value="{{ $branch->id }}">{{ $branch->name }}</option>
+								@endforeach
+							</select>
+						</div>
+
 						{{-- Password --}}
 						<div class="form-group">
 							<input class="form-control" name="password" id="password" placeholder="Enter Password" value="">
@@ -105,6 +115,8 @@ $(document).ready(function(){
     $('#employee_id').on('change', function(){
         const emp_id = $(this).val();
         $('#username').val(''); // reset first
+        $('#role_id').val('');
+        $('#branch_id').val([]);
 
         if(emp_id !== ''){
             $.ajax({
@@ -113,12 +125,26 @@ $(document).ready(function(){
                 success: function(data){
                     if(data.status === 'success'){
                         $('#username').val(data.username ?? '');
+                        $('#role_id').val(data.role_id ?? '').trigger('change');
+                        $('#branch_id').val(data.branches ?? []).trigger('change');
                     } else {
                         $('#username').val('');
+                        $('#role_id').val('').trigger('change');
+                        $('#branch_id').val([]).trigger('change');
                     }
                 }
             });
         }
+    });
+
+    $('#select_all_branches').on('click', function() {
+        $('#branch_id option').prop('selected', true);
+        $('#branch_id').trigger('change');
+    });
+
+    $('#deselect_all_branches').on('click', function() {
+        $('#branch_id option').prop('selected', false);
+        $('#branch_id').trigger('change');
     });
 
     // Save button click
@@ -129,6 +155,7 @@ $(document).ready(function(){
             employee_id: $('#employee_id').val(),
             username: $('#username').val(),
             role_id: $('#role_id').val(),
+            branch_id: $('#branch_id').val(),
             password: $('#password').val(),
         };
 

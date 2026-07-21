@@ -43,16 +43,19 @@ Class ConfigController extends Controller{
 
 		$employees = User::leftJoin('profile', 'users.id', '=', 'profile.user_id')->select('users.id', 'users.first_name as name', 'profile.employee_code as employee_id')->get();
 		$roles = Role::all();
+		$branches = \App\Branch::all();
 
-		return view('configuration.permission',compact('permissions','permission_role','category', 'employees', 'roles'));
+		return view('configuration.permission',compact('permissions','permission_role','category', 'employees', 'roles', 'branches'));
 	}
 
 	public function getEmployeeUsername($id)
 	{
 		$user = DB::table('users')->where('id', $id)->select('username')->first();
+		$role = DB::table('role_user')->where('user_id', $id)->first();
+		$branches = DB::table('user_branches')->where('user_id', $id)->pluck('branch_id');
 
 		if ($user) {
-			return response()->json(['status' => 'success', 'username' => $user->username]);
+			return response()->json(['status' => 'success', 'username' => $user->username, 'role_id' => $role ? $role->role_id : null, 'branches' => $branches]);
 		} else {
 			return response()->json(['status' => 'error', 'username' => null]);
 		}
@@ -410,8 +413,13 @@ Class ConfigController extends Controller{
 	public function permissionSave(Request $request){
 		$data = $request->all();
 
-		if (empty($data['employee_id']) || empty($data['role_id']) || empty($data['password'])) {
-			return response()->json(['status' => 'error', 'message' => 'All fields are required']);
+		if (empty($data['employee_id']) || empty($data['role_id'])) {
+			return response()->json(['status' => 'error', 'message' => 'Employee and Role fields are required']);
+		}
+
+		$userRecord = DB::table('users')->where('id', $data['employee_id'])->first();
+		if (empty($userRecord->username) && empty($data['password'])) {
+			return response()->json(['status' => 'error', 'message' => 'Password is required since the user does not have an existing username']);
 		}
 
 		// Username uniqueness check
@@ -426,10 +434,12 @@ Class ConfigController extends Controller{
 			}
 		}
 
-		DB::table('users')->where('id', $data['employee_id'])->update([
-			'username' => $data['username'],
-			'password' => bcrypt($data['password']),
-		]);
+		$updateData = ['username' => $data['username']];
+		if (!empty($data['password'])) {
+			$updateData['password'] = bcrypt($data['password']);
+		}
+
+		DB::table('users')->where('id', $data['employee_id'])->update($updateData);
 
 		// Role assign
 		$already = DB::table('role_user')
@@ -442,6 +452,23 @@ Class ConfigController extends Controller{
 				'user_id' => $data['employee_id'],
 				'role_id' => $data['role_id']
 			]);
+		} else {
+			DB::table('role_user')
+				->where('user_id', $data['employee_id'])
+				->update(['role_id' => $data['role_id']]);
+		}
+
+		// Branch assign
+		if (isset($data['branch_id']) && is_array($data['branch_id'])) {
+			$user = \App\User::find($data['employee_id']);
+			if ($user) {
+				$user->permitted_branches()->sync($data['branch_id']);
+			}
+		} else {
+			$user = \App\User::find($data['employee_id']);
+			if ($user) {
+				$user->permitted_branches()->sync([]);
+			}
 		}
 
 		return response()->json(['status' => 'success', 'message' => 'Permission & username updated successfully']);
