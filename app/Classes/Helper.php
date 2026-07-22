@@ -248,9 +248,17 @@ use Services_Twilio_RestException;
 	        return $my_shift;
 		}
 
-		public static function createLineTreeView($array, $currentParent = 1, $currLevel = 0, $prevLevel = -1) {
+		public static function createLineTreeView($array, $currentParent = 1, $currLevel = 0, $prevLevel = -1, &$visited = array()) {
+			if ($currLevel === 0) {
+				$visited = array();
+			}
+			if (isset($visited[$currentParent])) {
+				return;
+			}
+			$visited[$currentParent] = true;
+
 			foreach ($array as $categoryId => $category) {
-			if ($currentParent == $category['parent_id']) {                       
+			if ((string)$currentParent === (string)$category['parent_id']) {                       
 			    if ($currLevel > $prevLevel) echo " <ul class='tree'> "; 
 			    if ($currLevel == $prevLevel) echo " </li> ";
 			    
@@ -258,17 +266,26 @@ use Services_Twilio_RestException;
 
 			    if ($currLevel > $prevLevel) { $prevLevel = $currLevel; }
 			    $currLevel++; 
-			    Helper::createLineTreeView ($array, $categoryId, $currLevel, $prevLevel);
+			    Helper::createLineTreeView ($array, $categoryId, $currLevel, $prevLevel, $visited);
 			    $currLevel--;               
 			    }   
 			}
 			if ($currLevel == $prevLevel) echo " </li>  </ul> ";
 		}
 
-		public static function getChilds($array, $currentParent = 1, $id = 0, $currLevel = 0, $prevLevel = -1) {
+		public static function getChilds($array, $currentParent = 1, $id = 0, $currLevel = 0, $prevLevel = -1, &$visited = array()) {
 			STATIC $designation_child = array();
+			if ($currLevel === 0) {
+			    $designation_child = array();
+			    $visited = array();
+			}
+			if (isset($visited[$currentParent])) {
+				return $designation_child;
+			}
+			$visited[$currentParent] = true;
+
 			foreach ($array as $categoryId => $category) {
-			if ($currentParent == $category['parent_id']) {  
+			if ((string)$currentParent === (string)$category['parent_id']) {  
 				if ($currLevel > $prevLevel){} 
 				if ($currLevel == $prevLevel){}
 				if($id == 0)
@@ -277,7 +294,7 @@ use Services_Twilio_RestException;
 					$designation_child[] = $categoryId;
 			    if ($currLevel > $prevLevel) { $prevLevel = $currLevel; }
 			    $currLevel++; 
-			    Helper::getChilds($array, $categoryId, $id, $currLevel, $prevLevel);
+			    Helper::getChilds($array, $categoryId, $id, $currLevel, $prevLevel, $visited);
 			    $currLevel--;               
 			    }   
 			}

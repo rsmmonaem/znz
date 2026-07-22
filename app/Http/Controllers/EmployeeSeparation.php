@@ -38,9 +38,26 @@ class EmployeeSeparation extends Controller
             "Job dissatisfaction",
             "Physical disability"
         ];
-        $employee = User::LeftJoin('profile', 'users.id', '=', 'profile.user_id')
-            ->select('users.first_name', 'users.id', 'profile.employee_code')
-            ->get();
+
+        $userId = \Auth::user()->id;
+        $isAdmin = \DB::table('role_user')
+            ->join('roles', 'roles.id', '=', 'role_user.role_id')
+            ->where('role_user.user_id', $userId)
+            ->where('roles.name', 'admin')
+            ->exists();
+
+        $query = User::LeftJoin('profile', 'users.id', '=', 'profile.user_id')
+            ->select('users.first_name', 'users.id', 'profile.employee_code');
+
+        if (!$isAdmin) {
+            $branchIds = \DB::table('user_branches')
+                ->where('user_id', $userId)
+                ->pluck('branch_id');
+            $branchIds = is_object($branchIds) ? $branchIds->toArray() : (array) $branchIds;
+            $query->whereIn('profile.branch_id', $branchIds);
+        }
+
+        $employee = $query->get();
         return view('employee-separation.create', compact('separetionType', 'employee'));
     }
 
@@ -156,7 +173,14 @@ class EmployeeSeparation extends Controller
     // Get Employee Separetion Lists
     public function lists()
     {
-        $separation = AppEmployeeSeparation::LeftJoin('profile', 'employee_separations.employee_id', '=', 'profile.user_id')
+        $userId = \Auth::user()->id;
+        $isAdmin = \DB::table('role_user')
+            ->join('roles', 'roles.id', '=', 'role_user.role_id')
+            ->where('role_user.user_id', $userId)
+            ->where('roles.name', 'admin')
+            ->exists();
+
+        $query = AppEmployeeSeparation::LeftJoin('profile', 'employee_separations.employee_id', '=', 'profile.user_id')
             ->select(
                 'employee_separations.employee_name',
                 'employee_separations.id',
@@ -174,9 +198,17 @@ class EmployeeSeparation extends Controller
                 'employee_separations.mandatory_notice',
                 'employee_separations.short_day',
                 'profile.employee_code as employee_id'
-            )
-            ->orderby('id', 'desc')
-            ->get();
+            );
+
+        if (!$isAdmin) {
+            $branchIds = \DB::table('user_branches')
+                ->where('user_id', $userId)
+                ->pluck('branch_id');
+            $branchIds = is_object($branchIds) ? $branchIds->toArray() : (array) $branchIds;
+            $query->whereIn('profile.branch_id', $branchIds);
+        }
+
+        $separation = $query->orderby('id', 'desc')->get();
         return $separation;
     }
 
@@ -216,9 +248,26 @@ class EmployeeSeparation extends Controller
             "Job dissatisfaction",
             "Physical disability"
         ];
-        $employee = User::LeftJoin('profile', 'users.id', '=', 'profile.user_id')
-            ->select('users.first_name', 'users.id', 'profile.employee_code')
-            ->get();
+
+        $userId = \Auth::user()->id;
+        $isAdmin = \DB::table('role_user')
+            ->join('roles', 'roles.id', '=', 'role_user.role_id')
+            ->where('role_user.user_id', $userId)
+            ->where('roles.name', 'admin')
+            ->exists();
+
+        $query = User::LeftJoin('profile', 'users.id', '=', 'profile.user_id')
+            ->select('users.first_name', 'users.id', 'profile.employee_code');
+
+        if (!$isAdmin) {
+            $branchIds = \DB::table('user_branches')
+                ->where('user_id', $userId)
+                ->pluck('branch_id');
+            $branchIds = is_object($branchIds) ? $branchIds->toArray() : (array) $branchIds;
+            $query->whereIn('profile.branch_id', $branchIds);
+        }
+
+        $employee = $query->get();
         $separation = AppEmployeeSeparation::find($id);
         // return $separation;
         return view('employee-separation.edit', compact('separation', 'employee', 'separationType'));
@@ -254,12 +303,29 @@ class EmployeeSeparation extends Controller
     public function getUserData(Request $request)
     {
         $id = $request->id;
-        $user = User::LeftJoin('profile', 'users.id', '=', 'profile.user_id')
+        $userId = \Auth::user()->id;
+        $isAdmin = \DB::table('role_user')
+            ->join('roles', 'roles.id', '=', 'role_user.role_id')
+            ->where('role_user.user_id', $userId)
+            ->where('roles.name', 'admin')
+            ->exists();
+
+        $query = User::LeftJoin('profile', 'users.id', '=', 'profile.user_id')
             ->LeftJoin('designations', 'users.designation_id', '=', 'designations.id')
             ->leftJoin('sections', 'profile.section_id', '=', 'sections.id')
             ->LeftJoin('branchs', 'profile.branch_id', '=', 'branchs.id')
             ->select('users.id', 'users.first_name', 'profile.employee_code', 'profile.date_of_joining', 'designations.name as designation', 'sections.name as section', 'branchs.name as branch', 'profile.category')
-            ->where('users.id', '=', $id)->first();
+            ->where('users.id', '=', $id);
+
+        if (!$isAdmin) {
+            $branchIds = \DB::table('user_branches')
+                ->where('user_id', $userId)
+                ->pluck('branch_id');
+            $branchIds = is_object($branchIds) ? $branchIds->toArray() : (array) $branchIds;
+            $query->whereIn('profile.branch_id', $branchIds);
+        }
+
+        $user = $query->first();
         return $user;
     }
     public function  Report()
@@ -267,9 +333,26 @@ class EmployeeSeparation extends Controller
         $branch = Branch::get();
         $designation = Designation::get();
         $section = Section::get();
-        $employee = User::LeftJoin('profile', 'users.id', '=', 'profile.user_id')
-            ->select('users.first_name', 'users.id', 'profile.employee_code')
-            ->get();
+
+        $userId = \Auth::user()->id;
+        $isAdmin = \DB::table('role_user')
+            ->join('roles', 'roles.id', '=', 'role_user.role_id')
+            ->where('role_user.user_id', $userId)
+            ->where('roles.name', 'admin')
+            ->exists();
+
+        $query = User::LeftJoin('profile', 'users.id', '=', 'profile.user_id')
+            ->select('users.first_name', 'users.id', 'profile.employee_code');
+
+        if (!$isAdmin) {
+            $branchIds = \DB::table('user_branches')
+                ->where('user_id', $userId)
+                ->pluck('branch_id');
+            $branchIds = is_object($branchIds) ? $branchIds->toArray() : (array) $branchIds;
+            $query->whereIn('profile.branch_id', $branchIds);
+        }
+
+        $employee = $query->get();
         $department = Department::get();
         return view('employee-separation.report', compact('branch', 'designation', 'section', 'employee', 'department'));
     }

@@ -1,0 +1,1 @@
+<?php require __DIR__.'/bootstrap/autoload.php'; $app = require_once __DIR__.'/bootstrap/app.php'; $kernel = $app->make(Illuminate\Contracts\Http\Kernel::class); $roles = \DB::table('role_user')->join('roles', 'roles.id', '=', 'role_user.role_id')->where('role_user.user_id', 1)->pluck('roles.name'); var_dump($roles);

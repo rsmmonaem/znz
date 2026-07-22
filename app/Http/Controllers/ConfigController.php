@@ -53,6 +53,7 @@ Class ConfigController extends Controller{
 		$user = DB::table('users')->where('id', $id)->select('username')->first();
 		$role = DB::table('role_user')->where('user_id', $id)->first();
 		$branches = DB::table('user_branches')->where('user_id', $id)->pluck('branch_id');
+		$branches = array_map('strval', is_object($branches) ? $branches->toArray() : (array) $branches);
 
 		if ($user) {
 			return response()->json(['status' => 'success', 'username' => $user->username, 'role_id' => $role ? $role->role_id : null, 'branches' => $branches]);
@@ -434,7 +435,8 @@ Class ConfigController extends Controller{
 			}
 		}
 
-		$updateData = ['username' => $data['username']];
+		$username = isset($data['username']) ? $data['username'] : '';
+		$updateData = ['username' => $username];
 		if (!empty($data['password'])) {
 			$updateData['password'] = bcrypt($data['password']);
 		}

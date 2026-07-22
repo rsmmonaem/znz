@@ -176,7 +176,7 @@
 							<div class="the-notes info">
 								<h4>{!! $announcement->title !!}</h4>
 								<span style="color:green;"><i class="fa fa-clock-o"></i> {!! showDateTime($announcement->created_at) !!}</span>
-								<p class="time pull-right" style="text-align:right;">{!! trans('messages.by').' '.$announcement->User->full_name.'<br />'.$announcement->User->Designation->full_designation !!}</p>
+								<p class="time pull-right" style="text-align:right;">{!! trans('messages.by').' '.($announcement->User ? $announcement->User->full_name : '').'<br />'.($announcement->User && $announcement->User->Designation ? $announcement->User->Designation->full_designation : '') !!}</p>
 							</div>
 							</a>
 						@endforeach
@@ -192,7 +192,7 @@
 					<div class="notice-widget" >
 						<p class="alert alert-info"><strong>{!! Auth::user()->full_name.', '.trans('messages.no_of_employee_under_you').' : '.$child_staff_count !!}
 						</strong></p>
-						<h4><strong>{!! trans('messages.you').' : '.Auth::user()->Designation->full_designation !!}
+						<h4><strong>{!! trans('messages.you').' : '.(Auth::user()->Designation ? Auth::user()->Designation->full_designation : '') !!}
 						</strong></h4>
 			   			{!! App\Classes\Helper::createLineTreeView($tree,Auth::user()->designation_id) !!}
 		   			</div>
