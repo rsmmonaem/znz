@@ -1,387 +1,387 @@
 @extends('layouts.default')
 
 @section('breadcrumb')
-    <ul class="breadcrumb">
-        <li><a href="/dashboard">{!! trans('messages.dashboard') !!}</a></li>
-        <li class="active">Salary Slip</li>
-    </ul>
+<ul class="breadcrumb">
+    <li><a href="/dashboard">{!! trans('messages.dashboard') !!}</a></li>
+    <li class="active">Salary Slip</li>
+</ul>
 @stop
 
 @section('content')
-    <style>
-        .wrapper {
-            font-family: Arial, sans-serif;
-            padding: 20px;
-            background-color: #f9f9f9;
-        }
+<style>
+    .wrapper {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+        background-color: #f9f9f9;
+    }
 
-        .payslip {
-            max-width: 900px;
-            margin: auto;
-            background: #fff;
-            padding: 20px;
-            border: 1px solid #000;
-            border-radius: 4px;
-        }
+    .payslip {
+        max-width: 900px;
+        margin: auto;
+        background: #fff;
+        padding: 20px;
+        border: 1px solid #000;
+        border-radius: 4px;
+    }
 
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
 
-        .logo img {
-            max-width: 80px;
-        }
+    .logo img {
+        max-width: 80px;
+    }
 
-        .company-details h3,
-        .company-details p {
-            margin: 0;
-            text-align: right;
-        }
+    .company-details h3,
+    .company-details p {
+        margin: 0;
+        text-align: right;
+    }
 
-        .title {
-            text-align: center;
-            margin: 20px 0;
-            text-decoration: underline;
-            font-size: 1.5rem;
-        }
+    .title {
+        text-align: center;
+        margin: 20px 0;
+        text-decoration: underline;
+        font-size: 1.5rem;
+    }
 
-        .employee-info table,
-        .earnings table,
-        .deductions table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-        }
+    .employee-info table,
+    .earnings table,
+    .deductions table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+    }
 
-        .employee-info td,
-        .earnings td,
-        .earnings th,
-        .deductions td,
-        .deductions th {
-            border: 1px solid #000;
-            padding: 8px;
-            text-align: center;
-        }
+    .employee-info td,
+    .earnings td,
+    .earnings th,
+    .deductions td,
+    .deductions th {
+        border: 1px solid #000;
+        padding: 8px;
+        text-align: center;
+    }
 
-        .earnings th,
-        .deductions th {
-            background-color: #f2f2f2;
-        }
+    .earnings th,
+    .deductions th {
+        background-color: #f2f2f2;
+    }
 
-        .net-payable {
-            margin-top: 20px;
-        }
+    .net-payable {
+        margin-top: 20px;
+    }
 
-        .net-payable p {
-            font-weight: bold;
-            margin: 5px 0;
-        }
+    .net-payable p {
+        font-weight: bold;
+        margin: 5px 0;
+    }
 
-        .signatures {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 40px;
-        }
+    .signatures {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 40px;
+    }
 
-        .employee-info td,
-        .earnings td,
-        .earnings th,
-        .deductions td,
-        .deductions th {
-            border: 1px solid #000;
-            padding: 1px !important;
-            text-align: center;
-        }
-    </style>
-    
-    <div class="row">
-        <div class="col-sm-12">
-            <div class="box-info">
-                <div class="container">
-                    <h2 class="text-center">Salary Slip Panel</h2>
-                    <!-- Entry Panel -->
-                    <div class="panel-section">
-                        <form>
-                            <div class="row">
-                                <div class="col-sm-6">
-                                    <div class="form-group">
-                                        <label for="group">Group</label>
-                                        <select class="form-control" id="group">
-                                            <option value="">Select</option>
-                                            @foreach ($group as $g)
-                                                <option value="{{ $g->id }}" selected>{{ $g->name }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="branch">Branch</label>
-                                        <select class="form-control" id="branch">
-                                            <option value="">Select</option>
-                                            @foreach ($branch as $b)
-                                                <option value="{{ $b->id }}">{{ $b->name }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="department">Department</label>
-                                        <select class="form-control" id="department">
-                                            <option value="">Select</option>
-                                            @foreach ($department as $d)
-                                                <option value="{{ $d->id }}">{{ $d->name }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="section">Section</label>
-                                        <select class="form-control" id="section">
-                                            <option value="">Select</option>
-                                            @foreach ($section as $s)
-                                                <option value="{{ $s->id }}">{{ $s->name }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="employeeId">Employee ID</label>
-                                        <select class="form-control" id="employeeId">
-                                            <option value="">Select</option>
-                                            {{-- @foreach ($employee as $e)
-                                                <option value="{{ $e->id }}">{{ $e->first_name }} -
-                                                    {{ $e->employee_code }}</option>
-                                            @endforeach --}}
-                                        </select>
-                                    </div>
+    .employee-info td,
+    .earnings td,
+    .earnings th,
+    .deductions td,
+    .deductions th {
+        border: 1px solid #000;
+        padding: 1px !important;
+        text-align: center;
+    }
+</style>
+
+<div class="row">
+    <div class="col-sm-12">
+        <div class="box-info">
+            <div class="container">
+                <h2 class="text-center">Salary Slip Panel</h2>
+                <!-- Entry Panel -->
+                <div class="panel-section">
+                    <form>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label for="group">Group</label>
+                                    <select class="form-control" id="group">
+                                        <option value="">Select</option>
+                                        @foreach ($group as $g)
+                                            <option value="{{ $g->id }}" selected>{{ $g->name }}</option>
+                                        @endforeach
+                                    </select>
                                 </div>
-                                <div class="col-sm-6">
-                                    <div class="form-group">
-                                        <label for="report-type">Report Type</label>
-                                        {{-- <select class="form-control" id="report-type">
-                                            <option value="salary-slab">Salary Slab</option>
-                                        </select> --}}
-                                       @include('common.reportSelect')
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="entryDate">Form Date</label>
-                                        <input type="date" class="form-control" id="formDate">
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="effectiveDate">To Date</label>
-                                        <input type="date" class="form-control" id="toDate">
-                                    </div>
+                                <div class="form-group">
+                                    <label for="branch">Branch</label>
+                                    <select class="form-control" id="branch">
+                                        <option value="">Select</option>
+                                        @foreach ($branch as $b)
+                                            <option value="{{ $b->id }}">{{ $b->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="department">Department</label>
+                                    <select class="form-control" id="department">
+                                        <option value="">Select</option>
+                                        @foreach ($department as $d)
+                                            <option value="{{ $d->id }}">{{ $d->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="section">Section</label>
+                                    <select class="form-control" id="section">
+                                        <option value="">Select</option>
+                                        @foreach ($section as $s)
+                                            <option value="{{ $s->id }}">{{ $s->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="employeeId">Employee ID</label>
+                                    <select class="form-control" id="employeeId">
+                                        <option value="">Select</option>
+                                        {{-- @foreach ($employee as $e)
+                                        <option value="{{ $e->id }}">{{ $e->first_name }} -
+                                            {{ $e->employee_code }}</option>
+                                        @endforeach --}}
+                                    </select>
                                 </div>
                             </div>
-                            <div class="row">
-                                <div class="col-sm-12">
-                                    <div class="form-group">
-                                        <button type="submit" class="btn btn-primary pull-center" id="submit">Get Pay
-                                            Slip</button>
-                                    </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label for="report-type">Report Type</label>
+                                    {{-- <select class="form-control" id="report-type">
+                                        <option value="salary-slab">Salary Slab</option>
+                                    </select> --}}
+                                    @include('common.reportSelect')
                                 </div>
-                            </div>
-                        </form>
-                    </div>
-
-                    {{-- Slip Panel --}}
-                    <div id="payslip-container"></div>
-                    {{-- Slip Part --}}
-                    {{-- <div class="col-md-12">
-                        <div class="wrapper">
-                            <div class="payslip">
-                                <!-- Header -->
-                                <div class="header">
-                                    <div class="logo">
-                                        <img src="{{ URL::to(config('constants.upload_path.logo') . config('config.logo')) }}"
-                                            alt="Logo">
-                                    </div>
-                                    <div class="company-details">
-                                        <h3>Kasundi Restora Ltd.</h3>
-                                        <p>Uttara Dhaka</p>
-                                    </div>
+                                <div class="form-group">
+                                    <label for="entryDate">Form Date</label>
+                                    <input type="date" class="form-control" id="formDate">
                                 </div>
-
-                                <!-- Title -->
-                                <h2 class="title">Salary Pay Slip</h2>
-
-                                <!-- Employee Info -->
-                                <div class="employee-info">
-                                    <table>
-                                        <tr>
-                                            <td>Month:</td>
-                                            <td>JULY 2024</td>
-                                            <td>Employee ID:</td>
-                                            <td>5555</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Designation:</td>
-                                            <td>SERVICE</td>
-                                            <td>Employee Name:</td>
-                                            <td>MD. RAHUL ISLAM RAHAT</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Gross:</td>
-                                            <td>15,000</td>
-                                            <td>Days Of Month:</td>
-                                            <td>30</td>
-                                        </tr>
-                                        <tr>
-                                            <td></td>
-                                            <td></td>
-                                            <td>Attendance:</td>
-                                            <td>30</td>
-                                        </tr>
-                                    </table>
-                                </div>
-
-                                <!-- Earnings -->
-                                <div class="earnings">
-                                    <table>
-                                        <thead>
-                                            <tr>
-                                                <th>Earnings</th>
-                                                <th>Amount</th>
-                                                <th>Details</th>
-                                                <th>Amount</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td>Basic (50%)</td>
-                                                <td>7,500</td>
-                                                <td>OT Amount</td>
-                                                <td>-</td>
-                                            </tr>
-                                            <tr>
-                                                <td>House Rent (28%)</td>
-                                                <td>4,200</td>
-                                                <td>Arrear</td>
-                                                <td>5,000</td>
-                                            </tr>
-                                            <tr>
-                                                <td>Conveyance (9%)</td>
-                                                <td>1,350</td>
-                                                <td>Others</td>
-                                                <td>-</td>
-                                            </tr>
-                                            <tr>
-                                                <td>Medical (8%)</td>
-                                                <td>1,200</td>
-                                                <td>Other Payment</td>
-                                                <td>-</td>
-                                            </tr>
-                                            <tr>
-                                                <td>Others (5%)</td>
-                                                <td>750</td>
-                                                <td></td>
-                                                <td></td>
-                                            </tr>
-                                            <tr>
-                                                <td>Salary</td>
-                                                <td>15,000</td>
-                                                <td></td>
-                                                <td></td>
-                                            </tr>
-                                            <tr>
-                                                <td colspan="2"><strong>Total Payable</strong></td>
-                                                <td colspan="2"><strong>20,000</strong></td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-
-                                <!-- Deductions -->
-                                <div class="deductions">
-                                    <table>
-                                        <thead>
-                                            <tr>
-                                                <th>Deductions</th>
-                                                <th>Amount</th>
-                                                <th>Details</th>
-                                                <th>Amount</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td>Late</td>
-                                                <td>500</td>
-                                                <td>Advance</td>
-                                                <td>500</td>
-                                            </tr>
-                                            <tr>
-                                                <td>Provident Fund</td>
-                                                <td>-</td>
-                                                <td>Tax</td>
-                                                <td>-</td>
-                                            </tr>
-                                            <tr>
-                                                <td>Others</td>
-                                                <td>-</td>
-                                                <td></td>
-                                                <td></td>
-                                            </tr>
-                                            <tr>
-                                                <td colspan="2"><strong>Total Deduction</strong></td>
-                                                <td colspan="2"><strong>1,500</strong></td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-
-                                <!-- Net Payable -->
-                                <div class="net-payable">
-                                    <p><strong>Net Payable:</strong> 18,500</p>
-                                    <p><strong>Salary in Words:</strong> Eighteen Thousand Five Hundred Only</p>
-                                </div>
-
-                                <!-- Signatures -->
-                                <div class="signatures">
-                                    <p>Employee Signature: __________</p>
-                                    <p>Authorized Signature: _________</p>
+                                <div class="form-group">
+                                    <label for="effectiveDate">To Date</label>
+                                    <input type="date" class="form-control" id="toDate">
                                 </div>
                             </div>
                         </div>
-                    </div> --}}
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="form-group">
+                                    <button type="submit" class="btn btn-primary pull-center" id="submit">Get Pay
+                                        Slip</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
                 </div>
+
+                {{-- Slip Panel --}}
+                <div id="payslip-container"></div>
+                {{-- Slip Part --}}
+                {{-- <div class="col-md-12">
+                    <div class="wrapper">
+                        <div class="payslip">
+                            <!-- Header -->
+                            <div class="header">
+                                <div class="logo">
+                                    <img src="{{ URL::to(config('constants.upload_path.logo') . config('config.logo')) }}"
+                                        alt="Logo">
+                                </div>
+                                <div class="company-details">
+                                    <h3>Kasundi Restora Ltd.</h3>
+                                    <p>Uttara Dhaka</p>
+                                </div>
+                            </div>
+
+                            <!-- Title -->
+                            <h2 class="title">Salary Pay Slip</h2>
+
+                            <!-- Employee Info -->
+                            <div class="employee-info">
+                                <table>
+                                    <tr>
+                                        <td>Month:</td>
+                                        <td>JULY 2024</td>
+                                        <td>Employee ID:</td>
+                                        <td>5555</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Designation:</td>
+                                        <td>SERVICE</td>
+                                        <td>Employee Name:</td>
+                                        <td>MD. RAHUL ISLAM RAHAT</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Gross:</td>
+                                        <td>15,000</td>
+                                        <td>Days Of Month:</td>
+                                        <td>30</td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td></td>
+                                        <td>Attendance:</td>
+                                        <td>30</td>
+                                    </tr>
+                                </table>
+                            </div>
+
+                            <!-- Earnings -->
+                            <div class="earnings">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Earnings</th>
+                                            <th>Amount</th>
+                                            <th>Details</th>
+                                            <th>Amount</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Basic (50%)</td>
+                                            <td>7,500</td>
+                                            <td>OT Amount</td>
+                                            <td>-</td>
+                                        </tr>
+                                        <tr>
+                                            <td>House Rent (28%)</td>
+                                            <td>4,200</td>
+                                            <td>Arrear</td>
+                                            <td>5,000</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Conveyance (9%)</td>
+                                            <td>1,350</td>
+                                            <td>Others</td>
+                                            <td>-</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Medical (8%)</td>
+                                            <td>1,200</td>
+                                            <td>Other Payment</td>
+                                            <td>-</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Others (5%)</td>
+                                            <td>750</td>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Salary</td>
+                                            <td>15,000</td>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2"><strong>Total Payable</strong></td>
+                                            <td colspan="2"><strong>20,000</strong></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <!-- Deductions -->
+                            <div class="deductions">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Deductions</th>
+                                            <th>Amount</th>
+                                            <th>Details</th>
+                                            <th>Amount</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Late</td>
+                                            <td>500</td>
+                                            <td>Advance</td>
+                                            <td>500</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Provident Fund</td>
+                                            <td>-</td>
+                                            <td>Tax</td>
+                                            <td>-</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Others</td>
+                                            <td>-</td>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2"><strong>Total Deduction</strong></td>
+                                            <td colspan="2"><strong>1,500</strong></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <!-- Net Payable -->
+                            <div class="net-payable">
+                                <p><strong>Net Payable:</strong> 18,500</p>
+                                <p><strong>Salary in Words:</strong> Eighteen Thousand Five Hundred Only</p>
+                            </div>
+
+                            <!-- Signatures -->
+                            <div class="signatures">
+                                <p>Employee Signature: __________</p>
+                                <p>Authorized Signature: _________</p>
+                            </div>
+                        </div>
+                    </div>
+                </div> --}}
             </div>
         </div>
     </div>
+</div>
 @stop
 
 @section('javascript')
-    <script>
-        $(document).ready(function() {
-             $('#branch').on('change', function() {
-                var branch_id = $(this).val();
-                $('#employeeId').val('').trigger('change');
-                HandleBranchWiseEmployees(branch_id, '#employeeId');
+<script>
+    $(document).ready(function () {
+        $('#branch').on('change', function () {
+            var branch_id = $(this).val();
+            $('#employeeId').val('').trigger('change');
+            HandleBranchWiseEmployees(branch_id, '#employeeId');
+        });
+        $('#submit').click(function (e) {
+            e.preventDefault();
+            var formData = {
+                group: $('#group').val(),
+                branch: $('#branch').val(),
+                department: $('#department').val(),
+                section: $('#section').val(),
+                employeeId: $('#employeeId').val(),
+                formDate: $('#formDate').val(),
+                toDate: $('#toDate').val()
+            };
+            $.ajax({
+                url: '/salary-slip-post',
+                type: 'POST',
+                data: formData,
+                success: function (response) {
+                    generatePayslips(response);
+                }
             });
-            $('#submit').click(function(e) {
-                e.preventDefault();
-                var formData = {
-                    group: $('#group').val(),
-                    branch: $('#branch').val(),
-                    department: $('#department').val(),
-                    section: $('#section').val(),
-                    employeeId: $('#employeeId').val(),
-                    formDate: $('#formDate').val(),
-                    toDate: $('#toDate').val()
-                };
-                $.ajax({
-                    url: '/salary-slip-post',
-                    type: 'POST',
-                    data: formData,
-                    success: function(response) {
-                        generatePayslips(response);
-                    }
-                });
-            })
+        })
 
-            function generatePayslips(data) {
-                // Create a new window
-                const newWindow = window.open('', '_blank', 'width=800,height=600');
+        function generatePayslips(data) {
+            // Create a new window
+            const newWindow = window.open('', '_blank', 'width=800,height=600');
 
-                // HTML structure for the new window
-                let payslipsHtml = `
+            // HTML structure for the new window
+            let payslipsHtml = `
                     <html>
                         <head>
                             <title>Payslips</title>
@@ -497,29 +497,71 @@
                     <button id="print-btn">🖨️ Print</button>
                 </div>
                 `;
-            
-                // Loop through employee salary data to generate payslips content
-                data.employee_salary_data.forEach(employee => {
-                    const netPayable = 
-                        parseFloat(employee.net_salary || 0) +
-                        parseFloat(employee.arrear_amount || 0) +
-                        parseFloat(employee.holiday_amount || 0) +
-                        parseFloat(employee.ot_amount || 0) -
-                        parseFloat(employee.tax_amount || 0) -
-                        parseFloat(employee.provident_fund || 0) -
-                        parseFloat(employee.advance_salary || 0);
 
-                    const netPayableAfeterTax =
-                        parseFloat(employee.net_salary || 0) +
-                        parseFloat(employee.arrear_amount || 0) +
-                        parseFloat(employee.holiday_amount || 0) +
-                        parseFloat(employee.ot_amount || 0) -
-                        parseFloat(employee.tax_amount || 0) -
-                        parseFloat(employee.provident_fund || 0) -
-                        parseFloat(employee.advance_salary || 0);
-                    const grossSalary = parseFloat(employee.gross_salary || 0);
-                    // HTML structure for a single payslip
-                    const payslip = `
+            // Loop through employee salary data to generate payslips content
+            data.employee_salary_data.forEach(employee => {
+                const netPayable =
+                    parseFloat(employee.net_salary || 0) +
+                    parseFloat(employee.arrear_amount || 0) +
+                    parseFloat(employee.holiday_amount || 0) +
+                    parseFloat(employee.ot_amount || 0) -
+                    parseFloat(employee.tax_amount || 0) -
+                    parseFloat(employee.provident_fund || 0) -
+                    parseFloat(employee.advance_salary || 0);
+
+                const netPayableAfeterTax =
+                    parseFloat(employee.net_salary || 0) +
+                    parseFloat(employee.arrear_amount || 0) +
+                    parseFloat(employee.holiday_amount || 0) +
+                    parseFloat(employee.ot_amount || 0) -
+                    parseFloat(employee.tax_amount || 0) -
+                    parseFloat(employee.provident_fund || 0) -
+                    parseFloat(employee.advance_salary || 0);
+                const grossSalary = parseFloat(employee.gross_salary || 0);
+
+                let paymentModeHtml = '';
+                if (employee.bank_distributions && employee.bank_distributions.length > 0) {
+                    const totalRows = employee.bank_distributions.length + 1;
+                    paymentModeHtml += `
+                            <tr>
+                                <td rowspan="${totalRows}"><strong>Mode of Payment:</strong></td>
+                                <td colspan="2"><strong style="margin-left: 5px;">${employee.bank_distributions[0].bank_name} (${employee.bank_distributions[0].account_number}):</strong></td>
+                                <td class="text-right">${formatCurrency(Math.round(employee.bank_distributions[0].amount))}</td>
+                            </tr>
+                        `;
+
+                    for (let idx = 1; idx < employee.bank_distributions.length; idx++) {
+                        const dist = employee.bank_distributions[idx];
+                        paymentModeHtml += `
+                            <tr>
+                                <td colspan="2"><strong style="margin-left: 5px;">${dist.bank_name} (${dist.account_number}):</strong></td>
+                                <td class="text-right">${formatCurrency(Math.round(dist.amount))}</td>
+                            </tr>
+                            `;
+                    }
+
+                    paymentModeHtml += `
+                            <tr>
+                                <td colspan="2"><strong style="margin-left: 5px;">Cash Amount:</strong></td>
+                                <td class="text-right">${formatCurrency(Math.round(employee.cashamount || 0))}</td>
+                            </tr>
+                        `;
+                } else {
+                    paymentModeHtml += `
+                            <tr>
+                                <td rowspan="2"><strong>Mode of Payment:</strong></td>
+                                <td colspan="2"><strong style="margin-left: 5px;">Bank Amount:</strong></td>
+                                <td class="text-right">${formatCurrency(Math.round(employee.bankamount || 0))}</td>
+                            </tr>
+                            <tr>    
+                                <td colspan="2"><strong style="margin-left: 5px;">Cash Amount:</strong></td>
+                                <td class="text-right">${formatCurrency(Math.round(employee.cashamount || 0))}</td>
+                            </tr>
+                        `;
+                }
+
+                // HTML structure for a single payslip
+                const payslip = `
                         <div class="wrapper">
                             <div class="payslip">
                                 <!-- Header -->
@@ -609,11 +651,11 @@
                                             <tr>
                                                 <td colspan="1"><strong>Total Payable</strong></td>
                                                 <td colspan="3" style="text-align: right; margin-right: 20px"><strong>${formatCurrency(
-                                                    (parseFloat(employee.gross_salary || 0) +
-                                                    parseFloat(employee.ot_amount || 0) +
-                                                    parseFloat(employee.arrear_amount || 0) +
-                                                    parseFloat(employee.holiday_amount || 0))
-                                                )}</strong></td>
+                    (parseFloat(employee.gross_salary || 0) +
+                        parseFloat(employee.ot_amount || 0) +
+                        parseFloat(employee.arrear_amount || 0) +
+                        parseFloat(employee.holiday_amount || 0))
+                )}</strong></td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -649,11 +691,11 @@
                                                 <td colspan="1"><strong>Total Deduction</strong></td>
                                                 <td colspan="3" style="text-align: right;">
                                                     <strong>${formatCurrency(
-                                                        (parseFloat(employee.advance_salary || 0) +
-                                                        parseFloat(employee.provident_fund || 0) +
-                                                        parseFloat(employee.total_absents_fee || 0) +
-                                                        parseFloat(employee.tax_amount || 0))
-                                                    )}</strong>
+                    (parseFloat(employee.advance_salary || 0) +
+                        parseFloat(employee.provident_fund || 0) +
+                        parseFloat(employee.total_absents_fee || 0) +
+                        parseFloat(employee.tax_amount || 0))
+                )}</strong>
                                                 </td>
                                             </tr> 
                                             <tr>
@@ -663,17 +705,7 @@
                                                 </td>
                                             </tr>
                                             
-                                            <tr>
-                                                <td rowspan="2"><strong>Mode of Payment:</strong></td>
-                                            
-                                                <td  colspan="2"><strong style="margin-left: 5px;">Bank Amount:</strong></td>
-                                                <td class="text-right" > ${formatCurrency(Math.round(employee.bankamount || 0))}</td>
-                                            </tr>
-                                        
-                                            <tr>    
-                                                <td colspan="2" ><strong style="margin-left: 5px;">Cash Amount:</strong></td>
-                                                <td  class="text-right"> ${formatCurrency(Math.round(employee.cashamount || 0))}</td>
-                                            </tr>
+                                            ${paymentModeHtml}
                                             <tr>
                                                 <td colspan="1"><strong>Salary in Words:</strong></td>
                                                 <td colspan="3" class="text-center" style="font-size: 14px;">${numberToWords(Math.round(netPayableAfeterTax || 0))} Only</td>
@@ -690,37 +722,37 @@
                             </div>
                         </div>
                     `;
-                    
-                    payslipsHtml += payslip;
-                });
 
-                // Close the HTML tags
-                payslipsHtml += '</body></html>';
+                payslipsHtml += payslip;
+            });
 
-                // Write the payslips content to the new window
-                // Write the payslips content to the new window
-                newWindow.document.write(payslipsHtml);
-                
-                // Close the document so it renders
-                newWindow.document.close();
-                newWindow.onload = function() {
-                    const printBtn = newWindow.document.getElementById('print-btn');
-                    if (printBtn) {
-                        printBtn.addEventListener('click', function() {
-                            newWindow.focus();   // make sure the new window is active
-                            newWindow.print();   // trigger print
-                        });
-                    }
-                };
+            // Close the HTML tags
+            payslipsHtml += '</body></html>';
 
-                // Optionally, you can print the payslip in the new window after loading
-                // newWindow.document.close();
-                // newWindow.print();
-            }
+            // Write the payslips content to the new window
+            // Write the payslips content to the new window
+            newWindow.document.write(payslipsHtml);
 
-            // Helper function to generate earnings
-            function generateEarnings(salaryData) {
-                return Object.values(salaryData).map(salary => `
+            // Close the document so it renders
+            newWindow.document.close();
+            newWindow.onload = function () {
+                const printBtn = newWindow.document.getElementById('print-btn');
+                if (printBtn) {
+                    printBtn.addEventListener('click', function () {
+                        newWindow.focus();   // make sure the new window is active
+                        newWindow.print();   // trigger print
+                    });
+                }
+            };
+
+            // Optionally, you can print the payslip in the new window after loading
+            // newWindow.document.close();
+            // newWindow.print();
+        }
+
+        // Helper function to generate earnings
+        function generateEarnings(salaryData) {
+            return Object.values(salaryData).map(salary => `
                     <tr>
                         <td>${salary.head}</td>
                         <td>${formatCurrency(salary.amount)}</td>
@@ -728,61 +760,61 @@
                         <td></td>
                     </tr>
                 `).join('');
-            }
+        }
 
-            // Helper function to format currency
-            function formatCurrency(amount) {
-                return parseFloat(amount).toLocaleString('en-US', {
-                    style: 'currency',
-                    currency: 'USD'
-                }).replace('$', ''); // Remove dollar sign if not needed
-            }
+        // Helper function to format currency
+        function formatCurrency(amount) {
+            return parseFloat(amount).toLocaleString('en-US', {
+                style: 'currency',
+                currency: 'USD'
+            }).replace('$', ''); // Remove dollar sign if not needed
+        }
 
-            // Helper function to format date
-            function formatDate(date) {
-                const options = { year: 'numeric', month: 'long' };
-                return new Date(date).toLocaleDateString('en-US', options);
-            }
+        // Helper function to format date
+        function formatDate(date) {
+            const options = { year: 'numeric', month: 'long' };
+            return new Date(date).toLocaleDateString('en-US', options);
+        }
 
-            // Convert number to words
-            function numberToWords(amount) {
-                if (amount === 0) return "Zero";
+        // Convert number to words
+        function numberToWords(amount) {
+            if (amount === 0) return "Zero";
 
-                const ones = [
-                    "", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine",
-                    "Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen",
-                    "Seventeen", "Eighteen", "Nineteen"
-                ];
+            const ones = [
+                "", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine",
+                "Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen",
+                "Seventeen", "Eighteen", "Nineteen"
+            ];
 
-                const tens = [
-                    "", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"
-                ];
+            const tens = [
+                "", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"
+            ];
 
-                const scales = ["", "Thousand", "Million", "Billion"];
+            const scales = ["", "Thousand", "Million", "Billion"];
 
-                function convertToWords(num) {
-                    if (num === 0) return "";
+            function convertToWords(num) {
+                if (num === 0) return "";
 
-                    if (num < 20) {
-                        return ones[num];
-                    } else if (num < 100) {
-                        return tens[Math.floor(num / 10)] + (num % 10 > 0 ? " " + ones[num % 10] : "");
-                    } else if (num < 1000) {
-                        return ones[Math.floor(num / 100)] + " Hundred" + (num % 100 > 0 ? " and " + convertToWords(num % 100) : "");
-                    }
-
-                    for (let i = 0; i < scales.length; i++) {
-                        const unit = 1000 ** (i + 1);
-                        if (num < unit) {
-                            return convertToWords(Math.floor(num / (unit / 1000))) + " " + scales[i] + (num % (unit / 1000) > 0 ? " " + convertToWords(num % (unit / 1000)) : "");
-                        }
-                    }
+                if (num < 20) {
+                    return ones[num];
+                } else if (num < 100) {
+                    return tens[Math.floor(num / 10)] + (num % 10 > 0 ? " " + ones[num % 10] : "");
+                } else if (num < 1000) {
+                    return ones[Math.floor(num / 100)] + " Hundred" + (num % 100 > 0 ? " and " + convertToWords(num % 100) : "");
                 }
 
-                const words = convertToWords(amount);
-                return words;
+                for (let i = 0; i < scales.length; i++) {
+                    const unit = 1000 ** (i + 1);
+                    if (num < unit) {
+                        return convertToWords(Math.floor(num / (unit / 1000))) + " " + scales[i] + (num % (unit / 1000) > 0 ? " " + convertToWords(num % (unit / 1000)) : "");
+                    }
+                }
             }
 
-        });
-    </script>
+            const words = convertToWords(amount);
+            return words;
+        }
+
+    });
+</script>
 @stop

@@ -186,10 +186,10 @@ class SalaryProcessController extends Controller
             ->distinct()
             ->count('from_date');
 
-        $host = 'localhost';
-        $db = 'betikrom_znz';
-        $user = 'betikrom_znz';
-        $pass = 'betikrom_znz';
+        $host = env('DB_HOST', 'localhost');
+        $db = env('DB_DATABASE', 'betikrom_znz');
+        $user = env('DB_USERNAME', 'betikrom_znz');
+        $pass = env('DB_PASSWORD', 'betikrom_znz');
 
 
         // Declare leaveCount outside to make it accessible later
@@ -461,7 +461,7 @@ class SalaryProcessController extends Controller
             ->where('effective_date', $latestRecord->effective_date)
             ->get();
 
-        $totalBankAllocated = $BankDistributions->sum('bank_amount');
+        $totalBankAllocated = collect($BankDistributions)->sum('bank_amount');
 
         // Use the first record as a representative for gross/cash calculations 
         // (they are identical across the set in our new save logic)
@@ -1218,7 +1218,8 @@ class SalaryProcessController extends Controller
                 'employee_salary_details.cashamount',
                 'employee_salary_details.holiday_amount',
                 'employee_salary_details.weekendays_amount',
-                'employee_salary_details.holiday'
+                'employee_salary_details.holiday',
+                'employee_salary_details.to_date'
             )
             ->get();
 
@@ -1228,6 +1229,55 @@ class SalaryProcessController extends Controller
         foreach ($data as $record) {
             // Get the latest bank account for the user (already joined in the query)
             $record->account_number = $record->account_number ? $record->account_number : null;
+
+            // Get user's salary_bank record
+            $salary_bank = DB::table('salary_bank')
+                ->where('user_id', $record->user_id)
+                ->where('effective_date', '<=', $record->to_date)
+                ->latest('created_at')
+                ->first();
+
+            $distributions = [];
+            if ($salary_bank) {
+                $bankIds = json_decode($salary_bank->company_bank_id, true);
+                $bankAmounts = json_decode($salary_bank->bank_amounts, true);
+                $totalTarget = (float) $salary_bank->bank_amount;
+                $processedBankPay = (float) $record->bankamount;
+
+                if (is_array($bankIds) && count($bankIds) > 0) {
+                    $companyBanks = collect(DB::table('company_banks')->whereIn('id', $bankIds)->get())->keyBy('id');
+                    $userAccounts = DB::table('bank_accounts')->where('user_id', $record->user_id)->get();
+
+                    foreach ($bankIds as $index => $bankId) {
+                        $companyBank = isset($companyBanks[$bankId]) ? $companyBanks[$bankId] : null;
+                        if (!$companyBank)
+                            continue;
+
+                        $targetAmt = isset($bankAmounts[$index]) ? (float) $bankAmounts[$index] : 0;
+                        if ($totalTarget > 0) {
+                            $actualAmt = round($processedBankPay * ($targetAmt / $totalTarget), 2);
+                        } else {
+                            $actualAmt = round($processedBankPay / count($bankIds), 2);
+                        }
+
+                        // Match bank account of user
+                        $matchedAccount = null;
+                        foreach ($userAccounts as $acc) {
+                            if ($acc->bank_name && stripos($acc->bank_name, $companyBank->bank_name) !== false) {
+                                $matchedAccount = $acc;
+                                break;
+                            }
+                        }
+
+                        $distributions[] = [
+                            'bank_name' => $companyBank->bank_name,
+                            'account_number' => $matchedAccount ? $matchedAccount->account_number : ($record->account_number ?: 'N/A'),
+                            'amount' => $actualAmt
+                        ];
+                    }
+                }
+            }
+            $record->bank_distributions = $distributions;
 
             // Fetch latest salary data for the specific user
             $salaryData = DB::table('salary')
